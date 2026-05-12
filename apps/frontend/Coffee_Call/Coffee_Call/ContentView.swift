@@ -2,7 +2,10 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        OnboardingScreen()
+        NavigationView {
+            OnboardingScreen()
+        }
+        .navigationViewStyle(.stack)
     }
 }
 

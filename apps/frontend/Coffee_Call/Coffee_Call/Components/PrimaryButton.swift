@@ -12,8 +12,15 @@ struct PrimaryButton: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isDisabled ? Color.coffeeTextSecondary.opacity(0.5) : Color.coffeePrimary)
-                .clipShape(Capsule())
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(isDisabled ? Color.coffeeTextSecondary.opacity(0.35) : Color.coffeePrimaryDark)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color.white.opacity(isDisabled ? 0.08 : 0.12), lineWidth: 1)
+                )
+                .shadow(color: Color.coffeePrimary.opacity(isDisabled ? 0.0 : 0.22), radius: 14, x: 0, y: 8)
         }
         .disabled(isDisabled)
     }
@@ -22,7 +29,7 @@ struct PrimaryButton: View {
 struct PrimaryButton_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 20) {
-            PrimaryButton(title: "Let's Go", action: {})
+            PrimaryButton(title: "Find Meetups Nearby", action: {})
             PrimaryButton(title: "Disabled", action: {}, isDisabled: true)
         }
         .padding()

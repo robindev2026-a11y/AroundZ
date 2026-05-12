@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */; };
 		19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */; };
 		33CA3A282FB33A3F008EF23C /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */; };
 		33CA3A2A2FB33A3F008EF23C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A292FB33A3F008EF23C /* ContentView.swift */; };
@@ -17,6 +18,9 @@
 		33CA3A3F2FB33A42008EF23C /* Coffee_CallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A3E2FB33A42008EF23C /* Coffee_CallTests.swift */; };
 		33CA3A492FB33A42008EF23C /* Coffee_CallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */; };
 		33CA3A4B2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */; };
+		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
+		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
+		86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
 		9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFABF6FCFF8585103471820C /* Color+Extensions.swift */; };
@@ -42,7 +46,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTPVerificationScreen.swift; sourceTree = "<group>"; };
 		11C75F18AD0A56F05577934A /* PillBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PillBadge.swift; sourceTree = "<group>"; };
+		1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationPermissionScreen.swift; sourceTree = "<group>"; };
 		33CA3A242FB33A3F008EF23C /* Coffee_Call.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Coffee_Call.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallApp.swift; sourceTree = "<group>"; };
 		33CA3A292FB33A3F008EF23C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,7 +65,9 @@
 		4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingScreen.swift; sourceTree = "<group>"; };
 		5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6E4792D78269808A78FA6024 /* Font+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
+		8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneAuthScreen.swift; sourceTree = "<group>"; };
 		968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassmorphicCard.swift; sourceTree = "<group>"; };
+		B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileSetupScreen.swift; sourceTree = "<group>"; };
 		FFABF6FCFF8585103471820C /* Color+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -170,10 +178,23 @@
 			path = Coffee_CallUITests;
 			sourceTree = "<group>";
 		};
+		84551E1ABED9653323C91E44 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */,
+				B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */,
+				8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */,
+				1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */,
+			);
+			name = Auth;
+			path = Auth;
+			sourceTree = "<group>";
+		};
 		854F67326A3D7D34D2066BA2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
 				4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */,
+				84551E1ABED9653323C91E44 /* Auth */,
 			);
 			name = Screens;
 			path = Screens;
@@ -338,6 +359,10 @@
 				19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */,
 				8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */,
 				EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */,
+				54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */,
+				116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */,
+				423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */,
+				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

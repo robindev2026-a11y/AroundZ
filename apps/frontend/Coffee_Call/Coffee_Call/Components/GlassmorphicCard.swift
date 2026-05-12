@@ -10,20 +10,25 @@ struct GlassmorphicCard<Content: View>: View {
     var body: some View {
         content
             .padding()
-            .background(.thinMaterial)
-            .background(Color.white.opacity(0.15))
-            .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            .background(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color.coffeeSurface.opacity(0.94))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(Color.coffeeBorder.opacity(0.95), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.05), radius: 16, x: 0, y: 10)
     }
 }
 
 struct GlassmorphicCard_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
-            Color.coffeePrimary.edgesIgnoringSafeArea(.all)
+            Color.coffeeBackground.edgesIgnoringSafeArea(.all)
             GlassmorphicCard {
                 Text("Glassmorphism")
-                    .foregroundColor(.white)
+                    .foregroundColor(.coffeeTextPrimary)
                     .padding()
             }
         }

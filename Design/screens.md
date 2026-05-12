@@ -8,11 +8,13 @@ This file documents screen layouts, user flows, and design specifications for Co
 ## Screen List
 
 ### 0. Onboarding / Landing
-- Full-screen background image representing real-life connections
-- Glassmorphic "COFFEECALL BETA" badge at the top
-- Large heading emphasizing "real life."
-- Floating Glassmorphic cards showcasing nearby activities
-- Prominent "Let's Go" primary pill-shaped CTA button
+- Swipeable multi-page carousel introducing the app
+- **Slide 1**: Full-screen background, "Meet people nearby in real life.", with floating Glassmorphic activity cards
+- **Slide 2**: Value Proposition 2 (Placeholder)
+- **Slide 3**: Value Proposition 3 (Placeholder)
+- Glassmorphic "COFFEECALL BETA" badge consistently at the top
+- Prominent "Next" button on early slides
+- "Let's Go" primary pill-shaped CTA button on the final slide
 - Transitions smoothly into the Auth flow
 
 ### 1. Signup

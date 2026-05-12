@@ -9,4 +9,6 @@ extension Color {
     static let coffeeSuccess = Color("coffeeSuccess")
     static let coffeeTextPrimary = Color("coffeeTextPrimary")
     static let coffeeTextSecondary = Color("coffeeTextSecondary")
+    static let coffeeBorder = Color("coffeeBorder")
+    static let coffeePeach = Color("coffeePeach")
 }

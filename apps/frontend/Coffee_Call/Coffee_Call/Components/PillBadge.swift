@@ -14,9 +14,12 @@ struct PillBadge: View {
         .foregroundColor(.white)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background(.ultraThinMaterial)
-        .background(Color.white.opacity(0.2))
+        .background(Color.coffeePrimaryDark.opacity(0.92))
+        .overlay(
+            Capsule().stroke(Color.white.opacity(0.14), lineWidth: 1)
+        )
         .clipShape(Capsule())
+        .shadow(color: Color.coffeePrimary.opacity(0.16), radius: 10, x: 0, y: 5)
     }
 }
 
