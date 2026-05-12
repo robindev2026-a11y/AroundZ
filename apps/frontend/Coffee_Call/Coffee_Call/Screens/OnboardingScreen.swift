@@ -108,9 +108,7 @@ struct Slide1View: View {
                 .padding(.bottom, 48)
                 
                 PrimaryButton(title: "Let's Go →") {
-                    withAnimation {
-                        currentPage = 1
-                    }
+                    currentPage = 1
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
@@ -167,9 +165,7 @@ struct Slide2View: View {
             Spacer()
             
             PrimaryButton(title: "Next →") {
-                withAnimation {
-                    currentPage = 2
-                }
+                currentPage = 2
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
@@ -223,9 +219,7 @@ struct Slide3View: View {
             Spacer()
             
             PrimaryButton(title: "Sounds Good →") {
-                withAnimation {
-                    currentPage = 3
-                }
+                currentPage = 3
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
