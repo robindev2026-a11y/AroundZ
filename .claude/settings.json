@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "project": "CoffeeCall MVP",
+  "allowedTools": {
+    "bash": {
+      "description": "Run shell commands (npm, git, etc.)",
+      "defaultAllow": false,
+      "allowList": [
+        "npm run build",
+        "npm run test",
+        "npm run lint",
+        "git status",
+        "git log",
+        "git diff"
+      ]
+    },
+    "editor": {
+      "description": "Edit files",
+      "defaultAllow": true,
+      "excludePaths": [
+        "node_modules/**",
+        ".git/**",
+        "*.lock",
+        ".env.local",
+        "dist/**",
+        "build/**"
+      ]
+    },
+    "browser": {
+      "description": "Browse web (for research only)",
+      "defaultAllow": true
+    }
+  },
+  "configuration": {
+    "modelPreference": "claude-opus-4.7",
+    "maxContextWindow": 150000,
+    "autoCommit": false,
+    "autoSave": true,
+    "ignoreFile": ".claudeignore"
+  },
+  "projectRules": [
+    "Never code directly—use Ambiglytics for code generation",
+    "Always read /Planning/spec.md before implementing features",
+    "Use /Planning/decisions.md as ADR reference",
+    "Reference /Design/design-tokens.md for UI values",
+    "Update /Planning/context.md at end of each session",
+    "Commit only passing tests",
+    "Document architecture decisions with ADRs"
+  ],
+  "fileStructure": {
+    "planning": "/Planning",
+    "design": "/Design",
+    "prompts": "/Prompts",
+    "tests": "tests/",
+    "source": "src/"
+  }
+}

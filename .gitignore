@@ -1,0 +1,16 @@
+DerivedData/
+build/
+Pods/
+node_modules/
+.DS_Store
+*.xcuserstate
+*.xcuserdata/
+*.moved-aside
+*.swp
+
+# Firebase credentials
+apps/frontend/Config/Firebase/GoogleService-Info.plist
+
+# Firebase / Node build output
+apps/backend/functions/lib/
+apps/backend/functions/node_modules/

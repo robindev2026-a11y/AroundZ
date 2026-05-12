@@ -1,0 +1,30 @@
+{
+  "functions": {
+    "source": "apps/backend/functions",
+    "predeploy": [
+      "npm --prefix apps/backend/functions run build"
+    ]
+  },
+  "firestore": {
+    "rules": "apps/backend/firestore.rules",
+    "indexes": "apps/backend/firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "apps/backend/storage.rules"
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "storage": {
+      "port": 9199
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    }
+  }
+}

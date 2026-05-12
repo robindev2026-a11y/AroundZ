@@ -1,0 +1,105 @@
+# Claude Ignore File
+# Files and directories that Claude should not read or modify
+
+## Package Managers & Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+Podfile.lock
+.gradle/
+.m2/
+
+## Build Artifacts
+dist/
+build/
+.next/
+__pycache__/
+*.pyc
+.pytest_cache/
+.tox/
+*.egg-info/
+
+## Environment & Secrets
+.env
+.env.local
+.env.*.local
+.env.production.local
+.secrets/
+credentials.json
+private_key.json
+
+## Version Control
+.git/
+.gitignore
+.gitattributes
+
+## IDE & Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+## System Files
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+## Firebase
+.firebaserc
+firebase-debug.log
+functions/node_modules/
+
+## Temporary Files
+*.tmp
+*.temp
+.cache/
+tmp/
+
+## Lock Files
+*.lock
+Gemfile.lock
+
+## Large Media Files
+*.mp4
+*.mov
+*.mp3
+*.wav
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.zip
+*.tar.gz
+
+## Testing Reports
+coverage/
+.coverage
+htmlcov/
+.nyc_output/
+
+## Documentation Artifacts (keep source docs, ignore generated)
+docs/generated/
+api-docs/
+
+## CI/CD
+.github/workflows/
+.gitlab-ci.yml
+.circleci/
+
+## Development Databases
+*.db
+*.sqlite
+*.sqlite3
+
+## Logs
+*.log
+logs/
+
+## Only include if truly irrelevant to this project
+# (Customize based on your actual stack)

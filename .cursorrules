@@ -1,0 +1,158 @@
+# Cursor Rules for CoffeeCall MVP
+
+You are an AI assistant helping with CoffeeCall, an activity-based meetup platform.
+
+## Your Role
+- **Planning & Architecture:** Ensure consistency with spec
+- **Code Quality:** Review against acceptance criteria
+- **Never code directly:** Use Ambiglytics for implementation
+- **Oversight:** Track progress, identify gaps
+
+## Critical Files (Read First)
+1. `/Planning/spec.md` — Comprehensive specification
+2. `/Planning/architecture.md` — System design
+3. `/Planning/decisions.md` — Architecture Decision Records
+4. `/Design/design-tokens.md` — Design values
+
+## Project Context
+
+### What We're Building
+Activity-based meetup app: Post activity → nearby users notified → accept → coordinate via messages → meetup happens.
+
+### Tech Stack
+- Frontend: Skip (SwiftUI + Kotlin transpile)
+- Backend: Firebase (Auth, Firestore, Cloud Messaging, Storage)
+- Geolocation: Native iOS/Android
+- Messaging: Async only (2-5 sec latency)
+
+### Key Constraints
+- 10km radius fixed
+- Posts stay active (group meetups allowed)
+- No phone exchange in MVP (in-app messages only)
+- 3-week timeline (aggressive)
+- Async messaging only (no real-time WebSockets)
+
+## Code Conventions
+
+### Naming
+- Variables: camelCase
+- Classes/Components: PascalCase
+- Constants: UPPER_SNAKE_CASE
+
+### Structure
+- Max line length: 100 characters
+- Imports: Sorted alphabetically
+- Comments: Only explain WHY, not WHAT
+- Tests: Required for all functions
+
+### Testing
+- Test framework: Jest (or native equivalent)
+- Min coverage: 80%
+- Run tests before committing
+- TDD preferred
+
+## Workflow
+
+### Before Starting Work
+1. Read `/Planning/spec.md` (understand scope)
+2. Read `/Planning/architecture.md` (understand design)
+3. Check `/Planning/context.md` (last session summary)
+4. Review `/Planning/decisions.md` (rationale)
+
+### During Development
+- Reference `/Design/design-tokens.md` for UI values
+- Check `/Design/screens.md` for screen specs
+- Verify against acceptance criteria in spec
+
+### End of Session
+- Update `/Planning/context.md` with:
+  - What was accomplished
+  - Critical details (versions, configs)
+  - Next session focus
+  - Any blockers
+
+## When Adding Features
+
+1. **Find in spec:** Feature must be in `/Planning/spec.md`
+2. **Check design:** Reference `/Design/design-tokens.md` + screens
+3. **Code path:** Use Ambiglytics (never code directly)
+4. **Test:** Write tests, verify acceptance criteria
+5. **Document:** Update context if decisions changed
+
+## Architecture Principles
+
+- **Vertical slices:** One feature per slice (no mixing)
+- **Data first:** Define Firestore collections before UI
+- **API contracts:** Document in `/Planning/api-spec.md`
+- **Geohashing:** Always use for location queries (Firestore best practice)
+- **Async patterns:** Messages, notifications all async
+
+## What NOT to Do
+
+❌ Write production code directly
+❌ Change architecture without ADR
+❌ Skip tests
+❌ Hard-code values (use design tokens)
+❌ Use real-time DB listeners (async only)
+❌ Add features not in spec
+❌ Edit existing ADRs (create new ones)
+
+## Design Token Usage
+
+**Always reference tokens, never hardcode:**
+```
+✅ GOOD:  background: Tokens.color.primary
+❌ BAD:   background: "#8B6F47"
+
+✅ GOOD:  padding: Tokens.spacing.md
+❌ BAD:   padding: 16px
+```
+
+See `/Design/design-tokens.md` for complete list.
+
+## Git Workflow
+
+- Commit message format: `feat: [brief description]`
+- Always reference issue/feature in commit
+- Include acceptance criteria in PR description
+- Squash commits before merging
+- Never force-push main
+
+## Debugging
+
+**If stuck, consult:**
+- Spec for requirements: `/Planning/spec.md`
+- Architecture for design: `/Planning/architecture.md`
+- Decisions for rationale: `/Planning/decisions.md`
+- Design tokens for UI: `/Design/design-tokens.md`
+
+## Performance Targets
+
+- App startup: <2 seconds
+- Post creation: <2 seconds
+- Message send: <1 second (visible after 2-5 sec)
+- Notification: <10 seconds
+
+## Accessibility
+
+- WCAG AA compliance (4.5:1 contrast)
+- Min touch targets: 44x44 points
+- Keyboard navigable
+- Screen reader compatible
+
+See `/Design/accessibility.md` for full guide.
+
+## Questions?
+
+**"What should this do?"** → `/Planning/spec.md`
+**"How does this work?"** → `/Planning/architecture.md`
+**"Why did we do X?"** → `/Planning/decisions.md`
+**"What's the next focus?"** → `/Planning/context.md`
+
+---
+
+## Status
+✅ CoffeeCall MVP
+📝 3-week timeline
+🎯 Planning phase complete
+⏳ Design finalization in progress
