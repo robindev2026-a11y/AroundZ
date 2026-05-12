@@ -20,6 +20,7 @@
 		33CA3A4B2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */; };
 		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
 		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
+		64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79EEFE313C630B04AED288E /* AuthViewModel.swift */; };
 		86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
@@ -68,6 +69,7 @@
 		8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneAuthScreen.swift; sourceTree = "<group>"; };
 		968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassmorphicCard.swift; sourceTree = "<group>"; };
 		B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileSetupScreen.swift; sourceTree = "<group>"; };
+		F79EEFE313C630B04AED288E /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		FFABF6FCFF8585103471820C /* Color+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,7 +105,6 @@
 				11C75F18AD0A56F05577934A /* PillBadge.swift */,
 				5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */,
 			);
-			name = Components;
 			path = Components;
 			sourceTree = "<group>";
 		};
@@ -111,7 +112,6 @@
 			isa = PBXGroup;
 			children = (
 			);
-			name = Coffee_Call.xcdatamodel;
 			path = Coffee_Call.xcdatamodel;
 			sourceTree = "<group>";
 		};
@@ -149,6 +149,7 @@
 				D5039854887953B93268D7A0 /* Coffee_Call.xcdatamodeld */,
 				854F67326A3D7D34D2066BA2 /* Screens */,
 				147D07BDA2FF4DF23D1993AE /* Components */,
+				994023EC0D7FE9DAA8687F3A /* ViewModels */,
 			);
 			path = Coffee_Call;
 			sourceTree = "<group>";
@@ -186,7 +187,6 @@
 				8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */,
 				1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */,
 			);
-			name = Auth;
 			path = Auth;
 			sourceTree = "<group>";
 		};
@@ -196,8 +196,16 @@
 				4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */,
 				84551E1ABED9653323C91E44 /* Auth */,
 			);
-			name = Screens;
 			path = Screens;
+			sourceTree = "<group>";
+		};
+		994023EC0D7FE9DAA8687F3A /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				F79EEFE313C630B04AED288E /* AuthViewModel.swift */,
+			);
+			name = ViewModels;
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		D5039854887953B93268D7A0 /* Coffee_Call.xcdatamodeld */ = {
@@ -205,7 +213,6 @@
 			children = (
 				1615EE0FECEA9F14E46A0111 /* Coffee_Call.xcdatamodel */,
 			);
-			name = Coffee_Call.xcdatamodeld;
 			path = Coffee_Call.xcdatamodeld;
 			sourceTree = "<group>";
 		};
@@ -215,7 +222,6 @@
 				6E4792D78269808A78FA6024 /* Font+Extensions.swift */,
 				FFABF6FCFF8585103471820C /* Color+Extensions.swift */,
 			);
-			name = DesignSystem;
 			path = DesignSystem;
 			sourceTree = "<group>";
 		};
@@ -307,6 +313,9 @@
 				Base,
 			);
 			mainGroup = 33CA3A1B2FB33A3F008EF23C;
+			packageReferences = (
+				33CA3A572FB34FC7008EF23C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = 33CA3A252FB33A3F008EF23C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -363,6 +372,7 @@
 				116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */,
 				423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */,
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
+				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -687,6 +697,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		33CA3A572FB34FC7008EF23C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCVersionGroup section */
 		33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */ = {

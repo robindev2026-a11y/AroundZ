@@ -6,10 +6,15 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct Coffee_CallApp: App {
     let persistenceController = PersistenceController.shared
+
+    init() {
+        FirebaseApp.configure()
+    }
 
     var body: some Scene {
         WindowGroup {

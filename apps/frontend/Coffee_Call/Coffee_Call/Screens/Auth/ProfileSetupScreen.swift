@@ -1,20 +1,22 @@
 import SwiftUI
 
 struct ProfileSetupScreen: View {
+    @EnvironmentObject var auth: AuthViewModel
     @State private var firstName: String = ""
-    
+
     var isReady: Bool {
-        return !firstName.trimmingCharacters(in: .whitespaces).isEmpty
+        !firstName.trimmingCharacters(in: .whitespaces).isEmpty
     }
-    
+
     var body: some View {
         VStack(alignment: .center, spacing: 32) {
+
             Text("Set up your profile")
                 .font(.heading1)
                 .foregroundColor(.coffeeTextPrimary)
                 .padding(.top, 60)
-            
-            // Photo Upload Placeholder
+
+            // Avatar placeholder with camera badge
             ZStack(alignment: .bottomTrailing) {
                 Circle()
                     .fill(Color.coffeeTextSecondary.opacity(0.1))
@@ -24,7 +26,7 @@ struct ProfileSetupScreen: View {
                             .font(.system(size: 120))
                             .foregroundColor(.coffeeTextSecondary.opacity(0.3))
                     )
-                
+
                 Circle()
                     .fill(Color.coffeePrimary)
                     .frame(width: 36, height: 36)
@@ -35,33 +37,53 @@ struct ProfileSetupScreen: View {
                     )
                     .offset(x: -8, y: -8)
             }
-            .padding(.vertical, 24)
-            
+            .padding(.vertical, 8)
+
+            // Name input
             VStack(alignment: .leading, spacing: 8) {
                 Text("FIRST NAME")
                     .font(.captionText)
                     .foregroundColor(.coffeeTextSecondary)
-                
+
                 TextField("e.g. Alex", text: $firstName)
                     .font(.heading1)
                     .foregroundColor(.coffeeTextPrimary)
-                
+                    .padding(.bottom, 8)
+
                 Divider()
                     .background(Color.coffeeTextSecondary.opacity(0.3))
             }
-            
-            Spacer()
-            
-            NavigationLink(destination: LocationPermissionScreen()) {
-                Text("Continue →")
-                    .font(.buttonText)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(isReady ? Color.coffeePrimary : Color.coffeeTextSecondary.opacity(0.5))
-                    .clipShape(Capsule())
+            .padding(.horizontal, 8)
+
+            // Inline error
+            if let error = auth.errorMessage {
+                Text(error)
+                    .font(.captionText)
+                    .foregroundColor(.coffeeError)
             }
-            .disabled(!isReady)
+
+            Spacer()
+
+            // CTA
+            Button(action: {
+                auth.saveProfile(name: firstName) { _ in }
+            }) {
+                HStack(spacing: 12) {
+                    if auth.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.9)
+                    }
+                    Text(auth.isLoading ? "Saving..." : "Let's Go →")
+                        .font(.buttonText)
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(isReady ? Color.coffeePrimary : Color.coffeeTextSecondary.opacity(0.3))
+                .clipShape(Capsule())
+            }
+            .disabled(!isReady || auth.isLoading)
             .padding(.bottom, 40)
         }
         .padding(.horizontal, 24)
@@ -72,6 +94,9 @@ struct ProfileSetupScreen: View {
 
 struct ProfileSetupScreen_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileSetupScreen()
+        NavigationView {
+            ProfileSetupScreen()
+                .environmentObject(AuthViewModel())
+        }
     }
 }

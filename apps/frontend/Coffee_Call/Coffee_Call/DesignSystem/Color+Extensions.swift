@@ -11,4 +11,5 @@ extension Color {
     static let coffeeTextSecondary = Color("coffeeTextSecondary")
     static let coffeeBorder = Color("coffeeBorder")
     static let coffeePeach = Color("coffeePeach")
+    static let coffeeError = Color(red: 0.87, green: 0.27, blue: 0.27)
 }

@@ -1,11 +1,23 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var auth = AuthViewModel()
+
     var body: some View {
-        NavigationView {
-            OnboardingScreen()
+        Group {
+            if auth.isAuthenticated {
+                // TODO: Replace with HomeScreen when built
+                Text("Welcome! You're signed in.")
+                    .font(.heading1)
+                    .foregroundColor(.coffeeTextPrimary)
+            } else {
+                NavigationView {
+                    OnboardingScreen()
+                }
+                .navigationViewStyle(.stack)
+            }
         }
-        .navigationViewStyle(.stack)
+        .environmentObject(auth)
     }
 }
 
