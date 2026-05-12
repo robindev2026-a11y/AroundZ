@@ -12,25 +12,53 @@ class AuthViewModel: ObservableObject {
     // Internal: store verification ID between steps
     private var verificationID: String? = nil
     private let db = Firestore.firestore()
+    private var otpTimeoutTask: DispatchWorkItem?
 
     // MARK: - Init (check existing session)
     init() {
-        isAuthenticated = Auth.auth().currentUser != nil
+        let isFirebaseAuthed = Auth.auth().currentUser != nil
+        let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        isAuthenticated = isFirebaseAuthed && hasCompletedOnboarding
+
+        #if targetEnvironment(simulator)
+        Auth.auth().settings?.isAppVerificationDisabledForTesting = true
+        #endif
     }
 
     // MARK: - Step 1: Send OTP
     func sendOTP(phoneNumber: String, completion: @escaping (Bool) -> Void) {
         isLoading = true
         errorMessage = nil
+        otpTimeoutTask?.cancel()
+
+
+
+        let timeoutTask = DispatchWorkItem { [weak self] in
+            guard let self = self, self.isLoading else { return }
+            self.isLoading = false
+            self.errorMessage = "OTP request timed out. Use a Firebase test phone number in the simulator."
+            completion(false)
+        }
+        otpTimeoutTask = timeoutTask
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: timeoutTask)
 
         PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: nil) { [weak self] verificationID, error in
             DispatchQueue.main.async {
+                self?.otpTimeoutTask?.cancel()
                 self?.isLoading = false
                 if let error = error {
                     self?.errorMessage = error.localizedDescription
+                    print("[AuthViewModel] sendOTP error: \(error.localizedDescription)")
                     completion(false)
                     return
                 }
+
+                guard let verificationID = verificationID, !verificationID.isEmpty else {
+                    self?.errorMessage = "Firebase did not return a verification ID."
+                    completion(false)
+                    return
+                }
+
                 self?.verificationID = verificationID
                 completion(true)
             }
@@ -94,15 +122,23 @@ class AuthViewModel: ObservableObject {
                     completion(false)
                     return
                 }
-                self?.isAuthenticated = true
+                // Profile saved successfully, but don't set isAuthenticated = true yet.
+                // Wait for the user to complete the remaining onboarding screens.
                 completion(true)
             }
         }
     }
 
+    // MARK: - Finalize Onboarding
+    func completeOnboarding() {
+        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        isAuthenticated = true
+    }
+
     // MARK: - Sign Out
     func signOut() {
         try? Auth.auth().signOut()
+        UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
         isAuthenticated = false
     }
 }

@@ -95,7 +95,9 @@ struct PhoneAuthScreen: View {
             // CTA Button
             Button(action: {
                 auth.sendOTP(phoneNumber: fullPhoneNumber) { success in
-                    if success { navigateToOTP = true }
+                    if success && !auth.isAuthenticated {
+                        navigateToOTP = true
+                    }
                 }
             }) {
                 HStack(spacing: 12) {
@@ -114,14 +116,25 @@ struct PhoneAuthScreen: View {
                 .clipShape(Capsule())
             }
             .disabled(!isPhoneValid || auth.isLoading)
-            .padding(.bottom, 40)
+            .padding(.bottom, 8)
 
-            // Hidden NavigationLink triggered programmatically
+            #if DEBUG
+            Button(action: { navigateToOTP = true }) {
+                Text("⚡ Skip OTP (Debug)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.coffeeTextSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, 32)
+            #endif
+
+        }
+        .background(
             NavigationLink(
                 destination: OTPVerificationScreen(phoneNumber: fullPhoneNumber),
                 isActive: $navigateToOTP
             ) { EmptyView() }
-        }
+        )
         .padding(.horizontal, 24)
         .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)

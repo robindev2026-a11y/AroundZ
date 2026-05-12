@@ -49,7 +49,7 @@ CoffeeCall is an activity-based meetup platform. Users post activities (coffee, 
 | `/Planning/decisions.md` | Architecture Decision Records | ✅ YES |
 | `/Design/design-tokens.md` | Reusable design values | When generating UI code |
 | `/Design/screens.md` | Screen specifications | When building screens |
-| `/Planning/context.md` | Last session summary | At start of each session |
+| `/Planning/context.md` | Shared rolling session log for all AI tools | At start of each session |
 
 ---
 
@@ -178,8 +178,18 @@ CoffeeCall/
 - ❌ Change architecture without ADR (update decisions.md)
 - ❌ Edit design tokens without updating design-tokens.md
 - ❌ Commit without tests passing
-- ❌ Update context.md manually between sessions (Claude does this)
+- ❌ Update context.md manually between sessions unless you are appending the current session log
 - ❌ Ignore .claudeignore files
+
+## Shared Session Log
+
+All AI tools should use `/Planning/context.md` as the single rolling session log.
+
+- Append a short note after finishing work.
+- Put the newest session at the top.
+- Include what changed, why, files updated, and verification.
+- Keep the log compact.
+- When it grows too large, delete the oldest session entries and keep only the latest 5 sessions or about 300 lines.
 
 ---
 

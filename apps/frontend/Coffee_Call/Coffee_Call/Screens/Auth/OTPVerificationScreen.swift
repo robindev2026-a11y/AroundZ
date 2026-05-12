@@ -109,13 +109,25 @@ struct OTPVerificationScreen: View {
                 .clipShape(Capsule())
             }
             .disabled(!isCodeComplete || auth.isLoading)
-            .padding(.bottom, 40)
+            .padding(.bottom, 8)
 
+            #if DEBUG
+            Button(action: { navigateToProfile = true }) {
+                Text("⚡ Skip Verify (Debug)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.coffeeTextSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, 32)
+            #endif
+
+        }
+        .background(
             NavigationLink(
                 destination: ProfileSetupScreen(),
                 isActive: $navigateToProfile
             ) { EmptyView() }
-        }
+        )
         .padding(.horizontal, 24)
         .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)

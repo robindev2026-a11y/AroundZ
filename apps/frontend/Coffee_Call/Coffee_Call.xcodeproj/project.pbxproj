@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */; };
 		116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */; };
 		19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */; };
 		33CA3A282FB33A3F008EF23C /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */; };
@@ -27,6 +28,7 @@
 		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
 		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
 		64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79EEFE313C630B04AED288E /* AuthViewModel.swift */; };
+		7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */; };
 		86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
@@ -63,7 +65,6 @@
 		33CA3A2E2FB33A41008EF23C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		33CA3A302FB33A41008EF23C /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		33CA3A332FB33A41008EF23C /* Coffee_Call.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Coffee_Call.xcdatamodel; sourceTree = "<group>"; };
-		33CA3A352FB33A41008EF23C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		33CA3A3A2FB33A42008EF23C /* Coffee_CallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Coffee_CallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A3E2FB33A42008EF23C /* Coffee_CallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallTests.swift; sourceTree = "<group>"; };
 		33CA3A442FB33A42008EF23C /* Coffee_CallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Coffee_CallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,7 +72,9 @@
 		33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingScreen.swift; sourceTree = "<group>"; };
+		5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReadyScreen.swift; sourceTree = "<group>"; };
 		5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
+		67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PermissionsScreen.swift; sourceTree = "<group>"; };
 		6E4792D78269808A78FA6024 /* Font+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
 		8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneAuthScreen.swift; sourceTree = "<group>"; };
 		968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassmorphicCard.swift; sourceTree = "<group>"; };
@@ -155,7 +158,6 @@
 				33CA3A292FB33A3F008EF23C /* ContentView.swift */,
 				33CA3A2B2FB33A41008EF23C /* Assets.xcassets */,
 				33CA3A302FB33A41008EF23C /* Persistence.swift */,
-				33CA3A352FB33A41008EF23C /* Info.plist */,
 				33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */,
 				33CA3A2D2FB33A41008EF23C /* Preview Content */,
 				EC5C2209D10A1787EA76F764 /* DesignSystem */,
@@ -199,6 +201,8 @@
 				B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */,
 				8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */,
 				1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */,
+				67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */,
+				5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -393,6 +397,8 @@
 				423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */,
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
+				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
+				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
