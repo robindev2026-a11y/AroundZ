@@ -18,12 +18,12 @@
 		33CA3A3F2FB33A42008EF23C /* Coffee_CallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A3E2FB33A42008EF23C /* Coffee_CallTests.swift */; };
 		33CA3A492FB33A42008EF23C /* Coffee_CallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */; };
 		33CA3A4B2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */; };
-		33CA3A592FB35F43008EF23C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A582FB35F43008EF23C /* GoogleService-Info.plist */; };
 		33CA3A5C2FB3617D008EF23C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 33CA3A5B2FB3617D008EF23C /* FirebaseAuth */; };
 		33CA3A5E2FB3617D008EF23C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 33CA3A5D2FB3617D008EF23C /* FirebaseCrashlytics */; };
 		33CA3A602FB3617D008EF23C /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 33CA3A5F2FB3617D008EF23C /* FirebaseFirestore */; };
 		33CA3A622FB3617D008EF23C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 33CA3A612FB3617D008EF23C /* FirebaseMessaging */; };
 		33CA3A642FB3617D008EF23C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 33CA3A632FB3617D008EF23C /* FirebaseStorage */; };
+		33CA3A662FB36C6B008EF23C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */; };
 		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
 		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
 		64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79EEFE313C630B04AED288E /* AuthViewModel.swift */; };
@@ -69,7 +69,7 @@
 		33CA3A442FB33A42008EF23C /* Coffee_CallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Coffee_CallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITests.swift; sourceTree = "<group>"; };
 		33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		33CA3A582FB35F43008EF23C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingScreen.swift; sourceTree = "<group>"; };
 		5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		6E4792D78269808A78FA6024 /* Font+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
@@ -130,7 +130,6 @@
 		33CA3A1B2FB33A3F008EF23C = {
 			isa = PBXGroup;
 			children = (
-				33CA3A582FB35F43008EF23C /* GoogleService-Info.plist */,
 				33CA3A262FB33A3F008EF23C /* Coffee_Call */,
 				33CA3A3D2FB33A42008EF23C /* Coffee_CallTests */,
 				33CA3A472FB33A42008EF23C /* Coffee_CallUITests */,
@@ -151,6 +150,7 @@
 		33CA3A262FB33A3F008EF23C /* Coffee_Call */ = {
 			isa = PBXGroup;
 			children = (
+				33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */,
 				33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */,
 				33CA3A292FB33A3F008EF23C /* ContentView.swift */,
 				33CA3A2B2FB33A41008EF23C /* Assets.xcassets */,
@@ -353,7 +353,7 @@
 			files = (
 				33CA3A2F2FB33A41008EF23C /* Preview Assets.xcassets in Resources */,
 				33CA3A2C2FB33A41008EF23C /* Assets.xcassets in Resources */,
-				33CA3A592FB35F43008EF23C /* GoogleService-Info.plist in Resources */,
+				33CA3A662FB36C6B008EF23C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,12 +555,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Coffee_Call/Info.plist;
-				INFOPLIST_KEY_CFBundleURLTypes = "{\"CFBundleTypeRole\"=>\"Editor\", \"CFBundleURLSchemes\"=>[\"app-1-835897938536-ios-0032b2f3736f46218fe1dd\"]}";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -586,12 +580,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Coffee_Call/Info.plist;
-				INFOPLIST_KEY_CFBundleURLTypes = "{\"CFBundleTypeRole\"=>\"Editor\", \"CFBundleURLSchemes\"=>[\"app-1-835897938536-ios-0032b2f3736f46218fe1dd\"]}";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
