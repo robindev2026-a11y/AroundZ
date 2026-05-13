@@ -192,33 +192,59 @@ Disabled:   background: color-surface-alt, text: color-text-tertiary
 
 ---
 
-## Implementation Guide for Code Generation
+## Implementation Standard
 
-When Codex/Ambiglytics generate code, reference tokens like:
+To ensure consistency and type-safety, we use a centralized naming system for all design assets.
 
-**Swift/SwiftUI:**
+### 1. Asset Catalog
+All binary assets (Colors, Images, Icons) MUST be stored in the `Assets.xcassets` catalog and accessed via our standardized extensions.
+
+### 2. Static Strings (Text)
+Strings are managed in `DesignSystem/AppStrings.swift` using a nested enum structure.
+- **Usage:** `AppText.Onboarding.title`
+- **Why:** Centralizes all copy, making updates and localization simple.
+
+### 3. Colors
+Colors are managed via an extension on `Color` in `DesignSystem/Color+Extensions.swift`.
+- **Usage:** `Color.coffeePrimary`
+- **Why:** Enables auto-complete and ensures only approved palette colors are used.
+
+### 4. Images & Backgrounds
+Images are managed in `DesignSystem/AppImages.swift`.
+- **Usage:** `AppImages.Onboarding.hero`
+- **Why:** Decouples the logic of fetching (local vs remote) from the View.
+
+### 5. Icons
+Icons (SF Symbols) are managed in `DesignSystem/AppIcons.swift`.
+- **Usage:** `AppIcons.navHome`
+- **Why:** Ensures consistent weight and style across the app.
+
+---
+
+## Code Example
+
 ```swift
-Button("Accept") {
-  // ...
+struct ExampleView: View {
+    var body: some View {
+        VStack {
+            AppImages.logo
+                .resizable()
+                .frame(width: 100, height: 100)
+            
+            Text(AppStrings.welcome)
+                .font(.heading1)
+                .foregroundColor(.coffeePrimary)
+            
+            Button(action: {}) {
+                Label(AppStrings.continueBtn, systemImage: AppIcons.arrowRight)
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        }
+    }
 }
-.padding(Tokens.spacing.md)
-.background(Tokens.color.primary)
-.foregroundColor(Tokens.color.textInverse)
-.clipShape(Capsule())
-```
-
-**SwiftUI:**
-```swift
-Button("Accept") {
-  // ...
-}
-.padding(Tokens.spacing.md)
-.background(Tokens.color.primary)
-.foregroundColor(Tokens.color.textInverse)
-.clipShape(Capsule())
 ```
 
 ---
 
 **Status:** Finalized  
-**Last Updated:** 2026-05-10
+**Last Updated:** 2026-05-13

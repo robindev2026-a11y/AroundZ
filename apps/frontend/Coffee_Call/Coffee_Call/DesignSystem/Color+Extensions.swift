@@ -1,15 +1,30 @@
 import SwiftUI
 
 extension Color {
-    static let coffeePrimary = Color("coffeePrimary")
-    static let coffeePrimaryLight = Color("coffeePrimaryLight")
-    static let coffeePrimaryDark = Color("coffeePrimaryDark")
-    static let coffeeBackground = Color("coffeeBackground")
-    static let coffeeSurface = Color("coffeeSurface")
-    static let coffeeSuccess = Color("coffeeSuccess")
-    static let coffeeTextPrimary = Color("coffeeTextPrimary")
-    static let coffeeTextSecondary = Color("coffeeTextSecondary")
-    static let coffeeBorder = Color("coffeeBorder")
-    static let coffeePeach = Color("coffeePeach")
-    static let coffeeError = Color(red: 0.87, green: 0.27, blue: 0.27)
+    // MARK: - Brand Colors
+    static let brandPrimary = Color("coffeePrimary")
+    static let brandSecondary = Color("coffeePeach")
+    static let brandPrimaryLight = Color("coffeePrimaryLight")
+    static let brandPrimaryDark = Color("coffeePrimaryDark")
+    
+    // MARK: - UI & Layout
+    static let backgroundMain = Color("coffeeBackground")
+    static let surfaceMain = Color("coffeeSurface")
+    static let appBorder = Color("coffeeBorder")
+    
+    // MARK: - Text & Content
+    static let textPrimary = Color("coffeeTextPrimary")
+    static let textSecondary = Color("coffeeTextSecondary")
+    static let textOnBrand = Color.white
+    
+    // MARK: - Status
+    static let statusSuccess = Color("coffeeSuccess")
+    static let statusError = Color(red: 0.87, green: 0.27, blue: 0.27)
+    
+    // MARK: - Legacy Aliases (to be deprecated)
+    static let coffeePrimary = brandPrimary
+    static let coffeeBackground = backgroundMain
+    static let coffeeTextPrimary = textPrimary
+    static let coffeeTextSecondary = textSecondary
+    static let coffeeError = statusError
 }
