@@ -8,7 +8,26 @@ Rules:
 - If this file grows too large, delete the oldest session entries and keep only the most recent ones.
 - Retention target: keep the latest 5 session entries or roughly the latest 300 lines, whichever comes first.
 
-## Session: Antigravity — Onboarding Flow & Post-Auth Screens (2026-05-12)
+## Session: Antigravity — Design System Standardization & Semantic Naming (2026-05-13)
+
+### What Changed
+- **Standardized Asset Management:** Created `AppStrings.swift`, `AppIcons.swift`, and `AppImages.swift` in `DesignSystem/` to centralize all text, icons, and image URLs.
+- **Semantic Color Naming:** Refactored `Color+Extensions.swift` to use a semantic structure (`brandPrimary`, `backgroundMain`, `textPrimary`, `statusSuccess`, etc.) rather than descriptive names.
+- **Documentation:** Updated `Design/design-tokens.md` with the new "Implementation Standard" for asset access.
+- **Refactoring Components:** Updated `PrimaryButton.swift`, `PillBadge.swift`, and `GlassmorphicCard.swift` to use the new semantic tokens and strings.
+- **Refactoring Screens:** Completed the refactor of ALL onboarding and authentication screens (`OnboardingScreen.swift`, `PhoneAuthScreen.swift`, `OTPVerificationScreen.swift`, `ProfileSetupScreen.swift`, `PermissionsScreen.swift`, `ReadyScreen.swift`, and `ContentView.swift`) to implement `AppStrings`, `AppIcons`, `AppImages`, and semantic colors.
+- **Project Maintenance:** Updated `AppStrings.swift` and `AppIcons.swift` to include missing tokens for the new screens.
+- **Commit:** Staged and committed the design system foundation and the complete refactor of the onboarding/auth flow.
+
+### Why
+- Eliminate magic strings and descriptive color names (like "red") which are brittle and hard to maintain.
+- Ensure type-safety for SF Symbols and Unsplash URLs across the entire application.
+- Prepare the codebase for dark mode support and future theming changes via centralized semantic tokens.
+- Maintain consistency with the Figma design brief by standardizing UI elements across all 8 core screens.
+
+### Next Step
+- Begin building the `Discovery/Home` screen (the main activities list) using the established standardized tokens and components.
+- Implement the "Post Activity" modal structure.
 
 ### What Changed
 - Added `Slide5View` ("Start Exploring" / pre-auth welcome screen) as the 5th slide in `OnboardingScreen.swift`, inserted between the interests picker and `PhoneAuthScreen`.

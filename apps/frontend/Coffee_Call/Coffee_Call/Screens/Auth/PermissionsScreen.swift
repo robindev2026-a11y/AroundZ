@@ -8,15 +8,15 @@ struct PermissionsScreen: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            Text("Almost there")
+            Text(AppStrings.Auth.permissionsTitle)
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundColor(.coffeeTextPrimary)
+                .foregroundColor(.textPrimary)
                 .padding(.top, 40)
                 .padding(.bottom, 12)
             
-            Text("CoffeeCall works best when we can find\nactivities and keep you updated.")
+            Text(AppStrings.Auth.permissionsSubtitle)
                 .font(.system(size: 16))
-                .foregroundColor(.coffeeTextSecondary)
+                .foregroundColor(.textSecondary)
                 .lineSpacing(4)
                 .padding(.bottom, 40)
             
@@ -24,21 +24,21 @@ struct PermissionsScreen: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 16) {
                     Circle()
-                        .fill(Color.blue.opacity(0.1))
+                        .fill(Color.brandPrimary.opacity(0.1))
                         .frame(width: 40, height: 40)
                         .overlay(
-                            Image(systemName: "location.fill")
-                                .foregroundColor(.blue)
+                            Image(systemName: AppIcons.location)
+                                .foregroundColor(.brandPrimary)
                         )
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Location Services")
+                        Text(AppStrings.Auth.locationTitle)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.coffeeTextPrimary)
+                            .foregroundColor(.textPrimary)
                         
-                        Text("We use your location to show you spontaneous activities happening right around you.")
+                        Text(AppStrings.Auth.locationDesc)
                             .font(.system(size: 13))
-                            .foregroundColor(.coffeeTextSecondary)
+                            .foregroundColor(.textSecondary)
                             .lineSpacing(2)
                     }
                 }
@@ -47,12 +47,12 @@ struct PermissionsScreen: View {
                     // MVP: Just simulate permission request
                     locationRequested = true
                 }) {
-                    Text(locationRequested ? "Location Granted" : "Allow Location Access")
+                    Text(locationRequested ? AppStrings.Auth.locationGranted : AppStrings.Auth.locationCTA)
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(.textOnBrand)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(locationRequested ? Color.coffeeSuccess : Color(red: 0.36, green: 0.71, blue: 0.64)) // Teal matching design
+                        .background(locationRequested ? Color.statusSuccess : Color.brandPrimary)
                         .clipShape(Capsule())
                 }
                 .disabled(locationRequested)
@@ -60,10 +60,10 @@ struct PermissionsScreen: View {
             .padding(20)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.coffeeTextSecondary.opacity(0.03))
+                    .fill(Color.textSecondary.opacity(0.03))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .strokeBorder(Color.coffeeTextSecondary.opacity(0.1), lineWidth: 1)
+                            .strokeBorder(Color.textSecondary.opacity(0.1), lineWidth: 1)
                     )
             )
             .padding(.bottom, 24)
@@ -72,21 +72,21 @@ struct PermissionsScreen: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 16) {
                     Circle()
-                        .fill(Color.orange.opacity(0.1))
+                        .fill(Color.brandSecondary.opacity(0.1))
                         .frame(width: 40, height: 40)
                         .overlay(
-                            Image(systemName: "bell.fill")
-                                .foregroundColor(.orange)
+                            Image(systemName: AppIcons.bell)
+                                .foregroundColor(.brandSecondary)
                         )
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Real-time Updates")
+                        Text(AppStrings.Auth.notificationsTitle)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.coffeeTextPrimary)
+                            .foregroundColor(.textPrimary)
                         
-                        Text("Get notified instantly when someone joins your activity or starts something nearby.")
+                        Text(AppStrings.Auth.notificationsDesc)
                             .font(.system(size: 13))
-                            .foregroundColor(.coffeeTextSecondary)
+                            .foregroundColor(.textSecondary)
                             .lineSpacing(2)
                     }
                 }
@@ -102,12 +102,12 @@ struct PermissionsScreen: View {
                         }
                     }
                 }) {
-                    Text(notificationsRequested ? "Notifications Enabled" : "Enable Notifications")
+                    Text(notificationsRequested ? AppStrings.Auth.notificationsEnabled : AppStrings.Auth.notificationsCTA)
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(.textOnBrand)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(notificationsRequested ? Color.coffeeSuccess : Color(red: 0.36, green: 0.71, blue: 0.64))
+                        .background(notificationsRequested ? Color.statusSuccess : Color.brandPrimary)
                         .clipShape(Capsule())
                 }
                 .disabled(notificationsRequested)
@@ -115,10 +115,10 @@ struct PermissionsScreen: View {
             .padding(20)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.coffeeTextSecondary.opacity(0.03))
+                    .fill(Color.textSecondary.opacity(0.03))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .strokeBorder(Color.coffeeTextSecondary.opacity(0.1), lineWidth: 1)
+                            .strokeBorder(Color.textSecondary.opacity(0.1), lineWidth: 1)
                     )
             )
             
@@ -127,9 +127,9 @@ struct PermissionsScreen: View {
             // Manual Continue button if auto-navigate fails or they skip
             if locationRequested || notificationsRequested {
                 NavigationLink(destination: ReadyScreen()) {
-                    Text("Continue →")
+                    Text(AppStrings.Auth.readyCTA + " →")
                         .font(.buttonText)
-                        .foregroundColor(.coffeePrimary)
+                        .foregroundColor(.brandPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                 }
@@ -137,18 +137,18 @@ struct PermissionsScreen: View {
             
             HStack(spacing: 6) {
                 Spacer()
-                Image(systemName: "checkmark.shield")
+                Image(systemName: AppIcons.privacyShield)
                     .font(.system(size: 12))
-                Text("YOUR PRIVACY IS OUR PRIORITY")
+                Text(AppStrings.Auth.privacyNote)
                     .font(.system(size: 10, weight: .bold))
                     .kerning(1.0)
                 Spacer()
             }
-            .foregroundColor(.coffeeTextSecondary.opacity(0.6))
+            .foregroundColor(.textSecondary.opacity(0.6))
             .padding(.bottom, 32)
         }
         .padding(.horizontal, 24)
-        .background(Color.white.edgesIgnoringSafeArea(.all))
+        .background(Color.textOnBrand.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
         .background(
             NavigationLink(

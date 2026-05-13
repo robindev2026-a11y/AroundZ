@@ -24,9 +24,9 @@ struct PhoneAuthScreen: View {
             // Back Button
             HStack {
                 Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "arrow.left")
+                    Image(systemName: AppIcons.arrowLeft)
                         .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.coffeeTextPrimary)
+                        .foregroundColor(.textPrimary)
                 }
                 Spacer()
             }
@@ -34,13 +34,13 @@ struct PhoneAuthScreen: View {
 
             // Title
             VStack(alignment: .leading, spacing: 8) {
-                Text("What's your\nphone number?")
+                Text(AppStrings.Auth.phoneTitle)
                     .font(.heading1)
-                    .foregroundColor(.coffeeTextPrimary)
-
-                Text("We'll send a one-time code to verify your number.")
+                    .foregroundColor(.textPrimary)
+                
+                Text(AppStrings.Auth.phoneSubtitle)
                     .font(.bodyStandard)
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
                     .lineSpacing(4)
             }
             .padding(.top, 16)
@@ -56,26 +56,26 @@ struct PhoneAuthScreen: View {
                             Text(selectedCountry.dialCode)
                                 .font(.bodyStandard)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.coffeeTextPrimary)
+                                .foregroundColor(.textPrimary)
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.coffeeTextSecondary)
+                                .foregroundColor(.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 14)
-                        .background(Color.white)
+                        .background(Color.textOnBrand)
                         .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     }
 
                     // Number Input
-                    TextField("Phone number", text: $phoneNumber)
+                    TextField(AppStrings.Auth.phonePlaceholder, text: $phoneNumber)
                         .font(.bodyStandard)
                         .keyboardType(.numberPad)
-                        .foregroundColor(.coffeeTextPrimary)
+                        .foregroundColor(.textPrimary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 14)
-                        .background(Color.white)
+                        .background(Color.textOnBrand)
                         .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                         .frame(maxWidth: .infinity)
@@ -85,7 +85,7 @@ struct PhoneAuthScreen: View {
                 if let error = auth.errorMessage {
                     Text(error)
                         .font(.captionText)
-                        .foregroundColor(.coffeeError)
+                        .foregroundColor(.statusError)
                         .padding(.top, 8)
                 }
             }
@@ -103,16 +103,16 @@ struct PhoneAuthScreen: View {
                 HStack(spacing: 12) {
                     if auth.isLoading {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .progressViewStyle(CircularProgressViewStyle(tint: .textOnBrand))
                             .scaleEffect(0.9)
                     }
-                    Text(auth.isLoading ? "Sending..." : "Send Code →")
+                    Text(auth.isLoading ? AppStrings.Auth.sending : AppStrings.Auth.phoneCTA)
                         .font(.buttonText)
-                        .foregroundColor(.white)
+                        .foregroundColor(.textOnBrand)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isPhoneValid ? Color.coffeePrimary : Color.coffeeTextSecondary.opacity(0.3))
+                .background(isPhoneValid ? Color.brandPrimary : Color.textSecondary.opacity(0.3))
                 .clipShape(Capsule())
             }
             .disabled(!isPhoneValid || auth.isLoading)
@@ -122,7 +122,7 @@ struct PhoneAuthScreen: View {
             Button(action: { navigateToOTP = true }) {
                 Text("⚡ Skip OTP (Debug)")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
             }
             .frame(maxWidth: .infinity)
             .padding(.bottom, 32)
@@ -136,7 +136,7 @@ struct PhoneAuthScreen: View {
             ) { EmptyView() }
         )
         .padding(.horizontal, 24)
-        .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
         .sheet(isPresented: $showCountryPicker) {
             CountryPickerView(selected: $selectedCountry)
@@ -196,15 +196,15 @@ struct CountryPickerView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(country.name)
                                 .font(.bodyStandard)
-                                .foregroundColor(.coffeeTextPrimary)
+                                .foregroundColor(.textPrimary)
                             Text(country.dialCode)
                                 .font(.captionText)
-                                .foregroundColor(.coffeeTextSecondary)
+                                .foregroundColor(.textSecondary)
                         }
                         Spacer()
                         if selected.dialCode == country.dialCode && selected.name == country.name {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.coffeePrimary)
+                            Image(systemName: AppIcons.checkmark)
+                                .foregroundColor(.brandPrimary)
                                 .fontWeight(.semibold)
                         }
                     }

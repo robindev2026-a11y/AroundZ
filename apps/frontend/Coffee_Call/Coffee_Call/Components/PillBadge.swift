@@ -11,15 +11,15 @@ struct PillBadge: View {
             Text(title)
                 .font(.system(size: 10, weight: .bold))
         }
-        .foregroundColor(.white)
+        .foregroundColor(.textOnBrand)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background(Color.coffeePrimaryDark.opacity(0.92))
+        .background(Color.brandPrimaryDark.opacity(0.92))
         .overlay(
-            Capsule().stroke(Color.white.opacity(0.14), lineWidth: 1)
+            Capsule().stroke(Color.textOnBrand.opacity(0.14), lineWidth: 1)
         )
         .clipShape(Capsule())
-        .shadow(color: Color.coffeePrimary.opacity(0.16), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.brandPrimary.opacity(0.16), radius: 10, x: 0, y: 5)
     }
 }
 

@@ -18,7 +18,7 @@ private struct UnsplashBackground: View {
                         .clipped()
                 case .failure, .empty:
                     LinearGradient(
-                        colors: [Color.coffeeTextPrimary, Color.coffeeTextSecondary],
+                        colors: [Color.textPrimary, Color.textSecondary],
                         startPoint: .top, endPoint: .bottom
                     )
                     .frame(
@@ -26,7 +26,7 @@ private struct UnsplashBackground: View {
                         height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom
                     )
                 @unknown default:
-                    Color.coffeeTextPrimary
+                    Color.textPrimary
                 }
             }
             .offset(y: -geo.safeAreaInsets.top)
@@ -63,7 +63,7 @@ struct Slide1View: View {
     var body: some View {
         ZStack {
             // Unsplash: exact image from Figma onboarding hero screen
-            UnsplashBackground(url: "https://images.unsplash.com/photo-1670272506160-bdf0c7a45d2b?auto=format&fit=crop&w=1000&q=80")
+            UnsplashBackground(url: AppImages.Onboarding.heroURL)
             
             // Overlay so text is always readable
             LinearGradient(
@@ -76,7 +76,7 @@ struct Slide1View: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Spacer()
-                    PillBadge(title: "COFFEECALL BETA", systemImage: "sparkles")
+                    PillBadge(title: AppStrings.betaTag, systemImage: AppIcons.sparkles)
                     Spacer()
                 }
                 .padding(.top, 60)
@@ -84,15 +84,15 @@ struct Slide1View: View {
                 Spacer()
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Meet people")
+                    Text(AppStrings.Onboarding.slide1Title1)
                         .font(.heading1)
-                        .foregroundColor(.white)
-                    Text("nearby in")
+                        .foregroundColor(.textOnBrand)
+                    Text(AppStrings.Onboarding.slide1Title2)
                         .font(.heading1)
-                        .foregroundColor(.white)
-                    Text("real life.")
+                        .foregroundColor(.textOnBrand)
+                    Text(AppStrings.Onboarding.slide1Title3)
                         .font(.heading1)
-                        .foregroundColor(.coffeePrimary)
+                        .foregroundColor(.brandPrimary)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
@@ -169,19 +169,19 @@ struct Slide2View: View {
             
             VStack(alignment: .leading, spacing: 16) {
                 Circle()
-                    .fill(Color.white)
+                    .fill(Color.textOnBrand)
                     .frame(width: 48, height: 48)
-                    .overlay(Image(systemName: "bolt.fill").foregroundColor(.coffeePrimary).font(.system(size: 24)))
+                    .overlay(Image(systemName: "bolt.fill").foregroundColor(.brandPrimary).font(.system(size: 24)))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
                 Text("Discover what's\nhappening nearby.")
                     .font(.heading1)
-                    .foregroundColor(.coffeeTextPrimary)
+                    .foregroundColor(.textPrimary)
                 
                 Text("Coffee chats, walks, gaming, and spontaneous social moments.")
                     .font(.bodyStandard)
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
                     .lineSpacing(4)
             }
             .padding(.top, 40)
@@ -210,7 +210,7 @@ struct Slide2View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
     }
 }
 
@@ -226,20 +226,20 @@ struct Slide3View: View {
             
             VStack(alignment: .center, spacing: 16) {
                 Circle()
-                    .fill(Color.white)
+                    .fill(Color.textOnBrand)
                     .frame(width: 64, height: 64)
-                    .overlay(Image(systemName: "checkmark.shield.fill").foregroundColor(.coffeePrimary).font(.system(size: 32)))
+                    .overlay(Image(systemName: "checkmark.shield.fill").foregroundColor(.brandPrimary).font(.system(size: 32)))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
                 Text("Safe, friendly,\nand verified.")
                     .font(.heading1)
-                    .foregroundColor(.coffeeTextPrimary)
+                    .foregroundColor(.textPrimary)
                     .multilineTextAlignment(.center)
                 
                 Text("We prioritize trust and real connections through verified profiles and community vibes.")
                     .font(.bodyStandard)
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
             }
@@ -264,7 +264,7 @@ struct Slide3View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
     }
 }
 
@@ -284,11 +284,11 @@ struct Slide4View: View {
             VStack(alignment: .leading, spacing: 16) {
                 Text("What are you into today?")
                     .font(.heading1)
-                    .foregroundColor(.coffeeTextPrimary)
+                    .foregroundColor(.textPrimary)
                 
                 Text("Select at least 3 to find your vibe.")
                     .font(.bodyStandard)
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
             }
             .padding(.top, 40)
             .padding(.horizontal, 24)
@@ -439,12 +439,12 @@ struct Slide5View: View {
                 
                 // Button
                 NavigationLink(destination: PhoneAuthScreen()) {
-                    Text("Start Exploring")
+                    Text(AppStrings.Onboarding.slide5CTA)
                         .font(.buttonText)
-                        .foregroundColor(.white)
+                        .foregroundColor(.textOnBrand)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(Color.coffeePrimary)
+                        .background(Color.brandPrimary)
                         .clipShape(Capsule())
                 }
                 .padding(.horizontal, 24)
@@ -470,7 +470,7 @@ struct OnboardingProgressBar: View {
         HStack(spacing: 8) {
             ForEach(0..<total, id: \.self) { index in
                 Rectangle()
-                    .fill(index <= activeIndex ? Color.coffeePrimary : Color.coffeeTextSecondary.opacity(0.2))
+                    .fill(index <= activeIndex ? Color.brandPrimary : Color.textSecondary.opacity(0.2))
                     .frame(height: 4)
                     .cornerRadius(2)
             }
@@ -487,26 +487,26 @@ struct ActivityChip: View {
         VStack(alignment: .leading, spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 24))
-                .foregroundColor(.coffeeTextPrimary)
+                .foregroundColor(.textPrimary)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.captionText)
-                    .foregroundColor(.coffeeTextPrimary)
+                    .foregroundColor(.textPrimary)
                 
                 HStack(spacing: 4) {
                     Circle()
-                        .fill(Color.coffeeSuccess)
+                        .fill(Color.statusSuccess)
                         .frame(width: 6, height: 6)
                     Text("\(activeCount) ACTIVE")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.coffeeSuccess)
+                        .foregroundColor(.statusSuccess)
                 }
             }
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white)
+        .background(Color.textOnBrand)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
@@ -519,19 +519,19 @@ struct SafetyFeatureRow: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .foregroundColor(.coffeePrimary)
+                .foregroundColor(.brandPrimary)
                 .font(.system(size: 20))
                 .frame(width: 24)
             
             Text(text)
                 .font(.bodyStandard)
                 .fontWeight(.medium)
-                .foregroundColor(.coffeeTextPrimary)
+                .foregroundColor(.textPrimary)
             
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(Color.textOnBrand)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
@@ -547,10 +547,10 @@ struct InterestPill: View {
             Text(title)
                 .font(.bodyStandard)
                 .fontWeight(.medium)
-                .foregroundColor(isSelected ? .white : .coffeeTextPrimary)
+                .foregroundColor(isSelected ? .textOnBrand : .textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isSelected ? Color.coffeePrimary : Color.white)
+                .background(isSelected ? Color.brandPrimary : Color.textOnBrand)
                 .cornerRadius(12)
                 .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         }

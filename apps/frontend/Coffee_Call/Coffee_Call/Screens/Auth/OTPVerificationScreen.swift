@@ -17,9 +17,9 @@ struct OTPVerificationScreen: View {
             // Back Button
             HStack {
                 Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "arrow.left")
+                    Image(systemName: AppIcons.arrowLeft)
                         .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.coffeeTextPrimary)
+                        .foregroundColor(.textPrimary)
                 }
                 Spacer()
             }
@@ -27,13 +27,13 @@ struct OTPVerificationScreen: View {
 
             // Title
             VStack(alignment: .leading, spacing: 8) {
-                Text("Enter verification\ncode")
+                Text(AppStrings.Auth.otpTitle)
                     .font(.heading1)
-                    .foregroundColor(.coffeeTextPrimary)
-
-                Text("Sent to \(phoneNumber)")
+                    .foregroundColor(.textPrimary)
+                
+                Text("\(AppStrings.Auth.sentTo) \(phoneNumber)")
                     .font(.bodyStandard)
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
             }
             .padding(.top, 16)
 
@@ -42,13 +42,13 @@ struct OTPVerificationScreen: View {
                 ForEach(0..<6, id: \.self) { index in
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white)
+                            .fill(Color.textOnBrand)
                             .frame(width: 46, height: 56)
                             .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .strokeBorder(
-                                        index < otpCode.count ? Color.coffeePrimary : Color.clear,
+                                        index < otpCode.count ? Color.brandPrimary : Color.clear,
                                         lineWidth: 2
                                     )
                             )
@@ -57,7 +57,7 @@ struct OTPVerificationScreen: View {
                             let charIndex = otpCode.index(otpCode.startIndex, offsetBy: index)
                             Text(String(otpCode[charIndex]))
                                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                                .foregroundColor(.coffeeTextPrimary)
+                                .foregroundColor(.textPrimary)
                         }
                     }
                 }
@@ -82,7 +82,7 @@ struct OTPVerificationScreen: View {
             if let error = auth.errorMessage {
                 Text(error)
                     .font(.captionText)
-                    .foregroundColor(.coffeeError)
+                    .foregroundColor(.statusError)
             }
 
             Spacer()
@@ -96,16 +96,16 @@ struct OTPVerificationScreen: View {
                 HStack(spacing: 12) {
                     if auth.isLoading {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .progressViewStyle(CircularProgressViewStyle(tint: .textOnBrand))
                             .scaleEffect(0.9)
                     }
-                    Text(auth.isLoading ? "Verifying..." : "Verify →")
+                    Text(auth.isLoading ? AppStrings.Auth.verifying : AppStrings.Auth.otpCTA)
                         .font(.buttonText)
-                        .foregroundColor(.white)
+                        .foregroundColor(.textOnBrand)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isCodeComplete ? Color.coffeePrimary : Color.coffeeTextSecondary.opacity(0.3))
+                .background(isCodeComplete ? Color.brandPrimary : Color.textSecondary.opacity(0.3))
                 .clipShape(Capsule())
             }
             .disabled(!isCodeComplete || auth.isLoading)
@@ -115,7 +115,7 @@ struct OTPVerificationScreen: View {
             Button(action: { navigateToProfile = true }) {
                 Text("⚡ Skip Verify (Debug)")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.coffeeTextSecondary)
+                    .foregroundColor(.textSecondary)
             }
             .frame(maxWidth: .infinity)
             .padding(.bottom, 32)
@@ -129,7 +129,7 @@ struct OTPVerificationScreen: View {
             ) { EmptyView() }
         )
         .padding(.horizontal, 24)
-        .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
     }
 }

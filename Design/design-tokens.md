@@ -192,59 +192,39 @@ Disabled:   background: color-surface-alt, text: color-text-tertiary
 
 ---
 
-## Implementation Standard
+### 1. Semantic Naming
+We use a semantic naming convention for colors to ensure the UI is role-based and theme-ready.
 
-To ensure consistency and type-safety, we use a centralized naming system for all design assets.
+- **Brand:** `brandPrimary`, `brandSecondary`
+- **UI:** `backgroundMain`, `surfaceMain`, `appBorder`
+- **Text:** `textPrimary`, `textSecondary`, `textOnBrand`
+- **Status:** `statusSuccess`, `statusError`
 
-### 1. Asset Catalog
-All binary assets (Colors, Images, Icons) MUST be stored in the `Assets.xcassets` catalog and accessed via our standardized extensions.
+### 2. Standardized Asset Management
+All assets are centralized in the `DesignSystem/` directory:
 
-### 2. Static Strings (Text)
-Strings are managed in `DesignSystem/AppStrings.swift` using a nested enum structure.
-- **Usage:** `AppText.Onboarding.title`
-- **Why:** Centralizes all copy, making updates and localization simple.
+- **Strings:** `AppStrings.swift` (Nested enums: `Auth`, `Onboarding`)
+- **Icons:** `AppIcons.swift` (SF Symbols)
+- **Images:** `AppImages.swift` (Remote & Local assets)
+- **Colors:** `Color+Extensions.swift` (Semantic tokens)
 
-### 3. Colors
-Colors are managed via an extension on `Color` in `DesignSystem/Color+Extensions.swift`.
-- **Usage:** `Color.coffeePrimary`
-- **Why:** Enables auto-complete and ensures only approved palette colors are used.
-
-### 4. Images & Backgrounds
-Images are managed in `DesignSystem/AppImages.swift`.
-- **Usage:** `AppImages.Onboarding.hero`
-- **Why:** Decouples the logic of fetching (local vs remote) from the View.
-
-### 5. Icons
-Icons (SF Symbols) are managed in `DesignSystem/AppIcons.swift`.
-- **Usage:** `AppIcons.navHome`
-- **Why:** Ensures consistent weight and style across the app.
-
----
-
-## Code Example
+### 3. Usage Pattern
+Developers MUST NOT use hardcoded strings, raw colors, or "magic symbols" in Views.
 
 ```swift
-struct ExampleView: View {
-    var body: some View {
-        VStack {
-            AppImages.logo
-                .resizable()
-                .frame(width: 100, height: 100)
-            
-            Text(AppStrings.welcome)
-                .font(.heading1)
-                .foregroundColor(.coffeePrimary)
-            
-            Button(action: {}) {
-                Label(AppStrings.continueBtn, systemImage: AppIcons.arrowRight)
-            }
-            .buttonStyle(PrimaryButtonStyle())
-        }
-    }
-}
+// [CORRECT]
+Text(AppStrings.Auth.phoneTitle)
+    .foregroundColor(.textPrimary)
+Image(systemName: AppIcons.arrowRight)
+    .foregroundColor(.brandPrimary)
+
+// [INCORRECT]
+Text("What's your number?")
+    .foregroundColor(Color("DarkGray"))
+Image(systemName: "arrow.right")
 ```
 
 ---
 
-**Status:** Finalized  
+**Status:** Standardized (v1.1)  
 **Last Updated:** 2026-05-13

@@ -9,7 +9,7 @@ struct ContentView: View {
                 // TODO: Replace with HomeScreen when built
                 Text("Welcome! You're signed in.")
                     .font(.heading1)
-                    .foregroundColor(.coffeeTextPrimary)
+                    .foregroundColor(.textPrimary)
             } else {
                 NavigationView {
                     OnboardingScreen()

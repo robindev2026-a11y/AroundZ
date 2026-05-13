@@ -14,13 +14,13 @@ struct PrimaryButton: View {
                 .padding(.vertical, 16)
                 .background(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(isDisabled ? Color.coffeeTextSecondary.opacity(0.35) : Color.coffeePrimaryDark)
+                        .fill(isDisabled ? Color.textSecondary.opacity(0.35) : Color.brandPrimaryDark)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(Color.white.opacity(isDisabled ? 0.08 : 0.12), lineWidth: 1)
+                        .stroke(Color.textOnBrand.opacity(isDisabled ? 0.08 : 0.12), lineWidth: 1)
                 )
-                .shadow(color: Color.coffeePrimary.opacity(isDisabled ? 0.0 : 0.22), radius: 14, x: 0, y: 8)
+                .shadow(color: Color.brandPrimary.opacity(isDisabled ? 0.0 : 0.22), radius: 14, x: 0, y: 8)
         }
         .disabled(isDisabled)
     }

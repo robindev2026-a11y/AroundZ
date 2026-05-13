@@ -12,11 +12,11 @@ struct GlassmorphicCard<Content: View>: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color.coffeeSurface.opacity(0.94))
+                    .fill(Color.surfaceMain.opacity(0.94))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(Color.coffeeBorder.opacity(0.95), lineWidth: 1)
+                    .stroke(Color.appBorder.opacity(0.95), lineWidth: 1)
             )
             .shadow(color: Color.black.opacity(0.05), radius: 16, x: 0, y: 10)
     }
