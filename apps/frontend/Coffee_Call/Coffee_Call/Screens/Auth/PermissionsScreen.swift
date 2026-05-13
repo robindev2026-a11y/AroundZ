@@ -146,6 +146,7 @@ struct PermissionsScreen: View {
             }
             .foregroundColor(.textSecondary.opacity(0.6))
             .padding(.bottom, 32)
+        }
         .padding(.horizontal, 24)
         .background(Color.textOnBrand.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)

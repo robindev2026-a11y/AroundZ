@@ -32,3 +32,9 @@ This document tracks recurring issues, build gotchas, and design patterns to ens
     - Headlines/Progress: `0.2s`
     - Content/Cards: `0.4s - 0.6s`
     - CTA Buttons: `0.6s`
+
+## 6. Build Environment
+- **Concurrent Builds**: NEVER run `xcodebuild` in the terminal while Xcode is open and building. 
+    - *Why:* This locks the build database and causes "Internal Inconsistency" errors (incomplete targets).
+    - *Fix:* Close Xcode or terminate terminal builds. If the database gets corrupted, delete the project's **Derived Data** folder.
+
