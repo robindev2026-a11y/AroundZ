@@ -52,7 +52,7 @@ struct ProfileSetupScreen: View {
                         .fill(Color.brandPrimary)
                         .frame(width: 32, height: 32)
                         .overlay(
-                            Image(systemName: AppIcons.cameraFill)
+                            Image(systemName: AppIcons.camera)
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.textOnBrand)
                         )
@@ -145,7 +145,7 @@ struct ProfileSetupScreen: View {
 
             #if DEBUG
             Button(action: { navigateToPermissions = true }) {
-                Text("⚡ Skip Profile (Debug)")
+                Text(AppStrings.Auth.skipProfileDebug)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.textSecondary)
             }

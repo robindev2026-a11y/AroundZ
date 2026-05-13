@@ -10,6 +10,9 @@
 		08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */; };
 		116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */; };
 		19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */; };
+		338E3B192FB435F40048FC32 /* AppIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B162FB435F40048FC32 /* AppIcons.swift */; };
+		338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B172FB435F40048FC32 /* AppImages.swift */; };
+		338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B182FB435F40048FC32 /* AppStrings.swift */; };
 		33CA3A282FB33A3F008EF23C /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */; };
 		33CA3A2A2FB33A3F008EF23C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A292FB33A3F008EF23C /* ContentView.swift */; };
 		33CA3A2C2FB33A41008EF23C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A2B2FB33A41008EF23C /* Assets.xcassets */; };
@@ -58,6 +61,9 @@
 		1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTPVerificationScreen.swift; sourceTree = "<group>"; };
 		11C75F18AD0A56F05577934A /* PillBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PillBadge.swift; sourceTree = "<group>"; };
 		1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationPermissionScreen.swift; sourceTree = "<group>"; };
+		338E3B162FB435F40048FC32 /* AppIcons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
+		338E3B172FB435F40048FC32 /* AppImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
+		338E3B182FB435F40048FC32 /* AppStrings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		33CA3A242FB33A3F008EF23C /* Coffee_Call.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Coffee_Call.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallApp.swift; sourceTree = "<group>"; };
 		33CA3A292FB33A3F008EF23C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -235,11 +241,15 @@
 		EC5C2209D10A1787EA76F764 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				338E3B162FB435F40048FC32 /* AppIcons.swift */,
+				338E3B172FB435F40048FC32 /* AppImages.swift */,
+				338E3B182FB435F40048FC32 /* AppStrings.swift */,
 				6E4792D78269808A78FA6024 /* Font+Extensions.swift */,
 				FFABF6FCFF8585103471820C /* Color+Extensions.swift */,
 			);
-			path = DesignSystem;
-			sourceTree = "<group>";
+			name = DesignSystem;
+			path = /Users/development/Documents/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem;
+			sourceTree = "<absolute>";
 		};
 /* End PBXGroup section */
 
@@ -386,10 +396,12 @@
 				33CA3A2A2FB33A3F008EF23C /* ContentView.swift in Sources */,
 				33CA3A282FB33A3F008EF23C /* Coffee_CallApp.swift in Sources */,
 				33CA3A342FB33A41008EF23C /* Coffee_Call.xcdatamodeld in Sources */,
+				338E3B192FB435F40048FC32 /* AppIcons.swift in Sources */,
 				8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */,
 				9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */,
 				9E04FFF08F3A7B125341F872 /* OnboardingScreen.swift in Sources */,
 				19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */,
+				338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */,
 				8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */,
 				EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */,
 				54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */,
@@ -398,6 +410,7 @@
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
 				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
+				338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */,
 				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

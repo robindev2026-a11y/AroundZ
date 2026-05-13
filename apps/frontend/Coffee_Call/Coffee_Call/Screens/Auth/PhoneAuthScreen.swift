@@ -120,7 +120,7 @@ struct PhoneAuthScreen: View {
 
             #if DEBUG
             Button(action: { navigateToOTP = true }) {
-                Text("⚡ Skip OTP (Debug)")
+                Text(AppStrings.Auth.skipDebug)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.textSecondary)
             }
@@ -211,8 +211,8 @@ struct CountryPickerView: View {
                     .padding(.vertical, 4)
                 }
             }
-            .searchable(text: $search, prompt: "Search country")
-            .navigationTitle("Select Country")
+            .searchable(text: $search, prompt: AppStrings.Auth.searchCountry)
+            .navigationTitle(AppStrings.Auth.selectCountry)
             .navigationBarTitleDisplayMode(.inline)
         }
     }

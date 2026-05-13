@@ -52,11 +52,11 @@ struct ReadyScreen: View {
                     )
                     .padding(.bottom, 4)
                 
-                Text("First Activity Tip")
+                Text(AppStrings.Auth.tipTitle)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.textPrimary)
                 
-                Text("Don't be shy! Most people on\nCoffeeCall are just as eager to meet\nsomeone new.")
+                Text(AppStrings.Auth.tipDesc)
                     .font(.system(size: 13))
                     .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)

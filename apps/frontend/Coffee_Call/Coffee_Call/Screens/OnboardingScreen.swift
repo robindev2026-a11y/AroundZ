@@ -107,10 +107,10 @@ struct Slide1View: View {
                                     .overlay(Image(systemName: "sun.max.fill").foregroundColor(.white))
                                 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("NOW NEARBY")
+                                    Text(AppStrings.Onboarding.nowNearby)
                                         .font(.captionText)
                                         .foregroundColor(.white.opacity(0.8))
-                                    Text("Sunset Walk + Convo")
+                                    Text(AppStrings.Onboarding.activity1Title)
                                         .font(.bodySmall)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.white)
@@ -131,10 +131,10 @@ struct Slide1View: View {
                                     .overlay(Image(systemName: "camera.fill").foregroundColor(.white))
                                 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("12 PEOPLE JOINED")
+                                    Text(String(format: AppStrings.Onboarding.peopleJoined, 12))
                                         .font(.captionText)
                                         .foregroundColor(.white.opacity(0.8))
-                                    Text("Photo Session at Park")
+                                    Text(AppStrings.Onboarding.activity2Title)
                                         .font(.bodySmall)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.white)
@@ -147,7 +147,7 @@ struct Slide1View: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 48)
                 
-                PrimaryButton(title: "Let's Go →") {
+                PrimaryButton(title: AppStrings.Onboarding.slide1CTA) {
                     currentPage = 1
                 }
                 .padding(.horizontal, 24)
@@ -175,11 +175,11 @@ struct Slide2View: View {
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
-                Text("Discover what's\nhappening nearby.")
+                Text(AppStrings.Onboarding.slide2Title)
                     .font(.heading1)
                     .foregroundColor(.textPrimary)
                 
-                Text("Coffee chats, walks, gaming, and spontaneous social moments.")
+                Text(AppStrings.Onboarding.slide2Subtitle)
                     .font(.bodyStandard)
                     .foregroundColor(.textSecondary)
                     .lineSpacing(4)
@@ -204,7 +204,7 @@ struct Slide2View: View {
             
             Spacer()
             
-            PrimaryButton(title: "Next →") {
+            PrimaryButton(title: AppStrings.Onboarding.slide2CTA) {
                 currentPage = 2
             }
             .padding(.horizontal, 24)
@@ -232,12 +232,12 @@ struct Slide3View: View {
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
-                Text("Safe, friendly,\nand verified.")
+                Text(AppStrings.Onboarding.slide3Title)
                     .font(.heading1)
                     .foregroundColor(.textPrimary)
                     .multilineTextAlignment(.center)
                 
-                Text("We prioritize trust and real connections through verified profiles and community vibes.")
+                Text(AppStrings.Onboarding.slide3Subtitle)
                     .font(.bodyStandard)
                     .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)
@@ -250,15 +250,15 @@ struct Slide3View: View {
             Spacer()
             
             VStack(spacing: 16) {
-                SafetyFeatureRow(icon: "checkmark.shield", text: "Verified Community")
-                SafetyFeatureRow(icon: "person.2", text: "Shared Mutual Friends")
-                SafetyFeatureRow(icon: "heart.text.square", text: "Vibe-Checked Meetups")
+                SafetyFeatureRow(icon: "checkmark.shield", text: AppStrings.Onboarding.safetyFeature1)
+                SafetyFeatureRow(icon: "person.2", text: AppStrings.Onboarding.safetyFeature2)
+                SafetyFeatureRow(icon: "heart.text.square", text: AppStrings.Onboarding.safetyFeature3)
             }
             .padding(.horizontal, 24)
             
             Spacer()
             
-            PrimaryButton(title: "Sounds Good →") {
+            PrimaryButton(title: AppStrings.Onboarding.slide3CTA) {
                 currentPage = 3
             }
             .padding(.horizontal, 24)
@@ -282,11 +282,11 @@ struct Slide4View: View {
                 .padding(.horizontal, 24)
             
             VStack(alignment: .leading, spacing: 16) {
-                Text("What are you into today?")
+                Text(AppStrings.Onboarding.slide4Title)
                     .font(.heading1)
                     .foregroundColor(.textPrimary)
                 
-                Text("Select at least 3 to find your vibe.")
+                Text(AppStrings.Onboarding.slide4Subtitle)
                     .font(.bodyStandard)
                     .foregroundColor(.textSecondary)
             }
@@ -324,19 +324,19 @@ struct Slide4View: View {
             let isReady = remaining == 0
             
             Button(action: { currentPage = 4 }) {
-                Text(isReady ? "Let's Go" : "Select \(remaining) more")
+                Text(isReady ? AppStrings.Onboarding.readyToGo : String(format: AppStrings.Onboarding.selectMore, remaining))
                     .font(.buttonText)
-                    .foregroundColor(isReady ? .white : .coffeeTextSecondary)
+                    .foregroundColor(isReady ? .white : .textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(isReady ? Color.coffeePrimary : Color.coffeeTextSecondary.opacity(0.2))
+                    .background(isReady ? Color.brandPrimary : Color.textSecondary.opacity(0.2))
                     .clipShape(Capsule())
             }
             .disabled(!isReady)
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
     }
     
     private func toggle(_ interest: String) {
@@ -374,7 +374,7 @@ struct Slide5View: View {
                 
                 // Icon
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color.coffeePrimary)
+                    .fill(Color.brandPrimary)
                     .frame(width: 88, height: 88)
                     .overlay(
                         Text("🎉")
@@ -384,7 +384,7 @@ struct Slide5View: View {
                     .padding(.bottom, 32)
                 
                 // Headings
-                Text("You're ready to\njoin the moment.")
+                Text(AppStrings.Onboarding.slide5Title)
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -392,7 +392,7 @@ struct Slide5View: View {
                     .padding(.bottom, 16)
                     .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
                 
-                Text("48 meetups happening in your\ncity right now.")
+                Text(AppStrings.Onboarding.slide5Subtitle)
                     .font(.bodyStandard)
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
@@ -422,7 +422,7 @@ struct Slide5View: View {
                         .fill(Color.purple.opacity(0.8))
                         .frame(width: 44, height: 44)
                         .overlay(
-                            Text("+1.2k")
+                            Text(AppStrings.Onboarding.socialProofCount)
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.white)
                         )
@@ -430,9 +430,9 @@ struct Slide5View: View {
                 }
                 .padding(.bottom, 16)
                 
-                Text("JOIN RILEY AND 1,204 OTHERS NEARBY")
+                Text(AppStrings.Onboarding.communityJoinNote)
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(.white.opacity(0.8) )
                     .kerning(1.2)
                 
                 Spacer()
@@ -450,7 +450,7 @@ struct Slide5View: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 16)
                 
-                Text("NO CREDIT CARD REQUIRED • JOIN FOR FREE")
+                Text(AppStrings.Onboarding.joinFreeNote)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.white.opacity(0.55))
                     .kerning(1.0)
@@ -498,7 +498,7 @@ struct ActivityChip: View {
                     Circle()
                         .fill(Color.statusSuccess)
                         .frame(width: 6, height: 6)
-                    Text("\(activeCount) ACTIVE")
+                    Text(String(format: AppStrings.Onboarding.activeCount, activeCount))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(.statusSuccess)
                 }

@@ -6,23 +6,23 @@ struct LocationPermissionScreen: View {
             Spacer()
             
             Circle()
-                .fill(Color.white)
+                .fill(Color.textOnBrand)
                 .frame(width: 80, height: 80)
                 .overlay(
-                    Image(systemName: "location.fill")
-                        .foregroundColor(.coffeePrimary)
+                    Image(systemName: AppIcons.location)
+                        .foregroundColor(.brandPrimary)
                         .font(.system(size: 32))
                 )
                 .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
             
-            Text("Enable Location")
+            Text(AppStrings.Auth.locationTitle)
                 .font(.heading1)
-                .foregroundColor(.coffeeTextPrimary)
+                .foregroundColor(.textPrimary)
                 .multilineTextAlignment(.center)
             
-            Text("CoffeeCall uses your location to match you with nearby people and activities within a 10km radius.")
+            Text(AppStrings.Auth.locationRadiusDesc)
                 .font(.bodyStandard)
-                .foregroundColor(.coffeeTextSecondary)
+                .foregroundColor(.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
                 .padding(.horizontal, 16)
@@ -30,23 +30,23 @@ struct LocationPermissionScreen: View {
             Spacer()
             
             VStack(spacing: 16) {
-                PrimaryButton(title: "Allow Location") {
+                PrimaryButton(title: AppStrings.Auth.locationSimpleCTA) {
                     print("Requesting Location Permissions")
                 }
                 
                 Button(action: {
                     print("Skipping Location")
                 }) {
-                    Text("Skip for now")
+                    Text(AppStrings.Auth.locationSkip)
                         .font(.buttonText)
-                        .foregroundColor(.coffeeTextSecondary)
+                        .foregroundColor(.textSecondary)
                 }
                 .padding(.vertical, 8)
             }
             .padding(.bottom, 40)
         }
         .padding(.horizontal, 24)
-        .background(Color.coffeeSurface.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
     }
 }

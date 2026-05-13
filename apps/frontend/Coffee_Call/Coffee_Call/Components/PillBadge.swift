@@ -26,7 +26,7 @@ struct PillBadge: View {
 struct PillBadge_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
-            Color.coffeePrimaryDark.edgesIgnoringSafeArea(.all)
+            Color.brandPrimaryDark.edgesIgnoringSafeArea(.all)
             PillBadge(title: "BETA", systemImage: "sparkles")
         }
     }

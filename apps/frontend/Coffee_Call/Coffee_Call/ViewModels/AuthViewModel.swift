@@ -36,7 +36,7 @@ class AuthViewModel: ObservableObject {
         let timeoutTask = DispatchWorkItem { [weak self] in
             guard let self = self, self.isLoading else { return }
             self.isLoading = false
-            self.errorMessage = "OTP request timed out. Use a Firebase test phone number in the simulator."
+            self.errorMessage = AppStrings.Error.otpTimeout
             completion(false)
         }
         otpTimeoutTask = timeoutTask
@@ -54,7 +54,7 @@ class AuthViewModel: ObservableObject {
                 }
 
                 guard let verificationID = verificationID, !verificationID.isEmpty else {
-                    self?.errorMessage = "Firebase did not return a verification ID."
+                    self?.errorMessage = AppStrings.Error.missingVerificationID
                     completion(false)
                     return
                 }
@@ -68,7 +68,7 @@ class AuthViewModel: ObservableObject {
     // MARK: - Step 2: Verify OTP
     func verifyOTP(code: String, completion: @escaping (Bool) -> Void) {
         guard let verificationID = verificationID else {
-            errorMessage = "Something went wrong. Please try again."
+            errorMessage = AppStrings.Error.generic
             completion(false)
             return
         }
@@ -85,7 +85,7 @@ class AuthViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.isLoading = false
                 if let error = error {
-                    self?.errorMessage = "Incorrect code. Please try again."
+                    self?.errorMessage = AppStrings.Error.incorrectCode
                     print("[AuthViewModel] OTP Error: \(error.localizedDescription)")
                     completion(false)
                     return
@@ -98,7 +98,7 @@ class AuthViewModel: ObservableObject {
     // MARK: - Step 3: Save Profile to Firestore
     func saveProfile(name: String, completion: @escaping (Bool) -> Void) {
         guard let user = Auth.auth().currentUser else {
-            errorMessage = "Not signed in."
+            errorMessage = AppStrings.Error.notSignedIn
             completion(false)
             return
         }

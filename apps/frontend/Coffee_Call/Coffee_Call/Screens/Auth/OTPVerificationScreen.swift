@@ -113,7 +113,7 @@ struct OTPVerificationScreen: View {
 
             #if DEBUG
             Button(action: { navigateToProfile = true }) {
-                Text("⚡ Skip Verify (Debug)")
+                Text(AppStrings.Auth.skipVerifyDebug)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.textSecondary)
             }

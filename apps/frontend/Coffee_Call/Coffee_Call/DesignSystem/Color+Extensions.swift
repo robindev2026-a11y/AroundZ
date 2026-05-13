@@ -20,11 +20,4 @@ extension Color {
     // MARK: - Status
     static let statusSuccess = Color("coffeeSuccess")
     static let statusError = Color(red: 0.87, green: 0.27, blue: 0.27)
-    
-    // MARK: - Legacy Aliases (to be deprecated)
-    static let coffeePrimary = brandPrimary
-    static let coffeeBackground = backgroundMain
-    static let coffeeTextPrimary = textPrimary
-    static let coffeeTextSecondary = textSecondary
-    static let coffeeError = statusError
 }
