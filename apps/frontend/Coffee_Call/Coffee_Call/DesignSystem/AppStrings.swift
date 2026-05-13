@@ -8,7 +8,7 @@ enum AppStrings {
         static let slide1Title1 = "Meet people"
         static let slide1Title2 = "nearby in"
         static let slide1Title3 = "real life."
-        static let slide1CTA = "Let's Go →"
+        static let slide1CTA = "Let's Go"
         static let activity1Title = "Sunset Walk + Convo"
         static let activity2Title = "Photo Session at Park"
         
@@ -81,6 +81,13 @@ enum AppStrings {
         static let privacyNote = "YOUR PRIVACY IS OUR PRIORITY"
         static let tipTitle = "First Activity Tip"
         static let tipDesc = "Don't be shy! Most people on\nCoffeeCall are just as eager to meet\nsomeone new."
+        
+        static let otpTitle = "Enter your\nverification code"
+        static let verifying = "Verifying..."
+        static let otpCTA = "Verify Code"
+        static let sentTo = "Sent to"
+        
+        
     }
     
     enum Error {
@@ -89,5 +96,43 @@ enum AppStrings {
         static let generic = "Something went wrong. Please try again."
         static let incorrectCode = "Incorrect code. Please try again."
         static let notSignedIn = "Not signed in."
+    }
+
+    enum Tabs {
+        static let discover  = "Discover"
+        static let myPosts   = "My Posts"
+        static let messages  = "Messages"
+        static let profile   = "Profile"
+    }
+
+    enum Discovery {
+        static let title = "Discover"
+        static let subtitle = "What's happening nearby"
+        static let locationLabel = "NEARBY"
+        static let searchPlaceholder = "Search activities..."
+        static let joinBtn = "Join"
+        static let joinedBtn = "Joined"
+        static let joinMomentBtn = "Join Moment"
+        static let distanceKm = "%d km away"
+        static let timeAgo = "%@ ago"
+        static let postBtn = "Post Activity"
+        static let meetupsNearby = "%d meetups happening nearby"
+
+        enum Categories {
+            static let all = "All"
+            static let coffee = "Coffee"
+            static let walks = "Walks"
+            static let gaming = "Gaming"
+            static let study = "Study"
+            static let food = "Food"
+            static let startup = "Startup"
+            static let music = "Music"
+        }
+    }
+
+    enum Main {
+        static let myPosts = "My Posts"
+        static let messages = "Messages"
+        static let profile = "Profile"
     }
 }

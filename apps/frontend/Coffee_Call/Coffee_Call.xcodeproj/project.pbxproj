@@ -10,14 +10,20 @@
 		08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */; };
 		116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */; };
 		19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */; };
+		3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F02FB475DD0077EAC8 /* Coffee_CallApp.swift */; };
+		3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F12FB475DD0077EAC8 /* ContentView.swift */; };
+		3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F32FB475DD0077EAC8 /* Persistence.swift */; };
+		3387CF312FB495D40084895E /* BetaBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3387CF302FB495D20084895E /* BetaBadge.swift */; };
 		338E3B192FB435F40048FC32 /* AppIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B162FB435F40048FC32 /* AppIcons.swift */; };
 		338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B172FB435F40048FC32 /* AppImages.swift */; };
 		338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B182FB435F40048FC32 /* AppStrings.swift */; };
-		33CA3A282FB33A3F008EF23C /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */; };
-		33CA3A2A2FB33A3F008EF23C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A292FB33A3F008EF23C /* ContentView.swift */; };
+		338E3B1E2FB44DFF0048FC32 /* ActivityCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B1C2FB44DFF0048FC32 /* ActivityCardView.swift */; };
+		338E3B1F2FB44DFF0048FC32 /* CategoryChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B1D2FB44DFF0048FC32 /* CategoryChip.swift */; };
+		338E3B222FB464920048FC32 /* CoffeeImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B202FB464920048FC32 /* CoffeeImageView.swift */; };
+		338E3B232FB464920048FC32 /* FloatingTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B212FB464920048FC32 /* FloatingTabBar.swift */; };
+		338E3B272FB46EA60048FC32 /* AnimationSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B262FB46EA50048FC32 /* AnimationSystem.swift */; };
 		33CA3A2C2FB33A41008EF23C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A2B2FB33A41008EF23C /* Assets.xcassets */; };
 		33CA3A2F2FB33A41008EF23C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A2E2FB33A41008EF23C /* Preview Assets.xcassets */; };
-		33CA3A312FB33A41008EF23C /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A302FB33A41008EF23C /* Persistence.swift */; };
 		33CA3A342FB33A41008EF23C /* Coffee_Call.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */; };
 		33CA3A3F2FB33A42008EF23C /* Coffee_CallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A3E2FB33A42008EF23C /* Coffee_CallTests.swift */; };
 		33CA3A492FB33A42008EF23C /* Coffee_CallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */; };
@@ -29,14 +35,17 @@
 		33CA3A642FB3617D008EF23C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 33CA3A632FB3617D008EF23C /* FirebaseStorage */; };
 		33CA3A662FB36C6B008EF23C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */; };
 		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
+		43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860AAD253DC8B95B03AF333 /* MainTabView.swift */; };
 		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
 		64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79EEFE313C630B04AED288E /* AuthViewModel.swift */; };
+		78E7D14988238765F3DD1D7C /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1DF7DD85DAFAEF4D0D1EA7F /* Activity.swift */; };
 		7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */; };
 		86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
 		9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFABF6FCFF8585103471820C /* Color+Extensions.swift */; };
 		9E04FFF08F3A7B125341F872 /* OnboardingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */; };
+		A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */; };
 		EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,30 +70,40 @@
 		1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTPVerificationScreen.swift; sourceTree = "<group>"; };
 		11C75F18AD0A56F05577934A /* PillBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PillBadge.swift; sourceTree = "<group>"; };
 		1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationPermissionScreen.swift; sourceTree = "<group>"; };
+		3302E3F02FB475DD0077EAC8 /* Coffee_CallApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coffee_CallApp.swift; sourceTree = "<group>"; };
+		3302E3F12FB475DD0077EAC8 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3302E3F22FB475DD0077EAC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3302E3F32FB475DD0077EAC8 /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		3387CF302FB495D20084895E /* BetaBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BetaBadge.swift; sourceTree = "<group>"; };
 		338E3B162FB435F40048FC32 /* AppIcons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		338E3B172FB435F40048FC32 /* AppImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
 		338E3B182FB435F40048FC32 /* AppStrings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
+		338E3B1C2FB44DFF0048FC32 /* ActivityCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityCardView.swift; sourceTree = "<group>"; };
+		338E3B1D2FB44DFF0048FC32 /* CategoryChip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryChip.swift; sourceTree = "<group>"; };
+		338E3B202FB464920048FC32 /* CoffeeImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoffeeImageView.swift; sourceTree = "<group>"; };
+		338E3B212FB464920048FC32 /* FloatingTabBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingTabBar.swift; sourceTree = "<group>"; };
+		338E3B262FB46EA50048FC32 /* AnimationSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationSystem.swift; sourceTree = "<group>"; };
 		33CA3A242FB33A3F008EF23C /* Coffee_Call.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Coffee_Call.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallApp.swift; sourceTree = "<group>"; };
-		33CA3A292FB33A3F008EF23C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		33CA3A2B2FB33A41008EF23C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		33CA3A2E2FB33A41008EF23C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		33CA3A302FB33A41008EF23C /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		33CA3A332FB33A41008EF23C /* Coffee_Call.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Coffee_Call.xcdatamodel; sourceTree = "<group>"; };
 		33CA3A3A2FB33A42008EF23C /* Coffee_CallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Coffee_CallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A3E2FB33A42008EF23C /* Coffee_CallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallTests.swift; sourceTree = "<group>"; };
 		33CA3A442FB33A42008EF23C /* Coffee_CallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Coffee_CallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITests.swift; sourceTree = "<group>"; };
 		33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "App/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingScreen.swift; sourceTree = "<group>"; };
 		5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReadyScreen.swift; sourceTree = "<group>"; };
 		5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PermissionsScreen.swift; sourceTree = "<group>"; };
 		6E4792D78269808A78FA6024 /* Font+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
+		6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiscoveryScreen.swift; sourceTree = "<group>"; };
 		8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneAuthScreen.swift; sourceTree = "<group>"; };
 		968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassmorphicCard.swift; sourceTree = "<group>"; };
+		B860AAD253DC8B95B03AF333 /* MainTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileSetupScreen.swift; sourceTree = "<group>"; };
+		D1DF7DD85DAFAEF4D0D1EA7F /* Activity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Activity.swift; path = Models/Activity.swift; sourceTree = "<group>"; };
 		F79EEFE313C630B04AED288E /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		FFABF6FCFF8585103471820C /* Color+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -122,6 +141,11 @@
 		147D07BDA2FF4DF23D1993AE /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				3387CF302FB495D20084895E /* BetaBadge.swift */,
+				338E3B202FB464920048FC32 /* CoffeeImageView.swift */,
+				338E3B212FB464920048FC32 /* FloatingTabBar.swift */,
+				338E3B1C2FB44DFF0048FC32 /* ActivityCardView.swift */,
+				338E3B1D2FB44DFF0048FC32 /* CategoryChip.swift */,
 				968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */,
 				11C75F18AD0A56F05577934A /* PillBadge.swift */,
 				5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */,
@@ -134,6 +158,17 @@
 			children = (
 			);
 			path = Coffee_Call.xcdatamodel;
+			sourceTree = "<group>";
+		};
+		2E9C5C7F8B1E4D0CB37D2C1A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				3302E3F02FB475DD0077EAC8 /* Coffee_CallApp.swift */,
+				3302E3F12FB475DD0077EAC8 /* ContentView.swift */,
+				3302E3F22FB475DD0077EAC8 /* Info.plist */,
+				3302E3F32FB475DD0077EAC8 /* Persistence.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		33CA3A1B2FB33A3F008EF23C = {
@@ -160,10 +195,8 @@
 			isa = PBXGroup;
 			children = (
 				33CA3A652FB36C6B008EF23C /* GoogleService-Info.plist */,
-				33CA3A272FB33A3F008EF23C /* Coffee_CallApp.swift */,
-				33CA3A292FB33A3F008EF23C /* ContentView.swift */,
+				2E9C5C7F8B1E4D0CB37D2C1A /* App */,
 				33CA3A2B2FB33A41008EF23C /* Assets.xcassets */,
-				33CA3A302FB33A41008EF23C /* Persistence.swift */,
 				33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */,
 				33CA3A2D2FB33A41008EF23C /* Preview Content */,
 				EC5C2209D10A1787EA76F764 /* DesignSystem */,
@@ -171,6 +204,7 @@
 				854F67326A3D7D34D2066BA2 /* Screens */,
 				147D07BDA2FF4DF23D1993AE /* Components */,
 				994023EC0D7FE9DAA8687F3A /* ViewModels */,
+				A616335262E59CBA3EF3D878 /* Models */,
 			);
 			path = Coffee_Call;
 			sourceTree = "<group>";
@@ -200,6 +234,15 @@
 			path = Coffee_CallUITests;
 			sourceTree = "<group>";
 		};
+		6C7F7ABFC2D113FA3339DA3D /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */,
+				B860AAD253DC8B95B03AF333 /* MainTabView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
 		84551E1ABED9653323C91E44 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -218,6 +261,7 @@
 			children = (
 				4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */,
 				84551E1ABED9653323C91E44 /* Auth */,
+				6C7F7ABFC2D113FA3339DA3D /* Main */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -228,6 +272,14 @@
 				F79EEFE313C630B04AED288E /* AuthViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A616335262E59CBA3EF3D878 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D1DF7DD85DAFAEF4D0D1EA7F /* Activity.swift */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 		D5039854887953B93268D7A0 /* Coffee_Call.xcdatamodeld */ = {
@@ -241,15 +293,15 @@
 		EC5C2209D10A1787EA76F764 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				338E3B262FB46EA50048FC32 /* AnimationSystem.swift */,
 				338E3B162FB435F40048FC32 /* AppIcons.swift */,
 				338E3B172FB435F40048FC32 /* AppImages.swift */,
 				338E3B182FB435F40048FC32 /* AppStrings.swift */,
 				6E4792D78269808A78FA6024 /* Font+Extensions.swift */,
 				FFABF6FCFF8585103471820C /* Color+Extensions.swift */,
 			);
-			name = DesignSystem;
-			path = /Users/development/Documents/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem;
-			sourceTree = "<absolute>";
+			path = DesignSystem;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -392,13 +444,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33CA3A312FB33A41008EF23C /* Persistence.swift in Sources */,
-				33CA3A2A2FB33A3F008EF23C /* ContentView.swift in Sources */,
-				33CA3A282FB33A3F008EF23C /* Coffee_CallApp.swift in Sources */,
+				338E3B232FB464920048FC32 /* FloatingTabBar.swift in Sources */,
+				3387CF312FB495D40084895E /* BetaBadge.swift in Sources */,
 				33CA3A342FB33A41008EF23C /* Coffee_Call.xcdatamodeld in Sources */,
 				338E3B192FB435F40048FC32 /* AppIcons.swift in Sources */,
 				8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */,
+				338E3B222FB464920048FC32 /* CoffeeImageView.swift in Sources */,
 				9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */,
+				3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */,
+				338E3B1E2FB44DFF0048FC32 /* ActivityCardView.swift in Sources */,
 				9E04FFF08F3A7B125341F872 /* OnboardingScreen.swift in Sources */,
 				19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */,
 				338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */,
@@ -406,12 +460,19 @@
 				EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */,
 				54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */,
 				116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */,
+				338E3B1F2FB44DFF0048FC32 /* CategoryChip.swift in Sources */,
 				423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */,
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
+				338E3B272FB46EA60048FC32 /* AnimationSystem.swift in Sources */,
 				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
 				338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */,
 				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,
+				A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */,
+				3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */,
+				43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */,
+				3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */,
+				78E7D14988238765F3DD1D7C /* Activity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,7 +634,7 @@
 				DEVELOPMENT_TEAM = JVJZXPS8LZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Coffee_Call/Info.plist;
+				INFOPLIST_FILE = Coffee_Call/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -598,7 +659,7 @@
 				DEVELOPMENT_TEAM = JVJZXPS8LZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Coffee_Call/Info.plist;
+				INFOPLIST_FILE = Coffee_Call/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -26,4 +26,7 @@ enum AppIcons {
     static let shield = "checkmark.shield.fill"
     static let privacyShield = "checkmark.shield"
     static let bolt = "bolt.fill"
+    static let search = "magnifyingglass"
+    static let plus = "plus"
+    static let map = "map.fill"
 }

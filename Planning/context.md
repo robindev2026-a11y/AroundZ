@@ -8,6 +8,265 @@ Rules:
 - If this file grows too large, delete the oldest session entries and keep only the most recent ones.
 - Retention target: keep the latest 5 session entries or roughly the latest 300 lines, whichever comes first.
 
+## Session: Antigravity — Navigation & Build System Fixes (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Fixed Navigation Deprecations:** Migrated `PhoneAuthScreen`, `OTPVerificationScreen`, `ProfileSetupScreen`, and `PermissionsScreen` from the deprecated `NavigationLink(destination:isActive:)` to the modern `.navigationDestination(isPresented:)` for iOS 16 compatibility.
+- **Fixed Build Errors:** Resolved `Extra arguments` errors in `OnboardingScreen` by updating `PrimaryButton` to support optional `height`, `cornerRadius`, and `icon` parameters.
+- **Fixed Scope Errors:** Corrected `UltraThinMaterial` usage in `BetaBadge` and `GlassmorphicCard` (applied as `ShapeStyle` via `.fill()` instead of as a `View`).
+- **Standardized UI Tokens:** Replaced hardcoded color strings with semantic extensions (e.g., `.brandPrimary`) in `BetaBadge`.
+- **Documentation:** Created `docs/Planning/build-guidelines.md` to track recurring build issues and design patterns.
+
+## Session: Antigravity — Xcode Folder Reference Fix (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Fixed Build Errors:** Resolved `Cannot find type 'Activity' in scope` errors in `ActivityCardView` and `DiscoveryScreen`.
+- **Xcode Project Maintenance:**
+  - Removed the `Models/` folder reference (blue folder in Xcode) which was causing its contents to be treated as resources instead of source code.
+  - Created a proper `Models` group (yellow folder in Xcode).
+  - Added `Activity.swift` to the `Models` group and registered it in the `Sources` build phase for the `Coffee_Call` target.
+- **Tools Used:** Created and executed a Ruby script `scratch/fix_project.rb` using the `xcodeproj` gem to safely modify the project structure.
+
+**Why:** Xcode treats "Folder References" (blue folders) as bundles where files are NOT compiled. By converting it to a "Group" (yellow folder), the Swift files inside are correctly identified as source code to be compiled, making the `Activity` type available across the app scope.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call.xcodeproj/project.pbxproj`
+- `scratch/fix_project.rb` (new)
+
+---
+
+## Session: Antigravity — UltraThinMaterial Scope Fix (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Fixed Build Error:** Resolved `Cannot find 'UltraThinMaterial' in scope` by replacing invalid `UltraThinMaterial()` view instantiation with `Rectangle().fill(.ultraThinMaterial)`.
+- **Components Updated:**
+  - `Components/GlassmorphicCard.swift`: Updated background ZStack to use proper Material fill.
+  - `Components/BetaBadge.swift`: Updated background ZStack to use proper Material fill.
+- **Verification:** Verified that `ActivityCardView.swift` uses the correct `.background(.ultraThinMaterial)` modifier.
+
+**Why:** `UltraThinMaterial` is a `ShapeStyle` in SwiftUI, not a `View`. It cannot be instantiated with `()` as a standalone view in a `ZStack`. Using `Rectangle().fill(.ultraThinMaterial)` is the correct way to use it as a layer.
+
+**Files updated:**
+- `Components/GlassmorphicCard.swift`
+- `Components/BetaBadge.swift`
+
+---
+
+## Session: Kilo AI — Landing Screen Figma Compliance Fixes (2026-05-13)
+
+### Changed by: Kilo AI
+
+**What changed:**
+- **Background & Overlay:** Fixed UnsplashBackground gradient to use `#243447` (RGB 36,52,71) with opacity 0.9→0.4; added brightness(0.8) filter to image.
+- **Badge:** Created new `BetaBadge` component with glassmorphic styling (white/10 background, white/20 border, UltraThinMaterial blur, no shadow).
+- **Typography:** Updated headline to 40px black font with lineSpacing(4); added letter spacing tracking(-0.5).
+- **Glass Cards:** Modified `GlassmorphicCard` to use white/10 background, white/20 border, UltraThinMaterial blur; fixed emoji content (🌅, 📸) and proper text styling.
+- **Card Colors:** Added `coffeePurple` color asset (#8E7DBE); updated card fills to `brandPrimary` (teal) and `brandPurple`.
+- **Card Rotations:** Added -2° and +2° rotations to cards for visual balance.
+- **CTA Button:** Created custom inline button with 64px height, 24px radius, brandPrimary color, proper shadow, and arrow icon.
+- **Spacing:** Fixed all padding values to match 8px grid (top 96px, horizontal 32px, headline bottom 48px, CTA bottom 64px).
+- **Animations:** Added entrance animations with staggered delays (headline 0.2s, cards 0.4-0.6s, CTA 0.6s).
+- **Colors:** Added `darkOverlay` color token for background gradient.
+- **Build Fix:** Removed duplicate Info.plist reference from Xcode project.
+
+**Why:** Landing screen implementation did not match Figma design — wrong colors, fonts, spacing, and styling throughout.
+
+**Files updated:**
+- `Screens/OnboardingScreen.swift` — Complete Slide1View refactor
+- `Components/GlassmorphicCard.swift` — Glass styling update
+- `Components/BetaBadge.swift` — New glass badge component
+- `Components/PrimaryButton.swift` — Reverted to original (custom button for Slide1)
+- `DesignSystem/Color+Extensions.swift` — Added darkOverlay and brandPurple
+- `Assets.xcassets/coffeePurple.colorset/Contents.json` — New color asset
+- `DesignSystem/AppStrings.swift` — Removed arrow from slide1CTA
+- `Coffee_Call.xcodeproj/project.pbxproj` — Fixed duplicate Info.plist
+
+## Session: Xcode Folder Reorganization (2026-05-13)
+
+### What Changed
+- Moved the core app files into a physical `App/` folder:
+  - `Coffee_CallApp.swift`
+  - `ContentView.swift`
+  - `Persistence.swift`
+  - `Info.plist`
+  - `GoogleService-Info.plist`
+- Updated the Xcode project to point to the new `App/` paths.
+- Replaced the absolute-path `DesignSystem` group entry with a relative folder-based group.
+
+### Why
+- Keep the source tree folder-based instead of leaving core app files loose at the project root.
+- Make the Xcode navigator mirror the filesystem layout more closely.
+
+### Files Updated
+- `/apps/frontend/Coffee_Call/Coffee_Call/App/Coffee_CallApp.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/App/ContentView.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/App/Persistence.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/App/Info.plist`
+- `/apps/frontend/Coffee_Call/Coffee_Call/App/GoogleService-Info.plist`
+- `/apps/frontend/Coffee_Call/Coffee_Call.xcodeproj/project.pbxproj`
+
+### Next Step
+- If needed, continue cleaning the remaining Xcode groups so the navigator stays aligned with the folder structure.
+
+## Session: Antigravity — Onboarding Screen Fixes & Refactoring (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- Refactored `Screens/OnboardingScreen.swift`:
+  - Fixed critical syntax errors in `UnsplashBackground` (broken braces and undefined state).
+  - Migrated all `AsyncImage` instances to `CoffeeImageView` (Standard Image Protocol).
+  - Wrapped content in `NavigationView` to enable `NavigationLink` functionality on the final slide.
+  - Standardized font sizes and weights to match design-tokens.
+  - Fixed progress bar logic (total slides updated to 4).
+  - Ensured all background colors use semantic tokens (`surfaceMain`, `backgroundMain`).
+
+**Why:** Syntax errors were preventing compilation. Navigation was non-functional due to missing container. Image overflow was a risk without `CoffeeImageView`.
+
+**Files updated:**
+- `Screens/OnboardingScreen.swift`
+
+**Verification:**
+- Open `OnboardingScreen` in Simulator.
+- Verify swiping through all 5 slides.
+- Verify "Start Exploring" button navigates to `PhoneAuthScreen`.
+
+---
+
+## Session: Antigravity — Firebase SDK Fix & Package Resolution (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- Triggered `xcodebuild -resolvePackageDependencies` to re-fetch Firebase SDK files.
+- Identified that `status_errno.cc` missing error is a byproduct of DerivedData cleanup requiring a full package re-resolution.
+- Verified `Color+Extensions.swift` manual updates: added `brandPurple` and `darkOverlay`.
+
+**Why:** Deleting DerivedData (to fix path issues) also clears the Swift Package Manager (SPM) checkouts. Xcode needs to re-fetch these dependencies from the web.
+
+**Files updated:**
+- `DesignSystem/Color+Extensions.swift` (manual update confirmed)
+
+**Verification:**
+- In Xcode UI: **File → Packages → Reset Package Cache** followed by **Product → Build**.
+
+---
+
+## Session: Antigravity — Build Error Fixes (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- Deleted Xcode derived data (`~/Library/Developer/Xcode/DerivedData/Coffee_Call-*`).
+  - Fixed "Build input files cannot be found: `.../App/App/Coffee_CallApp.swift`" error.
+  - Root cause: stale Xcode index cached a double `App/App/` path; files correctly exist at `Coffee_Call/App/`.
+- `Cannot find type 'Activity' in scope` — cascading error from derived data; resolved by clean derived data + `Models/Activity.swift` already registered.
+
+**Why:** Xcode's build index caches wrong resolved paths when project structure changes. Always clean derived data after significant xcodeproj changes.
+
+**Files updated:** None (project structure already correct).
+
+**Verification:** After derived data delete, do `Cmd+Shift+K` (Clean) then `Cmd+B` (Build) in Xcode.
+
+---
+
+## Session: Antigravity — Animation System & Model Extraction (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- Created `DesignSystem/AnimationSystem.swift`: centralized animation token system.
+  - `CoffeeAnimation.spring` / `.springSnap` / `.springGentle` / `.easeOut` presets.
+  - `PressScaleModifier` — all buttons scale down on press (Figma behavior).
+  - `SlideUpEntranceModifier` — slide up + fade in on screen load.
+  - `FadeInModifier` — opacity fade on appear.
+  - View extensions: `.pressScale()`, `.slideUpEntrance(delay:)`, `.fadeIn(delay:)`.
+- Applied animations across `DiscoveryScreen`, `ActivityCardView`, `FloatingTabBar`:
+  - Staggered card entrances (each delayed by 0.08s).
+  - Header/search/chips slide up on load.
+  - Tab icon spring scale on switch.
+  - Heart/join button spring state change.
+- Extracted `Activity` + `ActivityStatus` into `Models/Activity.swift`.
+  - Removed duplicate definitions from `ActivityCardView.swift`.
+  - Fixes cascading `Cannot find type 'Activity' in scope` build error.
+- Registered `AnimationSystem.swift` and `Models/Activity.swift` in Xcode project via xcodeproj Ruby script.
+
+**Why:** Models must never live inside View files. Animation values must be centralized tokens, not inline magic numbers.
+
+**Rules established:**
+- All animations use `CoffeeAnimation.*` tokens — never inline values.
+- All data models live in `Models/` directory.
+- All images use `CoffeeImageView` — never raw `AsyncImage`.
+
+**Files updated:**
+- `DesignSystem/AnimationSystem.swift` (new)
+- `Models/Activity.swift` (new)
+- `Components/ActivityCardView.swift`
+- `Components/FloatingTabBar.swift`
+- `Screens/Main/DiscoveryScreen.swift`
+
+**Verification:** Clean build (`Cmd+Shift+K`) required after xcodeproj changes.
+
+---
+
+## Session: Antigravity — Image Overflow Fix & Floating Tab Bar (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- Created `Components/CoffeeImageView.swift`: canonical image component using `GeometryReader` + `clipped()`. **All images in the app must use this.** Never use raw `AsyncImage` directly.
+- Fixed `ActivityCardView.swift`: replaced raw `AsyncImage` with `CoffeeImageView`; applied `clipShape(RoundedRectangle)` at card level so nothing bleeds outside bounds.
+- Created `Components/FloatingTabBar.swift`: custom floating pill tab bar with spring animations, semantic colors, and `AppStrings.Tabs` labels. Replaces native SwiftUI `TabView` chrome.
+- Rebuilt `MainTabView.swift`: uses ZStack (content + FloatingTabBar overlay) instead of native TabView — no iOS tab bar chrome.
+- Added `AppStrings.Tabs` namespace: `discover`, `myPosts`, `messages`, `profile`.
+
+**Rule established:** Always use `CoffeeImageView` for all image display. Never use raw `AsyncImage`.
+
+**Files updated:**
+- `Components/CoffeeImageView.swift` (new)
+- `Components/FloatingTabBar.swift` (new)
+- `Components/ActivityCardView.swift`
+- `Screens/Main/MainTabView.swift`
+- `DesignSystem/AppStrings.swift`
+
+---
+
+## Session: Antigravity — Discovery Screen Rebuild to Match Figma (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- Rebuilt `ActivityCardView.swift` to match actual Figma design:
+  - Full-bleed background image card (380pt height)
+  - Gradient overlay for readability
+  - `STARTING SOON` / `HAPPENING NOW` / `LATER TODAY` status badge
+  - Vibe tag badge (e.g. RELAXED, CHILL, SOCIAL) in `brandPrimary`
+  - Host avatar with stacked `+N` attendee bubble
+  - `Join Moment` CTA button + heart save button
+- Rebuilt `DiscoveryScreen.swift` to match actual Figma design:
+  - `Hey [name]` greeting + `N meetups happening nearby` subtitle
+  - Top-right icon row: bell + map + avatar initials circle
+  - Search bar with filter icon
+  - Horizontal scrolling category chips with spring animation
+  - Dark navy circular FAB (replaces wide pill button)
+- Added `AppStrings.Discovery.joinMomentBtn = "Join Moment"`
+- Added `AppStrings.Auth.otpTitle`, `.verifying`, `.otpCTA`, `.sentTo` (build fixes)
+
+**Why:** Previous Discovery implementation was generic and did not match the actual Figma design shared by user.
+
+**Files updated:**
+- `Components/ActivityCardView.swift`
+- `Screens/Main/DiscoveryScreen.swift`
+- `DesignSystem/AppStrings.swift`
+
+---
+
 ## Session: Antigravity — Discover Page & Reusable Components (2026-05-13)
 
 ### What Changed

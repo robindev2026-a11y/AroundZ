@@ -9,26 +9,30 @@ struct GlassmorphicCard<Content: View>: View {
     
     var body: some View {
         content
-            .padding()
+            .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color.surfaceMain.opacity(0.94))
+                ZStack {
+                    // Frosted glass: white with 15% opacity + material blur
+                    Color.white.opacity(0.15)
+                    Rectangle().fill(.ultraThinMaterial)
+                }
+                .cornerRadius(12)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(Color.appBorder.opacity(0.95), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
             )
-            .shadow(color: Color.black.opacity(0.05), radius: 16, x: 0, y: 10)
+            // No shadow per design
     }
 }
 
 struct GlassmorphicCard_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
-            Color.coffeeBackground.edgesIgnoringSafeArea(.all)
+            Color.backgroundMain.edgesIgnoringSafeArea(.all)
             GlassmorphicCard {
                 Text("Glassmorphism")
-                    .foregroundColor(.coffeeTextPrimary)
+                    .foregroundColor(.textPrimary)
                     .padding()
             }
         }

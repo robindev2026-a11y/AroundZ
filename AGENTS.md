@@ -47,6 +47,7 @@ CoffeeCall is an activity-based meetup platform. Users post activities (coffee, 
 | `/Planning/spec.md` | Comprehensive specification | ✅ YES |
 | `/Planning/architecture.md` | System design + tech decisions | ✅ YES |
 | `/Planning/decisions.md` | Architecture Decision Records | ✅ YES |
+| `/Planning/build-guidelines.md` | **Recurring build/design fixes** | ✅ YES |
 | `/Design/design-tokens.md` | Reusable design values | When generating UI code |
 | `/Design/screens.md` | Screen specifications | When building screens |
 | `/Planning/context.md` | Shared rolling session log for all AI tools | At start of each session |

@@ -156,13 +156,9 @@ struct ProfileSetupScreen: View {
         .padding(.horizontal, 24)
         .background(Color.textOnBrand.edgesIgnoringSafeArea(.all)) // Clean white background for this screen
         .navigationBarHidden(true)
-        .background(
-            NavigationLink(
-                destination: PermissionsScreen(),
-                isActive: $navigateToPermissions,
-                label: { EmptyView() }
-            )
-        )
+        .navigationDestination(isPresented: $navigateToPermissions) {
+            PermissionsScreen()
+        }
     }
 }
 

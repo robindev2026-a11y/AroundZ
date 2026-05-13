@@ -6,10 +6,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if auth.isAuthenticated {
-                // TODO: Replace with HomeScreen when built
-                Text("Welcome! You're signed in.")
-                    .font(.heading1)
-                    .foregroundColor(.textPrimary)
+                MainTabView()
             } else {
                 NavigationView {
                     OnboardingScreen()

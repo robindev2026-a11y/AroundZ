@@ -129,12 +129,9 @@ struct PhoneAuthScreen: View {
             #endif
 
         }
-        .background(
-            NavigationLink(
-                destination: OTPVerificationScreen(phoneNumber: fullPhoneNumber),
-                isActive: $navigateToOTP
-            ) { EmptyView() }
-        )
+        .navigationDestination(isPresented: $navigateToOTP) {
+            OTPVerificationScreen(phoneNumber: fullPhoneNumber)
+        }
         .padding(.horizontal, 24)
         .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)

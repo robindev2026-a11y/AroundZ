@@ -6,11 +6,13 @@ extension Color {
     static let brandSecondary = Color("coffeePeach")
     static let brandPrimaryLight = Color("coffeePrimaryLight")
     static let brandPrimaryDark = Color("coffeePrimaryDark")
+    static let brandPurple = Color("coffeePurple")
     
     // MARK: - UI & Layout
     static let backgroundMain = Color("coffeeBackground")
     static let surfaceMain = Color("coffeeSurface")
     static let appBorder = Color("coffeeBorder")
+    static let darkOverlay = Color(red: 36/255, green: 52/255, blue: 71/255)  // #243447
     
     // MARK: - Text & Content
     static let textPrimary = Color("coffeeTextPrimary")

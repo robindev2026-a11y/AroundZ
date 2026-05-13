@@ -3,35 +3,16 @@ import SwiftUI
 // MARK: - Reusable Unsplash background
 private struct UnsplashBackground: View {
     let url: String
+    
     var body: some View {
-        GeometryReader { geo in
-            AsyncImage(url: URL(string: url)) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(
-                            width: geo.size.width,
-                            height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom
-                        )
-                        .clipped()
-                case .failure, .empty:
-                    LinearGradient(
-                        colors: [Color.textPrimary, Color.textSecondary],
-                        startPoint: .top, endPoint: .bottom
-                    )
-                    .frame(
-                        width: geo.size.width,
-                        height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom
-                    )
-                @unknown default:
-                    Color.textPrimary
-                }
-            }
-            .offset(y: -geo.safeAreaInsets.top)
+        ZStack {
+            CoffeeImageView(urlString: url)
+                .ignoresSafeArea()
+            
+            // Subtle darken overlay for consistency with Figma
+            Color.black.opacity(0.1)
+                .ignoresSafeArea()
         }
-        .ignoresSafeArea()
     }
 }
 
@@ -39,85 +20,100 @@ struct OnboardingScreen: View {
     @State private var currentPage = 0
     
     var body: some View {
-        TabView(selection: $currentPage) {
-            Slide1View(currentPage: $currentPage)
-                .tag(0)
-            Slide2View(currentPage: $currentPage)
-                .tag(1)
-            Slide3View(currentPage: $currentPage)
-                .tag(2)
-            Slide4View(currentPage: $currentPage)
-                .tag(3)
-            Slide5View(currentPage: $currentPage)
-                .tag(4)
+        NavigationView { // Added NavigationView to support navigation from Slide 5
+            TabView(selection: $currentPage) {
+                Slide1View(currentPage: $currentPage)
+                    .tag(0)
+                Slide2View(currentPage: $currentPage)
+                    .tag(1)
+                Slide3View(currentPage: $currentPage)
+                    .tag(2)
+                Slide4View(currentPage: $currentPage)
+                    .tag(3)
+                Slide5View(currentPage: $currentPage)
+                    .tag(4)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .ignoresSafeArea()
+            .navigationBarHidden(true)
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .edgesIgnoringSafeArea(.all)
     }
 }
 
 // MARK: - Slide 1 (Landing)
 struct Slide1View: View {
     @Binding var currentPage: Int
+    @State private var animate = false
     
     var body: some View {
         ZStack {
-            // Unsplash: exact image from Figma onboarding hero screen
             UnsplashBackground(url: AppImages.Onboarding.heroURL)
             
             // Overlay so text is always readable
             LinearGradient(
-                colors: [Color.black.opacity(0.2), Color.black.opacity(0.65)],
+                colors: [Color.darkOverlay.opacity(0.9), Color.darkOverlay.opacity(0.4), Color.clear],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .edgesIgnoringSafeArea(.all)
+            .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Spacer()
-                    PillBadge(title: AppStrings.betaTag, systemImage: AppIcons.sparkles)
+                    BetaBadge(title: AppStrings.betaTag, systemImage: AppIcons.sparkles)
                     Spacer()
                 }
-                .padding(.top, 60)
+                .padding(.top, 96)
                 
                 Spacer()
                 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(AppStrings.Onboarding.slide1Title1)
-                        .font(.heading1)
-                        .foregroundColor(.textOnBrand)
+                        .font(.system(size: 40, weight: .black, design: .default))
+                        .foregroundColor(.white)
+                        .lineSpacing(4)
                     Text(AppStrings.Onboarding.slide1Title2)
-                        .font(.heading1)
-                        .foregroundColor(.textOnBrand)
+                        .font(.system(size: 40, weight: .black, design: .default))
+                        .foregroundColor(.white)
+                        .lineSpacing(4)
                     Text(AppStrings.Onboarding.slide1Title3)
-                        .font(.heading1)
-                        .foregroundColor(.brandPrimary)
+                        .font(.system(size: 40, weight: .black, design: .default))
+                        .foregroundColor(Color.brandPrimary)
+                        .lineSpacing(4)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 48)
+                .opacity(animate ? 1 : 0)
+                .offset(y: animate ? 0 : 30)
+                .animation(.easeOut(duration: 0.6).delay(0.2), value: animate)
                 
                 VStack(spacing: 16) {
                     HStack {
                         GlassmorphicCard {
                             HStack(spacing: 16) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.orange.opacity(0.8))
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.brandPrimary)
                                     .frame(width: 40, height: 40)
-                                    .overlay(Image(systemName: "sun.max.fill").foregroundColor(.white))
+                                    .overlay(
+                                        Text("🌅")
+                                            .font(.system(size: 24))
+                                    )
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(AppStrings.Onboarding.nowNearby)
-                                        .font(.captionText)
-                                        .foregroundColor(.white.opacity(0.8))
+                                        .font(.system(size: 10, weight: .black))
+                                        .foregroundColor(.white.opacity(0.6))
                                     Text(AppStrings.Onboarding.activity1Title)
-                                        .font(.bodySmall)
-                                        .fontWeight(.semibold)
+                                        .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(.white)
                                 }
                                 Spacer()
                             }
                         }
+                        .rotationEffect(.degrees(-2))
+                        .opacity(animate ? 1 : 0)
+                        .offset(x: animate ? 0 : -30)
+                        .animation(.easeOut(duration: 0.6).delay(0.4), value: animate)
                         Spacer(minLength: 40)
                     }
                     
@@ -125,34 +121,47 @@ struct Slide1View: View {
                         Spacer(minLength: 40)
                         GlassmorphicCard {
                             HStack(spacing: 16) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.purple.opacity(0.8))
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.brandPurple)
                                     .frame(width: 40, height: 40)
-                                    .overlay(Image(systemName: "camera.fill").foregroundColor(.white))
+                                    .overlay(
+                                        Text("📸")
+                                            .font(.system(size: 24))
+                                    )
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(String(format: AppStrings.Onboarding.peopleJoined, 12))
-                                        .font(.captionText)
-                                        .foregroundColor(.white.opacity(0.8))
+                                        .font(.system(size: 10, weight: .black))
+                                        .foregroundColor(.white.opacity(0.6))
                                     Text(AppStrings.Onboarding.activity2Title)
-                                        .font(.bodySmall)
-                                        .fontWeight(.semibold)
+                                        .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(.white)
                                 }
                                 Spacer()
                             }
                         }
+                        .rotationEffect(.degrees(2))
+                        .opacity(animate ? 1 : 0)
+                        .offset(x: animate ? 0 : 30)
+                        .animation(.easeOut(duration: 0.6).delay(0.5), value: animate)
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 32)
                 .padding(.bottom, 48)
                 
-                PrimaryButton(title: AppStrings.Onboarding.slide1CTA) {
-                    currentPage = 1
+                PrimaryButton(title: AppStrings.Onboarding.slide1CTA, height: 64, cornerRadius: 24, icon: AppIcons.arrowRight) {
+                    withAnimation {
+                        currentPage = 1
+                    }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 40)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 64)
+                .opacity(animate ? 1 : 0)
+                .animation(.easeOut(duration: 0.6).delay(0.6), value: animate)
             }
+        }
+        .onAppear {
+            animate = true
         }
     }
 }
@@ -163,24 +172,24 @@ struct Slide2View: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            OnboardingProgressBar(activeIndex: 0, total: 3)
+            OnboardingProgressBar(activeIndex: 0, total: 4) // total is 4 onboarding screens + intro
                 .padding(.top, 60)
                 .padding(.horizontal, 24)
             
             VStack(alignment: .leading, spacing: 16) {
                 Circle()
-                    .fill(Color.textOnBrand)
+                    .fill(Color.white)
                     .frame(width: 48, height: 48)
-                    .overlay(Image(systemName: "bolt.fill").foregroundColor(.brandPrimary).font(.system(size: 24)))
+                    .overlay(Image(systemName: AppIcons.bolt).foregroundColor(.brandPrimary).font(.system(size: 24)))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
                 Text(AppStrings.Onboarding.slide2Title)
-                    .font(.heading1)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.textPrimary)
                 
                 Text(AppStrings.Onboarding.slide2Subtitle)
-                    .font(.bodyStandard)
+                    .font(.body)
                     .foregroundColor(.textSecondary)
                     .lineSpacing(4)
             }
@@ -192,7 +201,7 @@ struct Slide2View: View {
             // Grid of activity chips
             VStack(spacing: 16) {
                 HStack(spacing: 16) {
-                    ActivityChip(icon: "cup.and.saucer.fill", title: "COFFEE CHAT", activeCount: 4)
+                    ActivityChip(icon: AppIcons.coffee, title: "COFFEE CHAT", activeCount: 4)
                     ActivityChip(icon: "figure.walk", title: "URBAN WALK", activeCount: 7)
                 }
                 HStack(spacing: 16) {
@@ -205,12 +214,14 @@ struct Slide2View: View {
             Spacer()
             
             PrimaryButton(title: AppStrings.Onboarding.slide2CTA) {
-                currentPage = 2
+                withAnimation {
+                    currentPage = 2
+                }
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.ignoresSafeArea())
     }
 }
 
@@ -220,25 +231,25 @@ struct Slide3View: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            OnboardingProgressBar(activeIndex: 1, total: 3)
+            OnboardingProgressBar(activeIndex: 1, total: 4)
                 .padding(.top, 60)
                 .padding(.horizontal, 24)
             
             VStack(alignment: .center, spacing: 16) {
                 Circle()
-                    .fill(Color.textOnBrand)
+                    .fill(Color.white)
                     .frame(width: 64, height: 64)
-                    .overlay(Image(systemName: "checkmark.shield.fill").foregroundColor(.brandPrimary).font(.system(size: 32)))
+                    .overlay(Image(systemName: AppIcons.shield).foregroundColor(.brandPrimary).font(.system(size: 32)))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
                 Text(AppStrings.Onboarding.slide3Title)
-                    .font(.heading1)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.textPrimary)
                     .multilineTextAlignment(.center)
                 
                 Text(AppStrings.Onboarding.slide3Subtitle)
-                    .font(.bodyStandard)
+                    .font(.body)
                     .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
@@ -250,7 +261,7 @@ struct Slide3View: View {
             Spacer()
             
             VStack(spacing: 16) {
-                SafetyFeatureRow(icon: "checkmark.shield", text: AppStrings.Onboarding.safetyFeature1)
+                SafetyFeatureRow(icon: AppIcons.privacyShield, text: AppStrings.Onboarding.safetyFeature1)
                 SafetyFeatureRow(icon: "person.2", text: AppStrings.Onboarding.safetyFeature2)
                 SafetyFeatureRow(icon: "heart.text.square", text: AppStrings.Onboarding.safetyFeature3)
             }
@@ -259,12 +270,14 @@ struct Slide3View: View {
             Spacer()
             
             PrimaryButton(title: AppStrings.Onboarding.slide3CTA) {
-                currentPage = 3
+                withAnimation {
+                    currentPage = 3
+                }
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.ignoresSafeArea())
     }
 }
 
@@ -277,17 +290,17 @@ struct Slide4View: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            OnboardingProgressBar(activeIndex: 2, total: 3)
+            OnboardingProgressBar(activeIndex: 2, total: 4)
                 .padding(.top, 60)
                 .padding(.horizontal, 24)
             
             VStack(alignment: .leading, spacing: 16) {
                 Text(AppStrings.Onboarding.slide4Title)
-                    .font(.heading1)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.textPrimary)
                 
                 Text(AppStrings.Onboarding.slide4Subtitle)
-                    .font(.bodyStandard)
+                    .font(.body)
                     .foregroundColor(.textSecondary)
             }
             .padding(.top, 40)
@@ -295,7 +308,6 @@ struct Slide4View: View {
             
             Spacer()
             
-            // Simple Grid alternative for iOS 14+ compatibility without LazyVGrid issues
             ScrollView {
                 VStack(spacing: 16) {
                     HStack(spacing: 16) {
@@ -323,9 +335,13 @@ struct Slide4View: View {
             let remaining = max(0, 3 - selectedInterests.count)
             let isReady = remaining == 0
             
-            Button(action: { currentPage = 4 }) {
+            Button(action: { 
+                withAnimation {
+                    currentPage = 4 
+                }
+            }) {
                 Text(isReady ? AppStrings.Onboarding.readyToGo : String(format: AppStrings.Onboarding.selectMore, remaining))
-                    .font(.buttonText)
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundColor(isReady ? .white : .textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -336,7 +352,7 @@ struct Slide4View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
+        .background(Color.surfaceMain.ignoresSafeArea())
     }
     
     private func toggle(_ interest: String) {
@@ -354,10 +370,9 @@ struct Slide5View: View {
     
     var body: some View {
         ZStack {
-            // Unsplash: exact image from Figma Start Exploring screen (Slide 5)
-            UnsplashBackground(url: "https://images.unsplash.com/photo-1735335568593-6b9f50ec909d?auto=format&fit=crop&w=1000&q=80")
+            UnsplashBackground(url: AppImages.Onboarding.readyURL)
             
-            // Gradient overlay — fades from subtle at top to dark at bottom for readability
+            // Gradient overlay
             LinearGradient(
                 stops: [
                     .init(color: Color.black.opacity(0.05), location: 0),
@@ -367,7 +382,7 @@ struct Slide5View: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .edgesIgnoringSafeArea(.all)
+            .ignoresSafeArea()
             
             VStack(alignment: .center, spacing: 0) {
                 Spacer()
@@ -393,33 +408,22 @@ struct Slide5View: View {
                     .shadow(color: Color.black.opacity(0.4), radius: 4, x: 0, y: 2)
                 
                 Text(AppStrings.Onboarding.slide5Subtitle)
-                    .font(.bodyStandard)
+                    .font(.body)
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
                     .padding(.bottom, 32)
                 
-                // Avatars with real Unsplash faces
+                // Avatars with CoffeeImageView
                 HStack(spacing: -12) {
-                    ForEach([
-                        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",
-                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=80",
-                        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80",
-                        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80"
-                    ], id: \.self) { avatarUrl in
-                        AsyncImage(url: URL(string: avatarUrl)) { phase in
-                            if case .success(let img) = phase {
-                                img.resizable().scaledToFill()
-                            } else {
-                                Circle().fill(Color.gray.opacity(0.5))
-                            }
-                        }
-                        .frame(width: 44, height: 44)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                    ForEach(AppImages.Onboarding.avatars, id: \.self) { avatarUrl in
+                        CoffeeImageView(urlString: avatarUrl)
+                            .frame(width: 44, height: 44)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.white, lineWidth: 2))
                     }
                     Circle()
-                        .fill(Color.purple.opacity(0.8))
+                        .fill(Color.brandPurple.opacity(0.8))
                         .frame(width: 44, height: 44)
                         .overlay(
                             Text(AppStrings.Onboarding.socialProofCount)
@@ -440,8 +444,8 @@ struct Slide5View: View {
                 // Button
                 NavigationLink(destination: PhoneAuthScreen()) {
                     Text(AppStrings.Onboarding.slide5CTA)
-                        .font(.buttonText)
-                        .foregroundColor(.textOnBrand)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(Color.brandPrimary)
@@ -491,7 +495,7 @@ struct ActivityChip: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.captionText)
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.textPrimary)
                 
                 HStack(spacing: 4) {
@@ -506,7 +510,7 @@ struct ActivityChip: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.textOnBrand)
+        .background(Color.white)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
@@ -524,14 +528,14 @@ struct SafetyFeatureRow: View {
                 .frame(width: 24)
             
             Text(text)
-                .font(.bodyStandard)
+                .font(.body)
                 .fontWeight(.medium)
                 .foregroundColor(.textPrimary)
             
             Spacer()
         }
         .padding()
-        .background(Color.textOnBrand)
+        .background(Color.white)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
@@ -545,12 +549,12 @@ struct InterestPill: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.bodyStandard)
+                .font(.body)
                 .fontWeight(.medium)
-                .foregroundColor(isSelected ? .textOnBrand : .textPrimary)
+                .foregroundColor(isSelected ? .white : .textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isSelected ? Color.brandPrimary : Color.textOnBrand)
+                .background(isSelected ? Color.brandPrimary : Color.white)
                 .cornerRadius(12)
                 .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         }

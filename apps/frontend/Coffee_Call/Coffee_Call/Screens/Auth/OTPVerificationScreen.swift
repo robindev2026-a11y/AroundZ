@@ -122,12 +122,9 @@ struct OTPVerificationScreen: View {
             #endif
 
         }
-        .background(
-            NavigationLink(
-                destination: ProfileSetupScreen(),
-                isActive: $navigateToProfile
-            ) { EmptyView() }
-        )
+        .navigationDestination(isPresented: $navigateToProfile) {
+            ProfileSetupScreen()
+        }
         .padding(.horizontal, 24)
         .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)

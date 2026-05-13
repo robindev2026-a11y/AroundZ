@@ -126,7 +126,7 @@ struct PermissionsScreen: View {
             
             // Manual Continue button if auto-navigate fails or they skip
             if locationRequested || notificationsRequested {
-                NavigationLink(destination: ReadyScreen()) {
+                Button(action: { navigateToReady = true }) {
                     Text(AppStrings.Auth.readyCTA + " →")
                         .font(.buttonText)
                         .foregroundColor(.brandPrimary)
@@ -146,17 +146,12 @@ struct PermissionsScreen: View {
             }
             .foregroundColor(.textSecondary.opacity(0.6))
             .padding(.bottom, 32)
-        }
         .padding(.horizontal, 24)
         .background(Color.textOnBrand.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
-        .background(
-            NavigationLink(
-                destination: ReadyScreen(),
-                isActive: $navigateToReady,
-                label: { EmptyView() }
-            )
-        )
+        .navigationDestination(isPresented: $navigateToReady) {
+            ReadyScreen()
+        }
     }
 }
 

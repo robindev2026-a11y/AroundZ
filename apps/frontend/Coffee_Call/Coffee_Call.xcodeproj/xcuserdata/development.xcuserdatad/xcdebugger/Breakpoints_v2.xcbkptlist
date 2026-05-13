@@ -34,6 +34,38 @@
             endingLineNumber = "35"
             landmarkName = "sendOTP(phoneNumber:completion:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2C6BE65E-91EB-4864-8030-BE7A16251F22 - da30057001cbbf5a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Coffee_Call.AuthViewModel.sendOTP(phoneNumber: Swift.String, completion: (Swift.Bool) -&gt; ()) -&gt; ()"
+                  moduleName = "Coffee_Call"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/development/Documents/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/ViewModels/AuthViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36"
+                  offsetFromSymbolStart = "454">
+               </Location>
+               <Location
+                  uuid = "2C6BE65E-91EB-4864-8030-BE7A16251F22 - ecb138057aa19b30"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in Coffee_Call.AuthViewModel.sendOTP(phoneNumber: Swift.String, completion: (Swift.Bool) -&gt; ()) -&gt; ()"
+                  moduleName = "Coffee_Call"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/development/Documents/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/ViewModels/AuthViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36"
+                  offsetFromSymbolStart = "85">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -50,38 +82,6 @@
             endingLineNumber = "31"
             landmarkName = "sendOTP(phoneNumber:completion:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "D12B0F4F-D664-43AB-B1F3-A9AEB64D350B - da30057001cbbcde"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Coffee_Call.AuthViewModel.sendOTP(phoneNumber: Swift.String, completion: (Swift.Bool) -&gt; ()) -&gt; ()"
-                  moduleName = "Coffee_Call"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/development/Documents/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/ViewModels/AuthViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "32"
-                  endingLineNumber = "32"
-                  offsetFromSymbolStart = "454">
-               </Location>
-               <Location
-                  uuid = "D12B0F4F-D664-43AB-B1F3-A9AEB64D350B - ecb138057aa198b4"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 () -&gt; () in Coffee_Call.AuthViewModel.sendOTP(phoneNumber: Swift.String, completion: (Swift.Bool) -&gt; ()) -&gt; ()"
-                  moduleName = "Coffee_Call"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/development/Documents/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/ViewModels/AuthViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "32"
-                  endingLineNumber = "32"
-                  offsetFromSymbolStart = "82">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
