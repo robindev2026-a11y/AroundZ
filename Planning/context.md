@@ -8,6 +8,87 @@ Rules:
 - If this file grows too large, delete the oldest session entries and keep only the most recent ones.
 - Retention target: keep the latest 5 session entries or roughly the latest 300 lines, whichever comes first.
 
+## Session: Antigravity — Discover Page & Reusable Components (2026-05-13)
+
+### What Changed
+- **Created Discovery Screen:** Built `DiscoveryScreen.swift` with a functional activity feed, category filtering (Coffee, Walks, Gaming, etc.), and search functionality.
+- **Reusable Component Library:** Extracted `ActivityCardView.swift` and `CategoryChip.swift` into a dedicated `Components/` directory for cross-screen reuse.
+- **Navigation Integration:** Created `MainTabView.swift` as the primary app container and integrated it into `ContentView.swift` for authenticated users.
+- **Design System Expansion:** Updated `AppStrings.swift` and `AppIcons.swift` with discovery-specific tokens (categories, search, map, post button).
+- **Xcode Integration:** Updated Ruby scripts and modified the `.xcodeproj` to include the new `Main` and `Components` groups and files.
+- **Repository Setup:** Created a private GitHub repository (`robindev2026-a11y/CoffeeCall`) and pushed all current progress.
+
+### Why
+- The Discovery/Home screen is the core of the CoffeeCall experience, allowing users to find and join nearby activities.
+- Moving components to a shared library ensures UI consistency and reduces code duplication as the app grows (e.g., for "My Activities").
+- Establishing a remote repository provides backup and enables collaboration.
+
+### Files Updated
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DiscoveryScreen.swift` (NEW)
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/MainTabView.swift` (NEW)
+- `/apps/frontend/Coffee_Call/Coffee_Call/Components/ActivityCardView.swift` (NEW)
+- `/apps/frontend/Coffee_Call/Coffee_Call/Components/CategoryChip.swift` (NEW)
+- `/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/AppStrings.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/AppIcons.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/ContentView.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/Color+Extensions.swift` (Cleanup)
+
+### Next Step
+- Build the **"Post Activity"** modal UI and logic.
+- Implement the **"Messages Thread"** screen for activity coordination.
+
+## Session: Antigravity — Design System "Deep Clean" (2026-05-13)
+
+### What Changed
+- **Total Tokenization:** Removed 100% of hardcoded strings from all auth and onboarding screens, including error messages, tip content, and debug labels.
+- **AppStrings Expansion:** Added comprehensive tokens for `Auth.tipTitle`, `Auth.locationRadiusDesc`, `Auth.skipProfileDebug`, and onboarding social proof.
+- **Legacy Cleanup:** Deleted all legacy `coffee-` prefixed color aliases from `Color+Extensions.swift`.
+- **Refactoring:** Updated `LocationPermissionScreen.swift`, `ProfileSetupScreen.swift`, and `OnboardingScreen.swift` to strictly use semantic tokens and `AppStrings`.
+- **Commit:** Committed all standardization changes with message: `style: deep clean of design system, removed all hardcoded strings and legacy color aliases`.
+
+### Why
+- Parity with the `Design/design-tokens.md` standard.
+- Centralizing UI text enables future localization and simplifies copy updates.
+- Removing legacy aliases prevents technical debt and ensures developers use only the approved semantic palette.
+
+### Files Updated
+- `/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/AppStrings.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/Color+Extensions.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Auth/LocationPermissionScreen.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Auth/ProfileSetupScreen.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/OnboardingScreen.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Auth/ReadyScreen.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Auth/PhoneAuthScreen.swift`
+- `/apps/frontend/Coffee_Call/Coffee_Call/Screens/Auth/OTPVerificationScreen.swift`
+
+## Session: Brand and Product Brainstorm Notes (2026-05-13)
+
+### What Was Noted
+- Brand the product as a social app focused on bringing people together.
+- Keep the logo theme social and simple; no unique logo system required.
+- Prioritize messaging as the core product behavior.
+- Build the story on trust, privacy, and a strong foundation.
+- Explore business tie-ups with cafes and restaurants.
+- Consider gift cards, promotions, and app-organized events for growth.
+- Consider future friend features and community/event promotion.
+- Consider broad audience segments: Gen Z, millennials, boomers, sports, exercise/walking users.
+
+### Product Ideas for Later Review
+- Add user ratings / activity scoring.
+- Penalize no-shows by lowering rating.
+- Let event creators choose how many people can request and how many extra members can join.
+- Let requesters indicate how many people they are bringing.
+- Allow creators to add extra members from existing profiles.
+- Add a location toggle button on the home page.
+- Use rounded distance text instead of exact distance, for example "less than 4 km" instead of "3.7 km".
+- Add a skip option on the permissions page so the app can continue without location access.
+
+### Notes on Current MVP Alignment
+- Some ideas overlap with the current MVP, but ratings, penalties, and richer group controls are future-facing and should stay out of the near-term build unless explicitly approved.
+
+### Next Step
+- Review these ideas against the current MVP scope before moving any of them into decisions or implementation.
+
 ## Session: Antigravity — Design System Standardization & Semantic Naming (2026-05-13)
 
 ### What Changed
