@@ -18,9 +18,12 @@ private struct UnsplashBackground: View {
 
 struct OnboardingScreen: View {
     @State private var currentPage = 0
+    @State private var navigateToAuth = false
     
     var body: some View {
-        NavigationView { // Added NavigationView to support navigation from Slide 5
+        ZStack {
+            currentBackground
+
             TabView(selection: $currentPage) {
                 Slide1View(currentPage: $currentPage)
                     .tag(0)
@@ -30,12 +33,48 @@ struct OnboardingScreen: View {
                     .tag(2)
                 Slide4View(currentPage: $currentPage)
                     .tag(3)
-                Slide5View(currentPage: $currentPage)
+                Slide5View(currentPage: $currentPage, navigateToAuth: $navigateToAuth)
                     .tag(4)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+        .navigationDestination(isPresented: $navigateToAuth) {
+            PhoneAuthScreen()
+        }
+    }
+
+    @ViewBuilder
+    private var currentBackground: some View {
+        switch currentPage {
+        case 0:
+            ZStack {
+                UnsplashBackground(url: AppImages.Onboarding.heroURL)
+                LinearGradient(
+                    colors: [Color.darkOverlay.opacity(0.9), Color.darkOverlay.opacity(0.4), Color.clear],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
             .ignoresSafeArea()
-            .navigationBarHidden(true)
+
+        case 4:
+            ZStack {
+                UnsplashBackground(url: AppImages.Onboarding.readyURL)
+                LinearGradient(
+                    stops: [
+                        .init(color: Color.black.opacity(0.05), location: 0),
+                        .init(color: Color.black.opacity(0.25), location: 0.4),
+                        .init(color: Color.black.opacity(0.78), location: 1.0)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+            .ignoresSafeArea()
+
+        default:
+            Color.surfaceMain
+                .ignoresSafeArea()
         }
     }
 }
@@ -47,16 +86,6 @@ struct Slide1View: View {
     
     var body: some View {
         ZStack {
-            UnsplashBackground(url: AppImages.Onboarding.heroURL)
-            
-            // Overlay so text is always readable
-            LinearGradient(
-                colors: [Color.darkOverlay.opacity(0.9), Color.darkOverlay.opacity(0.4), Color.clear],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Spacer()
@@ -367,23 +396,10 @@ struct Slide4View: View {
 // MARK: - Slide 5 (Start Exploring)
 struct Slide5View: View {
     @Binding var currentPage: Int
+    @Binding var navigateToAuth: Bool
     
     var body: some View {
         ZStack {
-            UnsplashBackground(url: AppImages.Onboarding.readyURL)
-            
-            // Gradient overlay
-            LinearGradient(
-                stops: [
-                    .init(color: Color.black.opacity(0.05), location: 0),
-                    .init(color: Color.black.opacity(0.25), location: 0.4),
-                    .init(color: Color.black.opacity(0.78), location: 1.0)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
             VStack(alignment: .center, spacing: 0) {
                 Spacer()
                 
@@ -442,14 +458,8 @@ struct Slide5View: View {
                 Spacer()
                 
                 // Button
-                NavigationLink(destination: PhoneAuthScreen()) {
-                    Text(AppStrings.Onboarding.slide5CTA)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.brandPrimary)
-                        .clipShape(Capsule())
+                PrimaryButton(title: AppStrings.Onboarding.slide5CTA) {
+                    navigateToAuth = true
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 16)

@@ -8,6 +8,59 @@ Rules:
 - If this file grows too large, delete the oldest session entries and keep only the most recent ones.
 - Retention target: keep the latest 5 session entries or roughly the latest 300 lines, whichever comes first.
 
+## Session: Antigravity — Navigation Stability & UI Polish (2026-05-13)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Refactored Navigation:** Migrated the onboarding and auth flow to a single `NavigationStack` root in `ContentView`. Removed redundant `NavigationStack` wrappers from child screens to prevent state synchronization issues and broken transitions.
+- **Fixed Onboarding Navigation:** Resolved a compiler type-checking error in `TabView` by unifying the parameter signatures of all slides. Added a `navigateToAuth` state to `OnboardingScreen` and implemented it via `.navigationDestination` for a smooth transition from Slide 5 to `PhoneAuthScreen`.
+- **Improved UI Interaction:** Enhanced `PrimaryButton` by adding `.contentShape(Rectangle())` to the label. This ensures the entire button surface (including the background) is hit-testable and responsive to touch, fixing intermittent interaction failures.
+- **Code Cleanup:** Replaced the legacy `NavigationLink` in `OnboardingScreen` Slide 5 with a consistent `PrimaryButton`.
+
+**Why:** Nested `NavigationStack`s were causing navigation triggers to fail. The `TabView` compiler error was a "gotcha" where heterogeneous child signatures in a page-style TabView caused type inference failures.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/App/ContentView.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/OnboardingScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/PrimaryButton.swift`
+- `Planning/context.md`
+
+---
+
+## Session: Codex — Onboarding TabView Navigation Diagnosis (2026-05-13)
+
+### Changed by: Codex
+
+**What changed:**
+- Diagnosed `OnboardingScreen` page navigation where tapping the first CTA did not visibly switch the `TabView`.
+- Added temporary debug prints to confirm the button action fired and `currentPage` changed from `0` to `1`.
+- Removed the temporary prints after confirmation.
+- Fixed `ContentView` layout by removing `.ignoresSafeArea()` from the whole `OnboardingScreen` inside `NavigationStack`.
+- Hid the navigation bar with `.toolbar(.hidden, for: .navigationBar)` instead.
+- Follow-up: moved onboarding image backgrounds into a root `ZStack` behind the `TabView`, keyed by `currentPage`, so image backgrounds cover the status bar and home indicator without invalidating `TabView` paging layout.
+
+**What was learned:**
+- The `TabView(selection: $currentPage)` and `.tag(0...4)` wiring was correct.
+- The button action was firing correctly; this was not a binding or state propagation bug.
+- The real symptom came from SwiftUI page `TabView`'s underlying `UICollectionView` getting invalid sizing:
+  - `item height must be less than the height of the UICollectionView minus the section/content insets`
+  - logged with adjusted inset `{59, 0, 34, 0}`
+- Root cause: forcing the entire onboarding `TabView` to ignore safe areas inside `NavigationStack` conflicted with UIKit's paging layout insets.
+- Keep full-bleed imagery at the slide/background layer, not by applying `.ignoresSafeArea()` to the whole `TabView` from `ContentView`.
+- Pattern to keep: if a screen uses a page `TabView` plus full-screen image background, render the background outside/behind the `TabView` and apply `.ignoresSafeArea()` only to that background layer.
+
+**Separate warnings not responsible for the page switch bug:**
+- Firebase Crashlytics/Messaging logs are unrelated to onboarding paging.
+- `UIBackgroundModes` remote-notification warning is unrelated to onboarding paging.
+- Missing `coffeePurple` asset warning is separate visual/config cleanup.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/App/ContentView.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/OnboardingScreen.swift`
+
+---
+
 ## Session: Antigravity — Navigation & Build System Fixes (2026-05-13)
 
 ### Changed by: Antigravity

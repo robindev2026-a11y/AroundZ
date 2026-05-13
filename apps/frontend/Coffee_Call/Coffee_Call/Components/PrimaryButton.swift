@@ -30,6 +30,7 @@ struct PrimaryButton: View {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .stroke(Color.textOnBrand.opacity(isDisabled ? 0.08 : 0.12), lineWidth: 1)
             )
+            .contentShape(Rectangle()) // Fix for tap area
             .shadow(color: Color.brandPrimary.opacity(isDisabled ? 0.0 : 0.22), radius: 14, x: 0, y: 8)
         }
         .disabled(isDisabled)
