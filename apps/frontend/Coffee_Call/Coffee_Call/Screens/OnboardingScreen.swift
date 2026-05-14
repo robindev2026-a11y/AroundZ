@@ -82,116 +82,176 @@ struct OnboardingScreen: View {
 // MARK: - Slide 1 (Landing)
 struct Slide1View: View {
     @Binding var currentPage: Int
-    @State private var animate = false
+    
+    // Animation states for staggered entrance
+    @State private var animateBadge = false
+    @State private var animateHeadline = false
+    @State private var animateCard1 = false
+    @State private var animateCard2 = false
+    @State private var animateCTA = false
     
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
+                // 1. Beta Badge (Top)
                 HStack {
                     Spacer()
                     BetaBadge(title: AppStrings.betaTag, systemImage: AppIcons.sparkles)
+                        .opacity(animateBadge ? 1 : 0)
+                        .offset(y: animateBadge ? 0 : -20)
                     Spacer()
                 }
                 .padding(.top, 96)
                 
                 Spacer()
                 
+                // 2. Main Headline
                 VStack(alignment: .leading, spacing: 4) {
                     Text(AppStrings.Onboarding.slide1Title1)
-                        .font(.system(size: 40, weight: .black, design: .default))
+                        .font(.system(size: 48, weight: .black))
                         .foregroundColor(.white)
-                        .lineSpacing(4)
+                        .lineSpacing(0)
                     Text(AppStrings.Onboarding.slide1Title2)
-                        .font(.system(size: 40, weight: .black, design: .default))
+                        .font(.system(size: 48, weight: .black))
                         .foregroundColor(.white)
-                        .lineSpacing(4)
+                        .lineSpacing(0)
                     Text(AppStrings.Onboarding.slide1Title3)
-                        .font(.system(size: 40, weight: .black, design: .default))
+                        .font(.system(size: 48, weight: .black))
                         .foregroundColor(Color.brandPrimary)
-                        .lineSpacing(4)
+                        .lineSpacing(0)
                 }
                 .padding(.horizontal, 32)
-                .padding(.bottom, 48)
-                .opacity(animate ? 1 : 0)
-                .offset(y: animate ? 0 : 30)
-                .animation(.easeOut(duration: 0.6).delay(0.2), value: animate)
+                .padding(.bottom, 40)
+                .opacity(animateHeadline ? 1 : 0)
+                .offset(y: animateHeadline ? 0 : 40)
                 
-                VStack(spacing: 16) {
+                // 3. Floating Activity Cards
+                VStack(spacing: 20) {
+                    // Left Card (Sunset Walk)
                     HStack {
                         GlassmorphicCard {
                             HStack(spacing: 16) {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color.brandPrimary)
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Text("🌅")
-                                            .font(.system(size: 24))
-                                    )
+                                    .frame(width: 44, height: 44)
+                                    .overlay(Text("🌅").font(.system(size: 24)))
                                 
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(alignment: .leading, spacing: 2) {
                                     Text(AppStrings.Onboarding.nowNearby)
                                         .font(.system(size: 10, weight: .black))
                                         .foregroundColor(.white.opacity(0.6))
+                                        .kerning(1.2)
                                     Text(AppStrings.Onboarding.activity1Title)
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(.system(size: 14, weight: .bold))
                                         .foregroundColor(.white)
                                 }
                                 Spacer()
                             }
                         }
-                        .rotationEffect(.degrees(-2))
-                        .opacity(animate ? 1 : 0)
-                        .offset(x: animate ? 0 : -30)
-                        .animation(.easeOut(duration: 0.6).delay(0.4), value: animate)
-                        Spacer(minLength: 40)
+                        .frame(width: 240)
+                        .rotationEffect(.degrees(animateCard1 ? -2 : -8))
+                        .opacity(animateCard1 ? 1 : 0)
+                        .offset(x: animateCard1 ? 0 : -60)
+                        
+                        Spacer()
                     }
                     
+                    // Right Card (Photo Session)
                     HStack {
-                        Spacer(minLength: 40)
+                        Spacer()
+                        
                         GlassmorphicCard {
                             HStack(spacing: 16) {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color.brandPurple)
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Text("📸")
-                                            .font(.system(size: 24))
-                                    )
+                                    .frame(width: 44, height: 44)
+                                    .overlay(Text("📸").font(.system(size: 24)))
                                 
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(alignment: .leading, spacing: 2) {
                                     Text(String(format: AppStrings.Onboarding.peopleJoined, 12))
                                         .font(.system(size: 10, weight: .black))
                                         .foregroundColor(.white.opacity(0.6))
+                                        .kerning(1.2)
                                     Text(AppStrings.Onboarding.activity2Title)
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(.system(size: 14, weight: .bold))
                                         .foregroundColor(.white)
                                 }
                                 Spacer()
                             }
                         }
-                        .rotationEffect(.degrees(2))
-                        .opacity(animate ? 1 : 0)
-                        .offset(x: animate ? 0 : 30)
-                        .animation(.easeOut(duration: 0.6).delay(0.5), value: animate)
+                        .frame(width: 240)
+                        .rotationEffect(.degrees(animateCard2 ? 2 : 8))
+                        .opacity(animateCard2 ? 1 : 0)
+                        .offset(x: animateCard2 ? 0 : 60)
                     }
                 }
-                .padding(.horizontal, 32)
-                .padding(.bottom, 48)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 60)
                 
-                PrimaryButton(title: AppStrings.Onboarding.slide1CTA, height: 64, cornerRadius: 16, icon: AppIcons.arrowRight) {
-                    withAnimation {
+                // 4. CTA Button (Bottom)
+                PrimaryButton(
+                    title: AppStrings.Onboarding.slide1CTA,
+                    height: 64,
+                    cornerRadius: 16,
+                    icon: AppIcons.arrowRight
+                ) {
+                    withAnimation(CoffeeAnimation.spring) {
                         currentPage = 1
                     }
                 }
+                .pressScale() // Responsive scale effect token
                 .padding(.horizontal, 32)
                 .padding(.bottom, 64)
-                .opacity(animate ? 1 : 0)
-                .animation(.easeOut(duration: 0.6).delay(0.6), value: animate)
+                .opacity(animateCTA ? 1 : 0)
+                .offset(y: animateCTA ? 0 : 20)
             }
         }
         .onAppear {
-            animate = true
+            if currentPage == 0 {
+                startAnimations()
+            }
         }
+        .onChange(of: currentPage) { newValue in
+            if newValue == 0 {
+                startAnimations()
+            } else {
+                resetAnimations()
+            }
+        }
+    }
+    
+    private func startAnimations() {
+        // Reset first to ensure clean replay if swiping back
+        resetAnimations()
+        
+        // Sequence triggers
+        withAnimation(CoffeeAnimation.spring.delay(0.1)) {
+            animateBadge = true
+        }
+        
+        withAnimation(CoffeeAnimation.spring.delay(0.25)) {
+            animateHeadline = true
+        }
+        
+        withAnimation(CoffeeAnimation.springGentle.delay(0.45)) {
+            animateCard1 = true
+        }
+        
+        withAnimation(CoffeeAnimation.springGentle.delay(0.65)) {
+            animateCard2 = true
+        }
+        
+        withAnimation(CoffeeAnimation.spring.delay(0.85)) {
+            animateCTA = true
+        }
+    }
+    
+    private func resetAnimations() {
+        animateBadge = false
+        animateHeadline = false
+        animateCard1 = false
+        animateCard2 = false
+        animateCTA = false
     }
 }
 
