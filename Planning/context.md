@@ -8,6 +8,53 @@ Rules:
 - If this file grows too large, delete the oldest session entries and keep only the most recent ones.
 - Retention target: keep the latest 5 session entries or roughly the latest 300 lines, whichever comes first.
 
+## Session: Antigravity — Fix View+Availability SDK Compatibility (2026-05-14)
+
+### Changed by: Antigravity
+
+**What changed:**
+- `View+Availability.swift`: All wrappers for iOS 16.4+ and iOS 17+ APIs changed to no-ops (`self`) with the real implementations sitting in commented lines beside each function body.
+- Root cause: `if #available` is a runtime guard only. If the API symbol doesn't exist in the current SDK headers (Xcode 14.2 = iOS 16.2 SDK), the compiler still rejects the reference inside the `if #available` block.
+
+**Upgrade path (no call-site changes needed):**
+- **Xcode 14.3+** (iOS 16.4 SDK): uncomment lines in `coffeeSheetCornerRadius`, `coffeeSheetDragIndicator`, `coffeeScrollBounceBehaviorBasedOnSize`.
+- **Xcode 15+** (iOS 17 SDK): uncomment lines in `coffeeScrollTargetLayout`, `coffeeImpactFeedback`, `coffeeSelectionFeedback`, `coffeeBounceSymbol`, `coffeeNumericContentTransition`.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/View+Availability.swift`
+- `Planning/context.md`
+
+---
+
+
+
+### Changed by: Antigravity
+
+**What changed:**
+- `CategoryChip.swift`: Added SF symbol icons per category (bolt, cup.and.saucer, figure.walk, book, fork.knife, gamecontroller, lightbulb). Active chip now has scale-1.05 animation matching Figma.
+- `ActivityCardView.swift`: Status badge uses animated mint pulse dot + `.ultraThinMaterial` `.clipShape(Capsule())`. Vibe badge clipped to `Capsule()`. Participant count badge is mint `Capsule`. Join button has mint shadow.
+- `DiscoveryScreen.swift` (full rewrite):
+  - Header: mint notification dot overlay on bell, mint ring on user avatar button.
+  - Search bar corner radius 20 (was 16); filter button uses `backgroundMain` tinted pill.
+  - Category chips now pass icons from chip definitions array.
+  - 5 richly varied sample activities (walks, coffee, study, food, street photo).
+  - Join tap opens `JoinConfirmSheet` (avatar + info card + PrimaryButton) via `.sheet`.
+  - On confirm, triggers `MatchCelebrationSheet` (full mint background, overlapping avatars, handshake emoji, keep-discovering CTA).
+  - Removed `presentationCornerRadius`/`presentationDragIndicator` — not available on iOS 16.2 target.
+
+**Verification:**
+- `BUILD SUCCEEDED` on iPhone 14 Pro simulator (iOS 16.2).
+- Searched all three touched `.swift` files for old blue/coral/`.rounded` drift — none found.
+- All colors use semantic tokens from `Color+Extensions.swift`; no hardcoded hex.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/CategoryChip.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/ActivityCardView.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DiscoveryScreen.swift`
+- `Planning/context.md`
+
+---
+
 ## Session: Codex — Auth To Discovery Figma Parity Pass (2026-05-14)
 
 ### Changed by: Codex

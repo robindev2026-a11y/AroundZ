@@ -2,6 +2,10 @@
 
 CoffeeCall is a premium mobile app for spontaneous in-person social meetups nearby.
 
+Current Figma source: `/Users/development/Downloads/figmaCoffe`
+
+Implementation note: use native iOS default system typography, not `.rounded` fonts.
+
 ## Product Direction
 
 - Discover people and activities nearby

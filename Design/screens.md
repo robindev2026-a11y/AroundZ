@@ -1,75 +1,94 @@
-# CoffeeCall MVP: Screen Specifications
+# CoffeeCall Screen Specifications
 
-## Overview
-This file documents screen layouts, user flows, and design specifications for CoffeeCall MVP.
+Status: active but evolving. Screens are still being built in SwiftUI.
 
-*To be updated with detailed wireframes and user flows after design finalization.*
+Visual source: `/Users/development/Downloads/figmaCoffe`
 
-## Screen List
-
-### 0. Onboarding / Landing
-- Swipeable multi-page carousel introducing the app
-- **Slide 1**: Full-screen background, "Meet people nearby in real life.", with floating Glassmorphic activity cards
-- **Slide 2**: Value Proposition 2 (Placeholder)
-- **Slide 3**: Value Proposition 3 (Placeholder)
-- Glassmorphic "COFFEECALL BETA" badge consistently at the top
-- Prominent "Next" button on early slides
-- "Let's Go" primary pill-shaped CTA button on the final slide
-- Transitions smoothly into the Auth flow
-
-### 1. Signup
-- Phone number input
-- OTP verification
-- Profile photo upload
-- Name input
-- Location permission request
-- Confirm button → Main app
-
-### 2. Post Creation
-- Location input (auto-populated from device)
-- Activity purpose (text input)
-- Time picker
-- Create button → Success notification
-
-### 3. Discovery / Notifications
-- List of nearby posts
-- Each post card shows:
-  - Poster's profile photo
-  - Poster's name
-  - Activity purpose
-  - Location (address)
-  - Time
-  - Accept / Reject buttons
-
-### 4. Acceptance Confirmation
-- Confirmation dialog showing:
-  - Activity details (purpose, location, time)
-  - Poster profile info
-  - Confirm / Cancel buttons
-- On confirm: Dialog closes, message thread opens
-
-### 5. Message Thread
-- List of messages in chronological order
-- Message input field at bottom
-- Send button
-- Display sender's name/photo for each message
-
-### 6. Poster Dashboard
-- List of all acceptances for this user's posts
-- For each acceptance:
-  - Acceptor's profile photo
-  - Acceptor's name
-  - Time they accepted
-  - Quick action buttons (if any)
-
-### 7. Profile
-- User's profile photo
-- User's name
-- Stats (posts created, acceptances)
-- Edit button
-- Logout button
+Design token source: `Design/design-tokens.md`
 
 ---
 
-**Status:** Awaiting Figma/Pencil design mockups  
-**Last Updated:** 2026-05-10
+## Screen Priorities
+
+1. Onboarding
+2. Discovery
+3. Activity Details
+4. Messages
+5. Profile/Auth completion
+6. Create Meetup
+7. Notifications
+8. Map View
+9. Empty States
+10. Create Meetup Success
+11. Verification and Trust
+
+---
+
+## Onboarding
+
+Current direction:
+- Multi-page carousel.
+- Full-screen photographic background where Figma uses a background image.
+- Warm dark overlay on image screens for readable white text.
+- "COFFEECALL BETA" glass badge.
+- Hero copy: bold, large, direct.
+- Floating social/activity cards.
+- Large mint pill CTA.
+
+Implementation rule:
+- Keep full-bleed image/gradient background behind the page `TabView`.
+- Do not apply `.ignoresSafeArea()` to the whole `TabView`.
+
+---
+
+## Discovery
+
+Current direction:
+- Nearby activities and people should feel alive and social.
+- Use warm background, layered cards, mint actions, lavender/peach accents.
+- Avoid dense admin/dashboard layouts.
+
+---
+
+## Auth And Profile Setup
+
+Current direction:
+- Simple, friendly setup flow.
+- Use native iOS typography with default system design.
+- Use mint for primary progress/action.
+- Use warm cards and clear helper text.
+
+---
+
+## Create Meetup
+
+Current direction:
+- Simple form.
+- Activity, place, time, and optional social context.
+- Primary mint submit action.
+
+---
+
+## Messages
+
+Current direction:
+- Async coordination, not real-time social chat complexity.
+- Clear sender distinction.
+- Warm surfaces and readable message bubbles.
+
+---
+
+## Profile
+
+Current direction:
+- Human, trust-building, not gamified.
+- No reputation/scoring system in MVP.
+
+---
+
+## Do Not Use
+
+- Old 7-screen-only prompt as a visual source of truth.
+- Old blue/coral MVP wireframe palette.
+- Placeholder "awaiting Figma" status.
+- Generic white/blue startup layouts.

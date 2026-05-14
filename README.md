@@ -13,6 +13,14 @@ CoffeeCall is an activity-based meetup app.
 
 - `apps/frontend/` - SwiftUI iOS app
 - `apps/backend/` - Firebase Functions and rules
+- `Design/` - active Figma-derived design tokens and component direction
+- `Planning/context.md` - latest AI/session handoff log
+
+## Design Source
+
+- Current Figma export/prototype: `/Users/development/Downloads/figmaCoffe`
+- Active tokens: `Design/design-tokens.md`
+- Do not use older blue/coral or placeholder design docs for implementation
 
 ## Setup Notes
 

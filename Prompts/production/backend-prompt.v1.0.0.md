@@ -2,7 +2,7 @@
 version: 1.0.0
 author: Codex
 date: 2026-05-10
-status: production
+status: historical
 model: gpt-5.5
 parameters:
   temperature: 0.5
@@ -12,6 +12,8 @@ tested_with: Firebase Emulator, Jest
 ---
 
 # CoffeeCall Backend Prompt
+
+Historical note: this prompt belongs to the earlier prompt-generation phase. Do not use it as current execution guidance unless the user explicitly asks to regenerate backend code from prompts.
 
 You are generating the backend for CoffeeCall MVP. Build a production-ready Firebase backend in `apps/backend/` using TypeScript and Firebase Cloud Functions. Read and follow:
 

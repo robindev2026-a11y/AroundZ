@@ -2,9 +2,9 @@
 
 ## 1. Project Overview
 
-**Name:** CoffeeCall  
-**Type:** Activity-based meetup platform  
-**MVP Timeline:** 3 weeks  
+**Name:** CoffeeCall
+**Type:** Activity-based meetup platform
+**MVP Timeline:** 3 weeks
 **Target Users:** People seeking casual social activities (coffee, movies, jogging, etc.)
 
 ### Problem Statement
@@ -23,7 +23,7 @@ Existing meetup apps are complex and designed for dating. CoffeeCall solves this
 ### 2.1 Core Features
 
 #### Feature: Phone Signup
-**User Story:**  
+**User Story:**
 As a new user, I want to sign up with my phone number, so I can start posting activities.
 
 **Acceptance Criteria:**
@@ -33,13 +33,13 @@ As a new user, I want to sign up with my phone number, so I can start posting ac
 - [ ] Session persists across app closes
 - [ ] User redirected to profile creation after signup
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 ---
 
 #### Feature: User Profile
-**User Story:**  
+**User Story:**
 As a user, I want to set up my profile with a photo and name, so others can see who I am.
 
 **Acceptance Criteria:**
@@ -49,13 +49,13 @@ As a user, I want to set up my profile with a photo and name, so others can see 
 - [ ] User can view/edit own profile
 - [ ] Phone number hidden until after acceptance
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 ---
 
 #### Feature: Post Activity
-**User Story:**  
+**User Story:**
 As a user, I want to post an activity with location and time, so others nearby can join me.
 
 **Acceptance Criteria:**
@@ -66,8 +66,8 @@ As a user, I want to post an activity with location and time, so others nearby c
 - [ ] Submit button saves post to Firestore
 - [ ] Post appears in Discovery for nearby users within 2 seconds
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 **Technical Details:**
 - Location accuracy: ±50 meters
@@ -77,7 +77,7 @@ As a user, I want to post an activity with location and time, so others nearby c
 ---
 
 #### Feature: Discover Nearby Activities
-**User Story:**  
+**User Story:**
 As a user, I want to see activities happening nearby, so I can find something to join.
 
 **Acceptance Criteria:**
@@ -87,8 +87,8 @@ As a user, I want to see activities happening nearby, so I can find something to
 - [ ] Each post shows: poster profile photo, activity purpose, location, time
 - [ ] User can accept or reject each post from list
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 **Technical Details:**
 - Firebase Cloud Messaging for notifications
@@ -99,7 +99,7 @@ As a user, I want to see activities happening nearby, so I can find something to
 ---
 
 #### Feature: Accept/Reject Activity
-**User Story:**  
+**User Story:**
 As a user, I want to accept or reject an activity, so I can commit to joining or skip it.
 
 **Acceptance Criteria:**
@@ -110,8 +110,8 @@ As a user, I want to accept or reject an activity, so I can commit to joining or
 - [ ] On confirm: Acceptance recorded, message thread opens, notification sent to poster
 - [ ] On reject: Post hidden from user, no notification sent
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 **Technical Details:**
 - Acceptance creates record in Firestore (acceptances collection)
@@ -121,7 +121,7 @@ As a user, I want to accept or reject an activity, so I can commit to joining or
 ---
 
 #### Feature: Message Coordination
-**User Story:**  
+**User Story:**
 As users who accepted an activity, I want to message each other, so we can coordinate meetup details.
 
 **Acceptance Criteria:**
@@ -133,8 +133,8 @@ As users who accepted an activity, I want to message each other, so we can coord
 - [ ] New messages load within 2-5 seconds (async acceptable)
 - [ ] No real-time notifications (async polling only)
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 **Technical Details:**
 - Firestore messages collection (one document per thread)
@@ -144,7 +144,7 @@ As users who accepted an activity, I want to message each other, so we can coord
 ---
 
 #### Feature: Poster Dashboard
-**User Story:**  
+**User Story:**
 As someone who posted an activity, I want to see who accepted, so I can manage joiners.
 
 **Acceptance Criteria:**
@@ -154,8 +154,8 @@ As someone who posted an activity, I want to see who accepted, so I can manage j
 - [ ] Clicking a post shows list of acceptors (name, profile photo, accept time)
 - [ ] Poster gets notification when someone accepts
 
-**Priority:** High  
-**Scope:** MVP  
+**Priority:** High
+**Scope:** MVP
 
 **Technical Details:**
 - Real-time query of acceptances for poster's posts
@@ -386,7 +386,7 @@ Signup → Profile → Home (Discovery/My Posts tabs) → Post Detail → Messag
 ```markdown
 ## Feature: [Name]
 
-**User Story:**  
+**User Story:**
 As a [role], I want to [action], so that [benefit]
 
 **Acceptance Criteria:**
@@ -394,13 +394,13 @@ As a [role], I want to [action], so that [benefit]
 - [ ] [Criterion 2]
 - [ ] [Criterion 3]
 
-**Priority:** [High/Medium/Low]  
-**Scope:** [MVP/v1.1/Future]  
+**Priority:** [High/Medium/Low]
+**Scope:** [MVP/v1.1/Future]
 **Technical Details:** [If applicable]
 ```
 
 ---
 
-**Document Status:** Finalized  
-**Last Updated:** 2026-05-10  
+**Document Status:** Finalized
+**Last Updated:** 2026-05-10
 **Owner:** Claude (Planner)

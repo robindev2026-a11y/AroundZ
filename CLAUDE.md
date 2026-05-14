@@ -1,159 +1,91 @@
-# CoffeeCall: Planning & Execution Workflow
+# CoffeeCall: AI Execution Context
 
-## Overview
-This document defines the workflow, roles, and folder structure for CoffeeCall MVP development using Ambiglytics for code generation and Codex for prompt generation.
+**Current phase:** Coding and verification
+**Last updated:** 2026-05-13
 
-## Roles & Responsibilities
-
-### Claude (Planner & Oversight)
-- **Planning**: Define architecture, scope, features, and timelines
-- **Oversight**: Track execution, ensure quality, maintain alignment with plan
-- **Never code**: Do not write implementation code directly
-- **Coordination**: Ensure Ambiglytics, Codex, and design systems are synchronized
-
-### Ambiglytics (Code Generation & System Projects)
-- **System projects**: Create project structure, build scorecards
-- **Code generation**: Transform prompts into implementation code
-- **Artifact delivery**: Produce working code based on Codex-generated prompts
-
-### Codex (Prompt Generation)
-- **Prompt engineering**: Generate detailed prompts from architecture/design specs
-- **Code synthesis**: Transform planning documents into executable instructions for Ambiglytics
-
-### Code (Generated Artifacts)
-- **Implementation**: Deliverable code produced by Ambiglytics
-- **Quality**: Must pass verification against planning specs
-
-## Workflow
-
-```
-1. Planning Phase (Claude)
-   ↓
-2. Architecture Definition (/docs/Planning/)
-   ↓
-3. Design & Mockups (/docs/Design/)
-   ↓
-4. Codex Prompt Generation
-   ↓
-5. Antigravity IDE Code Generation (apps/frontend/ + apps/backend/)
-   ↓
-6. Verification Against Plan
-```
-
-## Folder Structure (Monorepo)
-
-### `/docs/Planning`
-Contains architecture, scope, features, timelines, and decision logs.
-
-**Key files:**
-- `spec.md` — Comprehensive specification (features, acceptance criteria, data models)
-- `architecture.md` — System design, components, tech stack decisions
-- `features.md` — Feature breakdown, requirements, acceptance criteria
-- `timeline.md` — Week-by-week deliverables, milestones, dependencies
-- `decisions.md` — Architecture Decision Records (ADRs) with rationale
-- `context.md` — Session tracking (updated after each session)
-
-**Purpose:** Claude reads to understand scope. Codex reads to generate prompts.
-
-### `/docs/Design`
-Contains design specs, mockups, and design system decisions.
-
-**Key files:**
-- `design-tokens.md` — Colors, typography, spacing, shadows, component values
-- `design-system.md` — Overall design philosophy
-- `screens.md` — Screen-by-screen specifications
-- `component-specs.md` — Component details and states
-- `accessibility.md` — WCAG compliance notes
-
-**Purpose:** Reference for Codex/Antigravity IDE during code generation.
-
-### `/docs/Prompts` (Generated)
-Contains Codex-generated prompts for Antigravity IDE.
-
-**Key files:**
-- `backend-prompt.v1.0.0.md` — Firebase Cloud Functions generation
-- `frontend-prompt.v1.0.0.md` — SwiftUI iOS code generation
-- `integration-prompt.v1.0.0.md` — API + data flow generation
-
-**Purpose:** Codex generates these. Antigravity IDE reads to generate code.
-
-### `/apps/frontend`
-SwiftUI iOS app for the MVP. Android is future work.
-
-**Structure:**
-- `src/screens/` — UI screens
-- `src/components/` — Reusable components
-- `src/services/` — Firebase, location, API calls
-- `src/models/` — Data models
-
-**Purpose:** Antigravity IDE generates code here.
-
-### `/apps/backend`
-Firebase Cloud Functions + Firestore for serverless backend.
-
-**Structure:**
-- `functions/src/triggers/` — Cloud Function entry points
-- `functions/src/handlers/` — Business logic
-- `functions/src/services/` — Firebase, geohashing
-- `firestore.rules` — Security rules
-- `firestore.indexes.json` — Query indexes
-
-**Purpose:** Antigravity IDE generates code here.
-
-## How Claude Starts Each Session
-
-1. **Read CLAUDE.md** (this file)
-2. **Read `/Planning/architecture.md`** — Understand current scope & decisions
-3. **Check `/Design/screens.md`** — Understand design direction
-4. **Review `/Prompts`** — See what's been handed to Ambiglytics
-5. **Ask**: What's the next focus? (feature, component, prompt generation, verification?)
-
-## How to Add Context Between Sessions
-
-- Update `/Planning/decisions.md` after major decisions
-- Update `/Design/design-decisions.md` after design finalization
-- Update `/Planning/timeline.md` if scope or schedule changes
-- Create new prompt files in `/Prompts` after Codex generation
-
-## Quick Reference
-
-### When starting a session:
-1. Read this file (CLAUDE.md)
-2. Check `/Planning/architecture.md` for current scope
-3. Check `/Design/screens.md` for design direction
-4. Review latest prompt in `/Prompts/`
-5. Ask: What's the next focus?
-
-### To track progress:
-- Update `/Planning/decisions.md` after decisions
-- Update `/Planning/timeline.md` for schedule changes
-- Create new prompt files in `/Prompts/` after Codex generation
-
-## Current Status
-
-**Project:** CoffeeCall MVP  
-**Phase:** Architecture + Planning Complete  
-**Done:**
-- ✅ MVP scope defined
-- ✅ Architecture finalized (SwiftUI iOS + Firebase)
-- ✅ Key decisions documented
-- ✅ Features broken down
-- ✅ Screen list defined
-
-**Next Steps:**
-1. Design finalization (Figma/Pencil mockups)
-2. Codex prompt generation
-3. Ambiglytics code generation
-4. Verification + testing
-
-**Current Blockers:** None  
-**Owner:** User (Ambiglytics direction), Claude (Oversight)
+This file is for AI tools that need project context. It supersedes the older planning-only workflow.
 
 ---
 
-**Last Updated:** 2026-05-11  
-**Folder Structure:** ✅ Complete  
-**Planning Files:** ✅ Complete  
-**Design Files:** 🔄 In Progress  
-**Prompts:** ⏳ Awaiting Codex  
-**Figma Integration:** ✅ Plugin installed (v2.1.30)
+## Current Workflow
+
+1. Read `Planning/context.md` for the latest session state.
+2. Read `AGENTS.md` for active working rules.
+3. For product behavior, use `Planning/spec.md`, `Planning/architecture.md`, and `Planning/decisions.md`.
+4. For visual implementation, use `Design/design-tokens.md`, `Design/design-system.md`, `Design/screens.md`, and `Design/component-specs.md`.
+5. For Figma parity, compare against `/Users/development/Downloads/figmaCoffe`.
+6. Make scoped code/doc changes only for the user-requested task.
+7. Log meaningful changes in `Planning/context.md`.
+
+---
+
+## Active Design Direction
+
+CoffeeCall follows the Figma Social Refresh direction:
+
+- Warm neutral app background.
+- Mint primary actions.
+- Lavender and peach accents.
+- Slate text.
+- Layered cards.
+- Full-bleed photographic onboarding where Figma uses background images.
+- Native iOS default system typography, not rounded fonts.
+
+Active tokens:
+- Primary mint: `#53B8A6`
+- Pressed mint: `#3D8D7A`
+- Lavender: `#8E7DBE`
+- Peach: `#E88C6B`
+- Background: `#F6F1EB`
+- Card surface: `#FFFDF9`
+- Secondary surface: `#F4F4F8`
+- Text primary: `#243447`
+- Text secondary: `#5F6368`
+- Border: `#E7DED4`
+
+Do not use the older blue/coral MVP palette.
+
+---
+
+## Product Summary
+
+CoffeeCall is an activity-based meetup app. Users post activities, nearby people join, and participants coordinate through in-app messages.
+
+Core constraints:
+- Not a dating app.
+- Async messaging only.
+- Posts stay active after acceptance.
+- Group meetups are allowed.
+- No phone number exchange in MVP.
+- No reputation/scoring/friend system in MVP.
+- Firebase backend, SwiftUI iOS frontend.
+
+---
+
+## Important Files
+
+| File | Use |
+|---|---|
+| `AGENTS.md` | Active AI working rules |
+| `Planning/context.md` | Latest session log |
+| `Planning/spec.md` | Product requirements |
+| `Planning/architecture.md` | System architecture |
+| `Planning/decisions.md` | Decision records |
+| `docs/Planning/build-guidelines.md` | Xcode/Firebase gotchas |
+| `Design/design-tokens.md` | Active visual tokens |
+| `Design/design-system.md` | Current design philosophy |
+| `Design/screens.md` | Screen direction |
+| `Design/component-specs.md` | Component direction |
+| `apps/frontend/Coffee_Call/DESIGN_CONTEXT.md` | Frontend design context |
+
+---
+
+## Notes For Implementation
+
+- Code changes are allowed in this phase.
+- Keep scope tight.
+- Use semantic design tokens from Swift files.
+- Do not hardcode old design values.
+- Do not use old prompt-generation docs as current instructions.
+- Avoid nested navigation stacks unless required.
+- For onboarding `TabView`, keep full-screen backgrounds behind the pager, not applied to the pager itself.

@@ -27,6 +27,7 @@
 		338E3B222FB464920048FC32 /* CoffeeImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B202FB464920048FC32 /* CoffeeImageView.swift */; };
 		338E3B232FB464920048FC32 /* FloatingTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B212FB464920048FC32 /* FloatingTabBar.swift */; };
 		338E3B272FB46EA60048FC32 /* AnimationSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B262FB46EA50048FC32 /* AnimationSystem.swift */; };
+		338E3B282FB46EA60048FC32 /* View+Availability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B292FB46EA50048FC32 /* View+Availability.swift */; };
 		33CA3A2C2FB33A41008EF23C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A2B2FB33A41008EF23C /* Assets.xcassets */; };
 		33CA3A2F2FB33A41008EF23C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A2E2FB33A41008EF23C /* Preview Assets.xcassets */; };
 		33CA3A342FB33A41008EF23C /* Coffee_Call.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */; };
@@ -83,6 +84,7 @@
 		338E3B202FB464920048FC32 /* CoffeeImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoffeeImageView.swift; sourceTree = "<group>"; };
 		338E3B212FB464920048FC32 /* FloatingTabBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingTabBar.swift; sourceTree = "<group>"; };
 		338E3B262FB46EA50048FC32 /* AnimationSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationSystem.swift; sourceTree = "<group>"; };
+		338E3B292FB46EA50048FC32 /* View+Availability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+Availability.swift"; sourceTree = "<group>"; };
 		33CA3A242FB33A3F008EF23C /* Coffee_Call.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Coffee_Call.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A2B2FB33A41008EF23C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		33CA3A2E2FB33A41008EF23C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -294,6 +296,7 @@
 			isa = PBXGroup;
 			children = (
 				338E3B262FB46EA50048FC32 /* AnimationSystem.swift */,
+				338E3B292FB46EA50048FC32 /* View+Availability.swift */,
 				338E3B162FB435F40048FC32 /* AppIcons.swift */,
 				338E3B172FB435F40048FC32 /* AppImages.swift */,
 				338E3B182FB435F40048FC32 /* AppStrings.swift */,
@@ -465,6 +468,7 @@
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
 				338E3B272FB46EA60048FC32 /* AnimationSystem.swift in Sources */,
+				338E3B282FB46EA60048FC32 /* View+Availability.swift in Sources */,
 				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
 				338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */,
 				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,

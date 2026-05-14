@@ -107,4 +107,3 @@ Before committing:
 ## 🎯 FINAL DIRECTIVE
 
 "Clear commit > clever commit"
-

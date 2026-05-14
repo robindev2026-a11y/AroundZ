@@ -232,6 +232,6 @@ These are noted for v1.1+ planning:
 
 ---
 
-**Last Updated:** 2026-05-12  
-**Reviewed By:** Claude (Planner)  
+**Last Updated:** 2026-05-12
+**Reviewed By:** Claude (Planner)
 **Status:** All MVP decisions approved

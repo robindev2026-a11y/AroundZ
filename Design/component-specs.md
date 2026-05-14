@@ -1,446 +1,104 @@
-# CoffeeCall: Component Specifications
+# CoffeeCall Component Specifications
 
-Detailed specifications for each reusable UI component in the MVP.
+Status: active. Use with `Design/design-tokens.md`.
 
----
-
-## Button Component
-
-**Variants:**
-- Primary (CTA, default style)
-- Secondary (alternative action)
-- Danger (destructive actions)
-- Disabled (non-interactive)
-
-**States:**
-- Default
-- Hover
-- Pressed/Active
-- Disabled
-- Loading (spinner)
-
-**Properties:**
-- Size: small (36px), medium (44px), large (52px)
-- Full width option: true/false
-- Icon support: left, right, or icon-only
-- Text truncation: ellipsis
-
-**Styles (from design-tokens.md):**
-- Height: 44px (standard)
-- Padding: 12px vertical, 16px horizontal
-- Border radius: fully rounded (pill/capsule)
-- Font: 16px, 600 weight (SemiBold)
-- Color: primary (#49B89D), text: white (#FFFFFF)
-- Hover: darker background (#2B826C)
-- Disabled: gray background, gray text
-
-**Code Template (SwiftUI):**
-```swift
-Button(
-  action: { /* action */ },
-  label: {
-    Text("Accept")
-      .font(.system(size: 16, weight: .semibold))
-  }
-)
-.frame(height: 44)
-.frame(maxWidth: .infinity)
-.background(Color(hex: "#49B89D"))
-.foregroundColor(.white)
-.clipShape(Capsule())
-.disabled(isDisabled)
-```
-
-**Accessibility:**
-- Touch target: minimum 44x44 points
-- Contrast: 4.5:1 (WCAG AA)
-- Keyboard navigable
-- Screen reader: announces button text + state
+This file describes current component direction only. Older blue/coral component specs have been removed because they no longer match the Figma prototype.
 
 ---
 
-## Text Input Component
+## Primary Button
 
-**States:**
-- Default (empty, unfocused)
-- Focused (border highlight)
-- Filled (with content)
-- Error (invalid input)
-- Disabled
+Use for main actions such as "Let's Go", "Next", "Continue", "Accept", and "Create".
 
-**Properties:**
-- Placeholder text
-- Label (above input)
-- Helper text (below)
-- Error message
-- Keyboard type: default, phone, email, number
-- Max length
-- Clearable: true/false
-- Secure (password): true/false
+Visual:
+- Height: 52-64pt depending on screen context.
+- Shape: pill/capsule or large radius.
+- Fill: `#53B8A6` / `.brandPrimary`.
+- Pressed fill: `#3D8D7A` / `.brandPrimaryDark`.
+- Text: white / `.textOnBrand`.
+- Font: 16pt, heavy/bold default system, not rounded.
+- Optional trailing SF Symbol for forward motion.
 
-**Styles:**
-- Height: 44px
-- Padding: 10px vertical, 12px horizontal
-- Border: 1px, color-border (#E5E7EB)
-- Border radius: 8px
-- Font: 16px, regular
-- Focused: 2px primary border
-- Error: 2px error border + red text
-
-**Code Template (SwiftUI):**
-```swift
-TextField("Location", text: $location)
-  .frame(height: 44)
-  .padding(12)
-  .border(Color(hex: "#E5E7EB"), width: 1)
-  .cornerRadius(8)
-  .focused($isFocused)
-  .onChange(of: isFocused) { focused in
-    // Update border color
-  }
-```
-
-**Validation:**
-- Real-time feedback
-- Error message displays below input
-- Submit button disables if invalid
+Rules:
+- Minimum touch target: 44x44pt.
+- Use semantic color and font helpers.
+- Do not hardcode raw hex inside screen views.
 
 ---
 
-## Card Component
+## Secondary Button
 
-**Variants:**
-- Post card (shows activity details)
-- Profile card (shows user info)
-- Message card (shows message bubble)
-- Acceptance card (shows acceptance info)
-- Glassmorphic card (floating overlays over images)
+Use for alternate actions where the primary action should remain visually dominant.
 
-**States:**
-- Default
-- Hover
-- Pressed
-- Loading
-
-**Properties:**
-- Background color: surface (#F9FAFB)
-- Border: none (shadow only)
-- Shadow: md (standard elevation)
-- Padding: 16px
-- Corner radius: 8px
-
-**Glassmorphic Card Properties:**
-- Background: semi-transparent white/black
-- Blur: 10px backdrop blur
-- Border: 1px subtle white/transparent border
-- Shadow: subtle elevation
-- Corner radius: 12px or 16px
-
-**Post Card Anatomy:**
-```
-┌─────────────────────────┐
-│ [Avatar] [Name] [Time]  │ <- Header
-│─────────────────────────│
-│ Activity purpose text   │ <- Title
-│─────────────────────────│
-│ 📍 Location address     │ <- Location
-│ ⏰ Time (formatted)     │ <- Time
-│─────────────────────────│
-│ [Accept] [Reject]       │ <- Actions
-└─────────────────────────┘
-```
-
-**Code Template:**
-```swift
-VStack(alignment: .leading) {
-  // Header: Avatar + Name + Time
-  HStack {
-    Circle().frame(width: 40, height: 40) // Avatar
-    VStack(alignment: .leading) {
-      Text(userName).font(.system(size: 14, weight: .semibold))
-      Text(timeAgo).font(.system(size: 12, weight: .regular)).foregroundColor(.gray)
-    }
-    Spacer()
-  }
-  
-  // Activity purpose
-  Text(purpose).font(.system(size: 16, weight: .semibold))
-  
-  // Location + Time
-  HStack {
-    Label(location, systemImage: "mappin.circle")
-    Label(formattedTime, systemImage: "clock")
-  }
-  
-  // Action buttons
-  HStack {
-    Button("Accept") { /* ... */ }
-    Button("Reject") { /* ... */ }
-  }
-}
-.padding(16)
-.background(Color(hex: "#F9FAFB"))
-.cornerRadius(8)
-.shadow(color: Color.black.opacity(0.1), radius: 4)
+Visual:
+- Surface: `#FFFDF9` or transparent.
+- Border: `#E7DED4`.
+- Text: `#243447`.
+- Optional lavender or peach accent only when it matches Figma intent.
 
 ---
 
-## Pill Badge Component
+## Cards
 
-**Variants:**
-- Solid (primary, secondary)
-- Glassmorphic (semi-transparent over images)
+Use for activity cards, profile snippets, notification cards, and floating onboarding cards.
 
-**Code Template (Glassmorphic):**
-```swift
-HStack {
-  Image(systemName: "sparkles")
-  Text("COFFEECALL BETA")
-}
-.padding(.horizontal, 12)
-.padding(.vertical, 6)
-.background(.thinMaterial)
-.clipShape(Capsule())
-```
-```
+Visual:
+- Surface: `#FFFDF9` / `.surfaceMain`.
+- Secondary surface: `#F4F4F8` when needed.
+- Text primary: `#243447`.
+- Text secondary: `#5F6368`.
+- Border: `#E7DED4` when a card needs definition.
+- Radius: 16-24pt.
+- Shadow: soft slate-tinted shadow, not heavy black shadow.
 
----
-
-## Dialog/Modal Component
-
-**Variants:**
-- Confirmation dialog (Accept/Cancel)
-- Alert dialog (OK only)
-- Input dialog (with form)
-
-**Anatomy:**
-```
-┌────────────────────────┐
-│        Title           │ <- 24px, bold
-├────────────────────────┤
-│                        │
-│    Content area        │ <- Message, form, details
-│                        │
-├────────────────────────┤
-│ [Primary]  [Secondary] │ <- Actions
-└────────────────────────┘
-```
-
-**Styles:**
-- Background: white (#FFFFFF)
-- Shadow: lg (elevation + depth)
-- Border radius: 12px
-- Padding: 24px
-- Overlay: semi-transparent (backdrop)
-
-**Behavior:**
-- Modal (blocks background interaction)
-- Keyboard: Escape to close, Tab to navigate buttons
-- Focus management: First interactive element focused on open
+Floating cards over image backgrounds:
+- Use translucent material or overlay style.
+- Keep text high-contrast.
+- Preserve full-bleed background imagery behind the card.
 
 ---
 
-## Message Bubble Component
+## Inputs
 
-**Anatomy:**
-```
-Sent (Right-aligned):
-┌─────────────────────────────┐
-│ Hello there!               │ <- Blue background
-│ 3:45 PM                    │
-└─────────────────────────────┘
+Use for phone, OTP, profile, and create-activity forms.
 
-Received (Left-aligned):
-┌─────────────────────────────┐
-│ Hi! How are you?            │ <- Gray background
-│ 3:46 PM                     │
-└─────────────────────────────┘
-```
-
-**Styles:**
-- Sent: primary color (#49B89D) background, white text
-- Received: surface (#F9FAFB) background, dark text
-- Border radius: 12px
-- Padding: 12px horizontal, 8px vertical
-- Font: 16px, regular
-- Timestamp: 12px, secondary gray, below message
-
-**Code Template:**
-```swift
-HStack(alignment: .bottom) {
-  if isSent {
-    Spacer()
-    VStack(alignment: .trailing) {
-      Text(message)
-        .padding(12)
-        .background(Color(hex: "#49B89D"))
-        .foregroundColor(.white)
-        .cornerRadius(12)
-      Text(timestamp)
-        .font(.system(size: 12))
-        .foregroundColor(.gray)
-    }
-  } else {
-    VStack(alignment: .leading) {
-      Text(message)
-        .padding(12)
-        .background(Color(hex: "#F9FAFB"))
-        .foregroundColor(.black)
-        .cornerRadius(12)
-      Text(timestamp)
-        .font(.system(size: 12))
-        .foregroundColor(.gray)
-    }
-    Spacer()
-  }
-}
-.padding(.horizontal, 16)
-.padding(.vertical, 8)
-```
+Visual:
+- Height: 44-52pt.
+- Surface: `#FFFDF9` or `#F4F4F8`.
+- Border: `#E7DED4`.
+- Focus ring/accent: `#53B8A6`.
+- Error: `.statusError`.
+- Text: `#243447`.
+- Placeholder/helper: `#5F6368`.
 
 ---
 
-## Avatar Component
+## Badges And Chips
 
-**Variants:**
-- Small (32x32px)
-- Medium (40x40px)
-- Large (56x56px)
+Use for beta badge, activity metadata, filters, and status labels.
 
-**States:**
-- With image (circular)
-- Placeholder (initials or icon)
-- Loading (skeleton)
-- Offline (badge indicator)
-
-**Styles:**
-- Shape: Circle
-- Border: none
-- Fallback: light gray background + user initials
-
-**Code Template:**
-```swift
-AsyncImage(url: URL(string: photoUrl)) { image in
-  image.resizable()
-    .scaledToFill()
-    .frame(width: 40, height: 40)
-    .clipShape(Circle())
-} placeholder: {
-  Circle()
-    .fill(Color.gray.opacity(0.3))
-    .frame(width: 40, height: 40)
-    .overlay(
-      Text(initials)
-        .font(.system(size: 14, weight: .semibold))
-    )
-}
-```
+Visual:
+- Pill shape.
+- Mint, lavender, peach, or neutral surface depending on meaning.
+- Uppercase labels should use bold 12pt caption style.
+- Icons should use SF Symbols unless Figma provides a specific asset.
 
 ---
 
-## List Item Component
+## Avatar And Icon Wells
 
-**Anatomy:**
-```
-┌─────────────────────────────────────┐
-│ [Icon] Title      [Badge/Value] →   │
-│        Subtitle                     │
-└─────────────────────────────────────┘
-```
-
-**States:**
-- Default
-- Hover
-- Selected
-- Disabled
-
-**Properties:**
-- Icon (left)
-- Title + Subtitle
-- Value/Badge (right)
-- Divider: show/hide
-- Selectable: true/false
-
-**Styles:**
-- Padding: 16px
-- Height: 56px (min)
-- Border-bottom: 1px divider
-- Tap target: full cell
+Visual:
+- Avatar: circle.
+- Icon wells: rounded square or circle with mint/lavender/peach accent fill.
+- Keep icon size readable at small mobile scale.
 
 ---
 
-## Accessibility Requirements
+## Navigation And Layout
 
-All components must support:
-
-- **Color Contrast**
-  - Text: 4.5:1 minimum (WCAG AA)
-  - UI Components: 3:1 minimum
-
-- **Touch Targets**
-  - Minimum: 44x44 points
-  - Spacing: 8px between targets
-
-- **Keyboard Navigation**
-  - Tab to navigate all interactive elements
-  - Enter/Space to activate buttons
-  - Escape to close modals
-
-- **Screen Readers**
-  - Semantic HTML/accessibility labels
-  - Button text visible or announced
-  - Form labels associated with inputs
-  - Error messages announced
-
-- **Focus Indicators**
-  - Visible focus ring (2px primary color)
-  - Never remove focus outline
-
----
-
-## Design Token References
-
-All components use tokens from `/Design/design-tokens.md`:
-
-```
-Colors:
-- Primary: color-primary (#49B89D)
-- Secondary: color-success (#10B981)
-- Background: color-background (#FFFFFF)
-- Surface: color-surface (#F9FAFB)
-- Border: color-border (#E5E7EB)
-- Text: color-text-primary (#1F2937)
-
-Spacing:
-- Padding/Gap: spacing-md (16px)
-- Button padding: spacing-sm (8px) / spacing-md (16px)
-
-Typography:
-- Body: 16px, regular
-- Heading: 24px, bold
-- Button: 16px, semibold
-
-Radius:
-- Standard: radius-md (8px)
-- Modal: radius-lg (12px)
-
-Shadows:
-- Cards: shadow-md
-- Modals: shadow-lg
-```
-
----
-
-## Implementation Notes
-
-1. **Use design tokens** — Never hardcode values
-2. **Test accessibility** — Run WCAG AA compliance checks
-3. **Responsive design** — Components scale to all screen sizes
-4. **Consistent spacing** — Use spacing token values
-5. **State management** — Handle all states (default, hover, disabled, etc.)
-6. **Performance** — Images lazy-load, modals don't block rendering
-
----
-
-**Status:** Complete  
-**Last Updated:** 2026-05-10
+Rules:
+- Screens should feel mobile-first and spacious.
+- Prefer layered cards and clear sections over dashboard density.
+- Avoid generic blue startup UI.
+- Onboarding image backgrounds must be full bleed where Figma shows a full-screen image.
+- For page `TabView`, background imagery should sit behind the `TabView`; do not apply `.ignoresSafeArea()` to the entire `TabView`.
