@@ -47,9 +47,6 @@ enum AppStrings {
         static let phonePlaceholder = "(555) 000-0000"
         static let phoneCTA = "Send Code"
         static let sending = "Sending..."
-        static let skipDebug = "⚡ Skip OTP (Debug)"
-        static let skipVerifyDebug = "⚡ Skip Verify (Debug)"
-        static let skipProfileDebug = "⚡ Skip Profile (Debug)"
         static let searchCountry = "Search country"
         static let selectCountry = "Select Country"
         
@@ -87,12 +84,13 @@ enum AppStrings {
         static let verifying = "Verifying..."
         static let otpCTA = "Verify"
         static let sentTo = "Enter the 6-digit code sent to"
+        static let resendCode = "Resend code"
         
         
     }
     
     enum Error {
-        static let otpTimeout = "OTP request timed out. Use a Firebase test phone number in the simulator."
+        static let invalidPhoneNumber = "Enter a valid phone number with country code."
         static let missingVerificationID = "Firebase did not return a verification ID."
         static let generic = "Something went wrong. Please try again."
         static let incorrectCode = "Incorrect code. Please try again."

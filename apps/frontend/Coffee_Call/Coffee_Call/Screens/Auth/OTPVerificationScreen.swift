@@ -5,6 +5,7 @@ struct OTPVerificationScreen: View {
     @Environment(\.presentationMode) var presentationMode
 
     var phoneNumber: String
+    var onBack: (() -> Void)? = nil
 
     @State private var otpCode: String = ""
     @State private var navigateToProfile = false
@@ -14,7 +15,13 @@ struct OTPVerificationScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Button(action: { presentationMode.wrappedValue.dismiss() }) {
+            Button(action: {
+                if let onBack {
+                    onBack()
+                } else {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }) {
                 Image(systemName: AppIcons.arrowLeft)
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.textPrimary)
@@ -78,6 +85,7 @@ struct OTPVerificationScreen: View {
                 .opacity(0.01)
                 .focused($isOTPFocused)
                 .onChange(of: otpCode) { newValue in
+                    auth.clearError()
                     let digits = newValue.filter { $0.isNumber }
                     if digits.count > 6 {
                         otpCode = String(digits.prefix(6))
@@ -91,14 +99,19 @@ struct OTPVerificationScreen: View {
 
             HStack {
                 Spacer()
-                HStack(spacing: 2) {
-                    Text("Resend code in")
-                        .font(.system(size: 13, weight: .bold, design: .default))
-                        .foregroundColor(.textSecondary.opacity(0.7))
-                    Text("00:45")
+                Button(action: {
+                    auth.sendOTP(phoneNumber: phoneNumber) { success in
+                        if success {
+                            otpCode = ""
+                            isOTPFocused = true
+                        }
+                    }
+                }) {
+                    Text(auth.isLoading ? AppStrings.Auth.sending : AppStrings.Auth.resendCode)
                         .font(.system(size: 13, weight: .bold, design: .default))
                         .foregroundColor(.brandPrimary)
                 }
+                .disabled(auth.isLoading)
                 Spacer()
             }
             .padding(.vertical, 10)
@@ -142,16 +155,6 @@ struct OTPVerificationScreen: View {
             }
             .disabled(!isCodeComplete || auth.isLoading)
             .padding(.bottom, 12)
-
-            #if DEBUG
-            Button(action: { navigateToProfile = true }) {
-                Text(AppStrings.Auth.skipVerifyDebug)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.textSecondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 32)
-            #endif
 
         }
         .navigationDestination(isPresented: $navigateToProfile) {

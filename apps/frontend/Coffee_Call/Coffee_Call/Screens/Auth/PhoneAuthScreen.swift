@@ -1,5 +1,4 @@
 import SwiftUI
-import FirebaseAuth
 
 struct PhoneAuthScreen: View {
     @EnvironmentObject var auth: AuthViewModel
@@ -9,16 +8,37 @@ struct PhoneAuthScreen: View {
     @State private var selectedCountry: CountryCode = CountryCode.defaultCountry
     @State private var showCountryPicker = false
     @State private var navigateToOTP = false
+    @State private var otpPhoneNumber: String = ""
 
-    var fullPhoneNumber: String {
-        "\(selectedCountry.dialCode)\(phoneNumber)"
+    private var phoneDigits: String {
+        phoneNumber.filter(\.isNumber)
     }
 
-    var isPhoneValid: Bool {
-        phoneNumber.count >= 7
+    private var fullPhoneDigits: String {
+        selectedCountry.dialCode.filter(\.isNumber) + phoneDigits
+    }
+
+    private var fullPhoneNumber: String {
+        "\(selectedCountry.dialCode)\(phoneDigits)"
+    }
+
+    private var isPhoneValid: Bool {
+        (8...15).contains(fullPhoneDigits.count)
     }
 
     var body: some View {
+        if navigateToOTP {
+            OTPVerificationScreen(phoneNumber: otpPhoneNumber) {
+                navigateToOTP = false
+                otpPhoneNumber = ""
+                auth.clearError()
+            }
+        } else {
+            phoneEntryView
+        }
+    }
+    
+    private var phoneEntryView: some View {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: { presentationMode.wrappedValue.dismiss() }) {
                 Image(systemName: AppIcons.arrowLeft)
@@ -78,6 +98,9 @@ struct PhoneAuthScreen: View {
                         .frame(height: 64)
                         .frame(maxWidth: .infinity)
                         .background(phoneFieldBackground)
+                        .onChange(of: phoneNumber) { _ in
+                            auth.clearError()
+                        }
                 }
 
                 if let error = auth.errorMessage {
@@ -98,7 +121,8 @@ struct PhoneAuthScreen: View {
 
             Button(action: {
                 auth.sendOTP(phoneNumber: fullPhoneNumber) { success in
-                    if success && !auth.isAuthenticated {
+                    if success {
+                        otpPhoneNumber = fullPhoneNumber
                         navigateToOTP = true
                     }
                 }
@@ -124,19 +148,6 @@ struct PhoneAuthScreen: View {
             .disabled(!isPhoneValid || auth.isLoading)
             .padding(.bottom, 12)
 
-            #if DEBUG
-            Button(action: { navigateToOTP = true }) {
-                Text(AppStrings.Auth.skipDebug)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.textSecondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 32)
-            #endif
-
-        }
-        .navigationDestination(isPresented: $navigateToOTP) {
-            OTPVerificationScreen(phoneNumber: fullPhoneNumber)
         }
         .padding(.horizontal, 32)
         .background(Color.backgroundMain.edgesIgnoringSafeArea(.all))

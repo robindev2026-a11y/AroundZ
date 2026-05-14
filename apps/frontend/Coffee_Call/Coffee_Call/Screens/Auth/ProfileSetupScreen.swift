@@ -159,15 +159,6 @@ struct ProfileSetupScreen: View {
             .disabled(!isReady || auth.isLoading)
             .padding(.bottom, 12)
 
-            #if DEBUG
-            Button(action: { navigateToPermissions = true }) {
-                Text(AppStrings.Auth.skipProfileDebug)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.textSecondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 32)
-            #endif
         }
         .padding(.horizontal, 32)
         .background(Color.backgroundMain.edgesIgnoringSafeArea(.all))

@@ -9,57 +9,56 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
 
-    // Internal: store verification ID between steps
     private var verificationID: String? = nil
-    private let db = Firestore.firestore()
-    private var otpTimeoutTask: DispatchWorkItem?
+    private lazy var db = Firestore.firestore()
+    private let verificationIDKey = "authVerificationID"
 
     // MARK: - Init (check existing session)
     init() {
+        Auth.auth().languageCode = "en"
+        verificationID = UserDefaults.standard.string(forKey: verificationIDKey)
+
         let isFirebaseAuthed = Auth.auth().currentUser != nil
         let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         isAuthenticated = isFirebaseAuthed && hasCompletedOnboarding
-
-        #if targetEnvironment(simulator)
-        Auth.auth().settings?.isAppVerificationDisabledForTesting = true
-        #endif
     }
 
     // MARK: - Step 1: Send OTP
     func sendOTP(phoneNumber: String, completion: @escaping (Bool) -> Void) {
         isLoading = true
         errorMessage = nil
-        otpTimeoutTask?.cancel()
 
-
-
-        let timeoutTask = DispatchWorkItem { [weak self] in
-            guard let self = self, self.isLoading else { return }
-            self.isLoading = false
-            self.errorMessage = AppStrings.Error.otpTimeout
+        let normalizedPhone = phoneNumber.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+        let normalizedDigits = normalizedPhone.dropFirst()
+        guard normalizedPhone.hasPrefix("+"),
+              normalizedDigits.allSatisfy(\.isNumber),
+              (8...15).contains(normalizedDigits.count)
+        else {
+            isLoading = false
+            errorMessage = AppStrings.Error.invalidPhoneNumber
             completion(false)
+            return
         }
-        otpTimeoutTask = timeoutTask
-        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: timeoutTask)
 
-        PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: nil) { [weak self] verificationID, error in
+        PhoneAuthProvider.provider().verifyPhoneNumber(normalizedPhone, uiDelegate: nil) { [weak self] verificationID, error in
             DispatchQueue.main.async {
-                self?.otpTimeoutTask?.cancel()
-                self?.isLoading = false
+                guard let self else { return }
+                self.isLoading = false
+                
                 if let error = error {
-                    self?.errorMessage = error.localizedDescription
-                    print("[AuthViewModel] sendOTP error: \(error.localizedDescription)")
+                    self.errorMessage = error.localizedDescription
                     completion(false)
                     return
                 }
 
                 guard let verificationID = verificationID, !verificationID.isEmpty else {
-                    self?.errorMessage = AppStrings.Error.missingVerificationID
+                    self.errorMessage = AppStrings.Error.missingVerificationID
                     completion(false)
                     return
                 }
 
-                self?.verificationID = verificationID
+                self.verificationID = verificationID
+                UserDefaults.standard.set(verificationID, forKey: self.verificationIDKey)
                 completion(true)
             }
         }
@@ -81,15 +80,18 @@ class AuthViewModel: ObservableObject {
             verificationCode: code
         )
 
-        Auth.auth().signIn(with: credential) { [weak self] result, error in
+        Auth.auth().signIn(with: credential) { [weak self] _, error in
             DispatchQueue.main.async {
-                self?.isLoading = false
+                guard let self else { return }
+                self.isLoading = false
                 if let error = error {
-                    self?.errorMessage = AppStrings.Error.incorrectCode
-                    print("[AuthViewModel] OTP Error: \(error.localizedDescription)")
+                    self.errorMessage = AppStrings.Error.incorrectCode
                     completion(false)
                     return
                 }
+                
+                self.verificationID = nil
+                UserDefaults.standard.removeObject(forKey: self.verificationIDKey)
                 completion(true)
             }
         }
@@ -109,12 +111,12 @@ class AuthViewModel: ObservableObject {
         let data: [String: Any] = [
             "uid": user.uid,
             "name": name,
-            "phone": user.phoneNumber ?? "",
+            "phoneNumber": user.phoneNumber ?? "",
             "createdAt": Timestamp(date: Date()),
             "interests": []
         ]
 
-        db.collection("users").document(user.uid).setData(data) { [weak self] error in
+        db.collection("users").document(user.uid).setData(data, merge: true) { [weak self] error in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 if let error = error {
@@ -139,6 +141,12 @@ class AuthViewModel: ObservableObject {
     func signOut() {
         try? Auth.auth().signOut()
         UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
+        UserDefaults.standard.removeObject(forKey: verificationIDKey)
+        verificationID = nil
         isAuthenticated = false
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 }
