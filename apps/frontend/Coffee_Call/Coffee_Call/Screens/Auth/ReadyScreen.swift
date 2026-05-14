@@ -18,7 +18,7 @@ struct ReadyScreen: View {
                             .font(.system(size: 40, weight: .bold))
                             .foregroundColor(.textOnBrand)
                     )
-                    .shadow(color: Color.brandPrimary.opacity(0.3), radius: 15, x: 0, y: 8)
+                    .shadow(color: Color.brandPrimary.opacity(0.28), radius: 20, x: 0, y: 10)
                 
                 Image(systemName: AppIcons.sparkles)
                     .font(.system(size: 24))
@@ -28,12 +28,12 @@ struct ReadyScreen: View {
             .padding(.bottom, 32)
             
             Text(AppStrings.Auth.readyTitle)
-                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .font(.system(size: 32, weight: .black, design: .default))
                 .foregroundColor(.textPrimary)
                 .padding(.bottom, 16)
             
             Text(AppStrings.Auth.readySubtitle)
-                .font(.system(size: 16))
+                .font(.system(size: 16, weight: .medium, design: .default))
                 .foregroundColor(.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -43,7 +43,7 @@ struct ReadyScreen: View {
             // Tip Card
             VStack(spacing: 12) {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.brandPrimary.opacity(0.1))
+                    .fill(Color.brandPrimary.opacity(0.12))
                     .frame(width: 48, height: 48)
                     .overlay(
                         Image(systemName: AppIcons.coffee)
@@ -65,33 +65,25 @@ struct ReadyScreen: View {
             .padding(32)
             .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color.textOnBrand)
-                    .shadow(color: Color.black.opacity(0.04), radius: 20, x: 0, y: 10)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color.surfaceMain)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(Color.appBorder, lineWidth: 1)
+                    )
+                    .shadow(color: Color.textPrimary.opacity(0.05), radius: 20, x: 0, y: 10)
             )
             .padding(.horizontal, 32)
             
             Spacer()
             
-            // CTA
-            Button(action: {
+            PrimaryButton(title: AppStrings.Auth.readyCTA, height: 64, cornerRadius: 16, icon: AppIcons.arrowRight) {
                 auth.completeOnboarding()
-            }) {
-                HStack {
-                    Text(AppStrings.Auth.readyCTA)
-                    Image(systemName: AppIcons.arrowRight)
-                }
-                .font(.buttonText)
-                .foregroundColor(.textOnBrand)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(Color.brandPrimary)
-                .clipShape(Capsule())
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.textSecondary.opacity(0.02).edgesIgnoringSafeArea(.all)) // Very slight off-white
+        .background(Color.backgroundMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
     }
 }

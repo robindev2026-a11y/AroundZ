@@ -1,230 +1,132 @@
 # CoffeeCall: Design Tokens
 
-Reusable design values for consistent implementation across iOS.
+Source of truth for CoffeeCall visual implementation.
 
-## Colors
+Current design source: `/Users/development/Downloads/figmaCoffe/src/styles/theme.css`
 
-### Primary Palette
-| Token | Value | Hex | Usage |
-|-------|-------|-----|-------|
-| color-primary | Teal Green | #49B89D | CTAs, highlights, primary buttons |
-| color-primary-light | Light Teal | #74D1B9 | Hover states, disabled backgrounds |
-| color-primary-dark | Dark Teal | #2B826C | Active states, borders |
+Status: active. Use these values for SwiftUI and documentation. Do not use older blue/coral MVP palette docs.
 
-### Secondary Palette
-| Token | Value | Hex | Usage |
-|-------|-------|-----|-------|
-| color-success | Green | #10B981 | Accept, positive actions, success states |
-| color-warning | Amber | #F59E0B | Pending, caution states |
-| color-error | Red | #EF4444 | Errors, reject, danger states |
-| color-info | Blue | #3B82F6 | Information, notifications |
+---
 
-### Neutral Palette
-| Token | Value | Hex | Usage |
-|-------|-------|-----|-------|
-| color-background | White | #FFFFFF | Main app background |
-| color-surface | Light Gray | #F9FAFB | Card, container backgrounds |
-| color-surface-alt | Lighter Gray | #F3F4F6 | Alternative surface |
-| color-border | Gray | #E5E7EB | Dividers, borders |
-| color-border-dark | Dark Gray | #D1D5DB | Emphasis borders |
+## Color Tokens
 
-### Text Colors
-| Token | Value | Hex | Usage |
-|-------|-------|-----|-------|
-| color-text-primary | Dark Gray | #1F2937 | Body text, headings |
-| color-text-secondary | Medium Gray | #6B7280 | Secondary text, captions |
-| color-text-tertiary | Light Gray | #9CA3AF | Disabled text |
-| color-text-inverse | White | #FFFFFF | Text on dark backgrounds |
+### Brand
+
+| Token | Hex | SwiftUI semantic token | Usage |
+|---|---:|---|---|
+| brand-mint | `#53B8A6` | `.brandPrimary` | Primary CTAs, active controls, key accents |
+| brand-mint-pressed | `#3D8D7A` | `.brandPrimaryDark` | Pressed CTA state, strong mint accents |
+| brand-lavender | `#8E7DBE` | `.brandPurple` | Highlights, secondary accent, progress/illustration accents |
+| brand-peach | `#E88C6B` | `.brandSecondary` | Optional warm CTA/accent, alerts where appropriate |
+
+### Surfaces
+
+| Token | Hex | SwiftUI semantic token | Usage |
+|---|---:|---|---|
+| bg-primary | `#F6F1EB` | `.backgroundMain` | Main warm app background |
+| surface-card | `#FFFDF9` | `.surfaceMain` | Cards, elevated panels, form containers |
+| surface-secondary | `#F4F4F8` | Use semantic surface token when added | Secondary panels, subtle input fill |
+| border-subtle | `#E7DED4` | `.appBorder` | Card borders, separators, input outlines |
+
+### Text
+
+| Token | Hex | SwiftUI semantic token | Usage |
+|---|---:|---|---|
+| text-primary | `#243447` | `.textPrimary` | Headings, primary body text |
+| text-secondary | `#5F6368` | `.textSecondary` | Captions, metadata, helper text |
+| text-on-brand | `#FFFFFF` | `.textOnBrand` | Text on mint/lavender/peach backgrounds |
+
+### Status
+
+| Token | Hex | SwiftUI semantic token | Usage |
+|---|---:|---|---|
+| success | `#10B981` | `.statusSuccess` | Success confirmation only |
+| error | `#DE4545` | `.statusError` | Error/destructive states only |
 
 ---
 
 ## Typography
 
-### Font Family
-- **Primary:** Inter (sans-serif)
-- **Fallback:** System font stack (SF Pro Display on iOS)
+The Figma prototype uses Inter on web. The iOS implementation should use native SF Pro through SwiftUI system fonts with `design: .default`.
 
-### Heading Styles
-| Token | Font Size | Font Weight | Line Height | Letter Spacing | Usage |
-|-------|-----------|-------------|-------------|---|---|
-| heading-1 | 32px | 700 (Bold) | 1.2 | -0.5px | Page titles, major headings |
-| heading-2 | 24px | 700 (Bold) | 1.3 | 0px | Section titles |
-| heading-3 | 20px | 600 (SemiBold) | 1.4 | 0px | Subsection titles |
+Do not use `.rounded` typography unless a future Figma update explicitly requires it.
 
-### Body Styles
-| Token | Font Size | Font Weight | Line Height | Letter Spacing | Usage |
-|-------|-----------|-------------|-------------|---|---|
-| body-lg | 18px | 400 (Regular) | 1.6 | 0px | Large body text |
-| body | 16px | 400 (Regular) | 1.5 | 0px | Standard body text |
-| body-sm | 14px | 400 (Regular) | 1.5 | 0px | Smaller body text |
+| Token | Size | Weight | SwiftUI token | Usage |
+|---|---:|---|---|---|
+| h1 | 32 | black/bold | `.heading1` | Onboarding titles, major screen titles |
+| h2 | 24 | bold/semibold | Direct system token if needed | Section headers |
+| h3 | 20 | bold/semibold | Direct system token if needed | Card titles |
+| body | 16 | regular | `.bodyStandard` | Primary body copy |
+| body-sm | 14 | regular | `.bodySmall` | Secondary body copy |
+| caption | 12 | bold/regular by context | `.captionText` | Labels, metadata, uppercase badges |
+| button | 16 | black/bold | `.buttonText` | CTA labels |
 
-### Other Styles
-| Token | Font Size | Font Weight | Line Height | Usage |
-|-------|-----------|-------------|-------------|---|
-| caption | 12px | 400 (Regular) | 1.4 | Small text, labels |
-| overline | 11px | 600 (SemiBold) | 1.5 | Uppercase labels |
-| button | 16px | 600 (SemiBold) | 1.5 | Button text |
+Implementation rule: use shared typography helpers from `apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/Font+Extensions.swift` where possible.
 
 ---
 
-## Spacing System
+## Spacing
 
-All spacing follows an 8px base unit for consistency.
+Use the Figma Social Refresh spacing scale.
 
-| Token | Pixels | Usage |
-|-------|--------|-------|
-| spacing-xs | 4px | Tight spacing (rarely used) |
-| spacing-sm | 8px | Small gaps (inside inputs, between icons) |
-| spacing-md | 16px | Default spacing (padding in cards, gaps between elements) |
-| spacing-lg | 24px | Large gaps (between sections) |
-| spacing-xl | 32px | Extra large gaps (between major sections) |
-| spacing-2xl | 48px | Huge gaps (screen-level spacing) |
-
-**Examples:**
-- Button padding: `spacing-sm` (vertical), `spacing-md` (horizontal)
-- Card padding: `spacing-md`
-- Section gap: `spacing-lg`
-- Page padding: `spacing-md`
+| Token | Points | Usage |
+|---|---:|---|
+| spacing-xs | 8 | Tight internal gaps |
+| spacing-sm | 16 | Default card/form padding |
+| spacing-md | 24 | Section spacing |
+| spacing-lg | 32 | Large screen spacing |
+| spacing-xl | 48 | Hero spacing, large vertical separation |
 
 ---
 
-## Border Radius
+## Radius
 
-| Token | Pixels | Usage |
-|-------|--------|-------|
-| radius-none | 0px | Sharp corners (rare) |
-| radius-sm | 4px | Small elements (badges, small inputs) |
-| radius-md | 8px | Standard (cards, input fields) |
-| radius-lg | 12px | Large elements (modals, large containers) |
-| radius-full | 50% | Circles (avatars, profile photos), Pill Buttons |
+| Token | Points | Usage |
+|---|---:|---|
+| radius-sm | 8 | Inputs, chips |
+| radius-md | 16 | Cards, compact panels |
+| radius-lg | 24 | Large cards, sheets |
+| radius-xl | 32 | Hero CTAs, large containers |
+| radius-circle | 50% | Avatars, circular icon wells |
 
 ---
 
 ## Shadows
 
 | Token | Definition | Usage |
-|-------|-----------|-------|
-| shadow-none | None | Flat design, no depth |
-| shadow-sm | 0 1px 2px rgba(0, 0, 0, 0.05) | Subtle elevation |
-| shadow-md | 0 4px 6px rgba(0, 0, 0, 0.1) | Cards, default elevation |
-| shadow-lg | 0 10px 15px rgba(0, 0, 0, 0.1) | Modals, popovers |
-| shadow-xl | 0 20px 25px rgba(0, 0, 0, 0.15) | Overlays, dropdowns |
+|---|---|---|
+| shadow-soft | `0 4px 12px rgba(36, 52, 71, 0.04)` | Subtle layer separation |
+| shadow-card | `0 8px 24px rgba(36, 52, 71, 0.06)` | Activity cards, profile cards |
+| shadow-modal | `0 20px 48px rgba(36, 52, 71, 0.12)` | Sheets, overlays |
+
+SwiftUI equivalent: use `Color.textPrimary.opacity(...)` for shadow color rather than pure black where practical.
 
 ---
 
-## Effects
+## Usage Rules
 
-| Token | Definition | Usage |
-|-------|-----------|-------|
-| effect-glass | bg: rgba(255, 255, 255, 0.15), blur: 10px | Glassmorphic floating cards, badges |
-| effect-glass-dark | bg: rgba(0, 0, 0, 0.25), blur: 10px | Dark glass elements, dark mode overlays |
-
----
-
-## Component-Level Tokens
-
-### Button
-| Token | Value | Usage |
-|-------|-------|-------|
-| button-height-sm | 36px | Small buttons |
-| button-height-md | 44px | Standard buttons |
-| button-height-lg | 52px | Large buttons |
-| button-padding-h | spacing-md | Horizontal padding |
-| button-padding-v-sm | 8px | Small button vertical |
-| button-padding-v-md | 12px | Standard vertical |
-
-### Input
-| Token | Value | Usage |
-|-------|-------|-------|
-| input-height | 44px | Text inputs, select |
-| input-padding-h | spacing-md | Horizontal padding |
-| input-padding-v | 10px | Vertical padding |
-| input-border-width | 1px | Border thickness |
-| input-border-color | color-border | Default state |
-
-### Card
-| Token | Value | Usage |
-|-------|-------|-------|
-| card-padding | spacing-md | Internal padding |
-| card-border-radius | radius-md | Corner radius |
-| card-background | color-surface | Background color |
-| card-shadow | shadow-md | Depth |
+- Use semantic SwiftUI tokens from `Color+Extensions.swift`.
+- Do not hardcode raw hex values inside screens.
+- Do not use the old blue/coral MVP design palette.
+- Do not use placeholder design docs as implementation source.
+- Keep full-screen image backgrounds behind page `TabView`; apply `.ignoresSafeArea()` only to background layers.
+- Update this file whenever Figma visual tokens change.
 
 ---
 
-## States & Interactions
+## Current Swift Asset Mapping
 
-### Button States
-```
-Default:    background: color-primary, text: color-text-inverse
-Hover:      background: color-primary-dark, shadow: shadow-md
-Active:     background: color-primary-dark, transform: scale(0.98)
-Disabled:   background: color-border, text: color-text-tertiary
-Loading:    opacity: 0.7, spinner overlay
-```
-
-### Input States
-```
-Default:    border: 1px color-border, background: color-background
-Focused:    border: 2px color-primary, shadow: shadow-sm
-Error:      border: 2px color-error, text: color-error
-Disabled:   background: color-surface-alt, text: color-text-tertiary
-```
-
----
-
-## Animations
-
-| Token | Duration | Easing | Usage |
-|-------|----------|--------|-------|
-| animation-fast | 150ms | ease-in-out | Quick feedback (button press) |
-| animation-normal | 300ms | ease-in-out | Standard transitions |
-| animation-slow | 500ms | ease-in-out | Complex animations |
-
----
-
-## Accessibility Notes
-
-- **Contrast:** All text meets WCAG AA (4.5:1 minimum)
-- **Touch targets:** All interactive elements ≥44x44 points
-- **Color:** Never rely on color alone (use icons + text)
-- **Focus indicators:** Visible keyboard focus (2px primary border)
-
----
-
-### 1. Semantic Naming
-We use a semantic naming convention for colors to ensure the UI is role-based and theme-ready.
-
-- **Brand:** `brandPrimary`, `brandSecondary`
-- **UI:** `backgroundMain`, `surfaceMain`, `appBorder`
-- **Text:** `textPrimary`, `textSecondary`, `textOnBrand`
-- **Status:** `statusSuccess`, `statusError`
-
-### 2. Standardized Asset Management
-All assets are centralized in the `DesignSystem/` directory:
-
-- **Strings:** `AppStrings.swift` (Nested enums: `Auth`, `Onboarding`)
-- **Icons:** `AppIcons.swift` (SF Symbols)
-- **Images:** `AppImages.swift` (Remote & Local assets)
-- **Colors:** `Color+Extensions.swift` (Semantic tokens)
-
-### 3. Usage Pattern
-Developers MUST NOT use hardcoded strings, raw colors, or "magic symbols" in Views.
-
-```swift
-// [CORRECT]
-Text(AppStrings.Auth.phoneTitle)
-    .foregroundColor(.textPrimary)
-Image(systemName: AppIcons.arrowRight)
-    .foregroundColor(.brandPrimary)
-
-// [INCORRECT]
-Text("What's your number?")
-    .foregroundColor(Color("DarkGray"))
-Image(systemName: "arrow.right")
-```
-
----
-
-**Status:** Standardized (v1.1)  
-**Last Updated:** 2026-05-13
+| Asset | Hex |
+|---|---:|
+| `coffeePrimary` | `#53B8A6` |
+| `coffeePrimaryDark` | `#3D8D7A` |
+| `coffeePrimaryLight` | `#8E7DBE` |
+| `coffeePurple` | `#8E7DBE` |
+| `coffeePeach` | `#E88C6B` |
+| `coffeeBackground` | `#F6F1EB` |
+| `coffeeSurface` | `#FFFDF9` |
+| `coffeeSurfaceSecondary` | `#F4F4F8` |
+| `coffeeBorder` | `#E7DED4` |
+| `coffeeTextPrimary` | `#243447` |
+| `coffeeTextSecondary` | `#5F6368` |
+| `coffeeSuccess` | `#10B981` |

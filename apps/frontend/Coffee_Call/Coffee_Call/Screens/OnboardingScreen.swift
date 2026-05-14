@@ -73,7 +73,7 @@ struct OnboardingScreen: View {
             .ignoresSafeArea()
 
         default:
-            Color.surfaceMain
+            Color.backgroundMain
                 .ignoresSafeArea()
         }
     }
@@ -178,7 +178,7 @@ struct Slide1View: View {
                 .padding(.horizontal, 32)
                 .padding(.bottom, 48)
                 
-                PrimaryButton(title: AppStrings.Onboarding.slide1CTA, height: 64, cornerRadius: 24, icon: AppIcons.arrowRight) {
+                PrimaryButton(title: AppStrings.Onboarding.slide1CTA, height: 64, cornerRadius: 16, icon: AppIcons.arrowRight) {
                     withAnimation {
                         currentPage = 1
                     }
@@ -214,7 +214,7 @@ struct Slide2View: View {
                     .padding(.bottom, 8)
                 
                 Text(AppStrings.Onboarding.slide2Title)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 32, weight: .black, design: .default))
                     .foregroundColor(.textPrimary)
                 
                 Text(AppStrings.Onboarding.slide2Subtitle)
@@ -250,7 +250,7 @@ struct Slide2View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.surfaceMain.ignoresSafeArea())
+        .background(Color.backgroundMain.ignoresSafeArea())
     }
 }
 
@@ -273,7 +273,7 @@ struct Slide3View: View {
                     .padding(.bottom, 8)
                 
                 Text(AppStrings.Onboarding.slide3Title)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 32, weight: .black, design: .default))
                     .foregroundColor(.textPrimary)
                     .multilineTextAlignment(.center)
                 
@@ -306,7 +306,7 @@ struct Slide3View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.surfaceMain.ignoresSafeArea())
+        .background(Color.backgroundMain.ignoresSafeArea())
     }
 }
 
@@ -325,7 +325,7 @@ struct Slide4View: View {
             
             VStack(alignment: .leading, spacing: 16) {
                 Text(AppStrings.Onboarding.slide4Title)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 32, weight: .black, design: .default))
                     .foregroundColor(.textPrimary)
                 
                 Text(AppStrings.Onboarding.slide4Subtitle)
@@ -381,7 +381,7 @@ struct Slide4View: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.surfaceMain.ignoresSafeArea())
+        .background(Color.backgroundMain.ignoresSafeArea())
     }
     
     private func toggle(_ interest: String) {
@@ -416,7 +416,7 @@ struct Slide5View: View {
                 
                 // Headings
                 Text(AppStrings.Onboarding.slide5Title)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 32, weight: .black, design: .default))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
@@ -520,9 +520,15 @@ struct ActivityChip: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(Color.surfaceMain)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+        )
+        .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
     }
 }
 
@@ -545,9 +551,15 @@ struct SafetyFeatureRow: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.surfaceMain)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+        )
+        .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
     }
 }
 
@@ -564,9 +576,13 @@ struct InterestPill: View {
                 .foregroundColor(isSelected ? .white : .textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isSelected ? Color.brandPrimary : Color.white)
-                .cornerRadius(12)
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                .background(isSelected ? Color.brandPrimary : Color.surfaceMain)
+                .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .stroke(isSelected ? Color.clear : Color.appBorder, lineWidth: 1)
+                )
+                .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
         }
     }
 }

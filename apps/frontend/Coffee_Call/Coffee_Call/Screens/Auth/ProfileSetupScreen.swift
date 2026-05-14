@@ -12,52 +12,61 @@ struct ProfileSetupScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Back Button
             Button(action: {
                 presentationMode.wrappedValue.dismiss()
             }) {
-                Circle()
-                    .fill(Color.textSecondary.opacity(0.05))
-                    .frame(width: 40, height: 40)
-                    .overlay(
-                        Image(systemName: AppIcons.arrowLeft)
-                            .foregroundColor(.textPrimary)
+                Image(systemName: AppIcons.arrowLeft)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.textPrimary)
+                    .frame(width: 48, height: 48)
+                    .background(
+                        Circle()
+                            .fill(Color.surfaceMain)
+                            .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
                     )
+                    .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
             }
-            .padding(.top, 20)
-            .padding(.bottom, 24)
+            .padding(.top, 40)
+            .padding(.bottom, 32)
 
             Text(AppStrings.Auth.profileTitle)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(.system(size: 30, weight: .black, design: .default))
                 .foregroundColor(.textPrimary)
-                .padding(.bottom, 40)
+                .padding(.bottom, 36)
 
-            // Avatar Section
             VStack(spacing: 24) {
                 ZStack(alignment: .bottomTrailing) {
-                    RoundedRectangle(cornerRadius: 36, style: .continuous)
-                        .strokeBorder(Color.textSecondary.opacity(0.3), style: StrokeStyle(lineWidth: 1.5, dash: [6]))
-                        .frame(width: 120, height: 120)
+                    RoundedRectangle(cornerRadius: 48, style: .continuous)
+                        .fill(Color.surfaceSecondary)
+                        .frame(width: 140, height: 140)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 48, style: .continuous)
+                                .strokeBorder(Color.appBorder, style: StrokeStyle(lineWidth: 2, dash: [7]))
+                        )
                         .background(
-                            RoundedRectangle(cornerRadius: 36, style: .continuous)
-                                .fill(Color.textOnBrand)
+                            RoundedRectangle(cornerRadius: 48, style: .continuous)
+                                .fill(Color.surfaceMain)
                         )
                         .overlay(
                             Image(systemName: AppIcons.camera)
-                                .font(.system(size: 32))
+                                .font(.system(size: 38, weight: .medium))
                                 .foregroundColor(.textSecondary.opacity(0.5))
                         )
 
-                    Circle()
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(Color.brandPrimary)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 40, height: 40)
                         .overlay(
                             Image(systemName: AppIcons.camera)
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(.textOnBrand)
                         )
-                        .offset(x: 4, y: 4)
-                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        .offset(x: 2, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(Color.surfaceMain, lineWidth: 4)
+                        )
+                        .shadow(color: Color.brandPrimary.opacity(0.24), radius: 12, x: 0, y: 6)
                 }
 
                 HStack(spacing: 16) {
@@ -68,7 +77,7 @@ struct ProfileSetupScreen: View {
                             .padding(.vertical, 10)
                             .padding(.horizontal, 16)
                             .background(Color.brandPrimary.opacity(0.1))
-                            .clipShape(Capsule())
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
                     
                     Button(action: {}) {
@@ -78,7 +87,7 @@ struct ProfileSetupScreen: View {
                             .padding(.vertical, 10)
                             .padding(.horizontal, 16)
                             .background(Color.brandPrimary.opacity(0.1))
-                            .clipShape(Capsule())
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
                 }
             }
@@ -88,19 +97,24 @@ struct ProfileSetupScreen: View {
             // Name Input Section
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppStrings.Auth.displayNameLabel)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: 12, weight: .black, design: .default))
                     .foregroundColor(.textSecondary)
-                    .kerning(1.2)
+                    .kerning(1.8)
 
                 TextField(AppStrings.Auth.displayNamePlaceholder, text: $firstName)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 18, weight: .bold, design: .default))
                     .foregroundColor(.textPrimary)
-                    .padding()
+                    .padding(.horizontal, 18)
+                    .frame(height: 58)
                     .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(Color.textSecondary.opacity(0.1), lineWidth: 1)
-                            .background(RoundedRectangle(cornerRadius: 12).fill(Color.textSecondary.opacity(0.02)))
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.surfaceMain)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .strokeBorder(Color.appBorder, lineWidth: 1)
+                            )
                     )
+                    .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
 
                 Text(AppStrings.Auth.displayNameSubtitle)
                     .font(.system(size: 12))
@@ -117,7 +131,6 @@ struct ProfileSetupScreen: View {
 
             Spacer()
 
-            // CTA
             Button(action: {
                 auth.saveProfile(name: firstName) { success in
                     if success {
@@ -132,16 +145,19 @@ struct ProfileSetupScreen: View {
                             .scaleEffect(0.9)
                     }
                     Text(auth.isLoading ? AppStrings.Auth.saving : AppStrings.Auth.profileCTA)
-                        .font(.buttonText)
-                        .foregroundColor(.textOnBrand)
+                        .font(.system(size: 18, weight: .black, design: .default))
                 }
+                .foregroundColor(.textOnBrand)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(isReady ? Color.brandPrimary : Color.textSecondary.opacity(0.3))
-                .clipShape(Capsule())
+                .frame(height: 64)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(isReady ? Color.brandPrimary : Color.textSecondary.opacity(0.24))
+                )
+                .shadow(color: Color.brandPrimary.opacity(isReady ? 0.22 : 0), radius: 18, x: 0, y: 8)
             }
             .disabled(!isReady || auth.isLoading)
-            .padding(.bottom, 8)
+            .padding(.bottom, 12)
 
             #if DEBUG
             Button(action: { navigateToPermissions = true }) {
@@ -153,8 +169,8 @@ struct ProfileSetupScreen: View {
             .padding(.bottom, 32)
             #endif
         }
-        .padding(.horizontal, 24)
-        .background(Color.textOnBrand.edgesIgnoringSafeArea(.all)) // Clean white background for this screen
+        .padding(.horizontal, 32)
+        .background(Color.backgroundMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
         .navigationDestination(isPresented: $navigateToPermissions) {
             PermissionsScreen()

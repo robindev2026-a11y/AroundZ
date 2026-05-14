@@ -13,8 +13,12 @@ struct CategoryChip: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
                 .background(isSelected ? Color.brandPrimary : Color.surfaceMain)
-                .cornerRadius(20)
-                .shadow(color: Color.black.opacity(isSelected ? 0.1 : 0.02), radius: 5, x: 0, y: 2)
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(isSelected ? Color.clear : Color.appBorder, lineWidth: 1)
+                )
+                .shadow(color: Color.brandPrimary.opacity(isSelected ? 0.22 : 0), radius: 12, x: 0, y: 4)
         }
     }
 }

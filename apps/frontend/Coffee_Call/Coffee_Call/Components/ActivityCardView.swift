@@ -7,51 +7,50 @@ struct ActivityCardView: View {
     var onJoin: () -> Void
     var onSave: () -> Void
 
-    private let cardHeight: CGFloat = 380
+    private let cardAspectRatio: CGFloat = 4.0 / 5.0
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        GeometryReader { proxy in
+            ZStack(alignment: .bottom) {
+                CoffeeImageView(urlString: activity.backgroundImageURL)
+                    .frame(width: proxy.size.width, height: proxy.size.width / cardAspectRatio)
 
-            // Background image — CoffeeImageView, never overflows
-            CoffeeImageView(urlString: activity.backgroundImageURL)
-                .frame(maxWidth: .infinity)
-                .frame(height: cardHeight)
+                LinearGradient(
+                    colors: [.clear, Color.darkOverlay.opacity(0.2), Color.darkOverlay.opacity(0.9)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(width: proxy.size.width, height: proxy.size.width / cardAspectRatio)
 
-            // Gradient overlay
-            LinearGradient(
-                colors: [.clear, Color.black.opacity(0.78)],
-                startPoint: .center,
-                endPoint: .bottom
-            )
-            .frame(maxWidth: .infinity)
-            .frame(height: cardHeight)
-
-            // Top badges
-            VStack {
-                HStack(alignment: .top) {
-                    statusBadge
+                VStack {
+                    HStack(alignment: .top) {
+                        statusBadge
+                        Spacer()
+                        vibeBadge
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 24)
                     Spacer()
-                    vibeBadge
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                Spacer()
-            }
-            .frame(height: cardHeight)
+                .frame(width: proxy.size.width, height: proxy.size.width / cardAspectRatio)
 
-            // Bottom content
-            VStack(alignment: .leading, spacing: 12) {
-                hostRow
-                activityTitle
-                metaRow
-                ctaRow
+                VStack(alignment: .leading, spacing: 14) {
+                    hostRow
+                    activityTitle
+                    metaRow
+                    ctaRow
+                }
+                .padding(24)
+                .padding(.bottom, 6)
             }
-            .padding(16)
-            .padding(.bottom, 8)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: cardHeight)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .aspectRatio(cardAspectRatio, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 40, style: .continuous)
+                .stroke(Color.appBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.textPrimary.opacity(0.06), radius: 24, x: 0, y: 10)
     }
 
     // MARK: - Subviews
@@ -62,11 +61,11 @@ struct ActivityCardView: View {
                 .fill(Color.statusSuccess)
                 .frame(width: 6, height: 6)
             Text(activity.status.rawValue)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 10, weight: .black, design: .default))
                 .foregroundColor(.white)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
         .background(.ultraThinMaterial)
         .cornerRadius(20)
     }
@@ -76,8 +75,8 @@ struct ActivityCardView: View {
             .font(.system(size: 11, weight: .bold))
             .foregroundColor(.white)
             .padding(.horizontal, 12)
-            .padding(.vertical, 5)
-            .background(Color.brandPrimary)
+            .padding(.vertical, 7)
+            .background(Color.brandPurple)
             .cornerRadius(20)
     }
 
@@ -107,28 +106,35 @@ struct ActivityCardView: View {
             }
 
             Text(activity.userName)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.system(size: 18, weight: .black, design: .default))
                 .foregroundColor(.white)
         }
     }
 
     private var activityTitle: some View {
         Text(activity.title)
-            .font(.system(size: 20, weight: .bold, design: .rounded))
+            .font(.system(size: 24, weight: .bold, design: .default))
             .foregroundColor(.white)
             .lineLimit(3)
             .fixedSize(horizontal: false, vertical: true)
     }
 
     private var metaRow: some View {
-        HStack(spacing: 16) {
-            Label(String(format: "%.1f km away", activity.distanceKm),
-                  systemImage: "mappin.and.ellipse")
-                .font(.system(size: 13, weight: .medium))
+        HStack(spacing: 24) {
+            HStack(spacing: 8) {
+                Image(systemName: "mappin.and.ellipse")
+                    .foregroundColor(.brandPrimary)
+                Text(String(format: "%.1f km away", activity.distanceKm))
+            }
+                .font(.system(size: 14, weight: .bold, design: .default))
                 .foregroundColor(.white.opacity(0.85))
 
-            Label(activity.time, systemImage: "clock")
-                .font(.system(size: 13, weight: .medium))
+            HStack(spacing: 8) {
+                Image(systemName: "clock")
+                    .foregroundColor(.brandPurple)
+                Text(activity.time)
+            }
+                .font(.system(size: 14, weight: .bold, design: .default))
                 .foregroundColor(.white.opacity(0.85))
         }
     }
@@ -149,13 +155,13 @@ struct ActivityCardView: View {
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .frame(height: 64)
                 .background(
                     activity.isJoined
                     ? Color.white.opacity(0.2)
                     : Color.brandPrimary
                 )
-                .cornerRadius(30)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                 .animation(CoffeeAnimation.spring, value: activity.isJoined)
             }
             .pressScale()
@@ -167,9 +173,13 @@ struct ActivityCardView: View {
                     .foregroundColor(activity.isSaved ? Color.brandPrimary : .white)
                     .scaleEffect(activity.isSaved ? 1.15 : 1.0)
                     .animation(CoffeeAnimation.springSnap, value: activity.isSaved)
-                    .frame(width: 48, height: 48)
-                    .background(Color.white.opacity(0.15))
-                    .clipShape(Circle())
+                    .frame(width: 64, height: 64)
+                    .background(Color.white.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                    )
             }
             .pressScale(0.88)
         }

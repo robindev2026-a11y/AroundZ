@@ -5,14 +5,14 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-//            if auth.isAuthenticated {
-//                MainTabView()
-//            } else {
+            if auth.isAuthenticated {
+                MainTabView()
+            } else {
                 NavigationStack {
                     OnboardingScreen()
                         .toolbar(.hidden, for: .navigationBar)
                 }
-//            }
+            }
         }
         .environmentObject(auth)
     }

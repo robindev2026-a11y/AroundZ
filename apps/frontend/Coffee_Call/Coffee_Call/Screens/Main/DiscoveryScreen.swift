@@ -8,7 +8,6 @@ struct DiscoveryScreen: View {
 
     private let userName = "Hey Robin"
     private let userInitials = "ER"
-    private let nearbyCount = 2
 
     @State private var activities: [Activity] = [
         Activity(
@@ -76,13 +75,13 @@ struct DiscoveryScreen: View {
                     // Header — slides up on appear
                     headerView
                         .padding(.top, 16)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 24)
                         .slideUpEntrance(delay: 0)
 
                     // Search — slides up slightly after header
                     searchBar
                         .padding(.top, 20)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 24)
                         .slideUpEntrance(delay: 0.06)
 
                     // Category chips
@@ -91,7 +90,7 @@ struct DiscoveryScreen: View {
                         .slideUpEntrance(delay: 0.12)
 
                     // Feed — each card staggered
-                    LazyVStack(spacing: 16) {
+                    LazyVStack(spacing: 32) {
                         ForEach(Array(filteredActivities.enumerated()), id: \.element.id) { index, activity in
                             ActivityCardView(
                                 activity: activity,
@@ -113,16 +112,16 @@ struct DiscoveryScreen: View {
                             .slideUpEntrance(delay: 0.18 + Double(index) * 0.08)
                         }
                     }
-                    .padding(.top, 20)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 120)
+                        .padding(.top, 20)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 120)
                 }
             }
 
             // FAB
             fabButton
-                .padding(.trailing, 20)
-                .padding(.bottom, 28)
+                .padding(.trailing, 24)
+                .padding(.bottom, 96)
                 .slideUpEntrance(delay: 0.3)
         }
         .navigationBarHidden(true)
@@ -134,10 +133,10 @@ struct DiscoveryScreen: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(userName)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 30, weight: .black, design: .default))
                     .foregroundColor(.textPrimary)
-                Text("\(nearbyCount) meetups happening nearby")
-                    .font(.system(size: 14, weight: .regular))
+                Text("\(activities.count) meetups happening nearby")
+                    .font(.system(size: 14, weight: .medium, design: .default))
                     .foregroundColor(.textSecondary)
             }
 
@@ -151,9 +150,13 @@ struct DiscoveryScreen: View {
                     Text(userInitials)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.brandPrimary)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 48, height: 48)
                         .background(Color.brandPrimary.opacity(0.15))
-                        .clipShape(Circle())
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(Color.appBorder, lineWidth: 1)
+                        )
                 }
                 .pressScale(0.90)
             }
@@ -163,11 +166,16 @@ struct DiscoveryScreen: View {
     private func headerIconButton(icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundColor(.textPrimary)
-                .frame(width: 40, height: 40)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(icon == "bell" ? .brandPurple : .brandPrimary)
+                .frame(width: 48, height: 48)
                 .background(Color.surfaceMain)
-                .clipShape(Circle())
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+                .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
         }
         .pressScale(0.90)
     }
@@ -178,7 +186,7 @@ struct DiscoveryScreen: View {
                 .font(.system(size: 16))
                 .foregroundColor(.textSecondary)
             TextField(AppStrings.Discovery.searchPlaceholder, text: $searchText)
-                .font(.system(size: 15))
+                .font(.system(size: 15, weight: .medium, design: .default))
                 .foregroundColor(.textPrimary)
             Spacer()
             Button(action: {}) {
@@ -189,9 +197,14 @@ struct DiscoveryScreen: View {
             .pressScale(0.88)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .frame(height: 56)
         .background(Color.surfaceMain)
-        .cornerRadius(14)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.appBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
     }
 
     private var categoryChips: some View {
@@ -208,19 +221,23 @@ struct DiscoveryScreen: View {
                     }
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 24)
         }
     }
 
     private var fabButton: some View {
         Button(action: {}) {
             Image(systemName: "plus")
-                .font(.system(size: 22, weight: .bold))
+                .font(.system(size: 28, weight: .bold))
                 .foregroundColor(.white)
-                .frame(width: 56, height: 56)
-                .background(Color(red: 0.1, green: 0.12, blue: 0.22))
-                .clipShape(Circle())
-                .shadow(color: Color.black.opacity(0.25), radius: 12, x: 0, y: 6)
+                .frame(width: 64, height: 64)
+                .background(Color.textPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.surfaceMain, lineWidth: 4)
+                )
+                .shadow(color: Color.textPrimary.opacity(0.28), radius: 20, x: 0, y: 10)
         }
         .pressScale(0.88)
     }

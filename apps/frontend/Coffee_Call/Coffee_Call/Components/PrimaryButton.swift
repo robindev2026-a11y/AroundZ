@@ -3,7 +3,7 @@ import SwiftUI
 struct PrimaryButton: View {
     let title: String
     var height: CGFloat = 56
-    var cornerRadius: CGFloat = 20
+    var cornerRadius: CGFloat = 16
     var icon: String? = nil
     var isDisabled: Bool = false
     let action: () -> Void
@@ -24,7 +24,7 @@ struct PrimaryButton: View {
             .frame(height: height)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(isDisabled ? Color.textSecondary.opacity(0.35) : Color.brandPrimaryDark)
+                    .fill(isDisabled ? Color.textSecondary.opacity(0.24) : Color.brandPrimary)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)

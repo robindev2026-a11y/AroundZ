@@ -41,10 +41,11 @@ enum AppStrings {
     }
     
     enum Auth {
-        static let phoneTitle = "What's your\nphone number?"
-        static let phoneSubtitle = "We'll send a one-time code to verify your number."
-        static let phonePlaceholder = "Phone number"
-        static let phoneCTA = "Send Code →"
+        static let phoneTitle = "What's your number?"
+        static let phoneSubtitle = "We'll send you a verification code to keep your account secure."
+        static let phoneLabel = "PHONE NUMBER"
+        static let phonePlaceholder = "(555) 000-0000"
+        static let phoneCTA = "Send Code"
         static let sending = "Sending..."
         static let skipDebug = "⚡ Skip OTP (Debug)"
         static let skipVerifyDebug = "⚡ Skip Verify (Debug)"
@@ -76,16 +77,16 @@ enum AppStrings {
         static let notificationsEnabled = "Notifications Enabled"
         
         static let readyTitle = "You're ready!"
-        static let readySubtitle = "Your profile is set up and you're part of\nthe CoffeeCall community."
+        static let readySubtitle = "Your profile is complete and we've found activities near you."
         static let readyCTA = "Start Exploring"
         static let privacyNote = "YOUR PRIVACY IS OUR PRIORITY"
         static let tipTitle = "First Activity Tip"
         static let tipDesc = "Don't be shy! Most people on\nCoffeeCall are just as eager to meet\nsomeone new."
         
-        static let otpTitle = "Enter your\nverification code"
+        static let otpTitle = "Verify it's you"
         static let verifying = "Verifying..."
-        static let otpCTA = "Verify Code"
-        static let sentTo = "Sent to"
+        static let otpCTA = "Verify"
+        static let sentTo = "Enter the 6-digit code sent to"
         
         
     }
@@ -109,7 +110,7 @@ enum AppStrings {
         static let title = "Discover"
         static let subtitle = "What's happening nearby"
         static let locationLabel = "NEARBY"
-        static let searchPlaceholder = "Search activities..."
+        static let searchPlaceholder = "Search moments, vibes, or people..."
         static let joinBtn = "Join"
         static let joinedBtn = "Joined"
         static let joinMomentBtn = "Join Moment"

@@ -6,7 +6,7 @@ struct PhoneAuthScreen: View {
     @Environment(\.presentationMode) var presentationMode
 
     @State private var phoneNumber: String = ""
-    @State private var selectedCountry: CountryCode = CountryCode.all[0]
+    @State private var selectedCountry: CountryCode = CountryCode.defaultCountry
     @State private var showCountryPicker = false
     @State private var navigateToOTP = false
 
@@ -19,80 +19,83 @@ struct PhoneAuthScreen: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-
-            // Back Button
-            HStack {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: AppIcons.arrowLeft)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.textPrimary)
-                }
-                Spacer()
-            }
-            .padding(.top, 16)
-
-            // Title
-            VStack(alignment: .leading, spacing: 8) {
-                Text(AppStrings.Auth.phoneTitle)
-                    .font(.heading1)
+        VStack(alignment: .leading, spacing: 0) {
+            Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                Image(systemName: AppIcons.arrowLeft)
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.textPrimary)
-                
+                    .frame(width: 48, height: 48)
+                    .background(
+                        Circle()
+                            .fill(Color.surfaceMain)
+                            .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
+                    )
+                    .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
+            }
+            .padding(.top, 40)
+            .padding(.bottom, 40)
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppStrings.Auth.phoneTitle)
+                    .font(.system(size: 30, weight: .black, design: .default))
+                    .foregroundColor(.textPrimary)
+
                 Text(AppStrings.Auth.phoneSubtitle)
-                    .font(.bodyStandard)
+                    .font(.system(size: 18, weight: .medium, design: .default))
                     .foregroundColor(.textSecondary)
                     .lineSpacing(4)
             }
-            .padding(.top, 16)
+            .padding(.bottom, 48)
 
-            // Phone Input Row
-            VStack(spacing: 0) {
-                HStack(spacing: 12) {
-                    // Country Code Picker Button
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppStrings.Auth.phoneLabel)
+                    .font(.system(size: 12, weight: .black, design: .default))
+                    .foregroundColor(.textSecondary)
+                    .kerning(1.8)
+                    .padding(.leading, 4)
+
+                HStack(spacing: 14) {
                     Button(action: { showCountryPicker = true }) {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 8) {
                             Text(selectedCountry.flag)
-                                .font(.system(size: 22))
+                                .font(.system(size: 20))
                             Text(selectedCountry.dialCode)
-                                .font(.bodyStandard)
-                                .fontWeight(.semibold)
+                                .font(.system(size: 16, weight: .bold, design: .default))
                                 .foregroundColor(.textPrimary)
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.textSecondary)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 14)
-                        .background(Color.textOnBrand)
-                        .cornerRadius(12)
-                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                        .frame(width: 110, height: 64)
+                        .background(phoneFieldBackground)
                     }
 
-                    // Number Input
                     TextField(AppStrings.Auth.phonePlaceholder, text: $phoneNumber)
-                        .font(.bodyStandard)
+                        .font(.system(size: 20, weight: .bold, design: .default))
                         .keyboardType(.numberPad)
                         .foregroundColor(.textPrimary)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
-                        .background(Color.textOnBrand)
-                        .cornerRadius(12)
-                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                        .padding(.horizontal, 20)
+                        .frame(height: 64)
                         .frame(maxWidth: .infinity)
+                        .background(phoneFieldBackground)
                 }
 
-                // Inline error
                 if let error = auth.errorMessage {
                     Text(error)
                         .font(.captionText)
                         .foregroundColor(.statusError)
-                        .padding(.top, 8)
+                        .padding(.top, 4)
                 }
             }
 
+            Text("Standard SMS rates may apply. You'll receive a 6-digit code to verify your phone.")
+                .font(.system(size: 14, weight: .medium, design: .default))
+                .foregroundColor(.textSecondary.opacity(0.82))
+                .lineSpacing(3)
+                .padding(.top, 24)
+
             Spacer()
 
-            // CTA Button
             Button(action: {
                 auth.sendOTP(phoneNumber: fullPhoneNumber) { success in
                     if success && !auth.isAuthenticated {
@@ -107,16 +110,19 @@ struct PhoneAuthScreen: View {
                             .scaleEffect(0.9)
                     }
                     Text(auth.isLoading ? AppStrings.Auth.sending : AppStrings.Auth.phoneCTA)
-                        .font(.buttonText)
-                        .foregroundColor(.textOnBrand)
+                        .font(.system(size: 18, weight: .black, design: .default))
                 }
+                .foregroundColor(.textOnBrand)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(isPhoneValid ? Color.brandPrimary : Color.textSecondary.opacity(0.3))
-                .clipShape(Capsule())
+                .frame(height: 64)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(isPhoneValid ? Color.brandPrimary : Color.textSecondary.opacity(0.24))
+                )
+                .shadow(color: Color.brandPrimary.opacity(isPhoneValid ? 0.22 : 0), radius: 18, x: 0, y: 8)
             }
             .disabled(!isPhoneValid || auth.isLoading)
-            .padding(.bottom, 8)
+            .padding(.bottom, 12)
 
             #if DEBUG
             Button(action: { navigateToOTP = true }) {
@@ -132,12 +138,22 @@ struct PhoneAuthScreen: View {
         .navigationDestination(isPresented: $navigateToOTP) {
             OTPVerificationScreen(phoneNumber: fullPhoneNumber)
         }
-        .padding(.horizontal, 24)
-        .background(Color.surfaceMain.edgesIgnoringSafeArea(.all))
+        .padding(.horizontal, 32)
+        .background(Color.backgroundMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
         .sheet(isPresented: $showCountryPicker) {
             CountryPickerView(selected: $selectedCountry)
         }
+    }
+
+    private var phoneFieldBackground: some View {
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .fill(Color.surfaceMain)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.appBorder, lineWidth: 1)
+            )
+            .shadow(color: Color.textPrimary.opacity(0.04), radius: 12, x: 0, y: 4)
     }
 }
 
@@ -148,10 +164,12 @@ struct CountryCode: Identifiable {
     let flag: String
     let dialCode: String
 
+    static let defaultCountry = CountryCode(name: "United States", flag: "🇺🇸", dialCode: "+1")
+
     static let all: [CountryCode] = [
-        CountryCode(name: "India", flag: "🇮🇳", dialCode: "+91"),
-        CountryCode(name: "United States", flag: "🇺🇸", dialCode: "+1"),
+        defaultCountry,
         CountryCode(name: "United Kingdom", flag: "🇬🇧", dialCode: "+44"),
+        CountryCode(name: "India", flag: "🇮🇳", dialCode: "+91"),
         CountryCode(name: "Canada", flag: "🇨🇦", dialCode: "+1"),
         CountryCode(name: "Australia", flag: "🇦🇺", dialCode: "+61"),
         CountryCode(name: "Germany", flag: "🇩🇪", dialCode: "+49"),
