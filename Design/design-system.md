@@ -14,6 +14,9 @@ CoffeeCall should feel warm, social, safe, and premium. It is not a coffee order
 
 Design priorities:
 - Activity first, person second.
+- Discovery is ambient, not a people-pinging surface.
+- Users join or create a Drift with context, not random DMs.
+- Optional hooks or offers can make a Drift more tempting.
 - Warm neutral surfaces.
 - Mint primary actions.
 - Lavender and peach accents used sparingly.
@@ -58,12 +61,14 @@ Buttons:
 - Mint default, darker mint pressed.
 - White text.
 - Strong, simple labels.
+- Primary actions should favor `Start a Drift`, `Join`, or `I'm in` over `Say hi`.
 
 Cards:
 - Warm off-white surfaces.
 - Rounded corners.
 - Soft shadows.
 - Clear hierarchy between title, metadata, and actions.
+- Drift cards may include a small hook/offer line, but should not read like a coupon marketplace.
 
 Onboarding:
 - Figma image-background screens must remain full bleed.
@@ -71,7 +76,8 @@ Onboarding:
 - Do not apply `.ignoresSafeArea()` to the entire page `TabView`; apply it only to background layers.
 
 Discovery:
-- Prioritize nearby social activity cards.
+- Use radar as an ambient presence signal, not a direct people browser.
+- Prioritize nearby Drifts and interest states over direct person lists.
 - Avoid dense dashboard layouts.
 - Use mint/lavender accents for liveliness, not generic blue.
 

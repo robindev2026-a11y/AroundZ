@@ -15,6 +15,20 @@ CoffeeCall is an activity-based meetup app.
 - `apps/backend/` - Firebase Functions and rules
 - `Design/` - active Figma-derived design tokens and component direction
 - `Planning/context.md` - latest AI/session handoff log
+- `Planning/spec.md` - active product scope
+- `Planning/architecture.md` - active system design
+- `Planning/decisions.md` - active architecture and UX decisions
+
+## Archived Planning Docs
+
+Older planning and design brief files are kept only for reference. Do not use them as implementation truth.
+
+- `Planning/CoffeeCall_Final_Figma_Brief.md`
+- `Planning/CoffeeCall_MVP_Component_Specs.md`
+- `Planning/CoffeeCall_MVP_Design_Brief.md`
+- `Planning/CoffeeCall_MVP_Screen_Content.md`
+- `Planning/FIGMA_AI_README.md`
+- `Design/Design UX/` legacy folder
 
 ## Design Source
 

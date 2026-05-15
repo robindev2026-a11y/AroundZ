@@ -1,4 +1,29 @@
 
+## Session: Antigravity — Drift Detail & UI Flow Consolidation (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Drift Detail Screen**: Implemented high-fidelity detail view with MVVM, sticky multi-state CTA, and summary info grid.
+- **Navigation**: Linked Drifts feed to Drift Detail view using `NavigationStack`; added `Hashable` conformance to `Drift` models.
+- **Design System**: Refactored all hardcoded strings and SF Symbols into `AppStrings` and `AppIcons`.
+- **UI Flow Rules**: Created `Planning/ui-flow.md` and updated `Design/screens.md` with refined MVP rules (no people-browsing, no cold DMs, approximate location pre-join, exact coordination post-join).
+
+**Verification:**
+- Compiled and verified navigation flow.
+- Audit of `AppIcons` and `AppStrings` completed for detail and feed screens.
+
+**Files updated:**
+- `Planning/ui-flow.md`
+- `Design/screens.md`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftDetailScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/ViewModels/DriftDetailViewModel.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftsScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Models/Drift.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/AppIcons.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/AppStrings.swift`
+- `Planning/context.md`
+
 # CoffeeCall Project Context
 
 This file is a shared rolling log for all AI tools working on CoffeeCall.
@@ -8,6 +33,47 @@ Rules:
 - Keep entries short and factual.
 - If this file grows too large, delete the oldest session entries and keep only the most recent ones.
 - Retention target: keep the latest 5 session entries or roughly the latest 300 lines, whichever comes first.
+
+## Session: Codex — Future trust architecture added (2026-05-14)
+
+### Changed by: Codex
+
+**What changed:**
+- Added a dedicated `Future System Design: Trust and Reputation (v2+)` section to `Planning/architecture.md` with a bounded-context, append-only ledger, and derived summary model.
+- Added a future-planning decision in `Planning/decisions.md` so reputation stays out of MVP but has a clear upgrade path.
+
+**Verification:**
+- Docs-only update; no code paths changed.
+
+**Files updated:**
+- `Planning/architecture.md`
+- `Planning/decisions.md`
+- `Planning/context.md`
+
+## Session: Codex — Drift-first docs cleanup (2026-05-14)
+
+### Changed by: Codex
+
+**What changed:**
+- Tightened the active product docs to enforce the Drift-first model: discovery now leads to joining or creating a Drift, not cold person-pings.
+- Added optional hook/offer language for Drifts in the spec, architecture, design system, and screen guidance.
+- Archived the redundant `Planning/features.md` file and updated the repo README to distinguish active docs from archived planning briefs.
+
+**Verification:**
+- Doc grep pass completed. Remaining references to old patterns are either negative guidance or archived-context notes, not active implementation instructions.
+
+**Files updated:**
+- `AGENTS.md`
+- `README.md`
+- `Planning/spec.md`
+- `Planning/architecture.md`
+- `Planning/decisions.md`
+- `Planning/context.md`
+- `Design/design-system.md`
+- `Design/screens.md`
+- `Design/component-specs.md`
+- `apps/frontend/Coffee_Call/DESIGN_CONTEXT.md`
+- `Planning/features.md` (deleted)
 
 ## Session: Gemini — Phone Auth Resolution & Onboarding Polish (2026-05-14)
 

@@ -82,7 +82,7 @@ struct PhoneAuthScreen: View {
                             Text(selectedCountry.dialCode)
                                 .font(.system(size: 16, weight: .bold, design: .default))
                                 .foregroundColor(.textPrimary)
-                            Image(systemName: "chevron.down")
+                            Image(systemName: AppIcons.chevronDown)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.textSecondary)
                         }

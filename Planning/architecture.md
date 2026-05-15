@@ -1,16 +1,17 @@
 # CoffeeCall MVP Architecture
 
 ## Context
-CoffeeCall is an activity-based meetup platform. Users post what they're doing (coffee, jog, movie) with location and time. People within 10km get notified. They can accept and meet up. The MVP focuses on the core loop: post → discover → accept → confirm → message.
+CoffeeCall is an activity-based meetup platform. Users post what they're doing (coffee, jog, movie) with location, time, and an optional hook or offer. People within 10km see active drifts and interest signals. They join a Drift, confirm, and then message inside that context. The MVP focuses on the core loop: post → discover → join/accept → confirm → message.
 
 ## MVP Scope (3 Weeks)
 
 ### Core Features
-1. **Location Fix** — Geolocation capture + 10km radius notifications via Firebase Cloud Messaging
-2. **Acceptance Flow** — Post creation (Purpose + Location + Time) → notification delivery → user views poster profile → accept/reject → confirmation popup
-3. **Meeting Confirmation** — Confirmation popup shows activity details, message thread opens immediately
-4. **Simple Messages** — Async message tracking (not real-time chat). Users can send/receive messages in a thread to coordinate.
-5. **Poster Dashboard** — Poster sees list of all acceptances + notifications for each new acceptance. Posts stay active for group meetups.
+1. **Location Fix** — Geolocation capture + 10km radius discovery via Firebase Cloud Messaging
+2. **Drift Hooks** — Optional offer text on a drift such as `coffee on me`, `2 movie coupons`, or `free entry with me`
+3. **Acceptance Flow** — Post creation (Purpose + Location + Time + optional hook) → discovery delivery → user views Drift details → accept/reject → confirmation popup
+4. **Meeting Confirmation** — Confirmation popup shows activity details, message thread opens inside the Drift
+5. **Simple Messages** — Async message tracking (not real-time chat). Users can send/receive messages only after joining a Drift.
+6. **Poster Dashboard** — Poster sees list of all acceptances + notifications for each new acceptance. Posts stay active for group meetups.
 
 ### NOT in MVP
 - Scoring/reputation system
@@ -49,9 +50,13 @@ CoffeeCall is an activity-based meetup platform. Users post what they're doing (
   - purpose: string
   - location: {latitude, longitude, address}
   - time: timestamp
+  - hookText: string (optional)
+  - offerSummary: string (optional)
+  - interestTags: [string]
   - createdAt: timestamp
   - expiresAt: timestamp (optional)
   - isActive: boolean
+  - participantCount: number
 
 /acceptances/{acceptanceId}
   - postId: string
@@ -71,13 +76,13 @@ CoffeeCall is an activity-based meetup platform. Users post what they're doing (
 ```
 
 ### Cloud Functions
-- **Notification trigger** — When post created, query users within 10km, send FCM notification
+- **Notification trigger** — When post created, query users within 10km, send FCM discovery notification
 - **Acceptance handler** — When user accepts, create message thread, notify poster
 - **Message sync** — Store/retrieve messages from Firestore
 
 ### Cloud Messaging
-- **Topic**: `location_posts_{radius}` — Broadcast to users in 10km radius
-- **Payload**: Post ID, creator info, activity summary
+- **Topic**: `location_posts_{radius}` — Broadcast discovery signals to users in 10km radius
+- **Payload**: Post ID, creator info, activity summary, optional hook
 
 ## Frontend Architecture (SwiftUI iOS)
 
@@ -85,9 +90,10 @@ CoffeeCall is an activity-based meetup platform. Users post what they're doing (
 ```
 TabBar
 ├── Home/Discovery
-│   ├── Notifications/Nearby Posts List
-│   ├── Post Detail
-│   └── Accept/Reject Flow
+│   ├── Radar/Interest Overview
+│   ├── Nearby Posts List
+│   ├── Drift Detail
+│   └── Accept/Join Flow
 ├── My Posts
 │   ├── Active Posts List
 │   └── Acceptances Dashboard
@@ -100,8 +106,8 @@ TabBar
 ```
 
 ### Key Components
-- **PostCreationForm** — 3-field input (Purpose, Location, Time)
-- **PostCard** — Display post summary with poster profile
+- **PostCreationForm** — 3-field input (Purpose, Location, Time) plus optional hook
+- **PostCard** — Display drift summary with poster profile and optional offer
 - **AcceptanceDialog** — Confirmation popup
 - **MessageThread** — Display/send messages
 - **LocationPicker** — Map/address selection (if needed)
@@ -134,6 +140,8 @@ TabBar
 6. **Posts stay active** — Allows group meetups; poster manually manages acceptances
 7. **In-app messages only** — No phone exchange in MVP (security + simplicity)
 8. **Poster dashboard** — Centralized view of all acceptances
+9. **No direct person pings** — Discovery surfaces interest and active drifts, but users only message after joining a Drift
+10. **Hooks are optional** — Incentives such as coupons or `coffee on me` belong to the Drift, not to a cold outreach flow
 
 ## 3-Week Timeline
 
@@ -205,6 +213,89 @@ TabBar
 - Poster can see all acceptances + receive notifications for each new acceptance
 - Message threads are async (not real-time), sufficient for coordination
 - Geohashing implementation prevents inefficient location queries (Firebase best practice)
+
+## Future System Design: Trust and Reputation (v2+)
+
+This subsystem is intentionally excluded from the MVP core loop. If added later, it should be designed as a separate bounded context so it does not force rewrites in discovery, messaging, or post creation.
+
+### Goals
+- Provide lightweight trust signals for meeting strangers
+- Keep the core activity flow unchanged
+- Avoid turning CoffeeCall into a reputation-first app
+- Support moderation, safety, and ranking without coupling them to the UI layer
+
+### Architecture Pattern
+- **Core app domain**: users, posts, drifts, acceptances, messages
+- **Trust domain**: reputation events, trust summary, moderation cases
+- **Append-only event ledger**: record what happened, never overwrite history
+- **Derived read model**: show current trust state in profile or discovery cards
+- **Async processing**: Cloud Functions update summaries after new events
+
+### Firestore Data Model
+```
+/reputationEvents/{eventId}
+  - actorId: string
+  - targetUserId: string
+  - postId: string?
+  - driftId: string?
+  - type: "joined" | "completed" | "cancelled" | "no_show" | "reported"
+  - weight: number
+  - source: "system" | "poster" | "participant" | "moderation"
+  - createdAt: timestamp
+
+/reputationSummaries/{userId}
+  - trustScore: number
+  - reliabilityScore: number
+  - joinCount: number
+  - completionCount: number
+  - noShowCount: number
+  - reportCount: number
+  - lastUpdatedAt: timestamp
+
+/moderationCases/{caseId}
+  - targetUserId: string
+  - reporterId: string
+  - relatedEventId: string?
+  - reason: string
+  - status: "open" | "reviewed" | "dismissed" | "actioned"
+  - createdAt: timestamp
+```
+
+### Event Flow
+1. User joins or completes a Drift.
+2. Cloud Function writes a reputation event.
+3. Cloud Function recomputes the affected user summary.
+4. UI reads the summary doc only.
+5. Moderation cases are handled separately from score math.
+
+### Non-Negotiables
+- Do not calculate score in the SwiftUI client.
+- Do not use reputation as the primary discovery mechanic.
+- Do not block core Drift creation or join flow on score availability.
+- Do not overwrite reputation history; append events and derive summaries.
+- Keep moderation and reputation separate from message transport.
+
+### UI Impact Later
+- Small trust summary on profile
+- Optional trust indicator on Drift detail
+- Safety labels for hosts or repeat participants
+- Ranking or filtering only after the trust layer is proven useful
+
+### What Stays Stable
+- Auth
+- Profiles
+- Discovery
+- Drift creation
+- Acceptance flow
+- Messages
+- Poster dashboard
+
+### What May Change Later
+- Discovery ranking
+- Trust badges or safety labels
+- Moderation dashboards
+- Report handling
+- Profile summary cards
 
 ---
 

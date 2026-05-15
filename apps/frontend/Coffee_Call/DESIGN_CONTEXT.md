@@ -8,10 +8,10 @@ Implementation note: use native iOS default system typography, not `.rounded` fo
 
 ## Product Direction
 
-- Discover people and activities nearby
-- Join spontaneous meetups
-- Chat before meeting
-- Build trust for meeting strangers safely
+- Discover active Drifts and nearby interest signals
+- Join spontaneous meetups through context, not cold messaging
+- Create a Drift with a tempting hook or offer when needed
+- Chat only after joining a Drift
 - Make the app feel alive, warm, and human
 
 ## Visual Direction
@@ -54,6 +54,12 @@ Implementation note: use native iOS default system typography, not `.rounded` fo
 9. Empty States
 10. Create Meetup Success
 11. Verification and Trust
+
+## Discovery Rule
+
+- Radar is ambient presence only
+- No direct `Say hi` or person-ping interaction from the discovery surface
+- People connect by joining or creating a Drift with an activity hook
 
 ## Do Not Design It Like
 

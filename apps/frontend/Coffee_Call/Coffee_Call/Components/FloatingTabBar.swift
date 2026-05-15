@@ -12,10 +12,10 @@ struct FloatingTabBar: View {
     @Binding var selectedTab: Int
 
     private let tabs: [CoffeeTab] = [
-        CoffeeTab(icon: "house",       activeIcon: "house.fill",       label: AppStrings.Tabs.discover),
-        CoffeeTab(icon: "list.bullet", activeIcon: "list.bullet",      label: AppStrings.Tabs.myPosts),
-        CoffeeTab(icon: "bubble.left", activeIcon: "bubble.left.fill", label: AppStrings.Tabs.messages),
-        CoffeeTab(icon: "person",      activeIcon: "person.fill",      label: AppStrings.Tabs.profile),
+        CoffeeTab(icon: "antenna.radiowaves.left.and.right", activeIcon: "antenna.radiowaves.left.and.right", label: AppStrings.Tabs.discover),
+        CoffeeTab(icon: "calendar",                          activeIcon: "calendar",                          label: AppStrings.Tabs.myPosts),
+        CoffeeTab(icon: "bubble.left",                       activeIcon: "bubble.left.fill",                 label: AppStrings.Tabs.messages),
+        CoffeeTab(icon: "person",                            activeIcon: "person.fill",                      label: AppStrings.Tabs.profile),
     ]
 
     var body: some View {

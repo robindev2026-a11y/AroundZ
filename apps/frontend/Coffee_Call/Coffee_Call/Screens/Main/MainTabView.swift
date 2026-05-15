@@ -12,9 +12,9 @@ struct MainTabView: View {
             Group {
                 switch selectedTab {
                 case 0: DiscoveryScreen()
-                case 1: placeholderView(title: AppStrings.Tabs.myPosts,   icon: "list.bullet")
-                case 2: placeholderView(title: AppStrings.Tabs.messages,  icon: "bubble.left.fill")
-                case 3: placeholderView(title: AppStrings.Tabs.profile,   icon: "person.fill")
+                case 1: DriftsScreen()
+                case 2: ChatsListScreen()
+                case 3: ProfileScreen()
                 default: DiscoveryScreen()
                 }
             }

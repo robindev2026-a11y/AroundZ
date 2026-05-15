@@ -64,6 +64,8 @@ Do not use older blue/coral/placeholder design documents as implementation truth
 - Async messaging only.
 - Posts stay active after acceptance.
 - Group meetups are allowed.
+- No direct person-to-person pings, cold outreach, or random DM entry points.
+- The Around screen should convert ambient interest into a Drift, not expose people for unsolicited contact.
 - No phone exchange in MVP.
 - 10km radius fixed unless the product spec changes.
 - No scoring, reputation, reviews, penalties, follow/friend graph, or dating mechanics in MVP.

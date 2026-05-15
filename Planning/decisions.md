@@ -116,6 +116,7 @@
 - Push notifications are engaging (users don't need to open app constantly)
 - Simpler discovery UX (no complex feed algorithms)
 - Natural 10km radius filtering (notification sent only to nearby users)
+- Discovery notifications should surface active Drifts and interest signals, not expose nearby people for random pings.
 
 **Trade-off:** Users must allow notifications (permission dialog on signup)
 
@@ -146,6 +147,36 @@
 - Avoids real-time presence updates
 
 **Status:** Approved
+
+### 4. No Cold Outreach
+**Decision:** Discovery should not support direct person-to-person messaging or "say hi" entry points from radar or interest views.
+
+**Rationale:**
+- Keeps the product activity-first instead of turning it into a people browser
+- Reduces spam, safety overhead, and dating-style behavior
+- Forces the user to create a meaningful Drift with context, not just ping a stranger
+
+**Status:** Approved
+
+### 5. Drift Hooks
+**Decision:** Optional hooks or offers can be attached to a Drift to make it more tempting.
+
+**Rationale:**
+- Hooks give people a reason to join without turning the app into a coupon marketplace
+- Examples include `coffee on me`, `2 movie coupons`, or `free entry with me`
+- The Drift stays the primary object; the hook is support, not the product
+
+**Status:** Approved
+
+### 6. Reputation as v2 Subsystem
+**Decision:** Keep scoring/reputation out of the MVP core loop, but design it later as a separate bounded context with append-only events and derived summaries.
+
+**Rationale:**
+- Lets the current app stay activity-first and light
+- Avoids rewriting discovery, messaging, or post creation later
+- Gives a clean path for trust signals, moderation, and ranking if the product needs them
+
+**Status:** Approved for future planning
 
 ---
 
@@ -228,7 +259,7 @@ These are noted for v1.1+ planning:
 - [ ] Add activity history/analytics
 - [ ] Implement follow/friend system
 - [ ] Add in-app payment for premium features
-- [ ] Build scanner/radar visualization
+- [ ] Expand radar into richer ambient discovery states if user research supports it
 
 ---
 

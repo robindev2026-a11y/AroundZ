@@ -41,48 +41,51 @@ Implementation rule:
 
 ---
 
-## Discovery
+## Around (Discovery)
 
 Current direction:
-- Nearby activities and people should feel alive and social.
-- Use warm background, layered cards, mint actions, lavender/peach accents.
-- Avoid dense admin/dashboard layouts.
+- Primary dashboard is a **Radar visualization** with concentric distance rings (0.3mi, 0.6mi, 0.8mi).
+- "You" avatar at center; surrounding avatars/initials show ambient presence only.
+- **Rule**: No people-browsing. Radar is for ambient presence, not for unsolicited contact.
+- **Interests Section**: Horizontal list of vertical cards showing icon, title, and nearby count.
+- **Primary CTA**: Large capsule-shaped "Create Drift" button.
+- Navigation: Around | Drifts | Chats | You.
 
 ---
 
-## Auth And Profile Setup
+## Drifts
 
 Current direction:
-- Simple, friendly setup flow.
-- Use native iOS typography with default system design.
-- Use mint for primary progress/action.
-- Use warm cards and clear helper text.
+- Two main views: **Discover** (nearby active meetups) and **Mine** (your hosted/joined drifts).
+- **Mine** is nested within the Drifts screen.
+- Pre-join: Only approximate location/distance shown.
+- Post-acceptance: Exact coordination and meeting points unlocked.
 
 ---
 
-## Create Meetup
+## Drift Detail
 
 Current direction:
-- Simple form.
-- Activity, place, time, and optional social context.
-- Primary mint submit action.
+- Sticky multi-state CTA footer (Join, Requested, Joined, Full, Ended).
+- Rich summary info grid (Date, Time, Distance, Participants).
+- **Safety Banner**: Mandatory for user trust and coordination guidance.
 
 ---
 
-## Messages
+## Messages (Chats)
 
 Current direction:
-- Async coordination, not real-time social chat complexity.
-- Clear sender distinction.
-- Warm surfaces and readable message bubbles.
+- **Rule**: No cold DMs. Messaging is only enabled for active Drifts where the user is a participant or host.
+- Async coordination focus, not real-time social complexity.
 
 ---
 
-## Profile
+## Profile (You)
 
 Current direction:
-- Human, trust-building, not gamified.
-- No reputation/scoring system in MVP.
+- Focus on active involvement and basic trust metadata.
+- **Rule**: No full social profiles or dating-style bios.
+- No reputation, scoring, or phone number exchange in MVP.
 
 ---
 

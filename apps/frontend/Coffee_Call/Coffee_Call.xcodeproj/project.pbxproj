@@ -13,6 +13,29 @@
 		3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F02FB475DD0077EAC8 /* Coffee_CallApp.swift */; };
 		3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F12FB475DD0077EAC8 /* ContentView.swift */; };
 		3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F32FB475DD0077EAC8 /* Persistence.swift */; };
+		3374CEAD2FB6DFF50020F28D /* DiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEAB2FB6DFF50020F28D /* DiscoveryViewModel.swift */; };
+		3374CEAE2FB6DFF50020F28D /* DriftsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEAC2FB6DFF50020F28D /* DriftsViewModel.swift */; };
+		3374CEB12FB6E01A0020F28D /* RadarPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEAF2FB6E0190020F28D /* RadarPerson.swift */; };
+		3374CEB22FB6E01A0020F28D /* Drift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEB02FB6E01A0020F28D /* Drift.swift */; };
+		3374CEB42FB6E0630020F28D /* DriftsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEB32FB6E0630020F28D /* DriftsScreen.swift */; };
+		3374CEB62FB6E0950020F28D /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEB52FB6E0950020F28D /* AppConstants.swift */; };
+		3374CEB82FB6E6F80020F28D /* DriftDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEB72FB6E6F80020F28D /* DriftDetailScreen.swift */; };
+		3374CEBF2FB6E7A50020F28D /* RadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEB92FB6E7A50020F28D /* RadarView.swift */; };
+		3374CEC02FB6E7A50020F28D /* InterestCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEBA2FB6E7A50020F28D /* InterestCard.swift */; };
+		3374CEC12FB6E7A50020F28D /* TimeStateTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEBB2FB6E7A50020F28D /* TimeStateTabs.swift */; };
+		3374CEC22FB6E7A50020F28D /* DriftCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEBC2FB6E7A50020F28D /* DriftCard.swift */; };
+		3374CEC32FB6E7A50020F28D /* CreateDriftButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEBD2FB6E7A50020F28D /* CreateDriftButton.swift */; };
+		3374CEC42FB6E7A50020F28D /* DriftModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEBE2FB6E7A50020F28D /* DriftModeSwitch.swift */; };
+		3374CEC62FB6E7CA0020F28D /* DriftDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEC52FB6E7CA0020F28D /* DriftDetailViewModel.swift */; };
+		3374CEC82FB6F86A0020F28D /* ManageDriftScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEC72FB6F86A0020F28D /* ManageDriftScreen.swift */; };
+		3374CECA2FB6F8B30020F28D /* ManageDriftViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEC92FB6F8B30020F28D /* ManageDriftViewModel.swift */; };
+		3374CECE2FB6FDD90020F28D /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CECB2FB6FDD80020F28D /* ProfileScreen.swift */; };
+		3374CECF2FB6FDD90020F28D /* DriftChatScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CECC2FB6FDD80020F28D /* DriftChatScreen.swift */; };
+		3374CED02FB6FDD90020F28D /* ChatsListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CECD2FB6FDD80020F28D /* ChatsListScreen.swift */; };
+		3374CED42FB6FDF10020F28D /* DriftChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED12FB6FDF10020F28D /* DriftChatViewModel.swift */; };
+		3374CED52FB6FDF10020F28D /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED22FB6FDF10020F28D /* ProfileViewModel.swift */; };
+		3374CED62FB6FDF10020F28D /* ChatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */; };
+		3374CED82FB6FE280020F28D /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED72FB6FE280020F28D /* ChatMessage.swift */; };
 		3387CF312FB495D40084895E /* BetaBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3387CF302FB495D20084895E /* BetaBadge.swift */; };
 		3387CF342FB4AB830084895E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 3387CF332FB4AB830084895E /* FirebaseAuth */; };
 		3387CF362FB4AB830084895E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3387CF352FB4AB830084895E /* FirebaseCrashlytics */; };
@@ -75,6 +98,29 @@
 		3302E3F12FB475DD0077EAC8 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3302E3F22FB475DD0077EAC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3302E3F32FB475DD0077EAC8 /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		3374CEAB2FB6DFF50020F28D /* DiscoveryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoveryViewModel.swift; sourceTree = "<group>"; };
+		3374CEAC2FB6DFF50020F28D /* DriftsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftsViewModel.swift; sourceTree = "<group>"; };
+		3374CEAF2FB6E0190020F28D /* RadarPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RadarPerson.swift; path = Models/RadarPerson.swift; sourceTree = "<group>"; };
+		3374CEB02FB6E01A0020F28D /* Drift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Drift.swift; path = Models/Drift.swift; sourceTree = "<group>"; };
+		3374CEB32FB6E0630020F28D /* DriftsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DriftsScreen.swift; path = Main/DriftsScreen.swift; sourceTree = "<group>"; };
+		3374CEB52FB6E0950020F28D /* AppConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		3374CEB72FB6E6F80020F28D /* DriftDetailScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DriftDetailScreen.swift; path = Main/DriftDetailScreen.swift; sourceTree = "<group>"; };
+		3374CEB92FB6E7A50020F28D /* RadarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadarView.swift; sourceTree = "<group>"; };
+		3374CEBA2FB6E7A50020F28D /* InterestCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterestCard.swift; sourceTree = "<group>"; };
+		3374CEBB2FB6E7A50020F28D /* TimeStateTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeStateTabs.swift; sourceTree = "<group>"; };
+		3374CEBC2FB6E7A50020F28D /* DriftCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftCard.swift; sourceTree = "<group>"; };
+		3374CEBD2FB6E7A50020F28D /* CreateDriftButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateDriftButton.swift; sourceTree = "<group>"; };
+		3374CEBE2FB6E7A50020F28D /* DriftModeSwitch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftModeSwitch.swift; sourceTree = "<group>"; };
+		3374CEC52FB6E7CA0020F28D /* DriftDetailViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftDetailViewModel.swift; sourceTree = "<group>"; };
+		3374CEC72FB6F86A0020F28D /* ManageDriftScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ManageDriftScreen.swift; path = Main/ManageDriftScreen.swift; sourceTree = "<group>"; };
+		3374CEC92FB6F8B30020F28D /* ManageDriftViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageDriftViewModel.swift; sourceTree = "<group>"; };
+		3374CECB2FB6FDD80020F28D /* ProfileScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProfileScreen.swift; path = Main/ProfileScreen.swift; sourceTree = "<group>"; };
+		3374CECC2FB6FDD80020F28D /* DriftChatScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DriftChatScreen.swift; path = Main/DriftChatScreen.swift; sourceTree = "<group>"; };
+		3374CECD2FB6FDD80020F28D /* ChatsListScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatsListScreen.swift; path = Main/ChatsListScreen.swift; sourceTree = "<group>"; };
+		3374CED12FB6FDF10020F28D /* DriftChatViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftChatViewModel.swift; sourceTree = "<group>"; };
+		3374CED22FB6FDF10020F28D /* ProfileViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatsViewModel.swift; sourceTree = "<group>"; };
+		3374CED72FB6FE280020F28D /* ChatMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatMessage.swift; path = Models/ChatMessage.swift; sourceTree = "<group>"; };
 		3387CF302FB495D20084895E /* BetaBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BetaBadge.swift; sourceTree = "<group>"; };
 		338E3B162FB435F40048FC32 /* AppIcons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		338E3B172FB435F40048FC32 /* AppImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
@@ -143,6 +189,12 @@
 		147D07BDA2FF4DF23D1993AE /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				3374CEBD2FB6E7A50020F28D /* CreateDriftButton.swift */,
+				3374CEBC2FB6E7A50020F28D /* DriftCard.swift */,
+				3374CEBE2FB6E7A50020F28D /* DriftModeSwitch.swift */,
+				3374CEBA2FB6E7A50020F28D /* InterestCard.swift */,
+				3374CEB92FB6E7A50020F28D /* RadarView.swift */,
+				3374CEBB2FB6E7A50020F28D /* TimeStateTabs.swift */,
 				3387CF302FB495D20084895E /* BetaBadge.swift */,
 				338E3B202FB464920048FC32 /* CoffeeImageView.swift */,
 				338E3B212FB464920048FC32 /* FloatingTabBar.swift */,
@@ -261,6 +313,12 @@
 		854F67326A3D7D34D2066BA2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				3374CECD2FB6FDD80020F28D /* ChatsListScreen.swift */,
+				3374CECC2FB6FDD80020F28D /* DriftChatScreen.swift */,
+				3374CECB2FB6FDD80020F28D /* ProfileScreen.swift */,
+				3374CEC72FB6F86A0020F28D /* ManageDriftScreen.swift */,
+				3374CEB72FB6E6F80020F28D /* DriftDetailScreen.swift */,
+				3374CEB32FB6E0630020F28D /* DriftsScreen.swift */,
 				4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */,
 				84551E1ABED9653323C91E44 /* Auth */,
 				6C7F7ABFC2D113FA3339DA3D /* Main */,
@@ -271,6 +329,13 @@
 		994023EC0D7FE9DAA8687F3A /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */,
+				3374CED12FB6FDF10020F28D /* DriftChatViewModel.swift */,
+				3374CED22FB6FDF10020F28D /* ProfileViewModel.swift */,
+				3374CEC92FB6F8B30020F28D /* ManageDriftViewModel.swift */,
+				3374CEC52FB6E7CA0020F28D /* DriftDetailViewModel.swift */,
+				3374CEAB2FB6DFF50020F28D /* DiscoveryViewModel.swift */,
+				3374CEAC2FB6DFF50020F28D /* DriftsViewModel.swift */,
 				F79EEFE313C630B04AED288E /* AuthViewModel.swift */,
 			);
 			path = ViewModels;
@@ -279,6 +344,9 @@
 		A616335262E59CBA3EF3D878 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3374CED72FB6FE280020F28D /* ChatMessage.swift */,
+				3374CEB02FB6E01A0020F28D /* Drift.swift */,
+				3374CEAF2FB6E0190020F28D /* RadarPerson.swift */,
 				D1DF7DD85DAFAEF4D0D1EA7F /* Activity.swift */,
 			);
 			name = Models;
@@ -295,6 +363,7 @@
 		EC5C2209D10A1787EA76F764 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				3374CEB52FB6E0950020F28D /* AppConstants.swift */,
 				338E3B262FB46EA50048FC32 /* AnimationSystem.swift */,
 				338E3B292FB46EA50048FC32 /* View+Availability.swift */,
 				338E3B162FB435F40048FC32 /* AppIcons.swift */,
@@ -448,34 +517,57 @@
 			buildActionMask = 2147483647;
 			files = (
 				338E3B232FB464920048FC32 /* FloatingTabBar.swift in Sources */,
+				3374CEC82FB6F86A0020F28D /* ManageDriftScreen.swift in Sources */,
+				3374CEC62FB6E7CA0020F28D /* DriftDetailViewModel.swift in Sources */,
+				3374CEB42FB6E0630020F28D /* DriftsScreen.swift in Sources */,
 				3387CF312FB495D40084895E /* BetaBadge.swift in Sources */,
 				33CA3A342FB33A41008EF23C /* Coffee_Call.xcdatamodeld in Sources */,
+				3374CEC22FB6E7A50020F28D /* DriftCard.swift in Sources */,
 				338E3B192FB435F40048FC32 /* AppIcons.swift in Sources */,
 				8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */,
+				3374CECF2FB6FDD90020F28D /* DriftChatScreen.swift in Sources */,
+				3374CECA2FB6F8B30020F28D /* ManageDriftViewModel.swift in Sources */,
 				338E3B222FB464920048FC32 /* CoffeeImageView.swift in Sources */,
+				3374CEB82FB6E6F80020F28D /* DriftDetailScreen.swift in Sources */,
 				9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */,
 				3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */,
+				3374CEAE2FB6DFF50020F28D /* DriftsViewModel.swift in Sources */,
+				3374CEC02FB6E7A50020F28D /* InterestCard.swift in Sources */,
 				338E3B1E2FB44DFF0048FC32 /* ActivityCardView.swift in Sources */,
 				9E04FFF08F3A7B125341F872 /* OnboardingScreen.swift in Sources */,
 				19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */,
 				338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */,
 				8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */,
 				EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */,
+				3374CEBF2FB6E7A50020F28D /* RadarView.swift in Sources */,
 				54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */,
+				3374CEAD2FB6DFF50020F28D /* DiscoveryViewModel.swift in Sources */,
 				116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */,
+				3374CEB62FB6E0950020F28D /* AppConstants.swift in Sources */,
 				338E3B1F2FB44DFF0048FC32 /* CategoryChip.swift in Sources */,
 				423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */,
+				3374CED52FB6FDF10020F28D /* ProfileViewModel.swift in Sources */,
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
+				3374CED42FB6FDF10020F28D /* DriftChatViewModel.swift in Sources */,
 				338E3B272FB46EA60048FC32 /* AnimationSystem.swift in Sources */,
+				3374CEC32FB6E7A50020F28D /* CreateDriftButton.swift in Sources */,
 				338E3B282FB46EA60048FC32 /* View+Availability.swift in Sources */,
 				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
 				338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */,
 				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,
+				3374CEC12FB6E7A50020F28D /* TimeStateTabs.swift in Sources */,
+				3374CEB22FB6E01A0020F28D /* Drift.swift in Sources */,
+				3374CED62FB6FDF10020F28D /* ChatsViewModel.swift in Sources */,
+				3374CED82FB6FE280020F28D /* ChatMessage.swift in Sources */,
+				3374CECE2FB6FDD90020F28D /* ProfileScreen.swift in Sources */,
+				3374CED02FB6FDD90020F28D /* ChatsListScreen.swift in Sources */,
+				3374CEB12FB6E01A0020F28D /* RadarPerson.swift in Sources */,
 				A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */,
 				3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */,
 				43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */,
 				3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */,
+				3374CEC42FB6E7A50020F28D /* DriftModeSwitch.swift in Sources */,
 				78E7D14988238765F3DD1D7C /* Activity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

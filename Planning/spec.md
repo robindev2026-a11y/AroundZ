@@ -10,6 +10,12 @@
 ### Problem Statement
 Existing meetup apps are complex and designed for dating. CoffeeCall solves this by providing a lightweight, activity-focused platform where people can quickly post what they're doing and find others nearby to join them.
 
+### Product Rule
+- The Around screen is Drift-first, not person-ping-first.
+- Users do not cold-message nearby people.
+- Interest shown in the app should lead to creating or joining a Drift.
+- Optional hooks or offers can make a Drift more tempting, but the Drift remains the unit of action.
+
 ### Success Criteria
 - MVP launches in 3 weeks with core features
 - Users can post, discover, accept, and coordinate meetups
@@ -65,6 +71,8 @@ As a user, I want to post an activity with location and time, so others nearby c
 - [ ] User selects time via time picker
 - [ ] Submit button saves post to Firestore
 - [ ] Post appears in Discovery for nearby users within 2 seconds
+- [ ] User can attach an optional hook or offer such as `coffee on me`, `2 movie coupons`, or `free entry with me`
+- [ ] Drift remains the primary unit; the hook supports the Drift, it does not replace it
 
 **Priority:** High
 **Scope:** MVP
@@ -76,16 +84,18 @@ As a user, I want to post an activity with location and time, so others nearby c
 
 ---
 
-#### Feature: Discover Nearby Activities
+#### Feature: Around (Nearby Activities)
 **User Story:**
-As a user, I want to see activities happening nearby, so I can find something to join.
+As a user, I want to see people and activities happening around me, so I can find something to join.
 
 **Acceptance Criteria:**
-- [ ] User receives push notification when post created within 10km
-- [ ] Notification opens Discovery view in app
-- [ ] Discovery shows list of nearby posts (sorted by time)
-- [ ] Each post shows: poster profile photo, activity purpose, location, time
-- [ ] User can accept or reject each post from list
+- [ ] User sees a **Radar visualization** showing ambient presence within a 10km radius
+- [ ] User receives push notification when a Drift is created within 10km
+- [ ] Notification opens Around view in app
+- [ ] Around view shows vertical interest cards with nearby counts (e.g., "3 nearby")
+- [ ] User can tap an interest to see specific Drifts or people
+- [ ] Primary CTA "Create Drift" is clearly visible
+- [ ] Around view does not expose people for random direct messaging
 
 **Priority:** High
 **Scope:** MVP
@@ -107,7 +117,7 @@ As a user, I want to accept or reject an activity, so I can commit to joining or
 - [ ] Clicking Accept shows confirmation dialog
 - [ ] Dialog displays: activity details (purpose, location, time), poster info
 - [ ] User can confirm or cancel acceptance
-- [ ] On confirm: Acceptance recorded, message thread opens, notification sent to poster
+- [ ] On confirm: Acceptance recorded, message thread opens inside the Drift context, notification sent to poster
 - [ ] On reject: Post hidden from user, no notification sent
 
 **Priority:** High
@@ -132,6 +142,8 @@ As users who accepted an activity, I want to message each other, so we can coord
 - [ ] Messages persist across app closes
 - [ ] New messages load within 2-5 seconds (async acceptable)
 - [ ] No real-time notifications (async polling only)
+- [ ] Messaging is only available after a Drift is joined or accepted
+- [ ] No cold messaging or direct outreach from the discovery surface
 
 **Priority:** High
 **Scope:** MVP
@@ -257,7 +269,7 @@ See `/Design/screens.md`, `/Design/design-tokens.md`, and `/Design/component-spe
 1. **Signup** — Phone number input + OTP verification + profile photo upload + name input
 2. **Profile** — User's profile view (photo, name, stats) + edit capability
 3. **Post Creation** — 3-field form (Purpose, Location, Time) with location picker + submit
-4. **Discovery/Notifications** — List of nearby posts (10km radius) with poster profile + accept/reject buttons
+4. **Around** — Radar-based spatial discovery of nearby people and interests with "Create Drift" primary action
 5. **Acceptance Confirmation** — Modal dialog showing activity details + poster info + confirm/cancel
 6. **Messages** — Message thread view with chronological message list + message input + send button
 7. **Poster Dashboard** — List of all acceptances for poster's posts with acceptor info + accept time
