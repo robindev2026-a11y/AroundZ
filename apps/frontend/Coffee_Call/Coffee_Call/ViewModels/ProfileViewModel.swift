@@ -2,9 +2,9 @@ import SwiftUI
 import Combine
 
 class ProfileViewModel: ObservableObject {
-    @Published var name: String = "Arjun R."
+    @Published var name: String = AppConstants.MockData.userName
     @Published var bio: String = "Usually up for walks, coffee, and casual food plans."
-    @Published var initials: String = "AR"
+    @Published var initials: String = AppConstants.MockData.userInitials
     @Published var driftsJoined: Int = 24
     @Published var driftsHosted: Int = 8
     @Published var pastDriftsCount: Int = 16

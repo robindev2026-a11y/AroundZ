@@ -9,81 +9,97 @@ struct DiscoveryScreen: View {
     @StateObject private var viewModel = DiscoveryViewModel()
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Color.backgroundMain.ignoresSafeArea()
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                Color.backgroundMain.ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 0) {
-                // Header
-                headerView
-                    .padding(.top, AppConstants.Layout.headerTopPadding)
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    .slideUpEntrance(delay: 0)
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Header
+                        headerView
+                            .padding(.top, AppConstants.Layout.headerTopPadding)
+                            .padding(.horizontal, AppConstants.Layout.standardPadding)
 
-                Spacer(minLength: 10)
+                        Spacer(minLength: 24)
 
-                // Radar View
-                RadarView(persons: viewModel.radarPeople)
-                    .padding(.horizontal, 20)
-                    .slideUpEntrance(delay: AppConstants.Animation.entranceStagger)
+                        // Radar View
+                        RadarView(persons: viewModel.radarPeople)
+                            .padding(.horizontal, 20)
 
-                Spacer(minLength: 10)
+                        Spacer(minLength: 32)
 
-                // Interests Section
-                VStack(alignment: .leading, spacing: 20) {
-                    Text(AppStrings.Discovery.interestsNearby)
-                        .font(.system(size: 20, weight: .black))
-                        .foregroundColor(.textPrimary)
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
-                            ForEach(viewModel.interestCategories) { category in
-                                InterestCard(
-                                    title: category.label,
-                                    icon: category.icon,
-                                    count: category.count,
-                                    isSelected: viewModel.selectedCategory == category.label,
-                                    action: {
-                                        viewModel.selectCategory(category.label)
+                        // Interests Section
+                        VStack(alignment: .leading, spacing: 20) {
+                            Text(AppStrings.Discovery.interestsNearby)
+                                .font(.system(size: 20, weight: .black))
+                                .foregroundColor(.textPrimary)
+                                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 16) {
+                                    ForEach(viewModel.interestCategories) { category in
+                                        InterestCard(
+                                            title: category.label,
+                                            icon: category.icon,
+                                            count: category.count,
+                                            isSelected: viewModel.selectedCategory == category.label,
+                                            action: {
+                                                viewModel.selectCategory(category.label)
+                                            }
+                                        )
                                     }
-                                )
+                                }
+                                .padding(.horizontal, AppConstants.Layout.standardPadding)
                             }
                         }
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.vertical, 4)
-                    }
-                    
-                    // Helper Text
-                    HStack(spacing: 8) {
-                        Image(systemName: AppIcons.helpTip)
-                            .font(.system(size: 16))
-                            .foregroundColor(.textSecondary)
                         
-                        Text(AppStrings.Discovery.driftActivityTip)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.textSecondary)
+                        // Activity Feed (Horizontal)
+                        VStack(alignment: .leading, spacing: 20) {
+                            HStack {
+                                Text("Starting soon nearby")
+                                    .font(.system(size: 20, weight: .black))
+                                    .foregroundColor(.textPrimary)
+                                Spacer()
+                                Button("See all") {}
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(.brandPrimary)
+                            }
+                            .padding(.horizontal, AppConstants.Layout.standardPadding)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 16) {
+                                    ForEach(viewModel.featuredDrifts) { drift in
+                                        NavigationLink(value: drift) {
+                                            ActivityCardView(drift: drift)
+                                                .frame(width: 280)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                            }
+                        }
+                        .padding(.top, 32)
+                        
+                        // Primary CTA
+                        CreateDriftButton(action: {
+                            viewModel.createDrift()
+                        })
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
+                        .padding(.top, 32)
+                        
+                        Spacer(minLength: 120) // Space for floating tab bar
                     }
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
                 }
-                .slideUpEntrance(delay: AppConstants.Animation.entranceStagger * 2)
-                
-                Spacer(minLength: 24)
-                
-                // Primary CTA
-                CreateDriftButton(action: {
-                    viewModel.createDrift()
-                })
-                .padding(.horizontal, AppConstants.Layout.standardPadding)
-                .slideUpEntrance(delay: AppConstants.Animation.entranceStagger * 2.5)
-                
-                Spacer(minLength: AppConstants.Layout.screenBottomSpacer) // Space for floating tab bar
             }
-            
-            // Floating Tab Bar
-            FloatingTabBar(selectedTab: $viewModel.selectedTabIndex)
-                .padding(.bottom, AppConstants.Layout.floatingTabBarBottomPadding)
+            .navigationDestination(for: Drift.self) { drift in
+                if drift.isMine {
+                    ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))
+                } else {
+                    DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+                }
+            }
         }
-        .navigationBarHidden(true)
     }
 
     // MARK: - Subviews
