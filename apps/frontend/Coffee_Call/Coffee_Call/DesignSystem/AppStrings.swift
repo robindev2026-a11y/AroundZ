@@ -98,10 +98,10 @@ enum AppStrings {
     }
 
     enum Tabs {
-        static let discover  = "Discover"
-        static let myPosts   = "My Posts"
-        static let messages  = "Messages"
-        static let profile   = "Profile"
+        static let discover  = "Around"
+        static let myPosts   = "Drifts"
+        static let messages  = "Chats"
+        static let profile   = "You"
     }
 
     enum Discovery {
@@ -116,6 +116,10 @@ enum AppStrings {
         static let timeAgo = "%@ ago"
         static let postBtn = "Post Activity"
         static let meetupsNearby = "%d meetups happening nearby"
+        static let interestsNearby = "Your interests nearby"
+        static let driftActivityTip = "Tap an interest to explore nearby Drift activity"
+        static let createDrift = "Create Drift"
+        static let createDriftSubtitle = "Share what you're up for"
 
         enum Categories {
             static let all = "All"
@@ -129,9 +133,136 @@ enum AppStrings {
         }
     }
 
+    enum Drifts {
+        static let title = "Drifts"
+        static let subtitle = "Plans happening around you"
+        static let featured = "Featured near you"
+        static let openNow = "Open now"
+        static let startingSoon = "Starting soon"
+        static let laterToday = "Later today"
+        static let seeAll = "See all"
+        static let imIn = "I'm in"
+        static let bestMatch = "BEST MATCH"
+        static let going = "going"
+        static let spotsLeft = "spots left"
+        
+        enum Detail {
+            static let share = "Share"
+            static let save = "Save"
+            static let reminder = "Reminder"
+            static let aboutHeader = "About this Drift"
+            static let hostHeader = "Hosted by"
+            static let participantsHeader = "Who's coming"
+            static let detailsHeader = "Details"
+            static let timeLabel = "Time"
+            static let meetingPointLabel = "Meeting point"
+            static let bringLabel = "What to bring"
+            static let vibeLabel = "Vibe"
+            static let notesLabel = "Notes"
+            static let safetyTitle = "We keep it safe and respectful"
+            static let safetySubtitle = "Meet in public places. No personal contact shared."
+            static let coordinationNote = "Exact coordination happens in the Drift chat after joining."
+            
+            enum CTA {
+                static let join = "Join Drift"
+                static let joinSubtitle = "You'll be able to chat after joining"
+                static let requested = "Request Sent"
+                static let requestedSubtitle = "Host will review your request"
+                static let joined = "Open Chat"
+                static let joinedSubtitle = "Coordination is happening here"
+                static let full = "Drift Full"
+                static let fullSubtitle = "Try another drift nearby"
+                static let ended = "Drift Ended"
+                static let endedSubtitle = "This drift has ended"
+            }
+        }
+    }
+    
     enum Main {
         static let myPosts = "My Posts"
         static let messages = "Messages"
         static let profile = "Profile"
+    }
+
+    enum Manage {
+        static let title = "Manage Drift"
+        static let edit = "Edit Drift"
+        static let share = "Share Drift"
+        static let close = "Close Drift"
+        static let delete = "Delete Drift"
+        static let requests = "Join requests"
+        static let participants = "Joined participants"
+        static let openChat = "Open Drift Chat"
+        static let chatSubtitle = "Chat with joined participants"
+        static let requestsSubtitle = "Review people who want to join"
+        static let reminder = "A friendly reminder"
+        static let reminderSubtitle = "Meet in public places. No personal contact shared. Be respectful and kind."
+    }
+
+    enum Chat {
+        static let title = "Chats"
+        static let subtitle = "All your Drift conversations.\nNo chats exist outside a Drift."
+        static let bannerTitle = "Chats are only available after you join or are accepted into a Drift."
+        static let bannerSubtitle = "No cold messaging. No phone exchange."
+        static let active = "Active Drifts"
+        static let upcoming = "Upcoming Drifts"
+        static let past = "Past Drifts"
+        static let viewAll = "View all"
+        static let emptyTitle = "No chats yet"
+        static let emptySubtitle = "Join a Drift to start chatting with others.\nAll conversations happen inside Drifts."
+        static let exploreCTA = "Explore Drifts"
+    }
+
+    enum Profile {
+        static let title = "You"
+        static let subtitle = "Your profile, preferences and Drift history."
+        static let editProfile = "Edit Profile"
+        static let joined = "Drifts joined"
+        static let hosted = "Drifts hosted"
+        static let past = "Past Drifts"
+        static let activeThisMonth = "This month"
+        static let activeStatus = "Active"
+        
+        static let interests = "Interests"
+        static let edit = "Edit"
+        static let addInterest = "Add interest"
+        
+        static let availability = "Availability"
+        static let safety = "Safety & Privacy"
+        static let history = "Drift History"
+        static let settings = "Settings"
+        
+        static let phoneNotShared = "Phone numbers are not shared"
+        static let phoneCoordination = "Coordination happens only in Drift chat."
+        static let approxDistance = "Approximate distance only"
+        static let locationApprox = "Your location is kept approximate."
+        static let blockedUsers = "Blocked users"
+        static let blockedDesc = "Manage people you've blocked."
+        static let reportSafety = "Report / safety access"
+        static let reportDesc = "Help keep CoffeeCall safe for all."
+        static let locationVisibility = "Location visibility"
+        static let visibilityDesc = "Control how your location is shown."
+        
+        static let notifications = "Notifications"
+        static let notificationsDesc = "Manage alerts and reminders"
+        static let locPermissions = "Location permissions"
+        static let locPermsDesc = "Update location access"
+        static let accountSettings = "Account settings"
+        static let accountDesc = "Profile, email, password"
+        static let signOut = "Sign out"
+        static let signOutDesc = "Log out of your account"
+        
+        static let hostedTab = "Hosted"
+        static let joinedTab = "Joined"
+        static let pastTab = "Past"
+        static let viewAll = "View all"
+        static let createNew = "Create a new Drift"
+        
+        static let usuallyFree = "Usually free"
+        static let weekdayEvenings = "Weekday evenings"
+        static let weekends = "Weekends"
+        static let visibleToOthers = "Visible to others"
+        static let visibleEveryone = "Everyone"
+        static let visibleDesc = "Who can see your availability"
     }
 }
