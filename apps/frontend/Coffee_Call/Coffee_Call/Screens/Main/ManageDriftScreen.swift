@@ -8,8 +8,8 @@ struct ManageDriftScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             SubPageHeader {
-                headerAction(icon: AppIcons.share) { viewModel.shareDrift() }
-                headerAction(icon: AppIcons.ellipsis) { }
+                SubHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
+                SubHeaderButton(icon: AppIcons.ellipsis) { }
             }
             
             ScrollView(showsIndicators: false) {
@@ -57,20 +57,7 @@ struct ManageDriftScreen: View {
         }
     }
     
-    private func headerAction(icon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.textPrimary)
-                .frame(width: 40, height: 40)
-                .background(Color.surfaceMain)
-                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
-                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
-        }
-    }
-    
-    
-    // MARK: - Overview Card
+    // MARK: - View Components
     private var driftOverviewCard: some View {
         VStack(spacing: AppConstants.Layout.elementSpacing) {
             HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {

@@ -162,6 +162,28 @@ struct NotificationIconButton: View {
     }
 }
 
+struct SubHeaderButton: View {
+    let icon: String
+    var color: Color = .textPrimary
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(color)
+                .frame(width: 40, height: 40)
+                .background(Color.surfaceMain)
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+        }
+        .pressScale(0.9)
+    }
+}
+
 struct CoffeeHeaderButton: View {
     let icon: String
     var color: Color = .brandPrimary

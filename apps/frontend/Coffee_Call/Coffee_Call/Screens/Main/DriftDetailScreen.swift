@@ -8,9 +8,9 @@ struct DriftDetailScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             SubPageHeader {
-                headerAction(icon: AppIcons.share) { viewModel.shareDrift() }
-                headerAction(icon: AppIcons.bookmark) { viewModel.saveDrift() }
-                headerAction(icon: "bell.badge.fill", isSpecial: true) { viewModel.setReminder() }
+                SubHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
+                SubHeaderButton(icon: AppIcons.bookmark) { viewModel.saveDrift() }
+                SubHeaderButton(icon: "bell.badge.fill", color: .brandPrimary) { viewModel.setReminder() }
             }
             
             ScrollView(showsIndicators: false) {
@@ -58,19 +58,6 @@ struct DriftDetailScreen: View {
         }
         .onDisappear {
             navManager.isTabBarHidden = false
-        }
-    }
-    
-    // MARK: - Navigation Bar Helper (Local to Detail View)
-    private func headerAction(icon: String, isSpecial: Bool = false, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(isSpecial ? .brandPrimary : .textPrimary)
-                .frame(width: 40, height: 40)
-                .background(Color.surfaceMain)
-                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
-                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
         }
     }
     
