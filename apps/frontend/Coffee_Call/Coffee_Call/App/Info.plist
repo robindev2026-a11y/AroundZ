@@ -18,10 +18,29 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-835897938536-ios-0032b2f3736f46218fe1dd</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>CoffeeCall needs camera access to take a profile photo.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>CoffeeCall uses your location to notify you of nearby activities.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>CoffeeCall uses your location to find activities within 10km of you.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CoffeeCall needs access to your photos to set a profile picture.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -34,29 +53,9 @@
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>app-1-835897938536-ios-0032b2f3736f46218fe1dd</string>
-			</array>
-		</dict>
-	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>CoffeeCall needs camera access to take a profile photo.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>CoffeeCall uses your location to notify you of nearby activities.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>CoffeeCall uses your location to find activities within 10km of you.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>CoffeeCall needs access to your photos to set a profile picture.</string>
 </dict>
 </plist>

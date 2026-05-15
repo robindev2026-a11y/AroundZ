@@ -1,5 +1,25 @@
 
-## Session: Around Screen Finalization & UI Scaling (2026-05-15)
+## Session: Create Drift Sheet Validation & Fixes (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Create Drift Sheet**: Refactored the screen to match native iOS scale and the high-fidelity UX state board.
+- **Typography & Spacing**: Updated section headers (15pt bold), chips (12pt semibold), and spacing (20pt horizontal, 22pt vertical) to align with CoffeeCall design system.
+- **Navigation & Behavior**: 
+    - Center "Create" button in the floating tab bar triggers the sheet.
+    - Implemented native iOS sheet behavior with large detents and grabber.
+    - Added `.interactiveDismissDisabled` when the form is dirty, with a "Discard changes" confirmation.
+- **States & Logic**:
+    - Added "Location Resolving" and "Permission Missing" states with skeleton/interactive UI.
+    - Implemented sticky CTA area that respects safe area and blends with content.
+    - Integrated "Vibe" selection chips and "Optional Hook" suggestions.
+- **Copy**: Standardized labels and notes (e.g., "Manage Drift", "Exact coordination happens in Drift chat...").
+
+**Verification:**
+- Verified `FloatingTabBar` handles 5 items with center action correctly.
+- Verified sheet presentation and dismissal logic in `MainTabView`.
+- Build initiated to verify syntax and dependency graph.
 
 ### Changed by: Antigravity
 

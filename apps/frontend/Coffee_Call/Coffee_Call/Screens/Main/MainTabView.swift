@@ -31,6 +31,8 @@ struct MainTabView: View {
         .ignoresSafeArea(edges: .bottom)
         .sheet(isPresented: $isShowingCreateSheet) {
             CreateDriftScreen()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
 }
