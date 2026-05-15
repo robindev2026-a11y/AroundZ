@@ -21,18 +21,30 @@ struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
+            // Bottom Blur Shelf
+            // Provides a diffuse blurry feel for content scrolling behind the tab bar
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .frame(height: 120)
+                .mask(
+                    LinearGradient(
+                        colors: [.clear, .black.opacity(0.8), .black],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .ignoresSafeArea()
+
             // Floating tab bar
             FloatingTabBar(
                 selectedTab: $selectedTab,
                 onCreateTap: { isShowingCreateSheet = true }
             )
-            .padding(.bottom, 32)
+            .padding(.bottom, AppConstants.Layout.floatingTabBarBottomPadding)
         }
         .ignoresSafeArea(edges: .bottom)
         .sheet(isPresented: $isShowingCreateSheet) {
             CreateDriftScreen()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
         }
     }
 }

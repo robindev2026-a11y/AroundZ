@@ -2,23 +2,16 @@ import SwiftUI
 import Combine
 
 class CreateDriftViewModel: ObservableObject {
-    enum LocationState {
-        case resolving
-        case permissionMissing
-        case resolved
-    }
-    
     @Published var selectedActivity: String = "Coffee"
     @Published var planTitle: String = ""
     @Published var selectedTime: String = "Now"
-    @Published var location: String = "Detecting your location..."
-    @Published var locationState: LocationState = .resolving
+    @Published var location: String = "Indiranagar, Bengaluru"
     @Published var capacity: Int = 3
     @Published var joinMode: String = "Anyone can join"
     
     // Optional
     @Published var hook: String = ""
-    @Published var selectedVibe: String?
+    @Published var vibe: String = ""
     @Published var notes: String = ""
     
     @Published var isCreating: Bool = false
@@ -27,31 +20,8 @@ class CreateDriftViewModel: ObservableObject {
     
     let activities = ["Coffee", "Walk", "Food", "Movie", "Study", "Fitness", "Games", "Custom"]
     let times = ["Now", "In 30 mins", "Tonight", "Tomorrow", "Custom"]
-    let vibes = ["Relaxed", "Productive", "Fun", "Deep chat", "Quick meet", "Active"]
-    let hooks = ["Coffee on me", "Have coupons", "Free entry", "Bring a friend", "Custom"]
     let capacities = [1, 3, 5, 8]
     let joinModes = ["Anyone can join", "Approve requests"]
-    
-    var isDirty: Bool {
-        !planTitle.isEmpty || !hook.isEmpty || !notes.isEmpty || selectedVibe != nil
-    }
-    
-    init() {
-        simulateLocationResolving()
-    }
-    
-    func simulateLocationResolving() {
-        locationState = .resolving
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.location = "Indiranagar, Bengaluru"
-            self.locationState = .resolved
-        }
-    }
-    
-    func requestLocationPermission() {
-        // Mock permission request
-        simulateLocationResolving()
-    }
     
     func createDrift() {
         guard !planTitle.isEmpty else { return }
@@ -79,7 +49,7 @@ class CreateDriftViewModel: ObservableObject {
                 peopleGoing: 1,
                 spotsLeft: self.capacity - 1,
                 capacity: self.capacity,
-                vibeTags: [self.selectedVibe].compactMap { $0 },
+                vibeTags: [self.vibe].filter { !$0.isEmpty },
                 whatToBring: [],
                 notes: self.notes,
                 participantInitials: ["Y"],

@@ -37,17 +37,25 @@ struct FloatingTabBar: View {
         .padding(.vertical, 4)
         .background(
             ZStack {
+                // Main Glassmorphic Body
                 Capsule()
-                    .fill(Color.surfaceMain.opacity(0.95))
+                    .fill(Color.surfaceMain.opacity(0.85))
                     .background(.ultraThinMaterial)
+                
+                // Subtle Inner Highlight
                 Capsule()
-                    .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.6), lineWidth: 1.5)
+                
+                // Outer Border
                 Capsule()
-                    .stroke(Color.appBorder.opacity(0.4), lineWidth: 0.5)
+                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
             }
         )
         .clipShape(Capsule())
-        .shadow(color: Color.textPrimary.opacity(0.06), radius: 12, x: 0, y: 6)
+        // Primary Shadow (Tight)
+        .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 4)
+        // Secondary Shadow (Diffuse Bottom)
+        .shadow(color: Color.textPrimary.opacity(0.06), radius: 24, x: 0, y: 12)
         .padding(.horizontal, 16)
         .padding(.bottom, 6)
     }

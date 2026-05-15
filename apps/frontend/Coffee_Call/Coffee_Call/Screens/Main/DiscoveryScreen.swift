@@ -125,3 +125,11 @@ struct DiscoveryScreen: View {
         )
     }
 }
+
+
+// MARK: - Preview
+struct DiscoveryScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        DiscoveryScreen()
+    }
+}
