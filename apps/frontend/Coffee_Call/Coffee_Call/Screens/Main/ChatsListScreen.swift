@@ -6,64 +6,30 @@ struct ChatsListScreen: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.backgroundMain.ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 24) {
+                // Privacy Banner
+                if showPrivacyBanner {
+                    privacyBanner
+                        .padding(.horizontal, 24)
+                }
                 
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 24) {
-                        // Header
-                        headerView
-                            .padding(.horizontal, 24)
-                        
-                        // Privacy Banner
-                        if showPrivacyBanner {
-                            privacyBanner
-                                .padding(.horizontal, 24)
-                        }
-                        
-                        if viewModel.activeDrifts.isEmpty && viewModel.upcomingDrifts.isEmpty && viewModel.pastDrifts.isEmpty {
-                            emptyStateView
-                                .padding(.top, 40)
-                        } else {
-                            // Active Section
-                            chatSection(title: AppStrings.Chat.active, count: viewModel.activeDrifts.count, drifts: viewModel.activeDrifts)
-                            
-                            // Upcoming Section
-                            chatSection(title: AppStrings.Chat.upcoming, count: viewModel.upcomingDrifts.count, drifts: viewModel.upcomingDrifts)
-                            
-                            // Past Section
-                            chatSection(title: AppStrings.Chat.past, count: viewModel.pastDrifts.count, drifts: viewModel.pastDrifts)
-                        }
-                        
-                        Spacer(minLength: 100)
-                    }
-                    .padding(.vertical, 20)
+                if viewModel.activeDrifts.isEmpty && viewModel.upcomingDrifts.isEmpty && viewModel.pastDrifts.isEmpty {
+                    emptyStateView
+                        .padding(.top, 40)
+                } else {
+                    // Active Section
+                    chatSection(title: AppStrings.Chat.active, count: viewModel.activeDrifts.count, drifts: viewModel.activeDrifts)
+                    
+                    // Upcoming Section
+                    chatSection(title: AppStrings.Chat.upcoming, count: viewModel.upcomingDrifts.count, drifts: viewModel.upcomingDrifts)
+                    
+                    // Past Section
+                    chatSection(title: AppStrings.Chat.past, count: viewModel.pastDrifts.count, drifts: viewModel.pastDrifts)
                 }
             }
+            .asCoffeeScreen(config: viewModel)
             .navigationDestination(for: Drift.self) { drift in
                 DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
-            }
-        }
-    }
-    
-    // MARK: - Header
-    private var headerView: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(AppStrings.Chat.title)
-                    .font(.system(size: 32, weight: .black))
-                    .foregroundColor(.textPrimary)
-                Text(AppStrings.Chat.subtitle)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.textSecondary)
-                    .lineLimit(2)
-            }
-            
-            Spacer()
-            
-            HStack(spacing: 12) {
-                IconButton(icon: AppIcons.search) {}
-                IconButton(icon: AppIcons.filter) {}
             }
         }
     }
@@ -143,7 +109,6 @@ struct ChatsListScreen: View {
     // MARK: - Empty State
     private var emptyStateView: some View {
         VStack(spacing: 24) {
-            // Illustration (Simulated)
             ZStack {
                 Circle()
                     .fill(Color.brandPrimary.opacity(0.05))
@@ -187,7 +152,6 @@ struct ChatRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Image
             ZStack(alignment: .bottomTrailing) {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(drift.category.color.opacity(0.1))
@@ -198,7 +162,6 @@ struct ChatRow: View {
                     .foregroundColor(drift.category.color)
                     .frame(width: 64, height: 64)
                 
-                // Icon for type
                 ZStack {
                     Circle()
                         .fill(Color.white)
@@ -234,7 +197,6 @@ struct ChatRow: View {
                     Spacer()
                     
                     HStack(spacing: 8) {
-                        // Status Badge
                         Text(drift.status.rawValue)
                             .font(.system(size: 9, weight: .black))
                             .foregroundColor(drift.status.color)
@@ -243,7 +205,6 @@ struct ChatRow: View {
                             .background(drift.status.color.opacity(0.1))
                             .cornerRadius(4)
                         
-                        // Unread Badge
                         if drift.unreadCount > 0 {
                             Text("\(drift.unreadCount)")
                                 .font(.system(size: 10, weight: .bold))
@@ -259,22 +220,5 @@ struct ChatRow: View {
         .background(Color.surfaceMain)
         .cornerRadius(24)
         .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.appBorder, lineWidth: 1))
-    }
-}
-
-private struct IconButton: View {
-    let icon: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.textPrimary)
-                .frame(width: 44, height: 44)
-                .background(Color.surfaceMain)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
-        }
     }
 }

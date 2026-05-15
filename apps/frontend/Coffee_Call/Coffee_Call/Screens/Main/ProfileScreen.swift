@@ -6,44 +6,33 @@ struct ProfileScreen: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.backgroundMain.ignoresSafeArea()
+            VStack(spacing: AppConstants.Layout.standardPadding) {
+                // Profile Info
+                profileHeaderCard
                 
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: AppConstants.Layout.standardPadding) {
-                        // Header
-                        headerView
-                        
-                        // Profile Info
-                        profileHeaderCard
-                        
-                        // Stats
-                        statsRow
-                        
-                        // Interests
-                        interestsSection
-                        
-                        // Availability & Safety Row
-                        HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
-                            availabilitySection
-                            safetySection
-                        }
-                        
-                        // History
-                        historySection
-                        
-                        // Settings
-                        settingsSection
-                        
-                        // Safety Banner
-                        safetyBanner
-                        
-                        Spacer(minLength: AppConstants.Layout.screenBottomSpacer)
-                    }
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    .padding(.vertical, AppConstants.Layout.headerTopPadding)
+                // Stats
+                statsRow
+                
+                // Interests
+                interestsSection
+                
+                // Availability & Safety Row
+                HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
+                    availabilitySection
+                    safetySection
                 }
+                
+                // History
+                historySection
+                
+                // Settings
+                settingsSection
+                
+                // Safety Banner
+                safetyBanner
             }
+            .padding(.horizontal, AppConstants.Layout.standardPadding)
+            .asCoffeeScreen(config: viewModel)
             .sheet(isPresented: $showingEditProfile) {
                 EditProfileScreen(viewModel: viewModel)
             }
@@ -51,25 +40,6 @@ struct ProfileScreen: View {
     }
     
     // MARK: - Header
-    private var headerView: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(AppStrings.Profile.title)
-                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
-                    .foregroundColor(.textPrimary)
-                Text(AppStrings.Profile.subtitle)
-                    .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .medium))
-                    .foregroundColor(.textSecondary)
-            }
-            
-            Spacer()
-            
-            HStack(spacing: 12) {
-                IconButton(icon: AppIcons.bell) {}
-                IconButton(icon: AppIcons.settings) {}
-            }
-        }
-    }
     
     // MARK: - Profile Card
     private var profileHeaderCard: some View {
@@ -505,19 +475,3 @@ struct FlowLayout: View {
     }
 }
 
-private struct IconButton: View {
-    let icon: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(.textPrimary)
-                .frame(width: 44, height: 44)
-                .background(Color.surfaceMain)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
-        }
-    }
-}

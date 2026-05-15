@@ -1,7 +1,19 @@
 import SwiftUI
 import Combine
 
-class ProfileViewModel: ObservableObject {
+class ProfileViewModel: ObservableObject, CoffeeScreenConfiguration {
+    // CoffeeScreenConfiguration Conformance
+    var title: String { AppStrings.Profile.title }
+    var subtitle: String? { AppStrings.Profile.subtitle }
+    var trailingActions: AnyView? {
+        AnyView(
+            HStack(spacing: 12) {
+                NotificationIconButton()
+                CoffeeHeaderButton(icon: AppIcons.settings, action: {})
+            }
+        )
+    }
+    
     @Published var name: String = AppConstants.MockData.userName
     @Published var bio: String = AppConstants.MockData.userBio
     @Published var initials: String = AppConstants.MockData.userInitials
@@ -32,7 +44,7 @@ class ProfileViewModel: ObservableObject {
             ),
             Drift(
                 title: "Study session at Koramangala",
-                description: "", location: "Ended • 5 days ago", meetingPoint: "", time: "", endTime: "", date: "", distance: 0, status: .ended, category: .study, hook: nil, host: mockHost, peopleGoing: 6, spotsLeft: 0, capacity: 6, vibeTags: [], whatToBring: [], notes: "", participantInitials: [], imageUrl: "drift_study"
+                description: "", location: "Ended • 5 days ago", meetingPoint: "", time: "", endTime: "", date: "", distance: 0, status: .ended, category: .study, hook: nil, host: mockHost, peopleGoing: 6, spotsLeft: 0, capacity: 6, vibeTags: [], whatToBring: [], notes: "" , participantInitials: [], imageUrl: "drift_study"
             ),
             Drift(
                 title: "Brunch & Banter in Indiranagar",
@@ -44,7 +56,6 @@ class ProfileViewModel: ObservableObject {
     func updateProfile(name: String, bio: String) {
         self.name = name
         self.bio = bio
-        // In a real app, this would also trigger a Firestore update
     }
     
     func signOut() {

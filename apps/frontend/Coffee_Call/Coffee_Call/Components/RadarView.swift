@@ -2,7 +2,12 @@ import SwiftUI
 
 struct RadarView: View {
     let persons: [RadarPerson]
-    let maxDistance: Double = 1.0 // Maximum distance shown on radar
+    let maxDistance: Double = 1.0
+    
+    @State private var sweepRotation: Double = 0
+    @State private var ringPulse: CGFloat = 0.6
+    @State private var dotPulse: CGFloat = 0.8
+    @State private var isAnimating = false
     
     var body: some View {
         GeometryReader { geo in
@@ -10,25 +15,41 @@ struct RadarView: View {
             let radius = min(geo.size.width, geo.size.height) / 2
             
             ZStack {
+                // Atmospheric Tint
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: [Color.brandPrimary.opacity(0.08), Color.clear]),
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: radius
+                        )
+                    )
+                
                 // Background Rings
                 ForEach(AppConstants.Radar.distances, id: \.self) { distance in
                     let ringRadius = (distance / AppConstants.Radar.maxDistance) * radius
                     Circle()
                         .stroke(
-                            RadialGradient(
-                                gradient: Gradient(colors: [Color.brandPrimary.opacity(0.1), Color.clear]),
-                                center: .center,
-                                startRadius: ringRadius - 1,
-                                endRadius: ringRadius + 1
-                            ),
-                            lineWidth: 2
+                            Color.brandPrimary.opacity(0.12),
+                            lineWidth: 1
                         )
-                        .overlay(
-                            Circle()
-                                .stroke(Color.appBorder.opacity(AppConstants.Radar.ringOpacity), lineWidth: AppConstants.Radar.ringLineWidth)
-                        )
+                        .scaleEffect(distance == AppConstants.Radar.distances.last ? ringPulse : 1.0)
+                        .opacity(distance == AppConstants.Radar.distances.last ? (2.0 - ringPulse) : 1.0)
                         .frame(width: ringRadius * 2, height: ringRadius * 2)
                 }
+                
+                // Rotating Sweep
+                Circle()
+                    .fill(
+                        AngularGradient(
+                            gradient: Gradient(colors: [Color.brandPrimary.opacity(0.2), Color.clear]),
+                            center: .center,
+                            angle: .degrees(sweepRotation)
+                        )
+                    )
+                    .frame(width: radius * 2, height: radius * 2)
+                    .mask(Circle())
                 
                 // Center (You)
                 VStack(spacing: 8) {
@@ -66,11 +87,22 @@ struct RadarView: View {
                     let yOffset = personRadius * sin(person.angle * .pi / 180)
                     
                     RadarPersonAvatar(person: person)
+                        .scaleEffect(dotPulse)
                         .offset(x: xOffset, y: yOffset)
                         .transition(.scale.combined(with: .opacity))
                 }
             }
             .position(center)
+            .onAppear {
+                isAnimating = true
+                withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
+                    sweepRotation = 360
+                }
+                withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                    ringPulse = 1.05
+                    dotPulse = 1.02
+                }
+            }
         }
         .aspectRatio(1, contentMode: .fit)
     }
@@ -81,7 +113,7 @@ private struct RadarPersonAvatar: View {
     let person: RadarPerson
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack {
             Text(person.initials)
                 .font(.system(size: 14, weight: .bold))
                 .foregroundColor(.textPrimary)
@@ -95,16 +127,8 @@ private struct RadarPersonAvatar: View {
                 .background(
                     Circle()
                         .fill(Color.surfaceMain)
-                        .shadow(color: Color.textPrimary.opacity(0.06), radius: 8, x: 0, y: 4)
+                        .shadow(color: Color.brandPrimary.opacity(0.1), radius: 6, x: 0, y: 3)
                 )
-            
-            if person.hasPresence {
-                Circle()
-                    .fill(Color.brandPrimary)
-                    .frame(width: 10, height: 10)
-                    .overlay(Circle().stroke(Color.surfaceMain, lineWidth: 1.5))
-                    .offset(x: -2, y: 2)
-            }
         }
     }
 }

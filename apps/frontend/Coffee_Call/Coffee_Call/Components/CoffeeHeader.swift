@@ -1,0 +1,140 @@
+import SwiftUI
+
+// MARK: - Protocol Oriented Design
+protocol CoffeeScreenConfiguration {
+    var title: String { get }
+    var subtitle: String? { get }
+    var trailingActions: AnyView? { get }
+    var showNotificationIndicator: Bool { get }
+}
+
+extension CoffeeScreenConfiguration {
+    var subtitle: String? { nil }
+    var trailingActions: AnyView? { nil }
+    var showNotificationIndicator: Bool { false }
+}
+
+// MARK: - Reusable Base Page
+struct CoffeeBasePage<Content: View>: View {
+    let config: CoffeeScreenConfiguration
+    let content: () -> Content
+    
+    var body: some View {
+        ZStack(alignment: .top) {
+            Color.backgroundMain.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                CoffeeHeader(
+                    title: config.title,
+                    subtitle: config.subtitle,
+                    showNotificationIndicator: config.showNotificationIndicator,
+                    trailingActions: config.trailingActions
+                )
+                
+                ScrollView(showsIndicators: false) {
+                    content()
+                        .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Coffee Header
+struct CoffeeHeader: View {
+    let title: String
+    var subtitle: String? = nil
+    var showNotificationIndicator: Bool = false
+    var trailingActions: AnyView? = nil
+    
+    var body: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
+                    .foregroundColor(.textPrimary)
+                
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .medium))
+                        .foregroundColor(.textSecondary)
+                }
+            }
+            
+            Spacer()
+            
+            if let actions = trailingActions {
+                actions
+            } else {
+                NotificationIconButton(showIndicator: showNotificationIndicator)
+            }
+        }
+        .padding(.horizontal, AppConstants.Layout.standardPadding)
+        .padding(.top, AppConstants.Layout.headerTopPadding)
+        .padding(.bottom, 12)
+        .background(Color.backgroundMain)
+    }
+}
+
+// MARK: - Subcomponents
+struct NotificationIconButton: View {
+    var showIndicator: Bool = false
+    var action: () -> Void = {}
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: AppIcons.bell)
+                .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
+                .foregroundColor(.brandPurple)
+                .frame(width: 48, height: 48)
+                .background(Color.surfaceMain)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 8, x: 0, y: 2)
+                .overlay(alignment: .topTrailing) {
+                    if showIndicator {
+                        Circle()
+                            .fill(Color.brandPrimary)
+                            .frame(width: 9, height: 9)
+                            .overlay(Circle().stroke(Color.backgroundMain, lineWidth: 2))
+                            .offset(x: -4, y: 4)
+                    }
+                }
+        }
+        .pressScale(0.90)
+    }
+}
+
+struct CoffeeHeaderButton: View {
+    let icon: String
+    var color: Color = .brandPrimary
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
+                .foregroundColor(color)
+                .frame(width: 48, height: 48)
+                .background(Color.surfaceMain)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 8, x: 0, y: 2)
+        }
+        .pressScale(0.90)
+    }
+}
+
+extension View {
+    func asCoffeeScreen(config: CoffeeScreenConfiguration) -> some View {
+        CoffeeBasePage(config: config) {
+            self
+        }
+    }
+}

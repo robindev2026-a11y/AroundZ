@@ -9,7 +9,7 @@ struct CreateDriftButton: View {
                 // Leading Plus Icon
                 Circle()
                     .fill(Color.white)
-                    .frame(width: 48, height: 48)
+                    .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: AppIcons.plus)
                             .font(.system(size: 24, weight: .bold))
@@ -22,8 +22,8 @@ struct CreateDriftButton: View {
                         .foregroundColor(.white)
                     
                     Text(AppStrings.Discovery.createDriftSubtitle)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white.opacity(0.9))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.85))
                 }
                 
                 Spacer()
@@ -36,15 +36,9 @@ struct CreateDriftButton: View {
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity)
             .frame(height: AppConstants.Layout.createDriftButtonHeight)
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [.brandPrimary, .brandPrimaryDark]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .clipShape(Capsule())
-            .shadow(color: Color.brandPrimary.opacity(0.35), radius: 20, x: 0, y: 10)
+            .background(Color.brandPrimary)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge, style: .continuous))
+            .shadow(color: Color.brandPrimary.opacity(0.15), radius: 10, x: 0, y: 5)
         }
         .pressScale(0.96)
     }

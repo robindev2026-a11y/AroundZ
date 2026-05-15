@@ -1,7 +1,13 @@
 import SwiftUI
 import Combine
 
-class DiscoveryViewModel: ObservableObject {
+class DiscoveryViewModel: ObservableObject, CoffeeScreenConfiguration {
+    // CoffeeScreenConfiguration Conformance
+    var title: String { AppStrings.Tabs.discover }
+    var subtitle: String? { "\(radarPeople.count) people open to plans around you" }
+    var showNotificationIndicator: Bool { true }
+    var trailingActions: AnyView? { nil }
+    
     // MARK: - Published State
     @Published var radarPeople: [RadarPerson] = []
     @Published var interestCategories: [InterestCategory] = []

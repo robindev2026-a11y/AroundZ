@@ -21,7 +21,7 @@ enum AppConstants {
         
         static let interestCardWidth: CGFloat = 100
         static let interestCardHeight: CGFloat = 130
-        static let createDriftButtonHeight: CGFloat = 80
+        static let createDriftButtonHeight: CGFloat = 64
         static let interestCardRadius: CGFloat = 20
         static let floatingTabBarBottomPadding: CGFloat = 24
         static let screenBottomSpacer: CGFloat = 120

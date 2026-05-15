@@ -1,7 +1,19 @@
 import SwiftUI
 import Combine
 
-class DriftsViewModel: ObservableObject {
+class DriftsViewModel: ObservableObject, CoffeeScreenConfiguration {
+    // CoffeeScreenConfiguration Conformance
+    var title: String { AppStrings.Drifts.title }
+    var subtitle: String? { AppStrings.Drifts.subtitle }
+    var trailingActions: AnyView? {
+        AnyView(
+            HStack(spacing: 12) {
+                CoffeeHeaderButton(icon: AppIcons.search, action: {})
+                CoffeeHeaderButton(icon: AppIcons.filter, action: {})
+            }
+        )
+    }
+    
     @Published var drifts: [Drift] = []
     @Published var selectedMode: DriftMode = .discover
     @Published var selectedTimeState: TimeState = .all

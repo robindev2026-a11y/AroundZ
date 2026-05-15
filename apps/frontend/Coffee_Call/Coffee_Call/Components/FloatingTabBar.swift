@@ -12,10 +12,10 @@ struct FloatingTabBar: View {
     @Binding var selectedTab: Int
 
     private let tabs: [CoffeeTab] = [
-        CoffeeTab(icon: "antenna.radiowaves.left.and.right", activeIcon: "antenna.radiowaves.left.and.right", label: AppStrings.Tabs.discover),
-        CoffeeTab(icon: "calendar",                          activeIcon: "calendar",                          label: AppStrings.Tabs.myPosts),
-        CoffeeTab(icon: "bubble.left",                       activeIcon: "bubble.left.fill",                 label: AppStrings.Tabs.messages),
-        CoffeeTab(icon: "person",                            activeIcon: "person.fill",                      label: AppStrings.Tabs.profile),
+        CoffeeTab(icon: AppIcons.navAround,  activeIcon: AppIcons.navAround,   label: AppStrings.Tabs.discover),
+        CoffeeTab(icon: AppIcons.navDrifts,  activeIcon: AppIcons.navDrifts,   label: AppStrings.Tabs.myPosts),
+        CoffeeTab(icon: AppIcons.navChats,   activeIcon: AppIcons.navChatsFill, label: AppStrings.Tabs.messages),
+        CoffeeTab(icon: AppIcons.navYou,    activeIcon: AppIcons.navYouFill,   label: AppStrings.Tabs.profile),
     ]
 
     var body: some View {
@@ -25,13 +25,17 @@ struct FloatingTabBar: View {
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(Color.backgroundMain)
-                .shadow(color: Color.black.opacity(0.12), radius: 20, x: 0, y: 8)
+            ZStack {
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                Capsule()
+                    .stroke(Color.white.opacity(0.4), lineWidth: 0.5)
+            }
+            .shadow(color: Color.black.opacity(0.08), radius: 15, x: 0, y: 8)
         )
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 32)
         .slideUpEntrance(delay: 0.2)
     }
 

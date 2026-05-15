@@ -37,6 +37,7 @@
 		3374CED62FB6FDF10020F28D /* ChatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */; };
 		3374CED82FB6FE280020F28D /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED72FB6FE280020F28D /* ChatMessage.swift */; };
 		3374CEDA2FB708630020F28D /* EditProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CED92FB708630020F28D /* EditProfileScreen.swift */; };
+		3374CEDC2FB713430020F28D /* CoffeeHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEDB2FB713430020F28D /* CoffeeHeader.swift */; };
 		3387CF312FB495D40084895E /* BetaBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3387CF302FB495D20084895E /* BetaBadge.swift */; };
 		3387CF342FB4AB830084895E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 3387CF332FB4AB830084895E /* FirebaseAuth */; };
 		3387CF362FB4AB830084895E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3387CF352FB4AB830084895E /* FirebaseCrashlytics */; };
@@ -123,6 +124,7 @@
 		3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatsViewModel.swift; sourceTree = "<group>"; };
 		3374CED72FB6FE280020F28D /* ChatMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChatMessage.swift; path = Models/ChatMessage.swift; sourceTree = "<group>"; };
 		3374CED92FB708630020F28D /* EditProfileScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EditProfileScreen.swift; path = Main/EditProfileScreen.swift; sourceTree = "<group>"; };
+		3374CEDB2FB713430020F28D /* CoffeeHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoffeeHeader.swift; sourceTree = "<group>"; };
 		3387CF302FB495D20084895E /* BetaBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BetaBadge.swift; sourceTree = "<group>"; };
 		338E3B162FB435F40048FC32 /* AppIcons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		338E3B172FB435F40048FC32 /* AppImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 		147D07BDA2FF4DF23D1993AE /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				3374CEDB2FB713430020F28D /* CoffeeHeader.swift */,
 				3374CEBD2FB6E7A50020F28D /* CreateDriftButton.swift */,
 				3374CEBC2FB6E7A50020F28D /* DriftCard.swift */,
 				3374CEBE2FB6E7A50020F28D /* DriftModeSwitch.swift */,
@@ -565,6 +568,7 @@
 				3374CED62FB6FDF10020F28D /* ChatsViewModel.swift in Sources */,
 				3374CED82FB6FE280020F28D /* ChatMessage.swift in Sources */,
 				3374CECE2FB6FDD90020F28D /* ProfileScreen.swift in Sources */,
+				3374CEDC2FB713430020F28D /* CoffeeHeader.swift in Sources */,
 				3374CED02FB6FDD90020F28D /* ChatsListScreen.swift in Sources */,
 				3374CEB12FB6E01A0020F28D /* RadarPerson.swift in Sources */,
 				A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */,
