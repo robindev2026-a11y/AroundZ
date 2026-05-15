@@ -43,7 +43,7 @@ struct DriftDetailScreen: View {
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
                     .padding(.top, AppConstants.Layout.sectionSpacing + 4)
                     
-                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100)
+                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 60)
                 }
             }
             
@@ -253,36 +253,68 @@ struct DriftDetailScreen: View {
                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
             
+            let isLocked = viewModel.joinStatus == .notJoined || viewModel.joinStatus == .requested
+            
             HStack(spacing: AppConstants.Layout.elementSpacing) {
-                HStack(spacing: -12) {
-                    ForEach(0..<min(viewModel.drift.participantInitials.count, 3), id: \.self) { index in
-                        Text(viewModel.drift.participantInitials[index])
-                            .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
-                            .foregroundColor(.white)
-                            .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color.brandPrimary))
-                            .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                if isLocked {
+                    // MARK: - Locked State
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.brandPrimary.opacity(0.1))
+                                .frame(width: 44, height: 44)
+                            Image(systemName: AppIcons.lock)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.brandPrimary)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
+                                .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
+                                .foregroundColor(.textPrimary)
+                            Text("Join to see participants")
+                                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
+                                .foregroundColor(.textSecondary)
+                        }
                     }
-                }
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
+                    
+                    Spacer()
+                    
+                    Image(systemName: AppIcons.chevronRight)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.textSecondary.opacity(0.3))
+                } else {
+                    // MARK: - Open State
+                    HStack(spacing: -12) {
+                        ForEach(0..<min(viewModel.drift.participantInitials.count, 3), id: \.self) { index in
+                            Text(viewModel.drift.participantInitials[index])
+                                .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 40, height: 40)
+                                .background(Circle().fill(Color.brandPrimary))
+                                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                        }
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
+                            .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
+                            .foregroundColor(.textPrimary)
+                        Text(AppStrings.Manage.capacity(count: viewModel.drift.capacity))
+                            .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
+                            .foregroundColor(.textSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(AppStrings.Drifts.seeAll) { }
                         .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
-                        .foregroundColor(.textPrimary)
-                    Text(AppStrings.Manage.capacity(count: viewModel.drift.capacity))
-                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
-                        .foregroundColor(.textSecondary)
+                        .foregroundColor(.brandPrimary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                        .cornerRadius(12)
                 }
-                
-                Spacer()
-                
-                Button(AppStrings.Drifts.seeAll) { }
-                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
-                    .foregroundColor(.brandPrimary)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
-                    .cornerRadius(12)
             }
             .padding(16)
             .background(Color.surfaceMain)
@@ -398,7 +430,7 @@ struct DriftDetailScreen: View {
     // MARK: - Sticky CTA Footer
     private var stickyCTAFooter: some View {
         VStack(spacing: 0) {
-            Divider()
+            Divider().opacity(0.1)
             
             HStack {
                 if viewModel.joinStatus == .joined {
@@ -416,9 +448,14 @@ struct DriftDetailScreen: View {
                     }
                 }
             }
-            .padding(AppConstants.Layout.standardPadding)
-            .background(Color.surfaceMain)
+            .padding(.horizontal, AppConstants.Layout.standardPadding)
+            .padding(.vertical, 12)
         }
+        .background(
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea(edges: .bottom)
+        )
     }
     
     private var ctaButtonContent: some View {

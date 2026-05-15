@@ -1,12 +1,12 @@
 ## CoffeeCall Session Log
 
-## 2026-05-15: Navigation Standardization & Detail UX Refinement
-- **Navigation Standardization**: Created `SubPageHeader` in `CoffeeHeader.swift` to unify the detail view navigation UX across the app.
-- **VStack Architecture**: Migrated `DriftDetailScreen` and `ManageDriftScreen` to a `VStack(spacing: 0)` structure for precise vertical alignment and "pushed up" content.
-- **Tab Bar Control**: Implemented `NavigationManager` to globally manage the visibility of the custom floating tab bar, successfully hiding it on detail screens.
-- **UI & Compatibility**: Compacted headers to a native 44pt height and added legacy `PreviewProvider` support for older Xcode versions.
-- **Files Updated**: `DriftDetailScreen.swift`, `ManageDriftScreen.swift`, `DriftChatScreen.swift`, `CoffeeHeader.swift`, `MainTabView.swift`, `NavigationManager.swift`.
-- **Status**: Navigation standardized; Tab bar visibility fixed; UI scale optimized for high-fidelity detail views.
+## 2026-05-15: Privacy & Glassmorphism Finalization
+- **Privacy Lock**: Implemented a locked/blurred state for the 'Who's coming' section in `DriftDetailScreen`, revealing participants only after joining.
+- **Glassmorphic Footer**: Converted `stickyCTAFooter` to a compact, glassmorphic floating element using `.ultraThinMaterial`.
+- **UI Optimization**: Reduced footer height and optimized `ScrollView` padding to maximize content visibility.
+- **Standardized Actions**: Replaced local view helpers with the global `SubHeaderButton` component for detail screen actions.
+- **Files Updated**: `DriftDetailScreen.swift`, `ManageDriftScreen.swift`, `CoffeeHeader.swift`.
+- **Status**: Privacy-first participant logic implemented; Glassmorphic UI language fully applied to detail screens.
 
 ---
 
