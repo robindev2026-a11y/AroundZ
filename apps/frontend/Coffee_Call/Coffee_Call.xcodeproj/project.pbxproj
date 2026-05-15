@@ -13,6 +13,7 @@
 		3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F02FB475DD0077EAC8 /* Coffee_CallApp.swift */; };
 		3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F12FB475DD0077EAC8 /* ContentView.swift */; };
 		3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302E3F32FB475DD0077EAC8 /* Persistence.swift */; };
+		33192FB12FB7838E00FBBEDE /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33192FB02FB7838E00FBBEDE /* NavigationManager.swift */; };
 		3374CEAD2FB6DFF50020F28D /* DiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEAB2FB6DFF50020F28D /* DiscoveryViewModel.swift */; };
 		3374CEAE2FB6DFF50020F28D /* DriftsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEAC2FB6DFF50020F28D /* DriftsViewModel.swift */; };
 		3374CEB22FB6E01A0020F28D /* Drift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEB02FB6E01A0020F28D /* Drift.swift */; };
@@ -103,6 +104,7 @@
 		3302E3F12FB475DD0077EAC8 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3302E3F22FB475DD0077EAC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3302E3F32FB475DD0077EAC8 /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		33192FB02FB7838E00FBBEDE /* NavigationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		3374CEAB2FB6DFF50020F28D /* DiscoveryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoveryViewModel.swift; sourceTree = "<group>"; };
 		3374CEAC2FB6DFF50020F28D /* DriftsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftsViewModel.swift; sourceTree = "<group>"; };
 		3374CEB02FB6E01A0020F28D /* Drift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Drift.swift; path = Models/Drift.swift; sourceTree = "<group>"; };
@@ -342,6 +344,7 @@
 		994023EC0D7FE9DAA8687F3A /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				33192FB02FB7838E00FBBEDE /* NavigationManager.swift */,
 				3374CEDF2FB725670020F28D /* CreateDriftViewModel.swift */,
 				3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */,
 				3374CED12FB6FDF10020F28D /* DriftChatViewModel.swift */,
@@ -545,6 +548,7 @@
 				3374CECA2FB6F8B30020F28D /* ManageDriftViewModel.swift in Sources */,
 				338E3B222FB464920048FC32 /* CoffeeImageView.swift in Sources */,
 				3374CEB82FB6E6F80020F28D /* DriftDetailScreen.swift in Sources */,
+				33192FB12FB7838E00FBBEDE /* NavigationManager.swift in Sources */,
 				9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */,
 				3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */,
 				3374CEAE2FB6DFF50020F28D /* DriftsViewModel.swift in Sources */,

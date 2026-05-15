@@ -265,3 +265,35 @@ struct ChatComposer: View {
         .padding(.vertical, 12)
     }
 }
+
+struct DriftChatScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        let mockHost = Host(name: "Arjun", role: "Hosting", imageUrl: nil, isVerified: true)
+        let mockDrift = Drift(
+            title: "Coffee Drift",
+            description: "Spontaneous coffee meetup.",
+            location: "Panampilly Nagar",
+            meetingPoint: "Main Entrance",
+            time: "6:30 PM",
+            endTime: "7:30 PM",
+            date: "Today",
+            distance: 1.2,
+            status: .open,
+            category: .coffee,
+            hook: nil,
+            host: mockHost,
+            peopleGoing: 3,
+            spotsLeft: 2,
+            capacity: 5,
+            vibeTags: ["Casual"],
+            whatToBring: ["Good mood"],
+            notes: nil,
+            participantInitials: ["AL", "RI", "MA"],
+            imageUrl: "drift_coffee"
+        )
+        
+        return NavigationStack {
+            DriftChatScreen(viewModel: DriftChatViewModel(drift: mockDrift))
+        }
+    }
+}

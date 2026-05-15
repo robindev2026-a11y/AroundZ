@@ -1,3 +1,14 @@
+## CoffeeCall Session Log
+
+## 2026-05-15: Navigation Standardization & Detail UX Refinement
+- **Navigation Standardization**: Created `SubPageHeader` in `CoffeeHeader.swift` to unify the detail view navigation UX across the app.
+- **VStack Architecture**: Migrated `DriftDetailScreen` and `ManageDriftScreen` to a `VStack(spacing: 0)` structure for precise vertical alignment and "pushed up" content.
+- **Tab Bar Control**: Implemented `NavigationManager` to globally manage the visibility of the custom floating tab bar, successfully hiding it on detail screens.
+- **UI & Compatibility**: Compacted headers to a native 44pt height and added legacy `PreviewProvider` support for older Xcode versions.
+- **Files Updated**: `DriftDetailScreen.swift`, `ManageDriftScreen.swift`, `DriftChatScreen.swift`, `CoffeeHeader.swift`, `MainTabView.swift`, `NavigationManager.swift`.
+- **Status**: Navigation standardized; Tab bar visibility fixed; UI scale optimized for high-fidelity detail views.
+
+---
 
 ## Session: Navigation Refinement & UI Cleanup (2026-05-15)
 

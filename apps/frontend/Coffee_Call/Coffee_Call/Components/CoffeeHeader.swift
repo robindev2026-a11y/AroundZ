@@ -100,6 +100,36 @@ struct CoffeeHeader: View {
     }
 }
 
+// MARK: - SubPage Header (For Detail Views)
+struct SubPageHeader<Trailing: View>: View {
+    let trailing: () -> Trailing
+    
+    init(@ViewBuilder trailing: @escaping () -> Trailing) {
+        self.trailing = trailing
+    }
+    
+    var body: some View {
+        HStack {
+            CoffeeBackButton()
+            
+            Spacer()
+            
+            HStack(spacing: 8) {
+                trailing()
+            }
+        }
+        .padding(.horizontal, AppConstants.Layout.standardPadding)
+        .frame(height: 44) // Native detail header height
+        .background(.ultraThinMaterial)
+    }
+}
+
+extension SubPageHeader where Trailing == EmptyView {
+    init() {
+        self.init(trailing: { EmptyView() })
+    }
+}
+
 // MARK: - Subcomponents
 struct NotificationIconButton: View {
     var showIndicator: Bool = false

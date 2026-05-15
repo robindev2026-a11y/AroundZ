@@ -3,51 +3,72 @@ import SwiftUI
 struct ManageDriftScreen: View {
     @StateObject var viewModel: ManageDriftViewModel
     @Environment(\.dismiss) var dismiss
+    @StateObject private var navManager = NavigationManager.shared
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: AppConstants.Layout.standardPadding) {
-                // MARK: - Header & Overview Card
-                driftOverviewCard
-                
-                // MARK: - Host Actions
-                hostActionsRow
-                
-                // MARK: - Join Requests
-                if !viewModel.drift.pendingRequests.isEmpty {
-                    joinRequestsSection
-                }
-                
-                // MARK: - Joined Participants
-                joinedParticipantsSection
-                
-                // MARK: - Primary Action
-                openChatButton
-                
-                // MARK: - Safety Reminder
-                safetyReminderBanner
-            }
-            .padding(.horizontal, AppConstants.Layout.standardPadding)
-            .padding(.top, AppConstants.Layout.headerTopPadding)
-            .padding(.bottom, AppConstants.Layout.screenBottomSpacer / 3)
-        }
-        .background(Color.backgroundMain.ignoresSafeArea())
-        .navigationTitle(AppStrings.Manage.title)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                CoffeeBackButton()
+        VStack(spacing: 0) {
+            SubPageHeader {
+                headerAction(icon: AppIcons.share) { viewModel.shareDrift() }
+                headerAction(icon: AppIcons.ellipsis) { }
             }
             
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {}) {
-                    Image(systemName: AppIcons.ellipsis)
-                        .foregroundColor(.textPrimary)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: AppConstants.Layout.standardPadding) {
+                    // MARK: - Navigation Space & Title
+                    HStack {
+                        Text(AppStrings.Manage.title)
+                            .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
+                            .foregroundColor(.textPrimary)
+                        Spacer()
+                    }
+                    .padding(.top, 20) // Tight spacing under the VStack header
+                    
+                    // MARK: - Overview Card
+                    driftOverviewCard
+                    
+                    // MARK: - Host Actions
+                    hostActionsRow
+                    
+                    // MARK: - Join Requests
+                    if !viewModel.drift.pendingRequests.isEmpty {
+                        joinRequestsSection
+                    }
+                    
+                    // MARK: - Joined Participants
+                    joinedParticipantsSection
+                    
+                    // MARK: - Primary Action
+                    openChatButton
+                    
+                    // MARK: - Safety Reminder
+                    safetyReminderBanner
                 }
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.bottom, AppConstants.Layout.screenBottomSpacer + 40)
             }
         }
+        .background(Color.backgroundMain.ignoresSafeArea())
+        .navigationBarHidden(true)
+        .onAppear {
+            navManager.isTabBarHidden = true
+        }
+        .onDisappear {
+            navManager.isTabBarHidden = false
+        }
     }
+    
+    private func headerAction(icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(.textPrimary)
+                .frame(width: 40, height: 40)
+                .background(Color.surfaceMain)
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
+                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
+        }
+    }
+    
     
     // MARK: - Overview Card
     private var driftOverviewCard: some View {
@@ -373,5 +394,35 @@ struct JoinRequestRow: View {
         .background(Color.surfaceMain)
         .cornerRadius(AppConstants.UI.cornerRadiusSmall)
         .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
+    }
+}
+
+struct ManageDriftScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            ManageDriftScreen(viewModel: ManageDriftViewModel(drift: Drift(
+                title: "Coffee Drift",
+                description: "Spontaneous coffee meetup at a nice local cafe.",
+                location: "Panampilly Nagar, Kochi",
+                meetingPoint: "Near the Main Entrance",
+                time: "6:30 PM",
+                endTime: "7:30 PM",
+                date: "Today",
+                distance: 1.2,
+                status: .open,
+                category: .coffee,
+                hook: nil,
+                host: Host(name: "Arjun", role: "Hosting", imageUrl: nil, isVerified: true),
+                peopleGoing: 3,
+                spotsLeft: 2,
+                capacity: 5,
+                vibeTags: ["Casual"],
+                whatToBring: ["Good mood"],
+                notes: nil,
+                participantInitials: ["AL", "RI", "MA"],
+                imageUrl: "drift_coffee",
+                isMine: true
+            )))
+        }
     }
 }

@@ -3,17 +3,21 @@ import SwiftUI
 struct DriftDetailScreen: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: DriftDetailViewModel
+    @StateObject private var navManager = NavigationManager.shared
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Color.backgroundMain.ignoresSafeArea()
+        VStack(spacing: 0) {
+            SubPageHeader {
+                headerAction(icon: AppIcons.share) { viewModel.shareDrift() }
+                headerAction(icon: AppIcons.bookmark) { viewModel.saveDrift() }
+                headerAction(icon: "bell.badge.fill", isSpecial: true) { viewModel.setReminder() }
+            }
             
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
-                    // Custom Header with Images/Badges
-                    headerContent
+                    heroSection
                         .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.top, 16)
+                        .padding(.top, 20) // Pushed up under the VStack header
                     
                     // Summary Info Grid
                     summaryInfoGrid
@@ -39,98 +43,102 @@ struct DriftDetailScreen: View {
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
                     .padding(.top, AppConstants.Layout.sectionSpacing + 4)
                     
-                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer) // Space for sticky CTA
+                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100)
                 }
             }
             
-            // Sticky CTA Footer
+            // Sticky CTA Footer is still managed locally if needed, 
+            // but we can also put it in the VStack if it shd be fixed
             stickyCTAFooter
         }
+        .background(Color.backgroundMain.ignoresSafeArea())
         .navigationBarHidden(true)
-    }
-    
-    // MARK: - Header Content
-    private var headerContent: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-                    // Navigation & Actions
-            HStack {
-                CoffeeBackButton()
-                
-                Spacer()
-                
-                HStack(spacing: 12) {
-                    headerAction(icon: AppIcons.share, label: AppStrings.Drifts.Detail.share) { viewModel.shareDrift() }
-                    headerAction(icon: AppIcons.bookmark, label: AppStrings.Drifts.Detail.save) { viewModel.saveDrift() }
-                    headerAction(icon: AppIcons.bell, label: AppStrings.Drifts.Detail.reminder, isSpecial: true) { viewModel.setReminder() }
-                }
-            }
-            
-            HStack(alignment: .top, spacing: 20) {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 8) {
-                        // Category Badge
-                        HStack(spacing: 4) {
-                            Image(systemName: viewModel.drift.category.icon)
-                            Text(viewModel.drift.category.rawValue.capitalized)
-                        }
-                        .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
-                        .foregroundColor(.brandPrimary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
-                        .cornerRadius(20)
-                        
-                        // Status Badge
-                        HStack(spacing: 4) {
-                            Circle().fill(viewModel.drift.status.color).frame(width: 6, height: 6)
-                            Text(viewModel.drift.status.rawValue)
-                        }
-                        .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
-                        .foregroundColor(viewModel.drift.status.color)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(viewModel.drift.status.color.opacity(AppConstants.UI.opacityLight))
-                        .cornerRadius(20)
-                    }
-                    
-                    Text(viewModel.drift.title)
-                        .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
-                        .foregroundColor(.textPrimary)
-                        .lineLimit(2)
-                    
-                    Text(viewModel.drift.description.split(separator: ".").first ?? "")
-                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
-                        .foregroundColor(.textSecondary)
-                }
-                
-                Spacer()
-                
-                // Hero Image
-                Image("drift_walk") // Placeholder for viewModel.drift.imageUrl
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium))
-                    .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacityLight), radius: 10, x: 0, y: 5)
-            }
+        .onAppear {
+            navManager.isTabBarHidden = true
+        }
+        .onDisappear {
+            navManager.isTabBarHidden = false
         }
     }
     
-    private func headerAction(icon: String, label: String, isSpecial: Bool = false, action: @escaping () -> Void) -> some View {
+    // MARK: - Navigation Bar Helper (Local to Detail View)
+    private func headerAction(icon: String, isSpecial: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-                HStack(spacing: 6) {
-                    Image(systemName: icon)
-                    Text(label)
-                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(isSpecial ? .brandPrimary : .textPrimary)
+                .frame(width: 40, height: 40)
                 .background(Color.surfaceMain)
                 .cornerRadius(AppConstants.UI.cornerRadiusSmall)
                 .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
         }
-        .foregroundColor(isSpecial ? .brandPrimary : .textPrimary)
     }
+    
+    
+    // MARK: - Hero Content
+    private var heroSection: some View {
+        HStack(alignment: .top, spacing: 20) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 8) {
+                    // Category Badge
+                    HStack(spacing: 4) {
+                        Image(systemName: viewModel.drift.category.icon)
+                        Text(viewModel.drift.category.rawValue.capitalized)
+                    }
+                    .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
+                    .foregroundColor(.brandPrimary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                    .cornerRadius(20)
+                    
+                    // Status Badge
+                    HStack(spacing: 4) {
+                        Circle().fill(viewModel.drift.status.color).frame(width: 6, height: 6)
+                        Text(viewModel.drift.status.rawValue)
+                    }
+                    .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
+                    .foregroundColor(viewModel.drift.status.color)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(viewModel.drift.status.color.opacity(AppConstants.UI.opacityLight))
+                    .cornerRadius(20)
+                }
+                
+                Text(viewModel.drift.title)
+                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
+                    .foregroundColor(.textPrimary)
+                    .lineLimit(2)
+                
+                Text(viewModel.drift.description.split(separator: ".").first ?? "")
+                    .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
+                    .foregroundColor(.textSecondary)
+            }
+            
+            Spacer()
+            
+            // Hero Image
+            Image("drift_walk") // Placeholder for viewModel.drift.imageUrl
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 120, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium))
+                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacityLight), radius: 10, x: 0, y: 5)
+        }
+    }
+    
+    
+//    private func headerAction(icon: String, isSpecial: Bool = false, action: @escaping () -> Void) -> some View {
+//        Button(action: action) {
+//            Image(systemName: icon)
+//                .font(.system(size: 16, weight: .bold))
+//                .foregroundColor(isSpecial ? .brandPrimary : .textPrimary)
+//                .frame(width: 40, height: 40)
+//                .background(Color.surfaceMain)
+//                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
+//                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
+//        }
+//    }
     
     
     // MARK: - Summary Info Grid
@@ -499,6 +507,35 @@ struct DriftDetailScreen: View {
         case .requested: return .brandPurple
         case .joined: return .brandPrimary
         case .full, .ended: return .textSecondary
+        }
+    }
+}
+
+struct DriftDetailScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            DriftDetailScreen(viewModel: DriftDetailViewModel(drift: Drift(
+                title: "Coffee Drift",
+                description: "Spontaneous coffee meetup at a nice local cafe. Open to anyone who wants to chat and meet new people in the area.",
+                location: "Panampilly Nagar, Kochi",
+                meetingPoint: "Near the Main Entrance",
+                time: "6:30 PM",
+                endTime: "7:30 PM",
+                date: "Today",
+                distance: 1.2,
+                status: .open,
+                category: .coffee,
+                hook: "Coffee on me ☕\nFirst round's on me!",
+                host: Host(name: "Arjun", role: "Hosting this Drift", imageUrl: "host_arjun", isVerified: true),
+                peopleGoing: 3,
+                spotsLeft: 2,
+                capacity: 5,
+                vibeTags: ["Casual", "Friendly"],
+                whatToBring: ["Good mood"],
+                notes: "Just a quick chat.",
+                participantInitials: ["AL", "RI", "MA"],
+                imageUrl: "drift_coffee"
+            )))
         }
     }
 }

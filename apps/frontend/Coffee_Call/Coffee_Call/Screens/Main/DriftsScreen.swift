@@ -29,7 +29,7 @@ struct DriftsScreen: View {
             .padding(.top, AppConstants.Layout.sectionSpacing * 1.5)
             .asCoffeeScreen(config: viewModel)
             .navigationDestination(for: Drift.self) { drift in
-                if drift.isMine {
+                if viewModel.selectedMode == .mine {
                     ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))
                 } else {
                     DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))

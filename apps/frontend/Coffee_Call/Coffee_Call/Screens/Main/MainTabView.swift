@@ -6,6 +6,7 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var isShowingCreateSheet = false
+    @StateObject private var navManager = NavigationManager.shared
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -21,28 +22,32 @@ struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Bottom Blur Shelf
-            // Provides a diffuse blurry feel for content scrolling behind the tab bar
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .frame(height: 120)
-                .mask(
-                    LinearGradient(
-                        colors: [.clear, .black.opacity(0.8), .black],
-                        startPoint: .top,
-                        endPoint: .bottom
+            if !navManager.isTabBarHidden {
+                // Bottom Blur Shelf
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .frame(height: 120)
+                    .mask(
+                        LinearGradient(
+                            colors: [.clear, .black.opacity(0.8), .black],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
                     )
-                )
-                .ignoresSafeArea()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .ignoresSafeArea()
 
-            // Floating tab bar
-            FloatingTabBar(
-                selectedTab: $selectedTab,
-                onCreateTap: { isShowingCreateSheet = true }
-            )
-            .padding(.bottom, AppConstants.Layout.floatingTabBarBottomPadding)
+                // Floating tab bar
+                FloatingTabBar(
+                    selectedTab: $selectedTab,
+                    onCreateTap: { isShowingCreateSheet = true }
+                )
+                .padding(.bottom, AppConstants.Layout.floatingTabBarBottomPadding)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .ignoresSafeArea(edges: .bottom)
+        .animation(.spring(), value: navManager.isTabBarHidden)
         .sheet(isPresented: $isShowingCreateSheet) {
             CreateDriftScreen()
         }
