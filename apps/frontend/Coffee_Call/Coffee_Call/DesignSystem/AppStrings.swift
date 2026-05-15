@@ -85,8 +85,6 @@ enum AppStrings {
         static let otpCTA = "Verify"
         static let sentTo = "Enter the 6-digit code sent to"
         static let resendCode = "Resend code"
-        
-        
     }
     
     enum Error {
@@ -102,11 +100,18 @@ enum AppStrings {
         static let myPosts   = "Drifts"
         static let messages  = "Chats"
         static let profile   = "You"
+        static let create    = "Create"
     }
 
     enum Discovery {
-        static let title = "Discover"
-        static let subtitle = "What's happening nearby"
+        static let title = "Around"
+        static let subtitleDefault = "People nearby are open to plans"
+        static let subtitleRefreshing = "Refreshing nearby activity..."
+        
+        static let contextTitle = "People around you are open to plans."
+        static let contextSubtitle = "Join a Drift or create your own."
+        static let seeNearbyDrifts = "See nearby Drifts"
+        
         static let locationLabel = "NEARBY"
         static let searchPlaceholder = "Search moments, vibes, or people..."
         static let joinBtn = "Join"
@@ -131,6 +136,7 @@ enum AppStrings {
             static let startup = "Startup"
             static let music = "Music"
             static let yoga = "Yoga"
+            static let movies = "Movies"
         }
     }
 
@@ -177,6 +183,31 @@ enum AppStrings {
                 static let endedSubtitle = "This drift has ended"
             }
         }
+    }
+
+    enum Create {
+        static let title = "Create Drift"
+        static let step1 = "1. What's the plan?"
+        static let step2 = "2. Plan title"
+        static let step3 = "3. When?"
+        static let step4 = "4. Where?"
+        static let step5 = "5. Capacity"
+        static let step6 = "6. Join mode"
+        
+        static let titlePlaceholder = "e.g. Evening walk at Cubbon Park"
+        static let locationApprox = "Approximate area"
+        static let locationNote = "Exact coordination happens in Drift chat after joining."
+        static let manageDrift = "Manage Drift"
+        static let creating = "Creating your Drift..."
+        static let settingUp = "Setting things up for you"
+        static let created = "Drift created!"
+        static let createdSubtitle = "Your plan is live and people can join."
+        static let redirectNote = "We'll take you to manage your Drift."
+        
+        static let discardTitle = "Discard changes?"
+        static let discardMessage = "You have unsaved changes. If you go back now, they will be lost."
+        static let discardAction = "Discard changes"
+        static let continueEditing = "Continue editing"
     }
     
     enum Main {

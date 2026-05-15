@@ -26,6 +26,7 @@ enum AppIcons {
     static let infoCircle = "info.circle"
     static let paperclip = "paperclip"
     static let paperplaneFill = "paperplane.fill"
+    static let refresh = "arrow.clockwise"
     
     // MARK: - Features & Actions
     static let search = "magnifyingglass"
@@ -48,6 +49,8 @@ enum AppIcons {
     static let movie = "film"
     static let food = "fork.knife"
     static let chatGroup = "bubble.left.and.bubble.right.fill"
+    static let fitness = "bolt.fill"
+    static let games = "gamecontroller.fill"
     
     // MARK: - Spatial & Info
     static let calendar = "calendar"

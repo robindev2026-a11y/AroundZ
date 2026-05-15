@@ -1,9 +1,20 @@
 import SwiftUI
 
 extension Font {
-    static let heading1 = Font.system(size: 32, weight: .black, design: .default)
-    static let bodyStandard = Font.system(size: 16, weight: .regular, design: .default)
-    static let bodySmall = Font.system(size: 14, weight: .regular, design: .default)
-    static let captionText = Font.system(size: 12, weight: .bold, design: .default)
-    static let buttonText = Font.system(size: 16, weight: .black, design: .default)
+    // Large expressive titles
+    static let heading1 = Font.system(size: AppConstants.Typography.sizeDisplay, weight: .black)
+    static let heading2 = Font.system(size: AppConstants.Typography.sizeTitle, weight: .black)
+    
+    // Core body and UI text
+    static let bodyStandard = Font.system(size: AppConstants.Typography.sizeBody, weight: .medium)
+    static let bodyBold = Font.system(size: AppConstants.Typography.sizeBody, weight: .black)
+    static let bodySmall = Font.system(size: AppConstants.Typography.sizeCaption, weight: .bold)
+    static let captionText = Font.system(size: AppConstants.Typography.sizeCaption, weight: .bold)
+    
+    // Metadata and utility
+    static let metadata = Font.system(size: AppConstants.Typography.sizeTiny, weight: .bold)
+    static let micro = Font.system(size: AppConstants.Typography.sizeMicro, weight: .black)
+    
+    // Actions
+    static let buttonText = Font.system(size: AppConstants.Typography.sizeHeadline, weight: .black)
 }

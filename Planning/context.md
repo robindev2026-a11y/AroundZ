@@ -1,4 +1,17 @@
 
+## Session: Around Screen Finalization & UI Scaling (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **UI Scaling**: Reduced overall UI scale by ~15-20% globally (Typography, Spacing, Card sizing) for a more native feel.
+- **Around Screen Locked**: Finalized Discovery radar, Interests section (horizontal scrolling, no 'See All'), and Context Card. This screen, its ViewModel, and Model are now **LOCKED** per user instruction.
+- **Drift Card Refinement**: Fixed metadata wrapping issues and implemented compact labels.
+- **Tab Bar Polish**: Shrinking scale and fixing "Create" action positioning to be properly contained.
+- **Navigation Safety**: Increased scroll bottom spacers to 80pt to ensure content clears the floating nav bar.
+
+---
+
 ## Session: Navigation Architecture Standardization (2026-05-15)
 
 ### Changed by: Antigravity

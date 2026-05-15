@@ -1,14 +1,15 @@
 import SwiftUI
 
 // MARK: - Main Tab View
+// Implements the 5-item navigation model with Create as a modal sheet.
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @State private var isShowingCreateSheet = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
-
-            // Page content — no native TabView chrome
+            // Page content
             Group {
                 switch selectedTab {
                 case 0: DiscoveryScreen()
@@ -20,27 +21,17 @@ struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Floating tab bar sits on top
-            FloatingTabBar(selectedTab: $selectedTab)
-                .padding(.bottom, 20)
+            // Floating tab bar
+            FloatingTabBar(
+                selectedTab: $selectedTab,
+                onCreateTap: { isShowingCreateSheet = true }
+            )
+            .padding(.bottom, 32)
         }
         .ignoresSafeArea(edges: .bottom)
-    }
-
-    private func placeholderView(title: String, icon: String) -> some View {
-        VStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 48, weight: .light))
-                .foregroundColor(.brandPrimary)
-            Text(title)
-                .font(.heading1)
-                .foregroundColor(.textPrimary)
-            Text("Coming soon")
-                .font(.bodyStandard)
-                .foregroundColor(.textSecondary)
+        .sheet(isPresented: $isShowingCreateSheet) {
+            CreateDriftScreen()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.backgroundMain.ignoresSafeArea())
     }
 }
 

@@ -5,36 +5,36 @@ enum AppConstants {
     enum Radar {
         static let distances: [Double] = [0.3, 0.6, 0.8]
         static let maxDistance: Double = 1.0
-        static let ringOpacity: Double = 0.3
-        static let ringLineWidth: CGFloat = 1.0
-        static let personAvatarSize: CGFloat = 40.0
-        static let centerAvatarSize: CGFloat = 72.0
-        static let centerGlowSize: CGFloat = 90.0
+        static let ringOpacity: Double = 0.2
+        static let ringLineWidth: CGFloat = 0.5
+        static let personAvatarSize: CGFloat = 34.0
+        static let centerAvatarSize: CGFloat = 60.0
+        static let centerGlowSize: CGFloat = 78.0
     }
     
     enum Layout {
-        static let standardPadding: CGFloat = 24
-        static let headerTopPadding: CGFloat = 20
-        static let sectionSpacing: CGFloat = 28
-        static let elementSpacing: CGFloat = 16
-        static let subElementSpacing: CGFloat = 8
+        static let standardPadding: CGFloat = 20
+        static let headerTopPadding: CGFloat = 16
+        static let sectionSpacing: CGFloat = 22
+        static let elementSpacing: CGFloat = 12
+        static let subElementSpacing: CGFloat = 6
         
-        static let interestCardWidth: CGFloat = 100
-        static let interestCardHeight: CGFloat = 130
-        static let createDriftButtonHeight: CGFloat = 64
+        static let interestCardWidth: CGFloat = 92
+        static let interestCardHeight: CGFloat = 104
+        static let createDriftButtonHeight: CGFloat = 56
         static let interestCardRadius: CGFloat = 20
-        static let floatingTabBarBottomPadding: CGFloat = 24
-        static let screenBottomSpacer: CGFloat = 120
+        static let floatingTabBarBottomPadding: CGFloat = 20
+        static let screenBottomSpacer: CGFloat = 80 // Reduced to match compact UI
     }
 
     enum Typography {
-        static let sizeDisplay: CGFloat = 32
-        static let sizeTitle: CGFloat = 20
-        static let sizeHeadline: CGFloat = 18
-        static let sizeBody: CGFloat = 16
-        static let sizeCaption: CGFloat = 13
-        static let sizeTiny: CGFloat = 11
-        static let sizeMicro: CGFloat = 10
+        static let sizeDisplay: CGFloat = 28
+        static let sizeTitle: CGFloat = 17
+        static let sizeHeadline: CGFloat = 15
+        static let sizeBody: CGFloat = 14
+        static let sizeCaption: CGFloat = 11.5
+        static let sizeTiny: CGFloat = 10
+        static let sizeMicro: CGFloat = 9
     }
     
     enum Animation {
@@ -42,13 +42,13 @@ enum AppConstants {
     }
     
     enum UI {
-        static let cornerRadiusLarge: CGFloat = 32
-        static let cornerRadiusMedium: CGFloat = 24
-        static let cornerRadiusSmall: CGFloat = 16
-        static let cornerRadiusTiny: CGFloat = 8
+        static let cornerRadiusLarge: CGFloat = 24
+        static let cornerRadiusMedium: CGFloat = 20
+        static let cornerRadiusSmall: CGFloat = 12
+        static let cornerRadiusTiny: CGFloat = 6
         
-        static let shadowRadius: CGFloat = 15
-        static let shadowY: CGFloat = 8
+        static let shadowRadius: CGFloat = 12
+        static let shadowY: CGFloat = 6
         
         static let opacityOverlay: CGFloat = 0.92
         static let opacityNormal: CGFloat = 0.4

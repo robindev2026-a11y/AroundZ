@@ -26,26 +26,24 @@ extension Color {
         )
     }
 
-    // MARK: - Brand Colors
-    static let brandPrimary = Color("coffeePrimary")
-    static let brandSecondary = Color("coffeePeach")
-    static let brandPrimaryLight = Color("coffeePrimaryLight")
-    static let brandPrimaryDark = Color("coffeePrimaryDark")
-    static let brandPurple = Color("coffeePurple")
+    // MARK: - Social Refresh Palette
+    static let brandPrimary = Color(hex: "#53B8A6")     // Mint
+    static let brandPrimaryDark = Color(hex: "#3D8D7A") // Pressed Mint
+    static let brandPurple = Color(hex: "#8E7DBE")      // Lavender
+    static let brandSecondary = Color(hex: "#E88C6B")   // Peach
     
-    // MARK: - UI & Layout
-    static let backgroundMain = Color("coffeeBackground")
-    static let surfaceMain = Color("coffeeSurface")
-    static let surfaceSecondary = Color("coffeeSurfaceSecondary")
-    static let appBorder = Color("coffeeBorder")
-    static let darkOverlay = Color(hex: "#243447")
+    static let backgroundMain = Color(hex: "#F6F1EB")    // Warm White
+    static let surfaceMain = Color(hex: "#FFFDF9")       // Card Surface
+    static let surfaceSecondary = Color(hex: "#F4F4F8")  // Secondary Surface
+    static let appBorder = Color(hex: "#E7DED4")         // Border
     
-    // MARK: - Text & Content
-    static let textPrimary = Color("coffeeTextPrimary")
-    static let textSecondary = Color("coffeeTextSecondary")
+    static let textPrimary = Color(hex: "#243447")       // Dark Blue/Grey
+    static let textSecondary = Color(hex: "#5F6368")     // Muted Grey
     static let textOnBrand = Color.white
     
+    static let darkOverlay = Color(hex: "#243447").opacity(0.4)
+    
     // MARK: - Status
-    static let statusSuccess = Color("coffeeSuccess")
+    static let statusSuccess = Color(hex: "#53B8A6")
     static let statusError = Color(hex: "#DE4545")
 }
