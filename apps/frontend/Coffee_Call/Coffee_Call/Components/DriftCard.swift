@@ -11,7 +11,7 @@ struct DriftCard: View {
                 // Activity Icon
                 ZStack {
                     Circle()
-                        .fill(drift.category.color.opacity(0.15))
+                        .fill(drift.category.color.opacity(AppConstants.UI.opacityLight * 1.5))
                         .frame(width: 56, height: 56)
                     
                     Image(systemName: drift.category.icon)
@@ -27,7 +27,7 @@ struct DriftCard: View {
                                 .foregroundColor(.brandPurple)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color.brandPurple.opacity(0.1))
+                                .background(Color.brandPurple.opacity(AppConstants.UI.opacityLight))
                                 .cornerRadius(6)
                         }
                         
@@ -38,7 +38,7 @@ struct DriftCard: View {
                             .foregroundColor(drift.status.color)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(drift.status.color.opacity(0.1))
+                            .background(drift.status.color.opacity(AppConstants.UI.opacityLight))
                             .cornerRadius(6)
                     }
                     
@@ -76,11 +76,11 @@ struct DriftCard: View {
                     }
                 }
                 .padding(16)
-                .background(Color.brandSecondary.opacity(0.05))
-                .cornerRadius(20)
+                .background(Color.brandSecondary.opacity(AppConstants.UI.opacitySubtle))
+                .cornerRadius(AppConstants.UI.cornerRadiusMedium)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.brandSecondary.opacity(0.1), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
+                        .stroke(Color.brandSecondary.opacity(AppConstants.UI.opacityLight), lineWidth: 1)
                 )
             }
             
@@ -136,7 +136,7 @@ struct DriftCard: View {
         }
         .padding(20)
         .background(Color.surfaceMain)
-        .cornerRadius(32)
-        .shadow(color: Color.black.opacity(0.04), radius: 15, x: 0, y: 8)
+        .cornerRadius(AppConstants.UI.cornerRadiusLarge)
+        .shadow(color: Color.black.opacity(AppConstants.UI.opacitySubtle), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
     }
 }

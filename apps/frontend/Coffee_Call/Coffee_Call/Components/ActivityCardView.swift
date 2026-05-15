@@ -7,9 +7,9 @@ import SwiftUI
 // title, meta row (distance/time), Join Moment + heart CTA row.
 
 struct ActivityCardView: View {
-    let activity: Activity
-    var onJoin: () -> Void
-    var onSave: () -> Void
+    let drift: Drift
+    var onJoin: () -> Void = {}
+    var onSave: () -> Void = {}
 
     @State private var dotPulse = false
     private let cardAspectRatio: CGFloat = 4.0 / 5.0
@@ -21,7 +21,7 @@ struct ActivityCardView: View {
 
             ZStack(alignment: .bottom) {
                 // MARK: Background image
-                CoffeeImageView(urlString: activity.backgroundImageURL)
+                CoffeeImageView(urlString: drift.imageUrl ?? "")
                     .frame(width: w, height: h)
 
                 // MARK: Gradient overlay — dark bottom, clear top
@@ -70,7 +70,6 @@ struct ActivityCardView: View {
     }
 
     // MARK: - Status Badge
-    // Glassmorphic pill with animated mint dot — matches Figma "Starting Soon" badge
     private var statusBadge: some View {
         HStack(spacing: 6) {
             Circle()
@@ -84,7 +83,7 @@ struct ActivityCardView: View {
                 )
                 .onAppear { dotPulse = true }
 
-            Text(activity.status.rawValue)
+            Text(drift.status.rawValue)
                 .font(.system(size: 10, weight: .black, design: .default))
                 .foregroundColor(.white)
                 .tracking(1.2)
@@ -96,9 +95,8 @@ struct ActivityCardView: View {
     }
 
     // MARK: - Vibe Badge
-    // Lavender pill — matches Figma vibe tag
     private var vibeBadge: some View {
-        Text(activity.vibeTag)
+        Text(drift.vibeTags.first?.uppercased() ?? "VIBE")
             .font(.system(size: 10, weight: .black, design: .default))
             .foregroundColor(.white)
             .tracking(1.0)
@@ -109,12 +107,11 @@ struct ActivityCardView: View {
     }
 
     // MARK: - Host Row
-    // Avatar initials circle with participant count badge + poster name
     private var hostRow: some View {
         HStack(spacing: 10) {
             ZStack(alignment: .bottomTrailing) {
                 // Initials avatar
-                Text(activity.userInitials)
+                Text(drift.host.initials)
                     .font(.system(size: 14, weight: .bold, design: .default))
                     .foregroundColor(.textPrimary)
                     .frame(width: 42, height: 42)
@@ -123,8 +120,8 @@ struct ActivityCardView: View {
                     .overlay(Circle().stroke(Color.white, lineWidth: 2))
 
                 // Participant count badge
-                if activity.attendeeCount > 0 {
-                    Text("+\(activity.attendeeCount)")
+                if drift.peopleGoing > 0 {
+                    Text("+\(drift.peopleGoing)")
                         .font(.system(size: 9, weight: .black))
                         .foregroundColor(.white)
                         .padding(.horizontal, 5)
@@ -135,7 +132,7 @@ struct ActivityCardView: View {
                 }
             }
 
-            Text(activity.userName)
+            Text(drift.host.name)
                 .font(.system(size: 18, weight: .black, design: .default))
                 .foregroundColor(.white)
         }
@@ -143,21 +140,21 @@ struct ActivityCardView: View {
 
     // MARK: - Activity Title
     private var activityTitle: some View {
-        Text(activity.title)
+        Text(drift.title)
             .font(.system(size: 22, weight: .bold, design: .default))
             .foregroundColor(.white)
             .lineLimit(3)
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    // MARK: - Meta Row — distance + time
+    // MARK: - Meta Row
     private var metaRow: some View {
         HStack(spacing: 20) {
             HStack(spacing: 6) {
                 Image(systemName: AppIcons.mappin)
                     .foregroundColor(.brandPrimary)
                     .font(.system(size: 13, weight: .semibold))
-                Text(String(format: "%.1f km away", activity.distanceKm))
+                Text(String(format: "%.1f km away", drift.distance))
             }
             .font(.system(size: 13, weight: .bold, design: .default))
             .foregroundColor(.white.opacity(0.9))
@@ -166,55 +163,38 @@ struct ActivityCardView: View {
                 Image(systemName: AppIcons.clock)
                     .foregroundColor(.brandPurple)
                     .font(.system(size: 13, weight: .semibold))
-                Text(activity.time)
+                Text(drift.time)
             }
             .font(.system(size: 13, weight: .bold, design: .default))
             .foregroundColor(.white.opacity(0.9))
         }
     }
 
-    // MARK: - CTA Row — Join Moment + Heart Save
+    // MARK: - CTA Row
     private var ctaRow: some View {
         HStack(spacing: 12) {
             // Join button
             Button(action: onJoin) {
                 HStack(spacing: 6) {
-                    Text(activity.isJoined
-                         ? AppStrings.Discovery.joinedBtn
-                         : AppStrings.Discovery.joinMomentBtn)
+                    Text(AppStrings.Discovery.joinMomentBtn)
                         .font(.system(size: 16, weight: .black, design: .default))
-                        .coffeeNumericContentTransition()  // iOS 17+: smooth text swap
-                    if !activity.isJoined {
-                        Image(systemName: AppIcons.arrowUpRight)
-                            .font(.system(size: 13, weight: .bold))
-                    }
+                    Image(systemName: AppIcons.arrowUpRight)
+                        .font(.system(size: 13, weight: .bold))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 64)
-                .background(
-                    activity.isJoined
-                    ? Color.white.opacity(0.2)
-                    : Color.brandPrimary
-                )
+                .background(Color.brandPrimary)
                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(
-                    color: Color.brandPrimary.opacity(activity.isJoined ? 0 : 0.3),
-                    radius: 12, x: 0, y: 6
-                )
-                .animation(CoffeeAnimation.spring, value: activity.isJoined)
+                .shadow(color: Color.brandPrimary.opacity(0.3), radius: 12, x: 0, y: 6)
             }
             .pressScale()
-            .coffeeImpactFeedback(trigger: activity.isJoined)  // iOS 17+
 
             // Save/Heart button
             Button(action: onSave) {
-                Image(systemName: activity.isSaved ? AppIcons.heartFill : AppIcons.heart)
+                Image(systemName: AppIcons.heart)
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(activity.isSaved ? Color.brandPrimary : .white)
-                    .coffeeBounceSymbol(trigger: activity.isSaved)  // iOS 17+
-                    .scaleEffect(activity.isSaved ? 1.18 : 1.0)
-                    .animation(CoffeeAnimation.springSnap, value: activity.isSaved)
+                    .foregroundColor(.white)
                     .frame(width: 64, height: 64)
                     .background(Color.white.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -224,7 +204,6 @@ struct ActivityCardView: View {
                     )
             }
             .pressScale(0.88)
-            .coffeeImpactFeedback(trigger: activity.isSaved)  // iOS 17+
         }
     }
 }

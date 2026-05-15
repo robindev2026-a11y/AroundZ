@@ -46,6 +46,14 @@ struct Host: Identifiable, Hashable {
     let imageUrl: String?
     let isVerified: Bool
     
+    var initials: String {
+        name.components(separatedBy: " ")
+            .compactMap { $0.first }
+            .map { String($0) }
+            .joined()
+            .uppercased()
+    }
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
