@@ -1,5 +1,21 @@
 
-## Session: Discovery to Drifts Navigation (2026-05-15)
+## Session: Drifts Tab Refinement & Around Screen Lock (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Drifts Tab**: Updated `DriftsScreen` to only show the "Featured near you" section in Discover mode. It is now hidden in "Mine" mode to focus on user-created content.
+- **Project Rules**: Formally locked `DiscoveryScreen.swift` and `DiscoveryViewModel.swift` in `AGENTS.md` per user instruction. Future work is strictly focused on the Drifts tab and related components.
+
+**Verification:**
+- Verified logic switch in `DriftsScreen.swift`.
+- Audit of `AGENTS.md` completed.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftsScreen.swift`
+- `AGENTS.md`
+- `Planning/context.md`
+
 
 ### Changed by: Antigravity
 

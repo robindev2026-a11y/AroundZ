@@ -116,6 +116,7 @@ Rules:
 
 ## What Not To Do
 
+- Do not modify `DiscoveryScreen.swift` or `DiscoveryViewModel.swift` (Around screen is locked).
 - Do not treat old prompt-generation docs as current implementation rules.
 - Do not use the old blue/coral design palette.
 - Do not change architecture without updating `Planning/decisions.md`.

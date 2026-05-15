@@ -16,7 +16,7 @@ struct DriftsScreen: View {
                     .padding(.top, AppConstants.Layout.elementSpacing)
                 
                 VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
-                    if viewModel.selectedTimeState == .all {
+                    if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all {
                         // Featured Section
                         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                             HStack {
