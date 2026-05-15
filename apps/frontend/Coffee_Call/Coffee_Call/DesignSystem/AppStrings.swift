@@ -187,17 +187,22 @@ enum AppStrings {
 
     enum Manage {
         static let title = "Manage Drift"
-        static let edit = "Edit Drift"
-        static let share = "Share Drift"
-        static let close = "Close Drift"
-        static let delete = "Delete Drift"
-        static let requests = "Join requests"
-        static let participants = "Joined participants"
+        static let edit = "Edit"
+        static let share = "Share"
+        static let close = "Close"
+        static let delete = "Delete"
+        static let requests = "Requests"
+        static let participants = "Participants"
         static let openChat = "Open Drift Chat"
-        static let chatSubtitle = "Chat with joined participants"
+        static let chatSubtitle = "Coordinate with your group"
         static let requestsSubtitle = "Review people who want to join"
-        static let reminder = "A friendly reminder"
-        static let reminderSubtitle = "Meet in public places. No personal contact shared. Be respectful and kind."
+        static let reminder = "Safety Reminder"
+        static let reminderSubtitle = "Meet in public and stay within the group chat for coordination."
+        
+        static func capacity(count: Int) -> String { "Open to \(count) people" }
+        static func joinedCount(count: Int) -> String { "\(count) joined" }
+        static func openTo(count: Int) -> String { "Open to \(count)" }
+        static func requestsPending(count: Int) -> String { "\(count) requests pending" }
     }
 
     enum Chat {
@@ -265,5 +270,14 @@ enum AppStrings {
         static let visibleToOthers = "Visible to others"
         static let visibleEveryone = "Everyone"
         static let visibleDesc = "Who can see your availability"
+        static let changePhoto = "Change Photo"
+        static let bioLabel = "BIO"
+    }
+    
+    enum Common {
+        static let cancel = "Cancel"
+        static let save = "Save"
+        static let done = "Done"
+        static let delete = "Delete"
     }
 }

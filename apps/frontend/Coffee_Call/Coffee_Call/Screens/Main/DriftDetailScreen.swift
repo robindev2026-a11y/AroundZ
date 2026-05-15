@@ -12,15 +12,15 @@ struct DriftDetailScreen: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Custom Header with Images/Badges
                     headerContent
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
                         .padding(.top, 16)
                     
                     // Summary Info Grid
                     summaryInfoGrid
-                        .padding(.horizontal, 24)
-                        .padding(.top, 28)
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
+                        .padding(.top, AppConstants.Layout.sectionSpacing)
                     
-                    VStack(alignment: .leading, spacing: 32) {
+                    VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                         // About Section
                         aboutSection
                         
@@ -36,10 +36,10 @@ struct DriftDetailScreen: View {
                         // Safety Banner
                         safetyBanner
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 32)
+                    .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    .padding(.top, AppConstants.Layout.sectionSpacing + 4)
                     
-                    Spacer(minLength: 120) // Space for sticky CTA
+                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer) // Space for sticky CTA
                 }
             }
             
@@ -51,12 +51,12 @@ struct DriftDetailScreen: View {
     
     // MARK: - Header Content
     private var headerContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                     // Navigation & Actions
             HStack {
                 Button(action: { dismiss() }) {
                     Image(systemName: AppIcons.back)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                         .foregroundColor(.textPrimary)
                         .frame(width: 44, height: 44)
                         .background(Circle().fill(Color.surfaceMain))
@@ -80,11 +80,11 @@ struct DriftDetailScreen: View {
                             Image(systemName: viewModel.drift.category.icon)
                             Text(viewModel.drift.category.rawValue.capitalized)
                         }
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
                         .foregroundColor(.brandPrimary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
-                        .background(Color.brandPrimary.opacity(0.1))
+                        .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                         .cornerRadius(20)
                         
                         // Status Badge
@@ -92,21 +92,21 @@ struct DriftDetailScreen: View {
                             Circle().fill(viewModel.drift.status.color).frame(width: 6, height: 6)
                             Text(viewModel.drift.status.rawValue)
                         }
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
                         .foregroundColor(viewModel.drift.status.color)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
-                        .background(viewModel.drift.status.color.opacity(0.1))
+                        .background(viewModel.drift.status.color.opacity(AppConstants.UI.opacityLight))
                         .cornerRadius(20)
                     }
                     
                     Text(viewModel.drift.title)
-                        .font(.system(size: 32, weight: .black))
+                        .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
                         .foregroundColor(.textPrimary)
                         .lineLimit(2)
                     
                     Text(viewModel.drift.description.split(separator: ".").first ?? "")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
                         .foregroundColor(.textSecondary)
                 }
                 
@@ -117,29 +117,28 @@ struct DriftDetailScreen: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium))
+                    .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacityLight), radius: 10, x: 0, y: 5)
             }
         }
     }
     
     private func headerAction(icon: String, label: String, isSpecial: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 4) {
                 HStack(spacing: 6) {
                     Image(systemName: icon)
                     Text(label)
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(Color.surfaceMain)
-                .cornerRadius(12)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.appBorder, lineWidth: 1))
-            }
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
+                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
         }
         .foregroundColor(isSpecial ? .brandPrimary : .textPrimary)
     }
+    
     
     // MARK: - Summary Info Grid
     private var summaryInfoGrid: some View {
@@ -150,27 +149,27 @@ struct DriftDetailScreen: View {
             Divider().frame(height: 40).padding(.horizontal, 10)
             summaryInfoItem(icon: AppIcons.mappin, title: String(format: "%.1f km", viewModel.drift.distance), subtitle: "from you")
             Divider().frame(height: 40).padding(.horizontal, 10)
-            summaryInfoItem(icon: AppIcons.participants, title: "\(viewModel.drift.peopleGoing) joined", subtitle: "Open to \(viewModel.drift.capacity)")
+            summaryInfoItem(icon: AppIcons.participants, title: AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing), subtitle: AppStrings.Manage.openTo(count: viewModel.drift.capacity))
         }
         .padding(.vertical, 20)
         .frame(maxWidth: .infinity)
         .background(Color.surfaceMain)
-        .cornerRadius(24)
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.appBorder, lineWidth: 1))
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+        .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium).stroke(Color.appBorder, lineWidth: 1))
     }
     
     private func summaryInfoItem(icon: String, title: String, subtitle: String) -> some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 20))
+                .font(.system(size: AppConstants.Typography.sizeTitle))
                 .foregroundColor(.brandPrimary)
             
             VStack(spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
                     .foregroundColor(.textPrimary)
                 Text(subtitle)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
         }
@@ -179,23 +178,23 @@ struct DriftDetailScreen: View {
     
     // MARK: - About Section
     private var aboutSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.aboutHeader)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
             
             Text(viewModel.drift.description)
-                .font(.system(size: 16, weight: .medium))
+                .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
                 .foregroundColor(.textSecondary)
                 .lineSpacing(4)
             
             HStack(spacing: 8) {
                 ForEach(viewModel.drift.vibeTags, id: \.self) { tag in
                     Text(tag)
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(tagColor(for: tag).opacity(0.1))
+                        .background(tagColor(for: tag).opacity(AppConstants.UI.opacityLight))
                         .foregroundColor(tagColor(for: tag))
                         .cornerRadius(12)
                 }
@@ -211,13 +210,13 @@ struct DriftDetailScreen: View {
     
     // MARK: - Host Section
     private var hostSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.hostHeader)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
             
             Button(action: {}) {
-                HStack(spacing: 16) {
+                HStack(spacing: AppConstants.Layout.elementSpacing) {
                     ZStack(alignment: .bottomTrailing) {
                         Circle()
                             .fill(Color.appBorder)
@@ -238,10 +237,10 @@ struct DriftDetailScreen: View {
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(viewModel.drift.host.name)
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
                             .foregroundColor(.textPrimary)
                         Text(viewModel.drift.host.role)
-                            .font(.system(size: 14, weight: .medium))
+                            .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .medium))
                             .foregroundColor(.textSecondary)
                     }
                     
@@ -253,24 +252,24 @@ struct DriftDetailScreen: View {
                 }
                 .padding(16)
                 .background(Color.surfaceMain)
-                .cornerRadius(20)
-                .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.appBorder, lineWidth: 1))
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
+                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + 4).stroke(Color.appBorder, lineWidth: 1))
             }
         }
     }
     
     // MARK: - Participants Section
     private var participantsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.participantsHeader)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
             
-            HStack(spacing: 16) {
+            HStack(spacing: AppConstants.Layout.elementSpacing) {
                 HStack(spacing: -12) {
                     ForEach(0..<min(viewModel.drift.participantInitials.count, 3), id: \.self) { index in
                         Text(viewModel.drift.participantInitials[index])
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                             .foregroundColor(.white)
                             .frame(width: 40, height: 40)
                             .background(Circle().fill(Color.brandPrimary))
@@ -279,36 +278,36 @@ struct DriftDetailScreen: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("\(viewModel.drift.peopleGoing) joined")
-                        .font(.system(size: 14, weight: .bold))
+                    Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                         .foregroundColor(.textPrimary)
-                    Text("Open to \(viewModel.drift.capacity) people")
-                        .font(.system(size: 13, weight: .medium))
+                    Text(AppStrings.Manage.capacity(count: viewModel.drift.capacity))
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                         .foregroundColor(.textSecondary)
                 }
                 
                 Spacer()
                 
                 Button(AppStrings.Drifts.seeAll) { }
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                     .foregroundColor(.brandPrimary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(Color.brandPrimary.opacity(0.1))
+                    .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                     .cornerRadius(12)
             }
             .padding(16)
             .background(Color.surfaceMain)
-            .cornerRadius(20)
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.appBorder, lineWidth: 1))
+            .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
+            .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + 4).stroke(Color.appBorder, lineWidth: 1))
         }
     }
     
     // MARK: - Details List Section
     private var detailsListSection: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing + 4) {
             Text(AppStrings.Drifts.Detail.detailsHeader)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
             
             VStack(spacing: 0) {
@@ -330,14 +329,14 @@ struct DriftDetailScreen: View {
             }
             .padding(16)
             .background(Color.surfaceMain)
-            .cornerRadius(24)
-            .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.appBorder, lineWidth: 1))
+            .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+            .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium).stroke(Color.appBorder, lineWidth: 1))
         }
     }
     
     private func detailRow(icon: String, label: String, value: String, hasChevron: Bool = false, isLast: Bool = false, isLocked: Bool = false) -> some View {
         VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 16) {
+            HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
                 Image(systemName: isLocked ? AppIcons.lock : icon)
                     .font(.system(size: 18))
                     .foregroundColor(isLocked ? .textSecondary : .brandPrimary)
@@ -345,7 +344,7 @@ struct DriftDetailScreen: View {
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(label)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                         .foregroundColor(.textSecondary)
                     
                     Text(value)
@@ -358,9 +357,9 @@ struct DriftDetailScreen: View {
                 
                 if hasChevron {
                     Image(systemName: AppIcons.chevronRight)
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                         .foregroundColor(.textSecondary)
-                        .padding(.top, 20)
+                        .padding(.top, AppConstants.Layout.elementSpacing)
                 }
             }
             .padding(.vertical, 16)
@@ -373,36 +372,36 @@ struct DriftDetailScreen: View {
     
     // MARK: - Safety Banner
     private var safetyBanner: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppConstants.Layout.elementSpacing) {
             HStack {
                 Image(systemName: AppIcons.shield)
-                    .font(.system(size: 24))
+                    .font(.system(size: AppConstants.Typography.sizeHeadline))
                     .foregroundColor(.brandPurple)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(AppStrings.Drifts.Detail.safetyTitle)
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .bold))
                         .foregroundColor(.textPrimary)
                     Text(AppStrings.Drifts.Detail.safetySubtitle)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                         .foregroundColor(.textSecondary)
                 }
                 
                 Spacer()
                 
                 Image(systemName: AppIcons.chevronRight)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                     .foregroundColor(.brandPurple)
             }
             .padding(20)
-            .background(Color.brandPurple.opacity(0.05))
-            .cornerRadius(20)
+            .background(Color.brandPurple.opacity(AppConstants.UI.opacitySubtle))
+            .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
             
             HStack(spacing: 8) {
                 Image(systemName: AppIcons.lock)
-                    .font(.system(size: 12))
+                    .font(.system(size: AppConstants.Typography.sizeTiny + 1))
                 Text(AppStrings.Drifts.Detail.coordinationNote)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .medium))
             }
             .foregroundColor(.textSecondary)
         }
@@ -429,7 +428,7 @@ struct DriftDetailScreen: View {
                     }
                 }
             }
-            .padding(24)
+            .padding(AppConstants.Layout.standardPadding)
             .background(Color.surfaceMain)
         }
     }
@@ -441,15 +440,15 @@ struct DriftDetailScreen: View {
                 .frame(width: 48, height: 48)
                 .overlay(
                     Image(systemName: ctaIcon)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                         .foregroundColor(.white)
                 )
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(ctaTitle)
-                    .font(.system(size: 20, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                 Text(ctaSubtitle)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                     .opacity(0.9)
             }
             .foregroundColor(.white)
@@ -457,15 +456,15 @@ struct DriftDetailScreen: View {
             Spacer()
             
             Image(systemName: AppIcons.chevronRight)
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                 .foregroundColor(.white.opacity(0.6))
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .frame(height: 80)
         .background(ctaColor)
-        .cornerRadius(24)
-        .shadow(color: ctaColor.opacity(0.3), radius: 15, x: 0, y: 8)
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+        .shadow(color: ctaColor.opacity(0.3), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
     }
     
     // MARK: - Computed Properties for CTA

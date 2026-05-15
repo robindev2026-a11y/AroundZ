@@ -21,6 +21,11 @@ enum AppIcons {
     static let checkCircleFill = "checkmark.circle.fill"
     static let verified = "checkmark.seal.fill"
     static let close = "xmark"
+    static let ellipsis = "ellipsis"
+    static let more = "ellipsis"
+    static let infoCircle = "info.circle"
+    static let paperclip = "paperclip"
+    static let paperplaneFill = "paperplane.fill"
     
     // MARK: - Features & Actions
     static let search = "magnifyingglass"

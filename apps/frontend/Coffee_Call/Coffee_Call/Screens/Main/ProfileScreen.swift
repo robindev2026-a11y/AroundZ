@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
+    @State private var showingEditProfile = false
     
     var body: some View {
         NavigationStack {
@@ -9,7 +10,7 @@ struct ProfileScreen: View {
                 Color.backgroundMain.ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 24) {
+                    VStack(spacing: AppConstants.Layout.standardPadding) {
                         // Header
                         headerView
                         
@@ -23,7 +24,7 @@ struct ProfileScreen: View {
                         interestsSection
                         
                         // Availability & Safety Row
-                        HStack(alignment: .top, spacing: 16) {
+                        HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
                             availabilitySection
                             safetySection
                         }
@@ -37,11 +38,14 @@ struct ProfileScreen: View {
                         // Safety Banner
                         safetyBanner
                         
-                        Spacer(minLength: 120)
+                        Spacer(minLength: AppConstants.Layout.screenBottomSpacer)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 20)
+                    .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    .padding(.vertical, AppConstants.Layout.headerTopPadding)
                 }
+            }
+            .sheet(isPresented: $showingEditProfile) {
+                EditProfileScreen()
             }
         }
     }
@@ -51,10 +55,10 @@ struct ProfileScreen: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(AppStrings.Profile.title)
-                    .font(.system(size: 32, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
                     .foregroundColor(.textPrimary)
                 Text(AppStrings.Profile.subtitle)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
             
@@ -72,38 +76,38 @@ struct ProfileScreen: View {
         HStack(spacing: 20) {
             ZStack(alignment: .bottomTrailing) {
                 Text(viewModel.initials)
-                    .font(.system(size: 28, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeHeadline + 10, weight: .black))
                     .foregroundColor(.brandPrimary)
                     .frame(width: 80, height: 80)
-                    .background(Circle().fill(Color.brandPrimary.opacity(0.15)))
+                    .background(Circle().fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight)))
                 
                 ZStack {
                     Circle()
                         .fill(Color.white)
                         .frame(width: 28, height: 28)
                     Image(systemName: AppIcons.camera)
-                        .font(.system(size: 12))
+                        .font(.system(size: AppConstants.Typography.sizeTiny + 1))
                         .foregroundColor(.textPrimary)
                 }
-                .shadow(color: Color.black.opacity(0.1), radius: 2)
+                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacityLight), radius: 2)
                 .offset(x: 4, y: 4)
             }
             
             VStack(alignment: .leading, spacing: 6) {
                 Text(viewModel.name)
-                    .font(.system(size: 20, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                     .foregroundColor(.textPrimary)
                 Text(viewModel.bio)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                     .foregroundColor(.textSecondary)
                     .lineLimit(2)
                 
-                Button(action: {}) {
+                Button(action: { showingEditProfile = true }) {
                     HStack(spacing: 6) {
                         Image(systemName: "pencil")
                         Text(AppStrings.Profile.editProfile)
                     }
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                     .foregroundColor(.brandPrimary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
@@ -129,32 +133,32 @@ struct ProfileScreen: View {
     private func statItem(count: String, label: String, icon: String, color: Color = .textPrimary) -> some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(color.opacity(0.6))
+                .font(.system(size: AppConstants.Typography.sizeBody))
+                .foregroundColor(color.opacity(AppConstants.UI.opacityNormal + 0.2))
             Text(count)
-                .font(.system(size: 16, weight: .black))
+                .font(.system(size: AppConstants.Typography.sizeBody, weight: .black))
                 .foregroundColor(color)
             Text(label)
-                .font(.system(size: 10, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
                 .foregroundColor(.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
         .background(Color.surfaceMain)
-        .cornerRadius(20)
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.appBorder, lineWidth: 1))
+        .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
+        .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + 4).stroke(Color.appBorder, lineWidth: 1))
     }
     
     // MARK: - Interests
     private var interestsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             HStack {
                 Text(AppStrings.Profile.interests)
-                    .font(.system(size: 18, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
                 Spacer()
                 Button(AppStrings.Profile.edit) {}
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                     .foregroundColor(.brandPrimary)
             }
             
@@ -164,12 +168,12 @@ struct ProfileScreen: View {
                         Image(systemName: category.icon)
                         Text(category.rawValue.capitalized)
                     }
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(Color.surfaceMain)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.appBorder, lineWidth: 1))
+                    .cornerRadius(AppConstants.UI.cornerRadiusTiny + 4)
+                    .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusTiny + 4).stroke(Color.appBorder, lineWidth: 1))
                 }
                 
                 Button(action: {}) {
@@ -177,11 +181,11 @@ struct ProfileScreen: View {
                         Image(systemName: AppIcons.plus)
                         Text(AppStrings.Profile.addInterest)
                     }
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                     .foregroundColor(.brandPrimary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(Capsule().stroke(Color.brandPrimary, lineWidth: 1).opacity(0.3))
+                    .background(Capsule().stroke(Color.brandPrimary, lineWidth: 1).opacity(AppConstants.UI.opacityNormal))
                 }
             }
         }
@@ -189,13 +193,13 @@ struct ProfileScreen: View {
     
     // MARK: - Availability Section
     private var availabilitySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             HStack {
                 Text(AppStrings.Profile.availability)
                     .font(.system(size: 15, weight: .black))
                 Spacer()
                 Button(AppStrings.Profile.edit) {}
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                     .foregroundColor(.brandPrimary)
             }
             
@@ -212,25 +216,25 @@ struct ProfileScreen: View {
                         .foregroundColor(.textSecondary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(AppStrings.Profile.visibleToOthers)
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                         Text(AppStrings.Profile.visibleDesc)
-                            .font(.system(size: 10))
+                            .font(.system(size: AppConstants.Typography.sizeMicro))
                             .foregroundColor(.textSecondary)
                     }
                     Spacer()
                     Text(AppStrings.Profile.visibleEveryone)
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
                         .foregroundColor(.textSecondary)
                     Image(systemName: AppIcons.chevronRight)
-                        .font(.system(size: 10))
-                        .foregroundColor(.textSecondary.opacity(0.5))
+                        .font(.system(size: AppConstants.Typography.sizeMicro))
+                        .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
                 }
             }
         }
         .padding(16)
         .background(Color.surfaceMain)
-        .cornerRadius(20)
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.appBorder, lineWidth: 1))
+        .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
+        .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + 4).stroke(Color.appBorder, lineWidth: 1))
     }
     
     private func availabilityItem(icon: String, text: String) -> some View {
@@ -239,14 +243,14 @@ struct ProfileScreen: View {
                 .font(.system(size: 14))
                 .foregroundColor(.textSecondary)
             Text(text)
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .medium))
             Spacer()
         }
     }
     
     // MARK: - Safety Section
     private var safetySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Profile.safety)
                 .font(.system(size: 15, weight: .black))
             
@@ -260,8 +264,8 @@ struct ProfileScreen: View {
         }
         .padding(16)
         .background(Color.surfaceMain)
-        .cornerRadius(20)
-        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.appBorder, lineWidth: 1))
+        .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
+        .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + 4).stroke(Color.appBorder, lineWidth: 1))
     }
     
     private func safetyItem(icon: String, title: String, desc: String) -> some View {
@@ -271,29 +275,29 @@ struct ProfileScreen: View {
                 .foregroundColor(.brandPrimary)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
                     .lineLimit(1)
                 Text(desc)
-                    .font(.system(size: 10))
+                    .font(.system(size: AppConstants.Typography.sizeMicro))
                     .foregroundColor(.textSecondary)
                     .lineLimit(1)
             }
             Spacer()
             Image(systemName: AppIcons.chevronRight)
-                .font(.system(size: 10))
-                .foregroundColor(.textSecondary.opacity(0.5))
+                .font(.system(size: AppConstants.Typography.sizeMicro))
+                .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
         }
     }
     
     // MARK: - History Section
     private var historySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             HStack {
                 Text(AppStrings.Profile.history)
-                    .font(.system(size: 18, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
                 Spacer()
                 Button(AppStrings.Profile.viewAll) {}
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                     .foregroundColor(.brandPrimary)
             }
             
@@ -303,7 +307,7 @@ struct ProfileScreen: View {
                 historyTab(title: AppStrings.Profile.joinedTab, icon: AppIcons.participants, index: 1)
                 historyTab(title: AppStrings.Profile.pastTab, icon: AppIcons.clock, index: 2)
             }
-            .background(Color.surfaceSecondary.opacity(0.3))
+            .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
             .cornerRadius(12)
             .padding(.bottom, 8)
             
@@ -317,7 +321,7 @@ struct ProfileScreen: View {
             
             Button(action: {}) {
                 Text(AppStrings.Profile.createNew)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                     .foregroundColor(.brandPrimary)
                     .frame(maxWidth: .infinity)
             }
@@ -331,10 +335,10 @@ struct ProfileScreen: View {
                 Image(systemName: icon)
                 Text(title)
             }
-            .font(.system(size: 12, weight: .bold))
+            .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
             .frame(maxWidth: .infinity)
             .frame(height: 36)
-            .background(viewModel.selectedHistoryTab == index ? Color.white : Color.clear)
+            .background(viewModel.selectedHistoryTab == index ? Color.surfaceMain : Color.clear)
             .foregroundColor(viewModel.selectedHistoryTab == index ? .brandPrimary : .textSecondary)
             .cornerRadius(10)
             .padding(2)
@@ -343,9 +347,9 @@ struct ProfileScreen: View {
     
     // MARK: - Settings Section
     private var settingsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Profile.settings)
-                .font(.system(size: 18, weight: .black))
+                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
             
             VStack(spacing: 0) {
                 settingsRow(icon: AppIcons.bell, title: AppStrings.Profile.notifications, desc: AppStrings.Profile.notificationsDesc)
@@ -357,8 +361,8 @@ struct ProfileScreen: View {
                 settingsRow(icon: AppIcons.logout, title: AppStrings.Profile.signOut, desc: AppStrings.Profile.signOutDesc, color: .brandPurple)
             }
             .background(Color.surfaceMain)
-            .cornerRadius(24)
-            .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.appBorder, lineWidth: 1))
+            .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+            .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium).stroke(Color.appBorder, lineWidth: 1))
         }
     }
     
@@ -367,7 +371,7 @@ struct ProfileScreen: View {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
-                        .fill(color.opacity(0.1))
+                        .fill(color.opacity(AppConstants.UI.opacityLight))
                         .frame(width: 40, height: 40)
                     Image(systemName: icon)
                         .foregroundColor(color)
@@ -376,10 +380,10 @@ struct ProfileScreen: View {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                         .foregroundColor(.textPrimary)
                     Text(desc)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
                         .foregroundColor(.textSecondary)
                 }
                 
@@ -387,7 +391,7 @@ struct ProfileScreen: View {
                 
                 Image(systemName: AppIcons.chevronRight)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.textSecondary.opacity(0.3))
+                    .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal - 0.1))
             }
             .padding(16)
         }
@@ -398,7 +402,7 @@ struct ProfileScreen: View {
         HStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .fill(Color.brandPrimary.opacity(0.1))
+                    .fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                     .frame(width: 32, height: 32)
                 Image(systemName: AppIcons.shieldVerified)
                     .font(.system(size: 14))
@@ -419,11 +423,11 @@ struct ProfileScreen: View {
             
             Image(systemName: AppIcons.chevronRight)
                 .font(.system(size: 12, weight: .bold))
-                .foregroundColor(.brandPrimary.opacity(0.4))
+                .foregroundColor(.brandPrimary.opacity(AppConstants.UI.opacityNormal))
         }
         .padding(20)
-        .background(Color.brandPrimary.opacity(0.04))
-        .cornerRadius(24)
+        .background(Color.brandPrimary.opacity(AppConstants.UI.opacitySubtle))
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
         .padding(.top, 12)
     }
 }

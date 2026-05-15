@@ -3,7 +3,7 @@ import Combine
 
 class ProfileViewModel: ObservableObject {
     @Published var name: String = AppConstants.MockData.userName
-    @Published var bio: String = "Usually up for walks, coffee, and casual food plans."
+    @Published var bio: String = AppConstants.MockData.userBio
     @Published var initials: String = AppConstants.MockData.userInitials
     @Published var driftsJoined: Int = 24
     @Published var driftsHosted: Int = 8

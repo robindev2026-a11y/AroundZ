@@ -6,8 +6,8 @@ struct DriftCard: View {
     let onJoin: () -> Void
     
     var body: some View {
-        VStack(spacing: 16) {
-            HStack(alignment: .top, spacing: 16) {
+        VStack(spacing: AppConstants.Layout.elementSpacing) {
+            HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
                 // Activity Icon
                 ZStack {
                     Circle()
@@ -15,7 +15,7 @@ struct DriftCard: View {
                         .frame(width: 56, height: 56)
                     
                     Image(systemName: drift.category.icon)
-                        .font(.system(size: 24, weight: .semibold))
+                        .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .semibold))
                         .foregroundColor(drift.category.color)
                 }
                 
@@ -23,7 +23,7 @@ struct DriftCard: View {
                     HStack {
                         if isFeatured {
                             Text(AppStrings.Drifts.bestMatch)
-                                .font(.system(size: 10, weight: .black))
+                                .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
                                 .foregroundColor(.brandPurple)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -34,7 +34,7 @@ struct DriftCard: View {
                         Spacer()
                         
                         Text(drift.status.rawValue)
-                            .font(.system(size: 10, weight: .black))
+                            .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
                             .foregroundColor(drift.status.color)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -43,15 +43,15 @@ struct DriftCard: View {
                     }
                     
                     Text(drift.title)
-                        .font(.system(size: 20, weight: .black))
+                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                         .foregroundColor(.textPrimary)
                     
                     Text(drift.location)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .medium))
                         .foregroundColor(.textSecondary)
                     
                     Text("\(drift.time)  •  \(String(format: "%.1f", drift.distance)) km")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                         .foregroundColor(.textSecondary)
                 }
             }
@@ -60,18 +60,18 @@ struct DriftCard: View {
             if let hook = drift.hook {
                 HStack(spacing: 12) {
                     Image(systemName: AppIcons.gift)
-                        .font(.system(size: 20))
+                        .font(.system(size: AppConstants.Typography.sizeTitle))
                         .foregroundColor(.brandSecondary)
                     
                     Text(hook)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .semibold))
                         .foregroundColor(.textPrimary)
                     
                     Spacer()
                     
                     if drift.category == .coffee {
                         Image(systemName: AppIcons.coffeeFill)
-                            .font(.system(size: 24))
+                            .font(.system(size: AppConstants.Typography.sizeHeadline + 4))
                             .foregroundColor(.brandSecondary.opacity(0.4))
                     }
                 }
@@ -89,7 +89,7 @@ struct DriftCard: View {
                 HStack(spacing: -12) {
                     ForEach(0..<min(drift.participantInitials.count, 3), id: \.self) { index in
                         Text(drift.participantInitials[index])
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                             .foregroundColor(.white)
                             .frame(width: 32, height: 32)
                             .background(Circle().fill(Color.brandPrimary))
@@ -99,14 +99,14 @@ struct DriftCard: View {
                 
                 HStack(spacing: 4) {
                     Text("\(drift.peopleGoing) \(AppStrings.Drifts.going)")
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                         .foregroundColor(.textSecondary)
                     
                     if let spots = drift.spotsLeft {
                         Text("•")
                             .foregroundColor(.textSecondary)
                         Text("\(spots) \(AppStrings.Drifts.spotsLeft)")
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                             .foregroundColor(.brandSecondary)
                     }
                     
@@ -114,7 +114,7 @@ struct DriftCard: View {
                         Text("•")
                             .foregroundColor(.textSecondary)
                         Text(vibe)
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                             .foregroundColor(.textSecondary)
                     }
                 }
@@ -124,7 +124,7 @@ struct DriftCard: View {
                 
                 Button(action: onJoin) {
                     Text(AppStrings.Drifts.imIn)
-                        .font(.system(size: 14, weight: .black))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .black))
                         .foregroundColor(.white)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
@@ -137,6 +137,6 @@ struct DriftCard: View {
         .padding(20)
         .background(Color.surfaceMain)
         .cornerRadius(AppConstants.UI.cornerRadiusLarge)
-        .shadow(color: Color.black.opacity(AppConstants.UI.opacitySubtle), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
+        .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
     }
 }

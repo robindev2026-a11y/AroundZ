@@ -20,23 +20,23 @@ struct DiscoveryScreen: View {
                             .padding(.top, AppConstants.Layout.headerTopPadding)
                             .padding(.horizontal, AppConstants.Layout.standardPadding)
 
-                        Spacer(minLength: 24)
+                        Spacer(minLength: AppConstants.Layout.standardPadding)
 
                         // Radar View
                         RadarView(persons: viewModel.radarPeople)
                             .padding(.horizontal, 20)
 
-                        Spacer(minLength: 32)
+                        Spacer(minLength: AppConstants.Layout.sectionSpacing)
 
                         // Interests Section
-                        VStack(alignment: .leading, spacing: 20) {
+                        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                             Text(AppStrings.Discovery.interestsNearby)
-                                .font(.system(size: 20, weight: .black))
+                                .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                                 .foregroundColor(.textPrimary)
                                 .padding(.horizontal, AppConstants.Layout.standardPadding)
                             
                             ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 16) {
+                                HStack(spacing: AppConstants.Layout.elementSpacing) {
                                     ForEach(viewModel.interestCategories) { category in
                                         InterestCard(
                                             title: category.label,
@@ -53,44 +53,16 @@ struct DiscoveryScreen: View {
                             }
                         }
                         
-                        // Activity Feed (Horizontal)
-                        VStack(alignment: .leading, spacing: 20) {
-                            HStack {
-                                Text("Starting soon nearby")
-                                    .font(.system(size: 20, weight: .black))
-                                    .foregroundColor(.textPrimary)
-                                Spacer()
-                                Button("See all") {}
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(.brandPrimary)
-                            }
-                            .padding(.horizontal, AppConstants.Layout.standardPadding)
-                            
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 16) {
-                                    ForEach(viewModel.featuredDrifts) { drift in
-                                        NavigationLink(value: drift) {
-                                            ActivityCardView(drift: drift)
-                                                .frame(width: 280)
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-                                }
-                                .padding(.horizontal, AppConstants.Layout.standardPadding)
-                            }
-                        }
-                        .padding(.top, 32)
-                        
-                        // Primary CTA
-                        CreateDriftButton(action: {
-                            viewModel.createDrift()
-                        })
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.top, 32)
-                        
-                        Spacer(minLength: 120) // Space for floating tab bar
+                        Spacer(minLength: AppConstants.Layout.screenBottomSpacer) // Space for floating CTA + tab bar
                     }
                 }
+                
+                // Floating Primary CTA
+                CreateDriftButton(action: {
+                    viewModel.createDrift()
+                })
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.bottom, 110) // Positioned above the floating tab bar
             }
             .navigationDestination(for: Drift.self) { drift in
                 if drift.isMine {
@@ -108,10 +80,10 @@ struct DiscoveryScreen: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(AppStrings.Tabs.discover)
-                    .font(.system(size: 32, weight: .black, design: .default))
+                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black, design: .default))
                     .foregroundColor(.textPrimary)
                 Text("\(viewModel.radarPeople.count) people open to plans around you")
-                    .font(.system(size: 14, weight: .medium, design: .default))
+                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .medium, design: .default))
                     .foregroundColor(.textSecondary)
             }
 
@@ -131,16 +103,16 @@ struct DiscoveryScreen: View {
     private func headerIconButton(icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 17, weight: .semibold))
+                .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
                 .foregroundColor(icon == AppIcons.bell ? .brandPurple : .brandPrimary)
                 .frame(width: 48, height: 48)
                 .background(Color.surfaceMain)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
                         .stroke(Color.appBorder, lineWidth: 1)
                 )
-                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
+                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 8, x: 0, y: 2)
         }
         .pressScale(0.90)
     }

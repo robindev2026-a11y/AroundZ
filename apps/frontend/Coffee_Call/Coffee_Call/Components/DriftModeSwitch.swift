@@ -13,7 +13,7 @@ struct DriftModeSwitch: View {
                     }
                 }) {
                     Text(mode.rawValue)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
                         .foregroundColor(selectedMode == mode ? .brandPrimary : .textSecondary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
@@ -30,12 +30,12 @@ struct DriftModeSwitch: View {
             }
         }
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall)
                 .fill(Color.backgroundMain)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.appBorder.opacity(0.5), lineWidth: 1)
+            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall)
+                .stroke(Color.appBorder.opacity(AppConstants.UI.opacityNormal), lineWidth: 1)
         )
     }
 }

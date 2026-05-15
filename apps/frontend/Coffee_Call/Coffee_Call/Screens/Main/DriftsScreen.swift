@@ -11,40 +11,40 @@ struct DriftsScreen: View {
                 VStack(spacing: 0) {
                     // Top Bar
                     headerView
-                        .padding(.top, 16)
-                        .padding(.horizontal, 24)
+                        .padding(.top, AppConstants.Layout.headerTopPadding)
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
                     
                     // Mode Switch
                     DriftModeSwitch(selectedMode: $viewModel.selectedMode)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 24)
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
+                        .padding(.top, AppConstants.Layout.standardPadding)
                     
                     // Time-State Tabs
                     TimeStateTabs(selectedState: $viewModel.selectedTimeState)
-                        .padding(.top, 24)
+                        .padding(.top, AppConstants.Layout.standardPadding)
                     
                     // Content List
                     ScrollView(showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 28) {
+                        VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                             
                             if viewModel.selectedTimeState == .all {
                                 // Featured Section
-                                VStack(alignment: .leading, spacing: 16) {
+                                VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                                     HStack {
                                         Image(systemName: AppIcons.sparkles)
                                             .foregroundColor(.brandSecondary)
                                         Text(AppStrings.Drifts.featured)
-                                            .font(.system(size: 16, weight: .bold))
+                                            .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
                                             .foregroundColor(.textPrimary)
                                     }
-                                    .padding(.horizontal, 24)
+                                    .padding(.horizontal, AppConstants.Layout.standardPadding)
                                     
                                     if let first = viewModel.drifts.first {
                                         NavigationLink(value: first) {
                                             DriftCard(drift: first, isFeatured: true, onJoin: {})
                                         }
                                         .buttonStyle(.plain)
-                                        .padding(.horizontal, 24)
+                                        .padding(.horizontal, AppConstants.Layout.standardPadding)
                                     }
                                 }
                             }
@@ -58,9 +58,9 @@ struct DriftsScreen: View {
                             // Section: Later today
                             driftSection(title: AppStrings.Drifts.laterToday, drifts: viewModel.filteredDrifts.filter { $0.status == .tonight })
                             
-                            Spacer(minLength: 120)
+                            Spacer(minLength: AppConstants.Layout.screenBottomSpacer)
                         }
-                        .padding(.top, 28)
+                        .padding(.top, AppConstants.Layout.sectionSpacing)
                     }
                 }
             }
@@ -78,10 +78,10 @@ struct DriftsScreen: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(AppStrings.Drifts.title)
-                    .font(.system(size: 32, weight: .black))
+                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
                     .foregroundColor(.textPrimary)
                 Text(AppStrings.Drifts.subtitle)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
             
@@ -95,25 +95,25 @@ struct DriftsScreen: View {
     }
     
     private func driftSection(title: String, drifts: [Drift]) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             if !drifts.isEmpty {
                 HStack {
                     Text(title)
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                         .foregroundColor(.textPrimary)
                     Spacer()
                     Button(AppStrings.Drifts.seeAll) { }
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                         .foregroundColor(.brandPrimary)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
                 
                 ForEach(drifts) { drift in
                     NavigationLink(value: drift) {
                         DriftCard(drift: drift, isFeatured: false, onJoin: {})
                     }
                     .buttonStyle(.plain)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppConstants.Layout.standardPadding)
                 }
             }
         }

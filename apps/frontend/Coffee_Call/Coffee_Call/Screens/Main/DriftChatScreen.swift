@@ -12,7 +12,7 @@ struct DriftChatScreen: View {
             // MARK: - Message List
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: AppConstants.Layout.standardPadding) {
                         // System Messages (Top)
                         ForEach(viewModel.systemMessages) { msg in
                             SystemMessageRow(message: msg)
@@ -24,8 +24,8 @@ struct DriftChatScreen: View {
                                 .id(msg.id)
                         }
                     }
-                    .padding(.vertical, 24)
-                    .padding(.horizontal, 20)
+                    .padding(.vertical, AppConstants.Layout.standardPadding)
+                    .padding(.horizontal, AppConstants.Layout.elementSpacing)
                 }
                 .onChange(of: viewModel.messages.count) { _ in
                     if let last = viewModel.messages.last {
@@ -48,20 +48,20 @@ struct DriftChatScreen: View {
                 safetyBanner
             }
             .background(Color.surfaceMain)
-            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: -5)
+            .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 10, x: 0, y: -5)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
                     Text(viewModel.drift.title)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
                     HStack(spacing: 4) {
                         Circle()
                             .fill(Color.brandPrimary)
                             .frame(width: 6, height: 6)
                         Text("\(viewModel.drift.participantInitials.count) joined")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
                             .foregroundColor(.textSecondary)
                     }
                 }
@@ -69,7 +69,7 @@ struct DriftChatScreen: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {}) {
-                    Image(systemName: "info.circle")
+                    Image(systemName: AppIcons.infoCircle)
                         .foregroundColor(.textPrimary)
                 }
             }
@@ -81,12 +81,12 @@ struct DriftChatScreen: View {
             Image(systemName: AppIcons.bell)
                 .foregroundColor(.brandPurple)
             Text("This Drift has ended. You can still view messages but can't send new ones.")
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                 .foregroundColor(.textSecondary)
             Spacer()
         }
-        .padding(16)
-        .background(Color.brandPurple.opacity(0.05))
+        .padding(AppConstants.Layout.elementSpacing)
+        .background(Color.brandPurple.opacity(AppConstants.UI.opacitySubtle))
     }
     
     private var safetyBanner: some View {
@@ -95,14 +95,14 @@ struct DriftChatScreen: View {
                 .font(.system(size: 14))
                 .foregroundColor(.brandPurple)
             Text("Chats are for coordination only. No phone numbers. Be respectful.")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
                 .foregroundColor(.textSecondary)
             Spacer()
-            Image(systemName: "ellipsis")
+            Image(systemName: AppIcons.ellipsis)
                 .font(.system(size: 14))
                 .foregroundColor(.textSecondary)
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, AppConstants.Layout.standardPadding)
         .padding(.vertical, 12)
         .padding(.bottom, 8)
         .background(Color.surfaceMain)
@@ -114,26 +114,26 @@ struct DriftContextStrip: View {
     let drift: Drift
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: AppConstants.Layout.elementSpacing) {
             // Thumbnail
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(drift.category.color.opacity(0.1))
+                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall)
+                    .fill(drift.category.color.opacity(AppConstants.UI.opacityLight))
                     .frame(width: 48, height: 48)
                 Image(systemName: drift.category.icon)
-                    .font(.system(size: 20))
+                    .font(.system(size: AppConstants.Typography.sizeTitle))
                     .foregroundColor(drift.category.color)
             }
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(drift.title)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .bold))
                 HStack(spacing: 6) {
                     Text(drift.time)
                     Text("•")
                     Text(drift.location)
                 }
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .medium))
                 .foregroundColor(.textSecondary)
                 .lineLimit(1)
             }
@@ -145,11 +145,11 @@ struct DriftContextStrip: View {
                     Text("View Details")
                     Image(systemName: AppIcons.chevronRight)
                 }
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                 .foregroundColor(.brandPrimary)
             }
         }
-        .padding(16)
+        .padding(AppConstants.Layout.elementSpacing)
         .background(Color.surfaceMain)
         .overlay(Divider(), alignment: .bottom)
     }
@@ -164,10 +164,10 @@ struct ChatBubble: View {
             if !message.isSelf {
                 // Avatar
                 Text(message.senderInitials)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.textPrimary)
+                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
+                    .foregroundColor(.brandPrimary)
                     .frame(width: 32, height: 32)
-                    .background(Circle().fill(Color.surfaceSecondary))
+                    .background(Circle().fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight)))
             } else {
                 Spacer()
             }
@@ -175,21 +175,21 @@ struct ChatBubble: View {
             VStack(alignment: message.isSelf ? .trailing : .leading, spacing: 4) {
                 if !message.isSelf {
                     Text(message.senderName)
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
                         .foregroundColor(.textSecondary)
                         .padding(.leading, 4)
                 }
                 
                 Text(message.content)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .medium))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .foregroundColor(message.isSelf ? .white : .textPrimary)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
                             .fill(message.isSelf ? Color.brandPrimary : Color.surfaceMain)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 20)
+                                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
                                     .stroke(Color.appBorder, lineWidth: message.isSelf ? 0 : 1)
                             )
                     )
@@ -210,18 +210,18 @@ struct SystemMessageRow: View {
         HStack(spacing: 8) {
             if let icon = message.icon {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .font(.system(size: AppConstants.Typography.sizeTiny))
             }
             Text(message.content)
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
             Text(message.timestamp, style: .time)
-                .font(.system(size: 10))
-                .foregroundColor(.textSecondary.opacity(0.6))
+                .font(.system(size: AppConstants.Typography.sizeMicro))
+                .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.2))
         }
         .foregroundColor(.textSecondary)
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-        .background(Color.surfaceSecondary.opacity(0.5))
+        .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
         .clipShape(Capsule())
     }
 }
@@ -234,21 +234,21 @@ struct ChatComposer: View {
     var body: some View {
         HStack(spacing: 12) {
             Button(action: {}) {
-                Image(systemName: "paperclip")
-                    .font(.system(size: 20))
+                Image(systemName: AppIcons.paperclip)
+                    .font(.system(size: AppConstants.Typography.sizeTitle))
                     .foregroundColor(.textSecondary)
             }
             
             TextField("Message the Drift...", text: $text)
-                .font(.system(size: 15, weight: .medium))
+                .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .medium))
                 .padding(.horizontal, 16)
                 .frame(height: 48)
-                .background(Color.surfaceSecondary)
+                .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
                 .cornerRadius(24)
             
             Button(action: onSend) {
-                Image(systemName: "paperplane.fill")
-                    .font(.system(size: 18))
+                Image(systemName: AppIcons.paperplaneFill)
+                    .font(.system(size: AppConstants.Typography.sizeHeadline))
                     .foregroundColor(.white)
                     .frame(width: 48, height: 48)
                     .background(Color.brandPrimary)
@@ -256,7 +256,7 @@ struct ChatComposer: View {
             }
             .disabled(text.trimmingCharacters(in: .whitespaces).isEmpty)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, AppConstants.Layout.elementSpacing)
         .padding(.vertical, 12)
     }
 }
