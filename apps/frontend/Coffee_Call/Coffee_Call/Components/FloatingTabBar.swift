@@ -33,31 +33,37 @@ struct FloatingTabBar: View {
                 }
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
         .background(
             ZStack {
                 // Main Glassmorphic Body
                 Capsule()
-                    .fill(Color.surfaceMain.opacity(0.85))
+                    .fill(Color.surfaceMain.opacity(0.1))
                     .background(.ultraThinMaterial)
                 
-                // Subtle Inner Highlight
+                // Frosted Highlight (Top edge light)
                 Capsule()
-                    .stroke(Color.white.opacity(0.6), lineWidth: 1.5)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.6), .white.opacity(0.1), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
                 
-                // Outer Border
+                // Outer Border (Subtle depth)
                 Capsule()
-                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
+                    .stroke(Color.appBorder.opacity(0.2), lineWidth: 0.5)
             }
         )
         .clipShape(Capsule())
-        // Primary Shadow (Tight)
-        .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 4)
-        // Secondary Shadow (Diffuse Bottom)
-        .shadow(color: Color.textPrimary.opacity(0.06), radius: 24, x: 0, y: 12)
+        // Enhanced shadows for "Floating" glass look
+        .shadow(color: Color.textPrimary.opacity(0.05), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.textPrimary.opacity(0.03), radius: 20, x: 0, y: 15)
         .padding(.horizontal, 16)
-        .padding(.bottom, 6)
+        .padding(.bottom, 8)
     }
 
     private func tabButton(index: Int) -> some View {

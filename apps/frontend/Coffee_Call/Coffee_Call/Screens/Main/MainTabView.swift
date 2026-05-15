@@ -12,11 +12,11 @@ struct MainTabView: View {
             // Page content
             Group {
                 switch selectedTab {
-                case 0: DiscoveryScreen()
+                case 0: DiscoveryScreen(selectedTab: $selectedTab)
                 case 1: DriftsScreen()
                 case 2: ChatsListScreen()
                 case 3: ProfileScreen()
-                default: DiscoveryScreen()
+                default: DiscoveryScreen(selectedTab: $selectedTab)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

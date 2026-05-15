@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct DiscoveryScreen: View {
+    @Binding var selectedTab: Int
     @StateObject private var viewModel = DiscoveryViewModel()
 
     var body: some View {
         NavigationStack {
-            ScrollView(showsIndicators: false) {
+            VStack{
                 VStack(alignment: .leading, spacing: 0) {
                     // 1. Radar Section
                     ZStack(alignment: .bottomTrailing) {
@@ -107,7 +108,11 @@ struct DiscoveryScreen: View {
             
             Spacer()
             
-            Button(AppStrings.Discovery.seeNearbyDrifts) { }
+            Button(AppStrings.Discovery.seeNearbyDrifts) {
+                withAnimation(CoffeeAnimation.spring) {
+                    selectedTab = 1
+                }
+            }
             .font(.system(size: 10, weight: .black))
             .foregroundColor(.brandPrimary)
             .padding(.horizontal, 10)
@@ -130,6 +135,6 @@ struct DiscoveryScreen: View {
 // MARK: - Preview
 struct DiscoveryScreen_Previews: PreviewProvider {
     static var previews: some View {
-        DiscoveryScreen()
+        DiscoveryScreen(selectedTab: .constant(0))
     }
 }

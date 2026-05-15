@@ -1,4 +1,42 @@
 
+## Session: Discovery to Drifts Navigation (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Navigation Action**: Implemented "See Nearby Drifts" button action in `DiscoveryScreen` to navigate to the Drifts list tab.
+- **State Management**: Refactored `DiscoveryScreen` to accept a `@Binding` for `selectedTab` and updated `MainTabView` to pass this binding.
+- **Animation**: Applied `CoffeeAnimation.spring` to the tab switch for a smooth transition.
+
+**Verification:**
+- Verified binding logic and preview stability in `DiscoveryScreen`.
+- Confirmed `MainTabView` correctly passes state to the child screen.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DiscoveryScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/MainTabView.swift`
+- `Planning/context.md`
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Glassmorphic Navigation Architecture**: Implemented a global high-fidelity "Frosted Glass" aesthetic for primary navigation surfaces.
+- **CoffeeHeader**: Refactored to use `.ultraThinMaterial` with a floating layout. Header buttons (Notifications/Actions) now use `.thinMaterial` for consistent depth and transparency.
+- **FloatingTabBar**: Redesigned with a prominent glass effect using `.ultraThinMaterial`, frosted top-edge linear gradients, and multi-layered shadows to enhance the "floating" feel.
+- **Base Page Refactor**: Migrated `CoffeeBasePage` to a `ZStack` layout. This allows the main `ScrollView` content to physically scroll *underneath* the fixed header, providing a dynamic real-time blur effect.
+- **Content Optimization**: Removed redundant internal `ScrollView` wrappers from `DiscoveryScreen` and `DriftsScreen` to prevent double-scrolling and ensure the glass header tracks correctly with page offsets.
+- **MainTabView**: Verified the `Bottom Blur Shelf` implementation to ensure smooth content transitions behind the floating tab bar.
+
+**Verification:**
+- Verified that content correctly blurs when passing beneath the top header and bottom tab bar.
+- Confirmed stable scrolling behavior across Discovery and Drifts screens without nested gesture conflicts.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/CoffeeHeader.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/FloatingTabBar.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DiscoveryScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftsScreen.swift`
+
 ## Session: Create Drift Sheet Validation & Fixes (2026-05-15)
 
 ### Changed by: Antigravity
@@ -189,9 +227,7 @@ Rules:
 - `apps/frontend/Coffee_Call/Coffee_Call/App/Coffee_CallApp.swift`
 - `Planning/context.md`
 
----
-
-## Session: Codex — Fix Phone Auth Navigation (2026-05-14)
+## Session: Glassmorphic UI Implementation (2026-05-15)
 
 ### Changed by: Codex
 

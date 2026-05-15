@@ -23,20 +23,21 @@ struct CoffeeBasePage<Content: View>: View {
         ZStack(alignment: .top) {
             Color.backgroundMain.ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                CoffeeHeader(
-                    title: config.title,
-                    subtitle: config.subtitle,
-                    showNotificationIndicator: config.showNotificationIndicator,
-                    trailingActions: config.trailingActions
-                )
-                
-                ScrollView(showsIndicators: false) {
-                    content()
-                        .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
-                }
+            ScrollView(showsIndicators: false) {
+                content()
+                    .padding(.top, 110) // Space for the floating glass header
+                    .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
             }
+            .ignoresSafeArea()
+            
+            CoffeeHeader(
+                title: config.title,
+                subtitle: config.subtitle,
+                showNotificationIndicator: config.showNotificationIndicator,
+                trailingActions: config.trailingActions
+            )
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -71,8 +72,16 @@ struct CoffeeHeader: View {
         }
         .padding(.horizontal, AppConstants.Layout.standardPadding)
         .padding(.top, AppConstants.Layout.headerTopPadding)
-        .padding(.bottom, 12)
-        .background(Color.backgroundMain)
+        .padding(.bottom, 16)
+        .background {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea(edges: .top)
+        }
+        .overlay(
+            Divider().opacity(0.1),
+            alignment: .bottom
+        )
     }
 }
 
@@ -87,13 +96,13 @@ struct NotificationIconButton: View {
                 .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
                 .foregroundColor(.brandPurple)
                 .frame(width: 48, height: 48)
-                .background(Color.surfaceMain)
+                .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                        .stroke(Color.appBorder, lineWidth: 1)
+                        .stroke(Color.white.opacity(0.4), lineWidth: 1)
                 )
-                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 8, x: 0, y: 2)
+                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
                 .overlay(alignment: .topTrailing) {
                     if showIndicator {
                         Circle()
@@ -119,13 +128,13 @@ struct CoffeeHeaderButton: View {
                 .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
                 .foregroundColor(color)
                 .frame(width: 48, height: 48)
-                .background(Color.surfaceMain)
+                .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                        .stroke(Color.appBorder, lineWidth: 1)
+                        .stroke(Color.white.opacity(0.4), lineWidth: 1)
                 )
-                .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 8, x: 0, y: 2)
+                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
         }
         .pressScale(0.90)
     }
