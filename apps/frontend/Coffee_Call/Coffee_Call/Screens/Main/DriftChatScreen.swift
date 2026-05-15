@@ -50,8 +50,13 @@ struct DriftChatScreen: View {
             .background(Color.surfaceMain)
             .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 10, x: 0, y: -5)
         }
+        .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                CoffeeBackButton()
+            }
+            
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
                     Text(viewModel.drift.title)

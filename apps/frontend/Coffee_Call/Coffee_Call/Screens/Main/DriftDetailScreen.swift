@@ -54,14 +54,7 @@ struct DriftDetailScreen: View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                     // Navigation & Actions
             HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: AppIcons.back)
-                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
-                        .foregroundColor(.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .background(Circle().fill(Color.surfaceMain))
-                        .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
-                }
+                CoffeeBackButton()
                 
                 Spacer()
                 

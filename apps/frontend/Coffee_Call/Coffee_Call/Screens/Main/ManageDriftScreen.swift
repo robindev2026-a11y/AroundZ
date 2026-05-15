@@ -34,7 +34,12 @@ struct ManageDriftScreen: View {
         .background(Color.backgroundMain.ignoresSafeArea())
         .navigationTitle(AppStrings.Manage.title)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                CoffeeBackButton()
+            }
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {}) {
                     Image(systemName: AppIcons.ellipsis)

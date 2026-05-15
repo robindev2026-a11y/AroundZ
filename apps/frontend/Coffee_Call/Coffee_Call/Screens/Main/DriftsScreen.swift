@@ -8,24 +8,12 @@ struct DriftsScreen: View {
             VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                 if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all {
                     // Featured Section
-                    VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-                        HStack {
-                            Image(systemName: AppIcons.sparkles)
-                                .font(.system(size: 14))
-                                .foregroundColor(.brandSecondary)
-                            Text(AppStrings.Drifts.featured)
-                                .font(.bodyBold)
-                                .foregroundColor(.textPrimary)
+                    if let first = viewModel.drifts.first {
+                        NavigationLink(value: first) {
+                            DriftCard(drift: first, isFeatured: true, onJoin: {})
                         }
+                        .buttonStyle(.plain)
                         .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        
-                        if let first = viewModel.drifts.first {
-                            NavigationLink(value: first) {
-                                DriftCard(drift: first, isFeatured: true, onJoin: {})
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        }
                     }
                 }
                 
@@ -53,17 +41,6 @@ struct DriftsScreen: View {
     private func driftSection(title: String, drifts: [Drift]) -> some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             if !drifts.isEmpty {
-                HStack {
-                    Text(title)
-                        .font(.heading2)
-                        .foregroundColor(.textPrimary)
-                    Spacer()
-                    Button(AppStrings.Drifts.seeAll) { }
-                        .font(.bodySmall)
-                        .foregroundColor(.brandPrimary)
-                }
-                .padding(.horizontal, AppConstants.Layout.standardPadding)
-                
                 ForEach(drifts) { drift in
                     NavigationLink(value: drift) {
                         DriftCard(drift: drift, isFeatured: false, onJoin: {})

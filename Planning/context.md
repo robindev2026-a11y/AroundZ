@@ -1,5 +1,28 @@
 
-## Session: Persistent Filters & Layout Optimization (2026-05-15)
+## Session: Navigation Refinement & UI Cleanup (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Custom Navigation**: Replaced the default "Back" text with a standardized `CoffeeBackButton` icon component across all sub-screens (`ManageDrift`, `DriftDetail`, `DriftChat`).
+- **Swipe-Back Support**: Added a `UINavigationController` extension to preserve the native swipe-to-back gesture while using custom back buttons.
+- **UI Cleanup**: Removed redundant section headers ("Open now", "Starting soon", "Featured") and "See all" buttons in the Drifts tab for a cleaner, badge-driven feed.
+- **Architecture**: Standardized the `CoffeeBackButton` component in `CoffeeHeader.swift`.
+
+**Verification:**
+- Verified custom back button styling and tactile feedback.
+- Confirmed swipe-back gesture functionality via the new navigation extension.
+- Audit of Drifts tab feed for visual clarity.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/DesignSystem/Navigation+Extensions.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/CoffeeHeader.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/ManageDriftScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftDetailScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftChatScreen.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftsScreen.swift`
+- `Planning/context.md`
+
 
 ### Changed by: Antigravity
 

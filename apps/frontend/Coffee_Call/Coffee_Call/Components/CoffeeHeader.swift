@@ -155,6 +155,23 @@ struct CoffeeHeaderButton: View {
     }
 }
 
+struct CoffeeBackButton: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        Button(action: { dismiss() }) {
+            Image(systemName: AppIcons.back)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.textPrimary)
+                .frame(width: 40, height: 40)
+                .background(Circle().fill(Color.surfaceMain))
+                .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
+                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
+        }
+        .pressScale(0.9)
+    }
+}
+
 extension View {
     func asCoffeeScreen(config: CoffeeScreenConfiguration) -> some View {
         CoffeeBasePage(config: config) {
