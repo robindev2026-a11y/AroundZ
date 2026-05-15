@@ -1,5 +1,24 @@
 
-## Session: Drifts Tab Refinement & Around Screen Lock (2026-05-15)
+## Session: Persistent Filters & Layout Optimization (2026-05-15)
+
+### Changed by: Antigravity
+
+**What changed:**
+- **Persistent Filters**: Implemented sticky headers for the Drifts tab using a new `pinnedHeader` architecture in `CoffeeBasePage`. 
+- **Glassmorphic UI**: Sticky filters now use `.ultraThinMaterial` backgrounds, allowing content to blur as it scrolls underneath.
+- **Layout Fixes**: Resolved overlapping issues by adjusting dynamic top padding (increased to 235pt) and compactifying filter component spacing.
+- **Performance**: Migrated the core screen wrapper to `LazyVStack` for optimized list rendering.
+
+**Verification:**
+- Verified sticky behavior and frosted glass transparency in Drifts tab.
+- Confirmed "Featured near you" header visibility after padding adjustments.
+
+**Files updated:**
+- `apps/frontend/Coffee_Call/Coffee_Call/Components/CoffeeHeader.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/ViewModels/DriftsViewModel.swift`
+- `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftsScreen.swift`
+- `Planning/context.md`
+
 
 ### Changed by: Antigravity
 

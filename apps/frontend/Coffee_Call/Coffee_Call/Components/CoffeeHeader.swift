@@ -6,12 +6,14 @@ protocol CoffeeScreenConfiguration {
     var subtitle: String? { get }
     var trailingActions: AnyView? { get }
     var showNotificationIndicator: Bool { get }
+    var pinnedHeader: AnyView? { get }
 }
 
 extension CoffeeScreenConfiguration {
     var subtitle: String? { nil }
     var trailingActions: AnyView? { nil }
     var showNotificationIndicator: Bool { false }
+    var pinnedHeader: AnyView? { nil }
 }
 
 // MARK: - Reusable Base Page
@@ -24,18 +26,31 @@ struct CoffeeBasePage<Content: View>: View {
             Color.backgroundMain.ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
-                content()
-                    .padding(.top, 110) // Space for the floating glass header
-                    .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
+                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    content()
+                }
+                .padding(.top, config.pinnedHeader == nil ? 110 : 235)
+                .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
             }
             .ignoresSafeArea()
             
-            CoffeeHeader(
-                title: config.title,
-                subtitle: config.subtitle,
-                showNotificationIndicator: config.showNotificationIndicator,
-                trailingActions: config.trailingActions
-            )
+            VStack(spacing: 0) {
+                CoffeeHeader(
+                    title: config.title,
+                    subtitle: config.subtitle,
+                    showNotificationIndicator: config.showNotificationIndicator,
+                    trailingActions: config.trailingActions
+                )
+                
+                if let pinned = config.pinnedHeader {
+                    pinned
+                        .background(.ultraThinMaterial)
+                        .overlay(
+                            Divider().opacity(0.1),
+                            alignment: .bottom
+                        )
+                }
+            }
         }
         .toolbar(.hidden, for: .navigationBar)
     }

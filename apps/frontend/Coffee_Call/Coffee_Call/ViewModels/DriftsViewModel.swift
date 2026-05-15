@@ -5,6 +5,27 @@ class DriftsViewModel: ObservableObject, CoffeeScreenConfiguration {
     // CoffeeScreenConfiguration Conformance
     var title: String { AppStrings.Drifts.title }
     var subtitle: String? { AppStrings.Drifts.subtitle }
+    var showNotificationIndicator: Bool { false }
+    var pinnedHeader: AnyView? {
+        AnyView(
+            VStack(spacing: 0) {
+                DriftModeSwitch(selectedMode: Binding(
+                    get: { self.selectedMode },
+                    set: { self.selectedMode = $0 }
+                ))
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.top, 4)
+                .padding(.bottom, 8)
+                
+                TimeStateTabs(selectedState: Binding(
+                    get: { self.selectedTimeState },
+                    set: { self.selectedTimeState = $0 }
+                ))
+                .padding(.bottom, 8)
+            }
+        )
+    }
+    
     var trailingActions: AnyView? {
         AnyView(
             HStack(spacing: 12) {
