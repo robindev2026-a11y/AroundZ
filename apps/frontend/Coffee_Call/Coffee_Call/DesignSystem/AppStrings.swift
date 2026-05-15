@@ -117,12 +117,12 @@ enum AppStrings {
         static let postBtn = "Post Activity"
         static let meetupsNearby = "%d meetups happening nearby"
         static let interestsNearby = "Your interests nearby"
-        static let driftActivityTip = "Tap an interest to explore nearby Drift activity"
+        static let driftActivityTip = "Join a Drift or start your own to chat."
+        static let defaultCategory = "Coffee"
         static let createDrift = "Create Drift"
         static let createDriftSubtitle = "Share what you're up for"
 
         enum Categories {
-            static let all = "All"
             static let coffee = "Coffee"
             static let walks = "Walks"
             static let gaming = "Gaming"
@@ -130,6 +130,7 @@ enum AppStrings {
             static let food = "Food"
             static let startup = "Startup"
             static let music = "Music"
+            static let yoga = "Yoga"
         }
     }
 
