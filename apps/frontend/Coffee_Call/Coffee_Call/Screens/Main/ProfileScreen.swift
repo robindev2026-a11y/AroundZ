@@ -45,7 +45,7 @@ struct ProfileScreen: View {
                 }
             }
             .sheet(isPresented: $showingEditProfile) {
-                EditProfileScreen()
+                EditProfileScreen(viewModel: viewModel)
             }
         }
     }

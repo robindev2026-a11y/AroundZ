@@ -2,10 +2,16 @@ import SwiftUI
 
 struct EditProfileScreen: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel = ProfileViewModel()
+    @ObservedObject var viewModel: ProfileViewModel
     
-    @State private var name: String = AppConstants.MockData.userName
-    @State private var bio: String = AppConstants.MockData.userBio
+    @State private var name: String = ""
+    @State private var bio: String = ""
+    
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        _name = State(initialValue: viewModel.name)
+        _bio = State(initialValue: viewModel.bio)
+    }
     
     var body: some View {
         NavigationStack {
@@ -90,7 +96,7 @@ struct EditProfileScreen: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(AppStrings.Common.save) {
-                        // Save logic
+                        viewModel.updateProfile(name: name, bio: bio)
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .black))

@@ -41,6 +41,12 @@ class ProfileViewModel: ObservableObject {
         ]
     }
     
+    func updateProfile(name: String, bio: String) {
+        self.name = name
+        self.bio = bio
+        // In a real app, this would also trigger a Firestore update
+    }
+    
     func signOut() {
         // Sign out logic
     }
