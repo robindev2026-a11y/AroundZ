@@ -154,7 +154,7 @@ struct ActivityCardView: View {
     private var metaRow: some View {
         HStack(spacing: 20) {
             HStack(spacing: 6) {
-                Image(systemName: "mappin.and.ellipse")
+                Image(systemName: AppIcons.mappin)
                     .foregroundColor(.brandPrimary)
                     .font(.system(size: 13, weight: .semibold))
                 Text(String(format: "%.1f km away", activity.distanceKm))
@@ -163,7 +163,7 @@ struct ActivityCardView: View {
             .foregroundColor(.white.opacity(0.9))
 
             HStack(spacing: 6) {
-                Image(systemName: "clock")
+                Image(systemName: AppIcons.clock)
                     .foregroundColor(.brandPurple)
                     .font(.system(size: 13, weight: .semibold))
                 Text(activity.time)
@@ -185,7 +185,7 @@ struct ActivityCardView: View {
                         .font(.system(size: 16, weight: .black, design: .default))
                         .coffeeNumericContentTransition()  // iOS 17+: smooth text swap
                     if !activity.isJoined {
-                        Image(systemName: "arrow.up.right")
+                        Image(systemName: AppIcons.arrowUpRight)
                             .font(.system(size: 13, weight: .bold))
                     }
                 }
@@ -209,7 +209,7 @@ struct ActivityCardView: View {
 
             // Save/Heart button
             Button(action: onSave) {
-                Image(systemName: activity.isSaved ? "heart.fill" : "heart")
+                Image(systemName: activity.isSaved ? AppIcons.heartFill : AppIcons.heart)
                     .font(.system(size: 18, weight: .medium))
                     .foregroundColor(activity.isSaved ? Color.brandPrimary : .white)
                     .coffeeBounceSymbol(trigger: activity.isSaved)  // iOS 17+
