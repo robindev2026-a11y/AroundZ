@@ -10,31 +10,26 @@ struct DiscoveryScreen: View {
     @State private var selectedPerson: RadarPerson? = nil
     
     // Bottom Sheet
-    @State private var sheetOffset: CGFloat = 420
+    @State private var sheetOffset: CGFloat = AppConstants.Layout.sheetCollapsedOffset
     @GestureState private var dragOffset: CGFloat = 0
-    
-    // MARK: - Constants
-    
-    private let collapsedOffset: CGFloat = 420
-    private let expandedOffset: CGFloat = 110
     
     // 4 x 2 Grid per DESIGN.md
     private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
+        GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing),
+        GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing),
+        GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing),
+        GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing)
     ]
     
     // MARK: - Derived Animation Values
     
     private var currentSheetOffset: CGFloat {
-        max(expandedOffset, min(collapsedOffset, sheetOffset + dragOffset))
+        max(AppConstants.Layout.sheetExpandedOffset, min(AppConstants.Layout.sheetCollapsedOffset, sheetOffset + dragOffset))
     }
     
     private var progress: CGFloat {
-        let total = collapsedOffset - expandedOffset
-        let moved = collapsedOffset - currentSheetOffset
+        let total = AppConstants.Layout.sheetCollapsedOffset - AppConstants.Layout.sheetExpandedOffset
+        let moved = AppConstants.Layout.sheetCollapsedOffset - currentSheetOffset
         return max(0, min(1, moved / total))
     }
     
@@ -114,7 +109,7 @@ extension DiscoveryScreen {
         VStack {
             
             Spacer()
-                .frame(height: 120)
+                .frame(height: AppConstants.Layout.headerHeight + 38)
             
             RadarView(
                 persons: viewModel.radarPeople,
@@ -197,17 +192,17 @@ extension DiscoveryScreen {
                             Text(AppStrings.Discovery.seeNearbyDrifts)
                                 .font(.system(size: 12, weight: .black))
                                 .foregroundColor(.brandPrimary)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
+                                .padding(.horizontal, AppConstants.Layout.buttonPaddingHorizontal)
+                                .padding(.vertical, AppConstants.Layout.buttonPaddingVertical)
                                 .background(Color.brandPrimary.opacity(0.12))
                                 .clipShape(Capsule())
                         }
                     }
-                    .padding(16)
+                    .padding(AppConstants.Layout.buttonPaddingHorizontal)
                     .background(Color.surfaceMain)
-                    .clipShape(RoundedRectangle(cornerRadius: 26))
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 26)
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
                             .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
                     )
                     .onTapGesture {
@@ -216,13 +211,13 @@ extension DiscoveryScreen {
                     
                     // Interests
                     
-                    VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                         
                         Text(AppStrings.Discovery.interestsNearby)
-                            .font(.system(size: 20, weight: .black))
+                            .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
                             .foregroundColor(.textPrimary)
                         
-                        LazyVGrid(columns: columns, spacing: 14) {
+                        LazyVGrid(columns: columns, spacing: AppConstants.Layout.elementSpacing + 2) {
                             
                             ForEach(viewModel.interestCategories) { category in
                                 
@@ -243,7 +238,7 @@ extension DiscoveryScreen {
         }
         .frame(width: geo.size.width, height: geo.size.height)
         .background(
-            RoundedRectangle(cornerRadius: 36, style: .continuous)
+            RoundedRectangle(cornerRadius: AppConstants.Layout.sheetRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
                 .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: -8)
         )
@@ -255,19 +250,19 @@ extension DiscoveryScreen {
                 }
                 .onEnded { value in
                     
-                    let snapThreshold: CGFloat = 140
+                    let snapThreshold = AppConstants.Layout.sheetSnapThreshold
                     
                     withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
                         
                         if value.translation.height < -snapThreshold {
-                            sheetOffset = expandedOffset
+                            sheetOffset = AppConstants.Layout.sheetExpandedOffset
                         } else if value.translation.height > snapThreshold {
-                            sheetOffset = collapsedOffset
+                            sheetOffset = AppConstants.Layout.sheetCollapsedOffset
                         } else {
                             
                             sheetOffset = progress > 0.5
-                            ? expandedOffset
-                            : collapsedOffset
+                            ? AppConstants.Layout.sheetExpandedOffset
+                            : AppConstants.Layout.sheetCollapsedOffset
                         }
                     }
                 }
@@ -298,7 +293,7 @@ extension DiscoveryScreen {
                         
                         Circle()
                             .fill(.ultraThinMaterial)
-                            .frame(width: 58, height: 58)
+                            .frame(width: AppConstants.Layout.refreshButtonSize, height: AppConstants.Layout.refreshButtonSize)
                             .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
                             .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 0.5))
                         
@@ -315,7 +310,7 @@ extension DiscoveryScreen {
                     }
                 }
                 .padding(.trailing, 20)
-                .padding(.bottom, 120)
+                .padding(.bottom, AppConstants.Layout.refreshButtonBottomPadding)
             }
         }
     }

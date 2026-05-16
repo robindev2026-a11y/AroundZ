@@ -72,6 +72,7 @@
 		86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */; };
 		8BE4A1B52FB860B40064EE09 /* DriftContextCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */; };
 		8BE4A1B72FB8ACF50064EE09 /* RadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */; };
+		8BE4A1B92FB8B1620064EE09 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B82FB8B1620064EE09 /* AppColors.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
 		9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFABF6FCFF8585103471820C /* Color+Extensions.swift */; };
@@ -161,6 +162,7 @@
 		6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiscoveryScreen.swift; sourceTree = "<group>"; };
 		8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftContextCard.swift; sourceTree = "<group>"; };
 		8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarView.swift; sourceTree = "<group>"; };
+		8BE4A1B82FB8B1620064EE09 /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneAuthScreen.swift; sourceTree = "<group>"; };
 		968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassmorphicCard.swift; sourceTree = "<group>"; };
 		B860AAD253DC8B95B03AF333 /* MainTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 		EC5C2209D10A1787EA76F764 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				8BE4A1B82FB8B1620064EE09 /* AppColors.swift */,
 				338E3B262FB46EA50048FC32 /* AnimationSystem.swift */,
 				3374CEB52FB6E0950020F28D /* AppConstants.swift */,
 				338E3B162FB435F40048FC32 /* AppIcons.swift */,
@@ -565,6 +568,7 @@
 				3374CEC02FB6E7A50020F28D /* InterestCard.swift in Sources */,
 				338E3B1E2FB44DFF0048FC32 /* ActivityCardView.swift in Sources */,
 				3374CEE62FB732DB0020F28D /* RadarPerson.swift in Sources */,
+				8BE4A1B92FB8B1620064EE09 /* AppColors.swift in Sources */,
 				9E04FFF08F3A7B125341F872 /* OnboardingScreen.swift in Sources */,
 				19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */,
 				338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */,

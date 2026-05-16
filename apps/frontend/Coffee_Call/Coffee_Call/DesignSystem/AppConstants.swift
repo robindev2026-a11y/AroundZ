@@ -28,6 +28,17 @@ enum AppConstants {
         static let headerRadius: CGFloat = 30
         static let tooltipRadius: CGFloat = 14
         
+        static let sheetCollapsedOffset: CGFloat = 420
+        static let sheetExpandedOffset: CGFloat = 110
+        static let sheetSnapThreshold: CGFloat = 140
+        static let sheetRadius: CGFloat = 36
+        
+        static let refreshButtonSize: CGFloat = 58
+        static let refreshButtonBottomPadding: CGFloat = 120
+        
+        static let buttonPaddingHorizontal: CGFloat = 16
+        static let buttonPaddingVertical: CGFloat = 10
+        
         static let floatingTabBarBottomPadding: CGFloat = 20
         static let screenBottomSpacer: CGFloat = 80 // Reduced to match compact UI
     }
