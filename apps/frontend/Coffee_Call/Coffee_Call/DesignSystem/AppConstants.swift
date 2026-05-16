@@ -3,7 +3,7 @@ import CoreGraphics
 
 enum AppConstants {
     enum Radar {
-        static let distances: [Double] = [0.3, 0.6, 0.8]
+        static let distances: [Double] = [0.15, 0.35, 0.55, 0.75, 0.95]
         static let maxDistance: Double = 1.0
         static let ringOpacity: Double = 0.2
         static let ringLineWidth: CGFloat = 0.5

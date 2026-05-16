@@ -112,7 +112,7 @@ struct CoffeeHeader: View {
         .background(
             RoundedRectangle(cornerRadius: AppConstants.Layout.headerRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
         )
     }
 }

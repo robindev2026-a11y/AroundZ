@@ -45,8 +45,8 @@ class DiscoveryViewModel: ObservableObject {
     func refreshNearby() {
         guard !isScanning else { return }
         isScanning = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.isScanning = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.isScanning = false
         }
     }
 }

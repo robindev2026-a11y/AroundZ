@@ -11,7 +11,7 @@ struct DiscoveryScreen: View {
     
     // Bottom Sheet
     @State private var sheetOffset: CGFloat = AppConstants.Layout.sheetCollapsedOffset
-    @GestureState private var dragOffset: CGFloat = 0
+    @State private var dragOffset: CGFloat = 0
     
     // 4 x 2 Grid per DESIGN.md
     private let columns = [
@@ -105,20 +105,19 @@ struct DiscoveryScreen: View {
 extension DiscoveryScreen {
     
     private var radarLayer: some View {
-        
-        VStack {
+        VStack(spacing: 0) {
             
+            // This spacer pushes the radar center to the middle of the available gap
             Spacer()
-                .frame(height: AppConstants.Layout.headerHeight + 38)
+                .frame(height: (AppConstants.Layout.headerHeight + AppConstants.Layout.sheetCollapsedOffset) / 2 - 140)
             
             RadarView(
                 persons: viewModel.radarPeople,
                 isScanning: viewModel.isScanning,
+                progress: progress,
                 selectedPerson: selectedPerson,
                 onPersonTap: { person in
-                    
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
-                        
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
                         if selectedPerson?.id == person.id {
                             selectedPerson = nil
                         } else {
@@ -127,10 +126,13 @@ extension DiscoveryScreen {
                     }
                 }
             )
+            .frame(height: 380)
             
             Spacer()
         }
-        .ignoresSafeArea()
+        .frame(maxWidth: .infinity)
+        .blur(radius: radarBlur)
+        .opacity(radarOpacity)
     }
 }
 
@@ -234,27 +236,30 @@ extension DiscoveryScreen {
                 .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: -8)
         )
         .offset(y: currentSheetOffset)
-        .gesture(
-            DragGesture()
-                .updating($dragOffset) { value, state, _ in
-                    state = value.translation.height
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 5)
+                .onChanged { value in
+                    // Only allow dragging the sheet up/down if we're not scrolling the content
+                    // (Simple heuristic: if the drag is mainly vertical and we're at the top of scroll)
+                    dragOffset = value.translation.height
                 }
                 .onEnded { value in
+                    let translation = value.translation.height
+                    let velocity = value.predictedEndTranslation.height - translation
                     
-                    let snapThreshold = AppConstants.Layout.sheetSnapThreshold
-                    
-                    withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
-                        
-                        if value.translation.height < -snapThreshold {
+                    withAnimation(.spring(response: 0.38, dampingFraction: 0.85)) {
+                        if translation < -AppConstants.Layout.sheetSnapThreshold || velocity < -100 {
                             sheetOffset = AppConstants.Layout.sheetExpandedOffset
-                        } else if value.translation.height > snapThreshold {
+                        } else if translation > AppConstants.Layout.sheetSnapThreshold || velocity > 100 {
                             sheetOffset = AppConstants.Layout.sheetCollapsedOffset
                         } else {
-                            
-                            sheetOffset = progress > 0.5
-                            ? AppConstants.Layout.sheetExpandedOffset
-                            : AppConstants.Layout.sheetCollapsedOffset
+                            if currentSheetOffset < (AppConstants.Layout.sheetCollapsedOffset + AppConstants.Layout.sheetExpandedOffset) / 2 {
+                                sheetOffset = AppConstants.Layout.sheetExpandedOffset
+                            } else {
+                                sheetOffset = AppConstants.Layout.sheetCollapsedOffset
+                            }
                         }
+                        dragOffset = 0
                     }
                 }
         )
@@ -285,8 +290,8 @@ extension DiscoveryScreen {
                         Circle()
                             .fill(.ultraThinMaterial)
                             .frame(width: AppConstants.Layout.refreshButtonSize, height: AppConstants.Layout.refreshButtonSize)
-                            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
-                            .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 0.5))
+                            .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 6)
+                            .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
                         
                         Image(systemName: AppIcons.refresh)
                             .font(.system(size: AppConstants.Typography.sizeTitle - 6, weight: .bold))
@@ -302,6 +307,7 @@ extension DiscoveryScreen {
                 }
                 .padding(.trailing, AppConstants.Layout.standardPadding)
                 .padding(.bottom, AppConstants.Layout.refreshButtonBottomPadding)
+                .zIndex(30) // Explicitly higher than the sheet (15)
             }
         }
     }
