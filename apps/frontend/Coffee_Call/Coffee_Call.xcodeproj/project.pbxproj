@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -63,7 +63,6 @@
 		33CA3A3F2FB33A42008EF23C /* Coffee_CallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A3E2FB33A42008EF23C /* Coffee_CallTests.swift */; };
 		33CA3A492FB33A42008EF23C /* Coffee_CallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */; };
 		33CA3A4B2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */; };
-		33CA3A662FB36C6B008EF23C /* App/GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33CA3A652FB36C6B008EF23C /* App/GoogleService-Info.plist */; };
 		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
 		43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860AAD253DC8B95B03AF333 /* MainTabView.swift */; };
 		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
@@ -152,7 +151,6 @@
 		33CA3A442FB33A42008EF23C /* Coffee_CallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Coffee_CallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33CA3A482FB33A42008EF23C /* Coffee_CallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITests.swift; sourceTree = "<group>"; };
 		33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coffee_CallUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		33CA3A652FB36C6B008EF23C /* App/GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "App/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingScreen.swift; sourceTree = "<group>"; };
 		5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReadyScreen.swift; sourceTree = "<group>"; };
 		5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
@@ -167,6 +165,10 @@
 		F79EEFE313C630B04AED288E /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		FFABF6FCFF8585103471820C /* Color+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		8BE4A1B32FB837270064EE09 /* New Folder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "New Folder"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		33CA3A212FB33A3F008EF23C /* Frameworks */ = {
@@ -261,12 +263,12 @@
 		33CA3A262FB33A3F008EF23C /* Coffee_Call */ = {
 			isa = PBXGroup;
 			children = (
-				33CA3A652FB36C6B008EF23C /* App/GoogleService-Info.plist */,
+				EC5C2209D10A1787EA76F764 /* DesignSystem */,
 				2E9C5C7F8B1E4D0CB37D2C1A /* App */,
 				33CA3A2B2FB33A41008EF23C /* Assets.xcassets */,
 				33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */,
 				33CA3A2D2FB33A41008EF23C /* Preview Content */,
-				EC5C2209D10A1787EA76F764 /* DesignSystem */,
+				8BE4A1B32FB837270064EE09 /* New Folder */,
 				D5039854887953B93268D7A0 /* Coffee_Call.xcdatamodeld */,
 				854F67326A3D7D34D2066BA2 /* Screens */,
 				147D07BDA2FF4DF23D1993AE /* Components */,
@@ -381,14 +383,14 @@
 		EC5C2209D10A1787EA76F764 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
-				3374CEB52FB6E0950020F28D /* AppConstants.swift */,
 				338E3B262FB46EA50048FC32 /* AnimationSystem.swift */,
-				338E3B292FB46EA50048FC32 /* View+Availability.swift */,
+				3374CEB52FB6E0950020F28D /* AppConstants.swift */,
 				338E3B162FB435F40048FC32 /* AppIcons.swift */,
 				338E3B172FB435F40048FC32 /* AppImages.swift */,
 				338E3B182FB435F40048FC32 /* AppStrings.swift */,
-				6E4792D78269808A78FA6024 /* Font+Extensions.swift */,
 				FFABF6FCFF8585103471820C /* Color+Extensions.swift */,
+				6E4792D78269808A78FA6024 /* Font+Extensions.swift */,
+				338E3B292FB46EA50048FC32 /* View+Availability.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -407,6 +409,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8BE4A1B32FB837270064EE09 /* New Folder */,
 			);
 			name = Coffee_Call;
 			packageProductDependencies = (
@@ -510,7 +515,6 @@
 				3374CEE42FB731DB0020F28D /* App in Resources */,
 				33CA3A2F2FB33A41008EF23C /* Preview Assets.xcassets in Resources */,
 				33CA3A2C2FB33A41008EF23C /* Assets.xcassets in Resources */,
-				33CA3A662FB36C6B008EF23C /* App/GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -751,16 +755,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Coffee_Call/Preview Content\"";
-				DEVELOPMENT_TEAM = JVJZXPS8LZ;
+				DEVELOPMENT_TEAM = 5S8HZ77935;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Coffee_Call/App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Coffee Call";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "robins.Coffee-Call";
+				PRODUCT_BUNDLE_IDENTIFIER = "robinz.Coffee-Call";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -776,16 +782,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Coffee_Call/Preview Content\"";
-				DEVELOPMENT_TEAM = JVJZXPS8LZ;
+				DEVELOPMENT_TEAM = 5S8HZ77935;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Coffee_Call/App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Coffee Call";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "robins.Coffee-Call";
+				PRODUCT_BUNDLE_IDENTIFIER = "robinz.Coffee-Call";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -916,7 +924,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
+				minimumVersion = 12.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

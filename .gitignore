@@ -5,11 +5,22 @@ node_modules/
 .DS_Store
 *.xcuserstate
 *.xcuserdata/
+xcuserdata/
+*.xcuserdatad/
 *.moved-aside
 *.swp
 
 # Firebase credentials
 apps/frontend/Config/Firebase/GoogleService-Info.plist
+apps/frontend/Coffee_Call/Coffee_Call/App/GoogleService-Info.plist
+**/GoogleService-Info.plist
+**/serviceAccountKey.json
+**/service-account*.json
+**/.runtimeconfig.json
+**/.env
+**/.env.*
+*.p12
+*.mobileprovision
 
 # Firebase / Node build output
 apps/backend/functions/lib/
