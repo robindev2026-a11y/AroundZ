@@ -6,14 +6,14 @@ class DiscoveryViewModel: ObservableObject {
     @Published var radarPeople: [RadarPerson] = []
     @Published var isScanning: Bool = false
     
-    // Header Strings
-    let title = "Around"
-    let subtitle = "Plans forming nearby"
+    // Header Strings (Using AppStrings)
+    let title = AppStrings.Discovery.title
+    let subtitle = AppStrings.Discovery.subtitleDefault
     
-    // Context Card Strings
-    let contextTitle = "Nearby Drifts are forming"
-    let contextBody = "Join one or create your own."
-    let contextCTA = "See nearby Drifts"
+    // Context Card Strings (Using AppStrings)
+    let contextTitle = AppStrings.Discovery.driftsForming
+    let contextBody = AppStrings.Discovery.driftsFormingSub
+    let contextCTA = AppStrings.Discovery.seeNearbyDrifts
 
     init() {
         loadData()
@@ -22,14 +22,14 @@ class DiscoveryViewModel: ObservableObject {
     func loadData() {
         // Target Interest Categories (4 columns x 2 rows = 8 items)
         self.interestCategories = [
-            InterestCategory(id: "Coffee", label: "Coffee", icon: AppIcons.coffee, count: 3, color: .brandPrimary),
-            InterestCategory(id: "Walks",  label: "Walks",  icon: AppIcons.walk,   count: 4, color: Color(hex: "#4CAF50")),
-            InterestCategory(id: "Movies", label: "Movies", icon: AppIcons.movie,  count: 2, color: .brandPurple),
-            InterestCategory(id: "Food",   label: "Food",   icon: AppIcons.food,   count: 5, color: .brandSecondary),
-            InterestCategory(id: "Music",  label: "Music",  icon: "music.note",    count: 3, color: Color(hex: "#FF4081")),
-            InterestCategory(id: "Gaming", label: "Gaming", icon: AppIcons.games,   count: 2, color: Color(hex: "#FFC107")),
-            InterestCategory(id: "Books",  label: "Books",  icon: "book",          count: 2, color: Color(hex: "#2196F3")),
-            InterestCategory(id: "Workout",label: "Workout",icon: "dumbbell.fill", count: 4, color: .brandPurple)
+            InterestCategory(id: "Coffee", label: AppStrings.Discovery.Categories.coffee, icon: AppIcons.coffee, count: 3, color: .brandPrimary),
+            InterestCategory(id: "Walks",  label: AppStrings.Discovery.Categories.walks,  icon: AppIcons.walk,   count: 4, color: .brandPrimary),
+            InterestCategory(id: "Movies", label: AppStrings.Discovery.Categories.movies, icon: AppIcons.movie,  count: 2, color: .brandPurple),
+            InterestCategory(id: "Food",   label: AppStrings.Discovery.Categories.food,   icon: AppIcons.food,   count: 5, color: .brandSecondary),
+            InterestCategory(id: "Music",  label: AppStrings.Discovery.Categories.music,  icon: "music.note",    count: 3, color: .brandSecondary),
+            InterestCategory(id: "Gaming", label: AppStrings.Discovery.Categories.gaming, icon: AppIcons.games,   count: 2, color: .brandSecondary),
+            InterestCategory(id: "Books",  label: "Books",                                icon: "book",          count: 2, color: .brandPrimary),
+            InterestCategory(id: "Workout",label: "Workout",                               icon: "dumbbell.fill", count: 4, color: .brandPurple)
         ]
         
         // Target Radar People with names and interests

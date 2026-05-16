@@ -248,6 +248,25 @@ struct NotificationIconButton: View {
     }
 }
 
+struct IconCircle: View {
+    let icon: String
+    var size: CGFloat = 56
+    var color: Color = .brandPrimary
+    var iconSize: CGFloat? = nil
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(color.opacity(AppConstants.UI.opacityLight))
+                .frame(width: size, height: size)
+            
+            Image(systemName: icon)
+                .font(.system(size: iconSize ?? (size * 0.4), weight: .bold))
+                .foregroundColor(color)
+        }
+    }
+}
+
 extension View {
     func asCoffeeScreen(config: CoffeeScreenConfiguration) -> some View {
         CoffeeBasePage(config: config) {

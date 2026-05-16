@@ -42,7 +42,7 @@ struct DiscoveryScreen: View {
     }
     
     private var radarBlur: CGFloat {
-        progress * 8
+        progress * AppConstants.Layout.radarBlurFactor
     }
     
     // MARK: - Body
@@ -77,8 +77,8 @@ struct DiscoveryScreen: View {
                         subtitle: AppStrings.Discovery.subtitleDefault,
                         notificationCount: 3
                     )
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
+                    .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    .padding(.top, AppConstants.Layout.headerTopPadding - 6)
                     
                     Spacer()
                 }
@@ -146,40 +146,35 @@ extension DiscoveryScreen {
             // Handle
             
             Capsule()
-                .fill(Color.textSecondary.opacity(0.3))
-                .frame(width: 44, height: 5)
-                .padding(.top, 10)
-                .padding(.bottom, 18)
+                .fill(Color.textSecondary.opacity(AppConstants.UI.opacityMuted))
+                .frame(width: AppConstants.Layout.sheetHandleWidth, height: AppConstants.Layout.sheetHandleHeight)
+                .padding(.top, AppConstants.Layout.sheetHandleTopPadding)
+                .padding(.bottom, AppConstants.Layout.sheetHandleBottomPadding)
             
             // Internal Scroll
             
             ScrollView(showsIndicators: false) {
                 
-                VStack(spacing: 28) {
+                VStack(spacing: AppConstants.Layout.sectionSpacing + 6) {
                     
                     // Drift Card
                     
-                    HStack(spacing: 18) {
+                    HStack(spacing: AppConstants.Layout.elementSpacing + 6) {
                         
-                        ZStack {
-                            
-                            Circle()
-                                .fill(Color.brandPrimary.opacity(0.1))
-                                .frame(width: 62, height: 62)
-                            
-                            Image(systemName: AppIcons.participants)
-                                .font(.system(size: 24))
-                                .foregroundColor(.brandPrimary)
-                        }
+                        IconCircle(
+                            icon: AppIcons.participants,
+                            size: AppConstants.Layout.avatarSizeLarge,
+                            iconSize: AppConstants.Typography.sizeHeadline + 4
+                        )
                         
                         VStack(alignment: .leading, spacing: 2) {
                             
                             Text(AppStrings.Discovery.driftsForming)
-                                .font(.system(size: 16, weight: .black))
+                                .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
                                 .foregroundColor(.textPrimary)
                             
                             Text(AppStrings.Discovery.driftsFormingSub)
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.system(size: AppConstants.Typography.sizeMicro - 2, weight: .bold))
                                 .foregroundColor(.textSecondary)
                         }
                         
@@ -190,11 +185,11 @@ extension DiscoveryScreen {
                         }) {
                             
                             Text(AppStrings.Discovery.seeNearbyDrifts)
-                                .font(.system(size: 12, weight: .black))
+                                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
                                 .foregroundColor(.brandPrimary)
                                 .padding(.horizontal, AppConstants.Layout.buttonPaddingHorizontal)
                                 .padding(.vertical, AppConstants.Layout.buttonPaddingVertical)
-                                .background(Color.brandPrimary.opacity(0.12))
+                                .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                                 .clipShape(Capsule())
                         }
                     }
@@ -231,9 +226,9 @@ extension DiscoveryScreen {
                         }
                     }
                     
-                    Spacer(minLength: 180)
+                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
             }
         }
         .frame(width: geo.size.width, height: geo.size.height)
@@ -298,7 +293,7 @@ extension DiscoveryScreen {
                             .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 0.5))
                         
                         Image(systemName: AppIcons.refresh)
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeTitle - 6, weight: .bold))
                             .foregroundColor(.brandPrimary)
                             .rotationEffect(.degrees(viewModel.isScanning ? 360 : 0))
                             .animation(
@@ -309,7 +304,7 @@ extension DiscoveryScreen {
                             )
                     }
                 }
-                .padding(.trailing, 20)
+                .padding(.trailing, AppConstants.Layout.standardPadding)
                 .padding(.bottom, AppConstants.Layout.refreshButtonBottomPadding)
             }
         }

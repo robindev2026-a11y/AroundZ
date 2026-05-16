@@ -7,35 +7,36 @@ struct InterestCard: View {
     let color: Color
     
     var body: some View {
-        VStack(spacing: 8) {
-            // Icon Well (Circular per spec)
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.12))
-                    .frame(width: 44, height: 44)
-                
-                Image(systemName: icon)
-                    .font(.system(size: 22))
-                    .foregroundColor(color)
-            }
+        VStack(spacing: AppConstants.Layout.subElementSpacing + 2) {
+            
+            // Reusable Icon Circle
+            IconCircle(
+                icon: icon,
+                size: AppConstants.Layout.sheetHandleWidth, // 44pt
+                color: color,
+                iconSize: 22
+            )
             
             VStack(spacing: 1) {
                 Text(title)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: AppConstants.Typography.sizeCaption - 1, weight: .bold))
                     .foregroundColor(.textPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                 
-                Text("\(count) nearby")
-                    .font(.system(size: 9, weight: .bold))
+                Text("\(count) \(AppStrings.Discovery.nearby)")
+                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
                     .foregroundColor(.textSecondary.opacity(0.7))
             }
         }
-        .frame(width: 79, height: 112) // Exact size target from DESIGN.md
+        .frame(
+            width: AppConstants.Layout.interestCardWidth,
+            height: AppConstants.Layout.interestCardHeight
+        )
         .background(Color.surfaceMain)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous)) // 22pt per spec
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.interestCardRadius, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: AppConstants.Layout.interestCardRadius, style: .continuous)
                 .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
         )
         .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)

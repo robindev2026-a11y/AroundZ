@@ -13,6 +13,7 @@ enum AppConstants {
     }
     
     enum Layout {
+        static let radarBlurFactor: CGFloat = 8
         static let standardPadding: CGFloat = 20
         static let headerTopPadding: CGFloat = 16
         static let sectionSpacing: CGFloat = 22
@@ -32,9 +33,15 @@ enum AppConstants {
         static let sheetExpandedOffset: CGFloat = 110
         static let sheetSnapThreshold: CGFloat = 140
         static let sheetRadius: CGFloat = 36
+        static let sheetHandleWidth: CGFloat = 44
+        static let sheetHandleHeight: CGFloat = 5
+        static let sheetHandleTopPadding: CGFloat = 10
+        static let sheetHandleBottomPadding: CGFloat = 18
         
         static let refreshButtonSize: CGFloat = 58
         static let refreshButtonBottomPadding: CGFloat = 120
+        
+        static let avatarSizeLarge: CGFloat = 62
         
         static let buttonPaddingHorizontal: CGFloat = 16
         static let buttonPaddingVertical: CGFloat = 10
@@ -68,6 +75,7 @@ enum AppConstants {
         
         static let opacityOverlay: CGFloat = 0.92
         static let opacityNormal: CGFloat = 0.4
+        static let opacityMuted: CGFloat = 0.3
         static let opacityLight: CGFloat = 0.15
         static let opacitySubtle: CGFloat = 0.05
     }

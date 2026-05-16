@@ -130,6 +130,7 @@ enum AppStrings {
         static let defaultCategory = "Coffee"
         static let createDrift = "Create Drift"
         static let createDriftSubtitle = "Share what you're up for"
+        static let nearby = "nearby"
 
         enum Categories {
             static let coffee = "Coffee"
