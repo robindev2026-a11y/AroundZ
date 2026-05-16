@@ -157,49 +157,45 @@ extension DiscoveryScreen {
                 
                 VStack(spacing: AppConstants.Layout.sectionSpacing + 6) {
                     
-                    // Drift Card
+                    // Drift Card (Compact Pill Redesign)
                     
-                    HStack(spacing: AppConstants.Layout.elementSpacing + 6) {
-                        
-                        IconCircle(
-                            icon: AppIcons.participants,
-                            size: AppConstants.Layout.avatarSizeLarge,
-                            iconSize: AppConstants.Typography.sizeHeadline + 4
+                    Button(action: {
+                        selectedTab = 1
+                    }) {
+                        HStack(spacing: AppConstants.Layout.elementSpacing) {
+                            
+                            IconCircle(
+                                icon: AppIcons.participants,
+                                size: AppConstants.Layout.sheetHandleWidth, // 44pt
+                                iconSize: 18
+                            )
+                            
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(AppStrings.Discovery.driftsForming)
+                                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
+                                    .foregroundColor(.textPrimary)
+                                
+                                Text(AppStrings.Discovery.driftsFormingSub)
+                                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
+                                    .foregroundColor(.textSecondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.brandPrimary.opacity(0.4))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.surfaceMain)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
                         )
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            
-                            Text(AppStrings.Discovery.driftsForming)
-                                .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
-                                .foregroundColor(.textPrimary)
-                            
-                            Text(AppStrings.Discovery.driftsFormingSub)
-                                .font(.system(size: AppConstants.Typography.sizeMicro - 2, weight: .bold))
-                                .foregroundColor(.textSecondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            selectedTab = 1
-                        }) {
-                            
-                            Text(AppStrings.Discovery.seeNearbyDrifts)
-                                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
-                                .foregroundColor(.brandPrimary)
-                                .padding(.horizontal, AppConstants.Layout.buttonPaddingHorizontal)
-                                .padding(.vertical, AppConstants.Layout.buttonPaddingVertical)
-                                .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
-                                .clipShape(Capsule())
-                        }
                     }
-                    .padding(AppConstants.Layout.buttonPaddingHorizontal)
-                    .background(Color.surfaceMain)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
-                            .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
-                    )
+                    .padding(.horizontal, 4) // Tightening the horizontal margin for the pill
                     .onTapGesture {
                         withAnimation { selectedPerson = nil }
                     }
