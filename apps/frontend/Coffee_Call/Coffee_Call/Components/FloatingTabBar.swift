@@ -33,17 +33,17 @@ struct FloatingTabBar: View {
                 }
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 16)
+        .frame(height: 78) // Match DESIGN.md spec
         .background(
             ZStack {
                 // Main Glassmorphic Body
-                Capsule()
+                RoundedRectangle(cornerRadius: 34, style: .continuous)
                     .fill(Color.surfaceMain.opacity(0.1))
                     .background(.ultraThinMaterial)
                 
                 // Frosted Highlight (Top edge light)
-                Capsule()
+                RoundedRectangle(cornerRadius: 34, style: .continuous)
                     .stroke(
                         LinearGradient(
                             colors: [.white.opacity(0.6), .white.opacity(0.1), .clear],
@@ -54,15 +54,15 @@ struct FloatingTabBar: View {
                     )
                 
                 // Outer Border (Subtle depth)
-                Capsule()
+                RoundedRectangle(cornerRadius: 34, style: .continuous)
                     .stroke(Color.appBorder.opacity(0.2), lineWidth: 0.5)
             }
         )
-        .clipShape(Capsule())
+        .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
         // Enhanced shadows for "Floating" glass look
         .shadow(color: Color.textPrimary.opacity(0.05), radius: 10, x: 0, y: 5)
         .shadow(color: Color.textPrimary.opacity(0.03), radius: 20, x: 0, y: 15)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20) // Match DESIGN.md spec (20pt margins)
         .padding(.bottom, 8)
     }
 

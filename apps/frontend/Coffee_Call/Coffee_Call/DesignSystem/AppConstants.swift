@@ -7,9 +7,9 @@ enum AppConstants {
         static let maxDistance: Double = 1.0
         static let ringOpacity: Double = 0.2
         static let ringLineWidth: CGFloat = 0.5
-        static let personAvatarSize: CGFloat = 34.0
-        static let centerAvatarSize: CGFloat = 60.0
-        static let centerGlowSize: CGFloat = 78.0
+        static let personAvatarSize: CGFloat = 46.0 // Match DESIGN.md
+        static let centerAvatarSize: CGFloat = 72.0 // Match DESIGN.md
+        static let centerGlowSize: CGFloat = 84.0
     }
     
     enum Layout {
@@ -19,20 +19,25 @@ enum AppConstants {
         static let elementSpacing: CGFloat = 12
         static let subElementSpacing: CGFloat = 6
         
-        static let interestCardWidth: CGFloat = 92
-        static let interestCardHeight: CGFloat = 104
+        static let interestCardWidth: CGFloat = 79 // Match DESIGN.md
+        static let interestCardHeight: CGFloat = 112 // Match DESIGN.md
         static let createDriftButtonHeight: CGFloat = 56
-        static let interestCardRadius: CGFloat = 20
+        static let interestCardRadius: CGFloat = 22 // Match DESIGN.md
+        
+        static let headerHeight: CGFloat = 82
+        static let headerRadius: CGFloat = 30
+        static let tooltipRadius: CGFloat = 14
+        
         static let floatingTabBarBottomPadding: CGFloat = 20
         static let screenBottomSpacer: CGFloat = 80 // Reduced to match compact UI
     }
 
     enum Typography {
-        static let sizeDisplay: CGFloat = 28
-        static let sizeTitle: CGFloat = 17
-        static let sizeHeadline: CGFloat = 15
-        static let sizeBody: CGFloat = 14
-        static let sizeCaption: CGFloat = 11.5
+        static let sizeDisplay: CGFloat = 32 // H1
+        static let sizeTitle: CGFloat = 24 // H2
+        static let sizeHeadline: CGFloat = 20 // H3
+        static let sizeBody: CGFloat = 16 // Body
+        static let sizeCaption: CGFloat = 12 // Caption
         static let sizeTiny: CGFloat = 10
         static let sizeMicro: CGFloat = 9
     }

@@ -71,6 +71,7 @@
 		7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */; };
 		86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */; };
 		8BE4A1B52FB860B40064EE09 /* DriftContextCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */; };
+		8BE4A1B72FB8ACF50064EE09 /* RadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
 		9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFABF6FCFF8585103471820C /* Color+Extensions.swift */; };
@@ -159,6 +160,7 @@
 		6E4792D78269808A78FA6024 /* Font+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
 		6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiscoveryScreen.swift; sourceTree = "<group>"; };
 		8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftContextCard.swift; sourceTree = "<group>"; };
+		8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarView.swift; sourceTree = "<group>"; };
 		8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneAuthScreen.swift; sourceTree = "<group>"; };
 		968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassmorphicCard.swift; sourceTree = "<group>"; };
 		B860AAD253DC8B95B03AF333 /* MainTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 		147D07BDA2FF4DF23D1993AE /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */,
 				8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */,
 				3374CEDB2FB713430020F28D /* CoffeeHeader.swift */,
 				3374CEBD2FB6E7A50020F28D /* CreateDriftButton.swift */,
@@ -597,6 +600,7 @@
 				3374CED02FB6FDD90020F28D /* ChatsListScreen.swift in Sources */,
 				A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */,
 				3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */,
+				8BE4A1B72FB8ACF50064EE09 /* RadarView.swift in Sources */,
 				43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */,
 				3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */,
 				3374CEC42FB6E7A50020F28D /* DriftModeSwitch.swift in Sources */,

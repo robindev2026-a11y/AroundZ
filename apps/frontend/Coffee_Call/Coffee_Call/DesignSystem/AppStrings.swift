@@ -111,6 +111,10 @@ enum AppStrings {
         static let contextTitle = "People around you are open to plans."
         static let contextSubtitle = "Join a Drift or create your own."
         static let seeNearbyDrifts = "See nearby Drifts"
+        static let driftsForming = "Nearby Drifts are forming"
+        static let driftsFormingSub = "Join one or create your own."
+        static let anonymousSignal = "Someone nearby is open to plans"
+        static let startDrift = "Start Drift"
         
         static let locationLabel = "NEARBY"
         static let searchPlaceholder = "Search moments, vibes, or people..."

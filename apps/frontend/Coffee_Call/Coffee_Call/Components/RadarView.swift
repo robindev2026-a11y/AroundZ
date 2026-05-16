@@ -19,7 +19,7 @@ struct RadarView: View {
             )
             
             // Rings with Distance Labels
-            ForEach([0.3, 0.6, 0.8], id: \.self) { distance in
+            ForEach(AppConstants.Radar.distances, id: \.self) { distance in
                 ZStack {
                     Circle()
                         .stroke(Color.appBorder.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [2, 4]))
@@ -58,14 +58,16 @@ struct RadarView: View {
                 ZStack {
                     Circle()
                         .fill(Color.surfaceMain)
-                        .frame(width: 72, height: 72)
+                        .frame(width: AppConstants.Radar.centerAvatarSize, height: AppConstants.Radar.centerAvatarSize)
                         .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 5)
                     
-                    Image(systemName: "person.fill")
+                    Image(systemName: AppIcons.person)
                         .foregroundColor(.brandPrimary)
                         .font(.system(size: 28))
                 }
-                Text("You").font(.system(size: 11, weight: .bold)).foregroundColor(.textSecondary)
+                Text(AppStrings.Tabs.profile)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.textSecondary)
             }
             
             // Nearby People
@@ -84,7 +86,7 @@ struct RadarView: View {
                         
                         Circle()
                             .fill(Color.white)
-                            .frame(width: 46, height: 46)
+                            .frame(width: AppConstants.Radar.personAvatarSize, height: AppConstants.Radar.personAvatarSize)
                             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                         
                         Text(person.initials)
@@ -103,7 +105,7 @@ struct RadarView: View {
                             ActivityTooltipView(person: person)
                                 .offset(
                                     x: cos(person.angle * .pi / 180) * (person.distance * 180),
-                                    y: sin(person.angle * .pi / 180) * (person.distance * 180) - 60
+                                    y: sin(person.angle * .pi / 180) * (person.distance * 180) - 50
                                 )
                         }
                     }
@@ -118,49 +120,46 @@ struct ActivityTooltipView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: 8) {
+                // Score Placeholder (Future)
+                Text("98")
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundColor(.brandPrimary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(Color.brandPrimary.opacity(0.1))
+                    .clipShape(Capsule())
+                
+                VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 6) {
                         Text(person.interests.joined(separator: " & "))
-                            .font(.system(size: 12, weight: .black))
+                            .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
                             .foregroundColor(.textPrimary)
                         
                         HStack(spacing: 4) {
                             ForEach(person.interests, id: \.self) { interest in
                                 Image(systemName: getIcon(for: interest))
-                                    .font(.system(size: 10))
+                                    .font(.system(size: 9))
                                     .foregroundColor(.brandPrimary)
                             }
                         }
                     }
-                    
-                    Text("Someone nearby is open to plans")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundColor(.textSecondary)
-                }
-                
-                Button(action: {
-                    // Logic handled by screen
-                }) {
-                    Text("Start Drift")
-                        .font(.system(size: 10, weight: .black))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.brandPrimary)
-                        .clipShape(Capsule())
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
             .background(Color.surfaceMain)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.tooltipRadius, style: .continuous))
+            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.Layout.tooltipRadius, style: .continuous)
+                    .stroke(Color.appBorder.opacity(0.2), lineWidth: 0.5)
+            )
             
             // Triangle pointer
             Image(systemName: "triangle.fill")
                 .resizable()
-                .frame(width: 12, height: 6)
+                .frame(width: 10, height: 5)
                 .foregroundColor(.surfaceMain)
                 .rotationEffect(.degrees(180))
                 .offset(y: -1)
@@ -169,15 +168,16 @@ struct ActivityTooltipView: View {
     
     func getIcon(for interest: String) -> String {
         switch interest {
-        case "Coffee": return "cup.and.saucer.fill"
-        case "Walks": return "figure.walk"
-        case "Food": return "fork.knife"
-        case "Movies": return "film.fill"
-        default: return "star.fill"
+        case "Coffee": return AppIcons.coffeeFill
+        case "Walks": return AppIcons.walk
+        case "Food": return AppIcons.food
+        case "Movies": return AppIcons.movie
+        default: return AppIcons.sparkles
         }
     }
 }
 
+// MARK: - Interactive Preview
 #Preview("Radar View") {
     PreviewWrapper()
 }

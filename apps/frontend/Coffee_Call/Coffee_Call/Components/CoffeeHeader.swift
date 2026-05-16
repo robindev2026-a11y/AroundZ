@@ -37,10 +37,11 @@ struct CoffeeBasePage<Content: View>: View {
             VStack(spacing: 0) {
                 CoffeeHeader(
                     title: config.title,
-                    subtitle: config.subtitle,
-                    showNotificationIndicator: config.showNotificationIndicator,
-                    trailingActions: config.trailingActions
+                    subtitle: config.subtitle ?? "",
+                    notificationCount: config.showNotificationIndicator ? 3 : 0
                 )
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.top, 10)
                 
                 if let pinned = config.pinnedHeader {
                     pinned
@@ -56,46 +57,62 @@ struct CoffeeBasePage<Content: View>: View {
     }
 }
 
-// MARK: - Coffee Header
+// MARK: - Social Refresh Main Header
 struct CoffeeHeader: View {
     let title: String
-    var subtitle: String? = nil
-    var showNotificationIndicator: Bool = false
-    var trailingActions: AnyView? = nil
+    let subtitle: String
+    var notificationCount: Int = 0
+    var onNotificationTap: () -> Void = {}
     
     var body: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
                     .foregroundColor(.textPrimary)
                 
-                if let subtitle = subtitle {
-                    Text(subtitle)
-                        .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .medium))
-                        .foregroundColor(.textSecondary)
-                }
+                Text(subtitle)
+                    .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .bold)) // 14pt
+                    .foregroundColor(.textSecondary)
             }
             
             Spacer()
             
-            if let actions = trailingActions {
-                actions
-            } else {
-                NotificationIconButton(showIndicator: showNotificationIndicator)
+            // Notification Button
+            Button(action: onNotificationTap) {
+                ZStack {
+                    Circle()
+                        .fill(Color.surfaceMain)
+                        .frame(width: 56, height: 56)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+                        )
+                    
+                    Image(systemName: AppIcons.bell)
+                        .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
+                        .foregroundColor(.textPrimary)
+                    
+                    if notificationCount > 0 {
+                        Circle()
+                            .fill(Color.brandPrimary)
+                            .frame(width: 18, height: 18)
+                            .overlay(
+                                Text("\(notificationCount)")
+                                    .font(.system(size: 9, weight: .black))
+                                    .foregroundColor(.white)
+                            )
+                            .offset(x: 12, y: -12)
+                    }
+                }
             }
         }
-        .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .padding(.top, AppConstants.Layout.headerTopPadding)
-        .padding(.bottom, 16)
-        .background {
-            Rectangle()
+        .padding(.horizontal, 20)
+        .frame(height: AppConstants.Layout.headerHeight)
+        .background(
+            RoundedRectangle(cornerRadius: AppConstants.Layout.headerRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .ignoresSafeArea(edges: .top)
-        }
-        .overlay(
-            Divider().opacity(0.1),
-            alignment: .bottom
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
         )
     }
 }
@@ -119,8 +136,10 @@ struct SubPageHeader<Trailing: View>: View {
             }
         }
         .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .frame(height: 44) // Native detail header height
+        .frame(height: 56)
         .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge, style: .continuous))
+        .padding(.horizontal, 20)
     }
 }
 
@@ -131,34 +150,20 @@ extension SubPageHeader where Trailing == EmptyView {
 }
 
 // MARK: - Subcomponents
-struct NotificationIconButton: View {
-    var showIndicator: Bool = false
-    var action: () -> Void = {}
+struct CoffeeBackButton: View {
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        Button(action: action) {
-            Image(systemName: AppIcons.bell)
-                .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
-                .foregroundColor(.brandPurple)
-                .frame(width: 48, height: 48)
-                .background(.thinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                        .stroke(Color.white.opacity(0.4), lineWidth: 1)
-                )
-                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
-                .overlay(alignment: .topTrailing) {
-                    if showIndicator {
-                        Circle()
-                            .fill(Color.brandPrimary)
-                            .frame(width: 9, height: 9)
-                            .overlay(Circle().stroke(Color.backgroundMain, lineWidth: 2))
-                            .offset(x: -4, y: 4)
-                    }
-                }
+        Button(action: { dismiss() }) {
+            Image(systemName: AppIcons.back)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.textPrimary)
+                .frame(width: 44, height: 44)
+                .background(Circle().fill(Color.surfaceMain))
+                .overlay(Circle().stroke(Color.appBorder.opacity(0.3), lineWidth: 1))
+                .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
         }
-        .pressScale(0.90)
+        .pressScale(0.9)
     }
 }
 
@@ -172,12 +177,12 @@ struct SubHeaderButton: View {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(color)
-                .frame(width: 40, height: 40)
+                .frame(width: 44, height: 44)
                 .background(Color.surfaceMain)
-                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall)
-                        .stroke(Color.appBorder, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
+                        .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
                 )
         }
         .pressScale(0.9)
@@ -192,33 +197,52 @@ struct CoffeeHeaderButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: AppConstants.Typography.sizeHeadline - 1, weight: .semibold))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundColor(color)
-                .frame(width: 48, height: 48)
-                .background(.thinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
+                .frame(width: 56, height: 56)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
+                    Circle()
                         .stroke(Color.white.opacity(0.4), lineWidth: 1)
                 )
-                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
         }
-        .pressScale(0.90)
+        .pressScale(0.9)
     }
 }
 
-struct CoffeeBackButton: View {
-    @Environment(\.dismiss) var dismiss
+struct NotificationIconButton: View {
+    var showIndicator: Bool = false
+    var action: () -> Void = {}
     
     var body: some View {
-        Button(action: { dismiss() }) {
-            Image(systemName: AppIcons.back)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(.textPrimary)
-                .frame(width: 40, height: 40)
-                .background(Circle().fill(Color.surfaceMain))
-                .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
-                .shadow(color: Color.textPrimary.opacity(0.04), radius: 8, x: 0, y: 2)
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(Color.surfaceMain)
+                    .frame(width: 56, height: 56)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+                    )
+                
+                Image(systemName: AppIcons.bell)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.textPrimary)
+                
+                if showIndicator {
+                    Circle()
+                        .fill(Color.brandPrimary)
+                        .frame(width: 18, height: 18)
+                        .overlay(
+                            Text("3") // Mocked badge count
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundColor(.white)
+                        )
+                        .offset(x: 12, y: -12)
+                }
+            }
         }
         .pressScale(0.9)
     }
