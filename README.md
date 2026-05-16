@@ -1,43 +1,40 @@
 # CoffeeCall
 
-CoffeeCall is an activity-based meetup app.
+CoffeeCall is an activity-based meetup app for nearby spontaneous plans.
 
-## Current Stack
+## Active Documentation
 
-- iOS frontend: SwiftUI
-- Backend: Firebase
-- Notifications: Firebase Cloud Messaging
-- Storage: Firebase Storage
+Use only the active docs in `docs/current/`:
+
+- `docs/current/CONTEXT.md`
+- `docs/current/PLAN.md`
+- `docs/current/ARCHITECTURE.md`
+- `docs/current/DESIGN.md`
+- `docs/current/STATUS.md`
+
+Agent starter files:
+
+- `AGENTS.md`
+- `CODEX.md`
+- `CLAUDE.md`
+- `ANTIGRAVITY.md`
+
+Historical markdown has been archived under `docs/archive/2026-05-16-md-reset/` and is not current guidance.
+
+## Stack
+
+- iOS frontend: SwiftUI.
+- Backend: Firebase Auth, Firestore, Cloud Messaging, Storage, and Functions.
 
 ## Repo Layout
 
-- `apps/frontend/` - SwiftUI iOS app
-- `apps/backend/` - Firebase Functions and rules
-- `Design/` - active Figma-derived design tokens and component direction
-- `Planning/context.md` - latest AI/session handoff log
-- `Planning/spec.md` - active product scope
-- `Planning/architecture.md` - active system design
-- `Planning/decisions.md` - active architecture and UX decisions
+```text
+apps/frontend/      SwiftUI iOS app
+apps/backend/       Firebase backend
+docs/current/       Active project documentation
+docs/archive/       Historical documentation
+```
 
-## Archived Planning Docs
+## Working Rule
 
-Older planning and design brief files are kept only for reference. Do not use them as implementation truth.
-
-- `Planning/CoffeeCall_Final_Figma_Brief.md`
-- `Planning/CoffeeCall_MVP_Component_Specs.md`
-- `Planning/CoffeeCall_MVP_Design_Brief.md`
-- `Planning/CoffeeCall_MVP_Screen_Content.md`
-- `Planning/FIGMA_AI_README.md`
-- `Design/Design UX/` legacy folder
-
-## Design Source
-
-- Current Figma export/prototype: `/Users/development/Downloads/figmaCoffe`
-- Active tokens: `Design/design-tokens.md`
-- Do not use older blue/coral or placeholder design docs for implementation
-
-## Setup Notes
-
-- Add the real `GoogleService-Info.plist` to `apps/frontend/Config/Firebase/`
-- Run `pod install` inside `apps/frontend/` after Firebase project details are ready
-- Run Firebase CLI from repo root with the root `firebase.json`
+Before changing UI or product behavior, read the active docs and ignore archive files unless the user explicitly asks for historical context.

@@ -4,45 +4,40 @@ struct InterestCard: View {
     let title: String
     let icon: String
     let count: Int
-    let isSelected: Bool
-    let action: () -> Void
+    let color: Color
     
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                // Reduced icon well
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .light))
-                    .foregroundColor(isSelected ? .white : accentColor)
-                    .frame(width: 38, height: 38)
+        VStack(spacing: 8) {
+            // Icon Well (Circular per spec)
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.12))
+                    .frame(width: 44, height: 44)
                 
-                VStack(spacing: 1) {
-                    Text(title)
-                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
-                        .foregroundColor(isSelected ? .white : .textPrimary)
-                    
-                    Text("\(count) nearby")
-                        .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
-                        .foregroundColor(isSelected ? .white.opacity(0.8) : .textSecondary.opacity(0.6))
-                }
+                Image(systemName: icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(color)
             }
-            .frame(width: AppConstants.Layout.interestCardWidth, height: AppConstants.Layout.interestCardHeight)
-            .background(isSelected ? Color.brandPrimary : Color.surfaceMain)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.Layout.interestCardRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.Layout.interestCardRadius, style: .continuous)
-                    .stroke(isSelected ? Color.clear : Color.appBorder.opacity(0.5), lineWidth: 1)
-            )
+            
+            VStack(spacing: 1) {
+                Text(title)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                
+                Text("\(count) nearby")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundColor(.textSecondary.opacity(0.7))
+            }
         }
-        .pressScale(0.95)
-    }
-    
-    private var accentColor: Color {
-        switch title.lowercased() {
-        case "coffee", "walks": return .brandPrimary
-        case "movies", "music": return .brandPurple
-        case "food": return .brandSecondary
-        default: return .brandPrimary
-        }
+        .frame(width: 79, height: 112) // Exact size target from DESIGN.md
+        .background(Color.surfaceMain)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous)) // 22pt per spec
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
+        )
+        .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
     }
 }

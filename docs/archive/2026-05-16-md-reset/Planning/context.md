@@ -1,4 +1,13 @@
-## CoffeeCall Session Log
+## 2026-05-16: Around (Discovery) Social Refresh Update
+- **Discovery Screen Polish**: Refactored `DiscoveryScreen` to align with the high-fidelity Social Refresh design.
+- **DriftContextCard**: Extracted and refined the context summary into a dedicated component with glassmorphic strokes and high-contrast actions.
+- **Radar Refinement**: Updated `RadarView` with softer atmospheric gradients, thinner rings, and a high-fidelity "YOU" avatar with pulsing scan effects.
+- **InterestCard Update**: Standardized vertical interest cards with uppercase typography, heavy weights, and multi-layered glassmorphic backgrounds.
+- **Project Governance**: Unlocked `DiscoveryScreen.swift` and `DiscoveryViewModel.swift` in `AGENTS.md` for this planned update.
+- **Files Updated**: `DiscoveryScreen.swift`, `RadarView.swift`, `InterestCard.swift`, `DriftContextCard.swift` (NEW), `AGENTS.md`.
+- **Status**: Around screen fully synchronized with Social Refresh visual language.
+
+---
 
 ## 2026-05-15: Privacy & Glassmorphism Finalization
 - **Privacy Lock**: Implemented a locked/blurred state for the 'Who's coming' section in `DriftDetailScreen`, revealing participants only after joining.

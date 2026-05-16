@@ -1,66 +1,29 @@
 # CoffeeCall Backend
 
-Firebase Cloud Functions + Firestore for serverless backend.
+Status: ACTIVE
+Last updated: 2026-05-16
 
-## Setup
+CoffeeCall uses Firebase for the MVP backend.
 
-**Platform:** Firebase (Cloud Functions, Firestore, Cloud Messaging, Storage)
-**Runtime:** Node.js 18+
+## Active Docs
 
-## Build & Deploy
+Use:
 
-```bash
-cd apps/backend/functions
-npm install
-npm run build
-cd ../../..
-firebase deploy --only functions
-```
+- `../../docs/current/CONTEXT.md`
+- `../../docs/current/PLAN.md`
+- `../../docs/current/ARCHITECTURE.md`
+- `../../docs/current/STATUS.md`
 
-## Local Testing
+Historical backend prompts and earlier planning notes are archived under `../../docs/archive/2026-05-16-md-reset/` and are not implementation guidance unless the user explicitly asks.
 
-```bash
-cd apps/backend/functions
-npm test
-cd ../../..
-firebase emulators:start
-```
+## Backend Scope
 
-## Implementation
+- Firebase Authentication for phone signup.
+- Firestore for users, posts/Drifts, acceptances, and messages.
+- Firebase Storage for profile photos.
+- Firebase Cloud Messaging for nearby Drift notifications.
+- Cloud Functions for notification and acceptance side effects.
 
-Current phase is coding and verification. Treat older prompt-generation docs as historical unless the user explicitly asks to regenerate backend code from prompts.
+## Working Rule
 
-### Reference Files
-- Architecture: `/Planning/architecture.md`
-- Specification: `/Planning/spec.md`
-- Rules and endpoints are documented in `/Planning/spec.md` and `/Planning/architecture.md`
-
-## Project Structure
-
-```
-backend/
-├── functions/
-│   ├── src/
-│   │   ├── triggers/         # Cloud Function triggers
-│   │   ├── handlers/         # Business logic
-│   │   ├── services/         # Firebase, geohashing
-│   │   ├── models/           # Data models
-│   │   └── index.ts          # Entry point
-│   ├── package.json
-│   └── tsconfig.json
-├── firestore.rules           # Firestore security rules
-├── firestore.indexes.json    # Firestore indexes
-└── firebase.json
-```
-
-## Key Functions
-
-- `POST /createPost` — Post creation + geohashing + notification
-- `POST /acceptPost` — Acceptance + thread creation + notification
-- `POST /sendMessage` — Message persistence
-- `GET /getNearbyPosts` — Geohashing query
-- `GET /getPosterDashboard` — Acceptances list
-
----
-
-**Status:** Implementation in progress
+Before backend changes, confirm behavior against `docs/current/ARCHITECTURE.md` and update `docs/current/STATUS.md` after meaningful work.

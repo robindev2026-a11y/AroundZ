@@ -1,91 +1,49 @@
-# CoffeeCall: AI Execution Context
+# CoffeeCall Claude Starter
 
-**Current phase:** Coding and verification
-**Last updated:** 2026-05-13
+Status: ACTIVE
+Last updated: 2026-05-16
 
-This file is for AI tools that need project context. It supersedes the older planning-only workflow.
+This is the standalone starter for Claude.
 
----
+## Required Reading
 
-## Current Workflow
+Before changing files, read:
 
-1. Read `Planning/context.md` for the latest session state.
-2. Read `AGENTS.md` for active working rules.
-3. For product behavior, use `Planning/spec.md`, `Planning/architecture.md`, and `Planning/decisions.md`.
-4. For visual implementation, use `Design/design-tokens.md`, `Design/design-system.md`, `Design/screens.md`, and `Design/component-specs.md`.
-5. For Figma parity, compare against `/Users/development/Downloads/figmaCoffe`.
-6. Make scoped code/doc changes only for the user-requested task.
-7. Log meaningful changes in `Planning/context.md`.
+1. `AGENTS.md`
+2. `docs/current/CONTEXT.md`
+3. `docs/current/STATUS.md`
+4. `docs/current/DESIGN.md` for UI work
+5. `docs/current/PLAN.md` for product scope
+6. `docs/current/ARCHITECTURE.md` for architecture
 
----
+Archive files are not current instructions. Use `docs/archive/` only for history when the user explicitly asks.
 
-## Active Design Direction
+## Claude Working Rules
 
-CoffeeCall follows the Figma Social Refresh direction:
+- Treat `docs/current/` as the only active documentation set.
+- Keep implementation and documentation changes scoped.
+- Do not merge archived or older instructions into current work.
+- If a screen spec conflicts with implementation, report the mismatch before rewriting broadly.
+- Update `docs/current/STATUS.md` after meaningful work.
 
-- Warm neutral app background.
-- Mint primary actions.
-- Lavender and peach accents.
-- Slate text.
-- Layered cards.
-- Full-bleed photographic onboarding where Figma uses background images.
-- Native iOS default system typography, not rounded fonts.
+## Product Guardrails
 
-Active tokens:
-- Primary mint: `#53B8A6`
-- Pressed mint: `#3D8D7A`
-- Lavender: `#8E7DBE`
-- Peach: `#E88C6B`
-- Background: `#F6F1EB`
-- Card surface: `#FFFDF9`
-- Secondary surface: `#F4F4F8`
-- Text primary: `#243447`
-- Text secondary: `#5F6368`
-- Border: `#E7DED4`
+- CoffeeCall is not a dating app or person directory.
+- Discovery converts ambient interest into Drifts.
+- Messaging is Drift-tied.
+- Posts remain active for group meetups.
+- No phone exchange, reputation, reviews, followers, or cold outreach in MVP.
 
-Do not use the older blue/coral MVP palette.
+## Design Guardrails
 
----
+Use the Social Refresh system in `docs/current/DESIGN.md`.
 
-## Product Summary
+The approved Around design is:
 
-CoffeeCall is an activity-based meetup app. Users post activities, nearby people join, and participants coordinate through in-app messages.
+- Floating glass header with `Around` and `Plans forming nearby`.
+- Radar with anonymous ambient initials and `You` at center.
+- Drift context card with `Nearby Drifts are forming`.
+- Two-row interests grid.
+- Floating glass tab bar with center Create sheet action.
 
-Core constraints:
-- Not a dating app.
-- Async messaging only.
-- Posts stay active after acceptance.
-- Group meetups are allowed.
-- No phone number exchange in MVP.
-- No reputation/scoring/friend system in MVP.
-- Firebase backend, SwiftUI iOS frontend.
-
----
-
-## Important Files
-
-| File | Use |
-|---|---|
-| `AGENTS.md` | Active AI working rules |
-| `Planning/context.md` | Latest session log |
-| `Planning/spec.md` | Product requirements |
-| `Planning/architecture.md` | System architecture |
-| `Planning/decisions.md` | Decision records |
-| `docs/Planning/build-guidelines.md` | Xcode/Firebase gotchas |
-| `Design/design-tokens.md` | Active visual tokens |
-| `Design/design-system.md` | Current design philosophy |
-| `Design/screens.md` | Screen direction |
-| `Design/component-specs.md` | Component direction |
-| `apps/frontend/Coffee_Call/DESIGN_CONTEXT.md` | Frontend design context |
-
----
-
-## Notes For Implementation
-
-- Code changes are allowed in this phase.
-- Keep scope tight.
-- Use semantic design tokens from Swift files.
-- Do not hardcode old design values.
-- Do not use old prompt-generation docs as current instructions.
-- Avoid nested navigation stacks unless required.
-- For onboarding `TabView`, keep full-screen backgrounds behind the pager, not applied to the pager itself.
+Do not follow historical design files unless explicitly asked.
