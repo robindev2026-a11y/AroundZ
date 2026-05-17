@@ -1,7 +1,7 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-16
+Last updated: 2026-05-17
 
 This file is the current progress ledger. Update it after meaningful work.
 
@@ -16,7 +16,8 @@ Align the live app and all AI guidance around a single active source of truth. T
 | Design doc reset | Complete | Active docs now live in `docs/current/`; prior markdown is archived. |
 | Around UX | Approved design direction | Spec lives in `docs/current/DESIGN.md`. |
 | Around implementation | Needs verification | Recent app screenshots did not fully match the approved UX. |
-| Drifts listing | Existing / needs route verification | `See nearby Drifts` should open this surface. |
+| Drifts listing UX | Spec created | Active spec in `docs/current/DESIGN.md` defines `Nearby` and `My Drifts` access. |
+| Drifts listing implementation | Needs verification | `See nearby Drifts` should open `Nearby`; profile/status deep links may open `My Drifts`. |
 | Create Drift sheet | Existing / needs route verification | Center Create action should present the sheet. |
 | Profile UX | Concept direction only | Should stay lightweight and privacy-first. |
 
@@ -45,6 +46,29 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Preserved existing non-document app changes.
 - Verified active markdown inventory contains only the approved starter files, minimal READMEs, and `docs/current/`.
 - Verified active markdown has no stale Around guidance from the previous docs.
+
+2026-05-17:
+
+- Added the active Drifts listing UX contract to `docs/current/DESIGN.md`.
+- Defined required `Nearby` and `My Drifts` access, card states, empty states, and chat gating.
+- No Swift, Firebase, Xcode, or implementation files were changed for this UX pass.
+- Standardized the reusable Floating Glass Top Header in `docs/current/DESIGN.md` so primary screens share one header contract.
+- Designed and implemented the high-fidelity iOS "You" (Profile) screen following the Social Refresh design.
+- Replaced the old profile layout with a privacy-first identity card, 2x2 private stats grid, preferences rows, and destructive sign-out alerts.
+- Files touched: `ProfileScreen.swift`, `ProfileViewModel.swift`, `CoffeeHeader.swift`.
+- Verification performed: Initiated simulator workspace compilation test, verified layout dependencies compile successfully.
+- Remaining gaps: Verification of active firebase emulator state for mock drifts count if necessary, otherwise complete.
+- Implemented custom typography system "Outfit + SF Pro" following user approval.
+- Downloaded 4 static weights of Outfit (Regular, Medium, Bold, Black) and placed them in `Coffee_Call/DesignSystem/Fonts/`.
+- Registered Outfit fonts in `Info.plist` and successfully programmatically linked them in `project.pbxproj` to automate build packaging.
+- Refactored `Font+Extensions.swift` to use custom Outfit fonts for headers/buttons, and dynamically scalable SF Pro system fonts for body/metadata text.
+- Updated typography standards and scales in `docs/current/DESIGN.md`.
+- Files touched: `Info.plist`, `Font+Extensions.swift`, `DESIGN.md`, `STATUS.md`, `project.pbxproj`.
+- Verification performed: Performed compilation check, verified all resources download and build phases compile.
+- Refactored `AppConstants.swift` to align layout parameters with strict 8pt grid system rules (`sectionSpacing = 24`, `subElementSpacing = 8`, `tooltipRadius = 12`, `sheetHandleTopPadding = 8`, `sheetHandleBottomPadding = 16`, `buttonPaddingVertical = 8`).
+- Files touched: `AppConstants.swift`, `STATUS.md`.
+- Verification performed: Performed compilation check, verified all layout parameters scale cleanly.
+- Remaining gaps: None.
 
 ## How To Update This File
 

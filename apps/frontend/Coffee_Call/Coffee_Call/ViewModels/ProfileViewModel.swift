@@ -4,15 +4,16 @@ import Combine
 class ProfileViewModel: ObservableObject, CoffeeScreenConfiguration {
     // CoffeeScreenConfiguration Conformance
     var title: String { AppStrings.Profile.title }
-    var subtitle: String? { AppStrings.Profile.subtitle }
+    var subtitle: String? { "Your profile" }
     var trailingActions: AnyView? {
         AnyView(
-            HStack(spacing: 12) {
-                NotificationIconButton()
-                CoffeeHeaderButton(icon: AppIcons.settings, action: {})
-            }
+            CoffeeHeaderButton(icon: AppIcons.settings, action: { [weak self] in
+                self?.showingSettingsSheet = true
+            })
         )
     }
+    
+    @Published var showingSettingsSheet = false
     
     @Published var name: String = AppConstants.MockData.userName
     @Published var bio: String = AppConstants.MockData.userBio

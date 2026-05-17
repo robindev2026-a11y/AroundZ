@@ -57,5 +57,12 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Outfit-Regular.ttf</string>
+		<string>Outfit-Medium.ttf</string>
+		<string>Outfit-Bold.ttf</string>
+		<string>Outfit-Black.ttf</string>
+	</array>
 </dict>
 </plist>

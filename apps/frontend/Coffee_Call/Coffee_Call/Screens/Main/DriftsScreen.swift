@@ -52,3 +52,7 @@ struct DriftsScreen: View {
         }
     }
 }
+
+#Preview {
+    DriftsScreen()
+}

@@ -58,6 +58,7 @@ Before UI implementation, search active docs for conflicts and state the active 
 - Use native iOS default typography.
 - Keep glassmorphic top and bottom navigation where specified.
 - Around must use the approved radar, Drift context card, interests grid, and floating bottom nav.
+- CORE UX CHANGES: If a request involves a core UX change, ALWAYS ask the user for confirmation first, and update the relevant markdown file (e.g., `DESIGN.md`) ASAP.
 
 ## Engineering Rules
 

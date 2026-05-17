@@ -2,6 +2,22 @@ import Foundation
 import CoreGraphics
 
 enum AppConstants {
+    // MARK: - Private 8-Point Grid Scales (Single Source of Truth)
+    private enum Grid {
+        static let step4: CGFloat = 4
+        static let step8: CGFloat = 8
+        static let step12: CGFloat = 12
+        static let step16: CGFloat = 16
+        static let step20: CGFloat = 20
+        static let step24: CGFloat = 24
+        static let step30: CGFloat = 30
+        static let step36: CGFloat = 36
+        static let step44: CGFloat = 44
+        static let step56: CGFloat = 56
+        static let step80: CGFloat = 80
+        static let step120: CGFloat = 120
+    }
+    
     enum Radar {
         static let distances: [Double] = [0.15, 0.35, 0.55, 0.75, 0.95]
         static let maxDistance: Double = 1.0
@@ -12,52 +28,61 @@ enum AppConstants {
         static let centerGlowSize: CGFloat = 84.0
     }
     
+    // MARK: - Specific Surface Naming (Mapped to Core Grid Scales)
     enum Layout {
-        static let radarBlurFactor: CGFloat = 8
-        static let standardPadding: CGFloat = 20
-        static let headerTopPadding: CGFloat = 16
-        static let sectionSpacing: CGFloat = 22
-        static let elementSpacing: CGFloat = 12
-        static let subElementSpacing: CGFloat = 6
+        static let radarBlurFactor: CGFloat = Grid.step8
         
+        // Screen padding & edge margins
+        static let standardPadding: CGFloat = Grid.step20
+        static let headerTopPadding: CGFloat = Grid.step8
+        static let floatingTabBarBottomPadding: CGFloat = Grid.step20
+        static let screenBottomSpacer: CGFloat = Grid.step80
+        
+        // Spacing & layout gaps
+        static let sectionSpacing: CGFloat = Grid.step24
+        static let elementSpacing: CGFloat = Grid.step12
+        static let subElementSpacing: CGFloat = Grid.step8
+        
+        // Buttons, inputs & touch targets
+        static let minTouchTarget: CGFloat = Grid.step44
+        static let createDriftButtonHeight: CGFloat = Grid.step56
+        static let refreshButtonSize: CGFloat = 58 // Custom action bounds
+        static let refreshButtonBottomPadding: CGFloat = Grid.step120
+        
+        // Cards & containers
         static let interestCardWidth: CGFloat = 79 // Match DESIGN.md
         static let interestCardHeight: CGFloat = 112 // Match DESIGN.md
-        static let createDriftButtonHeight: CGFloat = 56
         static let interestCardRadius: CGFloat = 22 // Match DESIGN.md
-        
         static let headerHeight: CGFloat = 82
-        static let headerRadius: CGFloat = 30
-        static let tooltipRadius: CGFloat = 14
+        static let headerRadius: CGFloat = Grid.step30
+        static let tooltipRadius: CGFloat = Grid.step12
         
+        // Presentation sheets
         static let sheetCollapsedOffset: CGFloat = 420
         static let sheetExpandedOffset: CGFloat = 110
         static let sheetSnapThreshold: CGFloat = 140
-        static let sheetRadius: CGFloat = 36
-        static let sheetHandleWidth: CGFloat = 44
+        static let sheetRadius: CGFloat = Grid.step36
+        static let sheetHandleWidth: CGFloat = Grid.step44
         static let sheetHandleHeight: CGFloat = 5
-        static let sheetHandleTopPadding: CGFloat = 10
-        static let sheetHandleBottomPadding: CGFloat = 18
+        static let sheetHandleTopPadding: CGFloat = Grid.step8
+        static let sheetHandleBottomPadding: CGFloat = Grid.step16
         
-        static let refreshButtonSize: CGFloat = 58
-        static let refreshButtonBottomPadding: CGFloat = 120
-        
+        // Avatar asset scales
         static let avatarSizeLarge: CGFloat = 62
         
-        static let buttonPaddingHorizontal: CGFloat = 16
-        static let buttonPaddingVertical: CGFloat = 10
-        
-        static let floatingTabBarBottomPadding: CGFloat = 20
-        static let screenBottomSpacer: CGFloat = 80 // Reduced to match compact UI
+        // Action margins
+        static let buttonPaddingHorizontal: CGFloat = Grid.step16
+        static let buttonPaddingVertical: CGFloat = Grid.step8
     }
 
     enum Typography {
-        static let sizeDisplay: CGFloat = 32 // H1
-        static let sizeTitle: CGFloat = 24 // H2
-        static let sizeHeadline: CGFloat = 20 // H3
-        static let sizeBody: CGFloat = 16 // Body
+        static let sizeDisplay: CGFloat = 28 // H1 (Header Titles)
+        static let sizeTitle: CGFloat = 20 // H2 (Sub-sections)
+        static let sizeHeadline: CGFloat = 17 // H3 (Card Titles)
+        static let sizeBody: CGFloat = 15 // Body (Standard lists)
         static let sizeCaption: CGFloat = 12 // Caption
-        static let sizeTiny: CGFloat = 10
-        static let sizeMicro: CGFloat = 9
+        static let sizeTiny: CGFloat = 10 // Detail Tags
+        static let sizeMicro: CGFloat = 9 // Micro tags
     }
     
     enum Animation {

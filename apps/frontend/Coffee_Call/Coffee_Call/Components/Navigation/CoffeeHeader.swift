@@ -1,7 +1,13 @@
 import SwiftUI
 
 // MARK: - Protocol Oriented Design
+enum CoffeeScreenType {
+    case main
+    case sub
+}
+
 protocol CoffeeScreenConfiguration {
+    var screenType: CoffeeScreenType { get }
     var title: String { get }
     var subtitle: String? { get }
     var trailingActions: AnyView? { get }
@@ -10,6 +16,7 @@ protocol CoffeeScreenConfiguration {
 }
 
 extension CoffeeScreenConfiguration {
+    var screenType: CoffeeScreenType { .main }
     var subtitle: String? { nil }
     var trailingActions: AnyView? { nil }
     var showNotificationIndicator: Bool { false }
@@ -35,13 +42,22 @@ struct CoffeeBasePage<Content: View>: View {
             .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                CoffeeHeader(
-                    title: config.title,
-                    subtitle: config.subtitle ?? "",
-                    notificationCount: config.showNotificationIndicator ? 3 : 0
-                )
-                .padding(.horizontal, AppConstants.Layout.standardPadding)
-                .padding(.top, 10)
+                switch config.screenType {
+                case .main:
+                    CoffeeHeader(
+                        title: config.title,
+                        subtitle: config.subtitle ?? "",
+                        notificationCount: config.showNotificationIndicator ? 3 : 0,
+                        customRightButton: config.trailingActions
+                    )
+                case .sub:
+                    SubPageHeader {
+                        // Add any trailing actions if needed
+                        if let actions = config.trailingActions {
+                            actions
+                        }
+                    }
+                }
                 
                 if let pinned = config.pinnedHeader {
                     pinned
@@ -63,6 +79,7 @@ struct CoffeeHeader: View {
     let subtitle: String
     var notificationCount: Int = 0
     var onNotificationTap: () -> Void = {}
+    var customRightButton: AnyView? = nil
     
     var body: some View {
         HStack(alignment: .center) {
@@ -78,31 +95,35 @@ struct CoffeeHeader: View {
             
             Spacer()
             
-            // Notification Button
-            Button(action: onNotificationTap) {
-                ZStack {
-                    Circle()
-                        .fill(Color.surfaceMain)
-                        .frame(width: 56, height: 56)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
-                        )
-                    
-                    Image(systemName: AppIcons.bell)
-                        .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
-                        .foregroundColor(.textPrimary)
-                    
-                    if notificationCount > 0 {
+            if let customRightButton = customRightButton {
+                customRightButton
+            } else {
+                // Notification Button
+                Button(action: onNotificationTap) {
+                    ZStack {
                         Circle()
-                            .fill(Color.brandPrimary)
-                            .frame(width: 18, height: 18)
+                            .fill(Color.surfaceMain)
+                            .frame(width: 56, height: 56)
                             .overlay(
-                                Text("\(notificationCount)")
-                                    .font(.system(size: 9, weight: .black))
-                                    .foregroundColor(.white)
+                                Circle()
+                                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
                             )
-                            .offset(x: 12, y: -12)
+                        
+                        Image(systemName: AppIcons.bell)
+                            .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
+                            .foregroundColor(.textPrimary)
+                        
+                        if notificationCount > 0 {
+                            Circle()
+                                .fill(Color.brandPrimary)
+                                .frame(width: 18, height: 18)
+                                .overlay(
+                                    Text("\(notificationCount)")
+                                        .font(.system(size: 9, weight: .black))
+                                        .foregroundColor(.white)
+                                )
+                                .offset(x: 12, y: -12)
+                        }
                     }
                 }
             }
