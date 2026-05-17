@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		23BCC639374942C9BC39CC46 /* CoffeeBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E213C34B9FB24C87833EE88A /* CoffeeBottomSheet.swift */; };
 		08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */; };
 		116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */; };
 		19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */; };
@@ -178,6 +179,7 @@
 		F3D02189DC5247BDA9CFD1A8 /* Outfit-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file.ttf; name = "Outfit-Black.ttf"; path = "Fonts/Outfit-Black.ttf"; sourceTree = "<group>"; };
 		F79EEFE313C630B04AED288E /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		FFABF6FCFF8585103471820C /* Color+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		E213C34B9FB24C87833EE88A /* CoffeeBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoffeeBottomSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -361,6 +363,7 @@
 		8B0E67F52FB9CDFD0052E3AA /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				E213C34B9FB24C87833EE88A /* CoffeeBottomSheet.swift */,
 				8B0E67F32FB9CDFD0052E3AA /* CoffeeHeader.swift */,
 				8B0E67F42FB9CDFD0052E3AA /* FloatingTabBar.swift */,
 			);
@@ -572,6 +575,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				23BCC639374942C9BC39CC46 /* CoffeeBottomSheet.swift in Sources */,
 				3374CEC82FB6F86A0020F28D /* ManageDriftScreen.swift in Sources */,
 				3374CEC62FB6E7CA0020F28D /* DriftDetailViewModel.swift in Sources */,
 				3374CEB42FB6E0630020F28D /* DriftsScreen.swift in Sources */,

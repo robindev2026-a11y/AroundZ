@@ -68,6 +68,14 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Refactored `AppConstants.swift` to align layout parameters with strict 8pt grid system rules (`sectionSpacing = 24`, `subElementSpacing = 8`, `tooltipRadius = 12`, `sheetHandleTopPadding = 8`, `sheetHandleBottomPadding = 16`, `buttonPaddingVertical = 8`).
 - Files touched: `AppConstants.swift`, `STATUS.md`.
 - Verification performed: Performed compilation check, verified all layout parameters scale cleanly.
+- Refactored `CoffeeHeader.swift` to introduce `isFloating` dual-mode, safe area clearance notch margins, and a premium top safe-area glassmorphic blur backing with bottom divider edge overlays.
+- Simplified `DiscoveryScreen.swift` by stripping manual layout, safe area, and `zIndex` wrappers into a single pristine CoffeeHeader call.
+- Refactored inline bottom sheet inside `DiscoveryScreen.swift` into a highly generic, reusable, and type-safe `CoffeeBottomSheet.swift` component under `Components/Navigation/`.
+- Encapsulated all `DragGesture` calculations, spring snapping physics, and intermediate offsets inside `CoffeeBottomSheet.swift`.
+- Purged all legacy visual literals and raw system font size declarations from bottom sheet scrolling views, replacing them with dynamic scaling `Font` tokens (`.bodySmall`, `.captionText`, `.metadata`) and `AppIcons.chevronRight`.
+- Programmatically deleted duplicate file instances on disk and purged old entries from `project.pbxproj` to resolve duplicate compile phase warnings.
+- Files touched: `CoffeeHeader.swift`, `DiscoveryScreen.swift`, `CoffeeBottomSheet.swift`, `project.pbxproj`, `STATUS.md`.
+- Verification performed: Executed compilation test checks and verified clean build output.
 - Remaining gaps: None.
 
 ## How To Update This File

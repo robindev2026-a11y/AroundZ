@@ -141,8 +141,22 @@ struct CoffeeHeader: View {
         .padding(.top, AppConstants.Layout.headerTopPadding - 6)   // Safe area clearance
         
         if isFloating {
-            VStack {
-                card
+            VStack(spacing: 0) {
+                ZStack(alignment: .top) {
+                    // Top Safe Area Glassmorphic Blur Backing Strip
+                    Color.clear
+                        .background(.ultraThinMaterial)
+                        .ignoresSafeArea(edges: .top)
+                        .frame(height: 142) // Covers status bar (47pt-59pt) + card padding + card height (82pt)
+                        .overlay(
+                            VStack {
+                                Spacer()
+                                Divider().opacity(0.15) // Subtle premium native bottom border
+                            }
+                        )
+                    
+                    card
+                }
                 Spacer()
             }
             .zIndex(20) // Built-in layering

@@ -86,8 +86,82 @@ struct DiscoveryScreen: View {
                 
                 // MARK: Bottom Sheet
                 
-                bottomSheet(geo: geo)
-                    .zIndex(15)
+                CoffeeBottomSheet(sheetOffset: $sheetOffset, dragOffset: $dragOffset, geo: geo) {
+                    ScrollView(showsIndicators: false) {
+                        
+                        VStack(spacing: AppConstants.Layout.sectionSpacing + 6) {
+                            
+                            // Drift Card (Compact Pill Redesign)
+                            
+                            Button(action: {
+                                selectedTab = 1
+                            }) {
+                                HStack(spacing: AppConstants.Layout.elementSpacing) {
+                                    
+                                    IconCircle(
+                                        icon: AppIcons.participants,
+                                        size: AppConstants.Layout.sheetHandleWidth, // 44pt
+                                        iconSize: 18
+                                    )
+                                    
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        Text(AppStrings.Discovery.driftsForming)
+                                            .font(.captionText)
+                                            .foregroundColor(.textPrimary)
+                                        
+                                        Text(AppStrings.Discovery.driftsFormingSub)
+                                            .font(.metadata)
+                                            .foregroundColor(.textSecondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: AppIcons.chevronRight)
+                                        .font(.bodySmall)
+                                        .foregroundColor(.brandPrimary.opacity(0.4))
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.surfaceMain)
+                                .clipShape(Capsule())
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
+                                )
+                            }
+                            .padding(.horizontal, 4) // Tightening the horizontal margin for the pill
+                            .onTapGesture {
+                                withAnimation { selectedPerson = nil }
+                            }
+                            
+                            // Interests
+                            
+                            VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
+                                
+                                Text(AppStrings.Discovery.interestsNearby)
+                                    .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
+                                    .foregroundColor(.textPrimary)
+                                
+                                LazyVGrid(columns: columns, spacing: AppConstants.Layout.elementSpacing + 2) {
+                                    
+                                    ForEach(viewModel.interestCategories) { category in
+                                        
+                                        InterestCard(
+                                            title: category.label,
+                                            icon: category.icon,
+                                            count: category.count,
+                                            color: category.color ?? .brandPrimary
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100)
+                        }
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    }
+                }
+                .zIndex(15)
             }
         }
     }
@@ -129,136 +203,7 @@ extension DiscoveryScreen {
     }
 }
 
-// MARK: - Bottom Sheet
 
-extension DiscoveryScreen {
-    
-    @ViewBuilder
-    private func bottomSheet(geo: GeometryProxy) -> some View {
-        
-        VStack(spacing: 0) {
-            
-            // Handle
-            
-            Capsule()
-                .fill(Color.textSecondary.opacity(AppConstants.UI.opacityMuted))
-                .frame(width: AppConstants.Layout.sheetHandleWidth, height: AppConstants.Layout.sheetHandleHeight)
-                .padding(.top, AppConstants.Layout.sheetHandleTopPadding)
-                .padding(.bottom, AppConstants.Layout.sheetHandleBottomPadding)
-            
-            // Internal Scroll
-            
-            ScrollView(showsIndicators: false) {
-                
-                VStack(spacing: AppConstants.Layout.sectionSpacing + 6) {
-                    
-                    // Drift Card (Compact Pill Redesign)
-                    
-                    Button(action: {
-                        selectedTab = 1
-                    }) {
-                        HStack(spacing: AppConstants.Layout.elementSpacing) {
-                            
-                            IconCircle(
-                                icon: AppIcons.participants,
-                                size: AppConstants.Layout.sheetHandleWidth, // 44pt
-                                iconSize: 18
-                            )
-                            
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text(AppStrings.Discovery.driftsForming)
-                                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
-                                    .foregroundColor(.textPrimary)
-                                
-                                Text(AppStrings.Discovery.driftsFormingSub)
-                                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
-                                    .foregroundColor(.textSecondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.brandPrimary.opacity(0.4))
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.surfaceMain)
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.appBorder.opacity(0.3), lineWidth: 0.5)
-                        )
-                    }
-                    .padding(.horizontal, 4) // Tightening the horizontal margin for the pill
-                    .onTapGesture {
-                        withAnimation { selectedPerson = nil }
-                    }
-                    
-                    // Interests
-                    
-                    VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
-                        
-                        Text(AppStrings.Discovery.interestsNearby)
-                            .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
-                            .foregroundColor(.textPrimary)
-                        
-                        LazyVGrid(columns: columns, spacing: AppConstants.Layout.elementSpacing + 2) {
-                            
-                            ForEach(viewModel.interestCategories) { category in
-                                
-                                InterestCard(
-                                    title: category.label,
-                                    icon: category.icon,
-                                    count: category.count,
-                                    color: category.color ?? .brandPrimary
-                                )
-                            }
-                        }
-                    }
-                    
-                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100)
-                }
-                .padding(.horizontal, AppConstants.Layout.standardPadding)
-            }
-        }
-        .frame(width: geo.size.width, height: geo.size.height)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.sheetRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: -8)
-        )
-        .offset(y: currentSheetOffset)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 5)
-                .onChanged { value in
-                    // Only allow dragging the sheet up/down if we're not scrolling the content
-                    // (Simple heuristic: if the drag is mainly vertical and we're at the top of scroll)
-                    dragOffset = value.translation.height
-                }
-                .onEnded { value in
-                    let translation = value.translation.height
-                    let velocity = value.predictedEndTranslation.height - translation
-                    
-                    withAnimation(.spring(response: 0.38, dampingFraction: 0.85)) {
-                        if translation < -AppConstants.Layout.sheetSnapThreshold || velocity < -100 {
-                            sheetOffset = AppConstants.Layout.sheetExpandedOffset
-                        } else if translation > AppConstants.Layout.sheetSnapThreshold || velocity > 100 {
-                            sheetOffset = AppConstants.Layout.sheetCollapsedOffset
-                        } else {
-                            if currentSheetOffset < (AppConstants.Layout.sheetCollapsedOffset + AppConstants.Layout.sheetExpandedOffset) / 2 {
-                                sheetOffset = AppConstants.Layout.sheetExpandedOffset
-                            } else {
-                                sheetOffset = AppConstants.Layout.sheetCollapsedOffset
-                            }
-                        }
-                        dragOffset = 0
-                    }
-                }
-        )
-        .ignoresSafeArea(edges: .bottom)
-    }
-}
 
 // MARK: - Refresh Button
 
