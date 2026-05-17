@@ -48,7 +48,8 @@ struct CoffeeBasePage<Content: View>: View {
                         title: config.title,
                         subtitle: config.subtitle ?? "",
                         notificationCount: config.showNotificationIndicator ? 3 : 0,
-                        customRightButton: config.trailingActions
+                        customRightButton: config.trailingActions,
+                        isFloating: false
                     )
                 case .sub:
                     SubPageHeader {
@@ -80,9 +81,10 @@ struct CoffeeHeader: View {
     var notificationCount: Int = 0
     var onNotificationTap: () -> Void = {}
     var customRightButton: AnyView? = nil
+    var isFloating: Bool = true // Default is true for plug-and-play overlay mode
     
     var body: some View {
-        HStack(alignment: .center) {
+        let card = HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
@@ -133,8 +135,20 @@ struct CoffeeHeader: View {
         .background(
             RoundedRectangle(cornerRadius: AppConstants.Layout.headerRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
         )
+        .padding(.horizontal, AppConstants.Layout.standardPadding) // Screen horizontal margins
+        .padding(.top, AppConstants.Layout.headerTopPadding - 6)   // Safe area clearance
+        
+        if isFloating {
+            VStack {
+                card
+                Spacer()
+            }
+            .zIndex(20) // Built-in layering
+        } else {
+            card
+        }
     }
 }
 

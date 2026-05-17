@@ -71,18 +71,11 @@ struct DiscoveryScreen: View {
                 
                 // MARK: Header
                 
-                VStack {
-                    CoffeeHeader(
-                        title: AppStrings.Discovery.title,
-                        subtitle: AppStrings.Discovery.subtitleDefault,
-                        notificationCount: 3
-                    )
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    .padding(.top, AppConstants.Layout.headerTopPadding - 6)
-                    
-                    Spacer()
-                }
-                .zIndex(20)
+                CoffeeHeader(
+                    title: AppStrings.Discovery.title,
+                    subtitle: AppStrings.Discovery.subtitleDefault,
+                    notificationCount: 3
+                )
                 
                 // MARK: Refresh Button
                 
