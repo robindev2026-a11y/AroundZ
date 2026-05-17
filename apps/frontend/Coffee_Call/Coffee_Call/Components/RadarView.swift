@@ -163,7 +163,6 @@ struct RadarView: View {
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height)
-            .drawingGroup()
             .onAppear {
                 if particles.isEmpty {
                     generateParticles()

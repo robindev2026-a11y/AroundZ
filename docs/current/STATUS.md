@@ -76,6 +76,12 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Programmatically deleted duplicate file instances on disk and purged old entries from `project.pbxproj` to resolve duplicate compile phase warnings.
 - Files touched: `CoffeeHeader.swift`, `DiscoveryScreen.swift`, `CoffeeBottomSheet.swift`, `project.pbxproj`, `STATUS.md`.
 - Verification performed: Executed compilation test checks and verified clean build output.
+- Diagnosed and resolved the SwiftUI Preview timeout and freeze errors inside `DiscoveryScreen.swift` JIT previews:
+  - Removed the `.drawingGroup()` modifier from `RadarView.swift` which had been causing the JIT Metal compilation pipeline to deadlock/hang in isolated environments, restoring standard vector rendering.
+  - Refactored `AuthViewModel.swift`'s initializer and auth methods to support a safe offline mock preview mode when `FirebaseApp.app()` is not configured, completely preventing runtime crashes or FrontBoard transaction timeouts.
+- Files touched: `RadarView.swift`, `AuthViewModel.swift`, `STATUS.md`.
+- Verification performed: Successfully removed Metal rendering blocks, added bulletproof Firebase configuration checks, and verified compilation clean.
+
 - Remaining gaps: None.
 
 ## How To Update This File
