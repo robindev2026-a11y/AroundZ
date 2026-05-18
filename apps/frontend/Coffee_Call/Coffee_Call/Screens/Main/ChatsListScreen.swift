@@ -33,20 +33,22 @@ struct ChatsListScreen: View {
                     }
                 }
             }
-            .asCoffeeMainPage(
+            .asCoffeePage(
+                .main,
                 title: viewModel.title,
-                subtitle: viewModel.subtitle ?? AppStrings.Chat.subtitle
-            ) {
-                // Shared Floating Glass Header Right Action: View Toggle Button
-                CoffeeHeaderButton(
-                    icon: viewMode == .bubbles ? "list.bullet" : "bubble.left.and.bubble.right",
-                    iconSize: 18
-                ) {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
-                        viewMode = (viewMode == .bubbles) ? .list : .bubbles
+                subtitle: viewModel.subtitle ?? AppStrings.Chat.subtitle,
+                rightView: {
+                    // Shared Floating Glass Header Right Action: View Toggle Button
+                    CoffeeHeaderButton(
+                        icon: viewMode == .bubbles ? "list.bullet" : "bubble.left.and.bubble.right",
+                        iconSize: 18
+                    ) {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                            viewMode = (viewMode == .bubbles) ? .list : .bubbles
+                        }
                     }
                 }
-            }
+            )
             .navigationDestination(for: Drift.self) { drift in
                 DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
             }

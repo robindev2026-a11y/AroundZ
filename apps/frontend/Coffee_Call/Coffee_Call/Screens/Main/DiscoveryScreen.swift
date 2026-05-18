@@ -49,19 +49,16 @@ struct DiscoveryScreen: View {
     
     var body: some View {
         GeometryReader { geo in
-            
             ZStack {
-                
-                // MARK: Background
-                
-                Color.backgroundMain
+                // MARK: Background Tap dismiss
+                Color.clear
+                    .contentShape(Rectangle())
                     .ignoresSafeArea()
                     .onTapGesture {
                         withAnimation(.spring()) { selectedPerson = nil }
                     }
                 
                 // MARK: Radar World
-                
                 radarLayer
                     .scaleEffect(radarScale)
                     .opacity(radarOpacity)
@@ -69,35 +66,21 @@ struct DiscoveryScreen: View {
                     .animation(.easeInOut(duration: 0.25), value: progress)
                     .zIndex(1)
                 
-                // MARK: Header
-                
-                CoffeeHeader(
-                    title: AppStrings.Discovery.title,
-                    subtitle: AppStrings.Discovery.subtitleDefault,
-                    notificationCount: 3
-                )
-                
                 // MARK: Refresh Button
-                
                 refreshButton
                     .opacity(progress < 0.55 ? 1 : 0)
                     .animation(.easeInOut(duration: 0.2), value: progress)
                     .zIndex(20)
                 
                 // MARK: Bottom Sheet
-                
                 CoffeeBottomSheet(sheetOffset: $sheetOffset, dragOffset: $dragOffset, geo: geo) {
                     ScrollView(showsIndicators: false) {
-                        
                         VStack(spacing: AppConstants.Layout.sectionSpacing + 6) {
-                            
                             // Drift Card (Compact Pill Redesign)
-                            
                             Button(action: {
                                 selectedTab = 1
                             }) {
                                 HStack(spacing: AppConstants.Layout.elementSpacing) {
-                                    
                                     IconCircle(
                                         icon: AppIcons.participants,
                                         size: AppConstants.Layout.sheetHandleWidth, // 44pt
@@ -135,17 +118,13 @@ struct DiscoveryScreen: View {
                             }
                             
                             // Interests
-                            
                             VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
-                                
                                 Text(AppStrings.Discovery.interestsNearby)
                                     .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
                                     .foregroundColor(.textPrimary)
                                 
                                 LazyVGrid(columns: columns, spacing: AppConstants.Layout.elementSpacing + 2) {
-                                    
                                     ForEach(viewModel.interestCategories) { category in
-                                        
                                         InterestCard(
                                             title: category.label,
                                             icon: category.icon,
@@ -164,6 +143,18 @@ struct DiscoveryScreen: View {
                 .zIndex(15)
             }
         }
+        .asCoffeePage(
+            .main,
+            title: AppStrings.Discovery.title,
+            subtitle: AppStrings.Discovery.subtitleDefault,
+            topPadding: 0,
+            scrollable: false,
+            rightView: {
+                NotificationIconButton(count: 3) {
+                    // Tap notification
+                }
+            }
+        )
     }
 }
 

@@ -8,14 +8,7 @@ struct DriftChatScreen: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // 1. Custom Capsule Navigation Header
-            customHeader
-                .padding(.horizontal, AppConstants.Layout.standardPadding)
-                .padding(.top, 8)
-                .padding(.bottom, 6)
-                .background(Color.backgroundMain)
-            
-            // 2. Custom Sub-Banner Context Row
+            // 1. Custom Sub-Banner Context Row
             subBanner
                 .padding(.horizontal, AppConstants.Layout.standardPadding)
                 .padding(.bottom, 10)
@@ -62,8 +55,6 @@ struct DriftChatScreen: View {
             .background(Color.surfaceMain)
             .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 10, x: 0, y: -5)
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarHidden(true)
         .sheet(isPresented: $showInfoSheet) {
             if #available(iOS 16.4, *) {
                 DriftChatDetailSheet(drift: viewModel.drift)
@@ -82,27 +73,17 @@ struct DriftChatScreen: View {
         .onDisappear {
             navManager.isTabBarHidden = false
         }
-    }
-    
-    // Custom Navigation Capsule Header utilizing Design System components
-    private var customHeader: some View {
-        CoffeeChatHeader(
-            categoryIcon: viewModel.drift.category.icon,
-            categoryColor: viewModel.drift.category.color,
+        .asCoffeePage(
+            .sub,
             title: viewModel.drift.title,
             subtitle: "\(viewModel.drift.time.replacingOccurrences(of: " • ", with: " ")) • \(AppStrings.Chat.locationUnlocked)",
-            trailing: {
-                Button(action: { showInfoSheet = true }) {
-                    Image(systemName: AppIcons.infoCircle)
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .background(Color.surfaceMain)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.appBorder.opacity(0.3), lineWidth: 1))
-                        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+            categoryIcon: viewModel.drift.category.icon,
+            categoryColor: viewModel.drift.category.color,
+            scrollable: false,
+            rightView: {
+                CoffeeHeaderButton(icon: AppIcons.infoCircle, color: .textPrimary) {
+                    showInfoSheet = true
                 }
-                .pressScale(0.9)
             }
         )
     }
@@ -352,23 +333,8 @@ struct DriftChatDetailSheet: View {
     @State private var showBlockAlert = false
     @State private var selectedUserToBlock = ""
     
-    struct ParticipantInfo: Identifiable {
-        let id = UUID()
-        let initials: String
-        let name: String
-        let color: Color
-        let isHost: Bool
-        let isMe: Bool
-    }
-    
     var participants: [ParticipantInfo] {
-        [
-            ParticipantInfo(initials: "M", name: "Mira", color: .brandPrimary, isHost: true, isMe: false),
-            ParticipantInfo(initials: "R", name: "Rahul", color: .brandPurple, isHost: false, isMe: false),
-            ParticipantInfo(initials: "A", name: "Aditi", color: .brandSecondary, isHost: false, isMe: false),
-            ParticipantInfo(initials: "N", name: "Neel", color: .blue, isHost: false, isMe: false),
-            ParticipantInfo(initials: "Y", name: "You", color: .brandPrimary, isHost: false, isMe: true)
-        ]
+        AppConstants.MockData.chatParticipants
     }
     
     var body: some View {

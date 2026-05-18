@@ -119,3 +119,12 @@ struct JoinRequest: Identifiable, Hashable {
     let message: String
     let timestamp: String
 }
+
+struct ParticipantInfo: Identifiable, Hashable {
+    let id = UUID()
+    let initials: String
+    let name: String
+    let color: Color
+    let isHost: Bool
+    let isMe: Bool
+}

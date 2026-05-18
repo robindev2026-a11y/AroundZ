@@ -180,6 +180,19 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Files touched: `AnimationSystem.swift`, `AppColors.swift`, `AppConstants.swift`, `AppStrings.swift`, `ProfileScreen.swift`, `STATUS.md`.
 - Verification performed: Successfully built the entire application using headless `xcodebuild` check targeting the iOS Simulator SDK. Confirming 0 errors, 0 warnings, and complete compilation success.
 
+2026-05-18:
+
+- Implemented Premium Sideways Subtitle Cycler & Dynamic Layout Truncation Detector:
+  - Developed custom spring-driven sideways cross-fading `CrossFadingText` component that replicates WhatsApp status ticker transitions (incoming text slides from right `.trailing`, outgoing slides to left `.leading`).
+  - Developed a bulletproof SwiftUI dynamic text truncation detector `TruncatableSubtitleView` using nested off-screen geometry measurements. It automatically compares unconstrained natural text width (`.fixedSize`) against actual container bounds.
+  - Dynamically triggers the horizontal text cycle *only* if the text actually truncates on the device viewport (safely rendering standard static typography on iPads and large screens, and cycling seamlessly on smaller viewports/iPhone SE).
+  - Simplified and fully decoupled `CoffeeSubHeader` capsule and standard subtitle codeblocks, removing duplicate nested splitter code and making the implementation 100% DRY.
+  - Updated the learning vault by writing [SwiftUI Cross-Fading Text Cycler.md](file:///Users/developer/Documents/Projects/ObsidianVault/Software%20Engineering/SwiftUI/SwiftUI%20Cross-Fading%20Text%20Cycler.md) to preserve implementation memories.
+  - Successfully staged and committed all modified files to git history per user's explicit request (`commit all`).
+- Files touched: `CoffeeHeader.swift`, `STATUS.md`, `SwiftUI Cross-Fading Text Cycler.md`.
+- Verification performed: Headless Xcode compiler validation successfully built target simulator bundle with absolute zero errors and warnings (**BUILD SUCCEEDED**).
+- Remaining gaps: None.
+
 ## How To Update This File
 
 When an agent changes the project, add a short entry with:

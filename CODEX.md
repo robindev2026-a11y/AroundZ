@@ -15,6 +15,7 @@ Before changing files, read:
 4. `docs/current/DESIGN.md` for UI work
 5. `docs/current/PLAN.md` for product scope
 6. `docs/current/ARCHITECTURE.md` for architecture
+7. `Obsidian Vault` at `/Users/developer/Documents/Projects/ObsidianVault/` for established design systems, styling guidelines, and composition standards. (Always read and contribute new notes here!)
 
 Never use `docs/archive/` as current guidance unless the user explicitly asks.
 

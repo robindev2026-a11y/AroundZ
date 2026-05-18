@@ -36,12 +36,15 @@ struct DriftsScreen: View {
                 // Section: Later today
                 driftSection(title: AppStrings.Drifts.laterToday, drifts: viewModel.filteredDrifts.filter { $0.status == .tonight })
             }
-            .asCoffeeMainPage(
+            .asCoffeePage(
+                .main,
                 title: viewModel.title,
-                subtitle: viewModel.subtitle ?? "", rightView: {
-                CoffeeHeaderButton(icon: AppIcons.search) {}
-                CoffeeHeaderButton(icon: AppIcons.filter) {}
-            })
+                subtitle: viewModel.subtitle ?? "",
+                rightView: {
+                    CoffeeHeaderButton(icon: AppIcons.search) {}
+                    CoffeeHeaderButton(icon: AppIcons.filter) {}
+                }
+            )
             .navigationDestination(for: Drift.self) { drift in
                 if viewModel.selectedMode == .mine {
                     ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))

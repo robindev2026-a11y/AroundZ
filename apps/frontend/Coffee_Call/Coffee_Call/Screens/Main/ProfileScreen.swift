@@ -38,14 +38,16 @@ struct ProfileScreen: View {
                 accountSection
             }
             .padding(.horizontal, AppConstants.Layout.standardPadding)
-            .asCoffeeMainPage(
+            .asCoffeePage(
+                .main,
                 title: viewModel.title,
-                subtitle: viewModel.subtitle ?? ""
-            ) {
-                CoffeeHeaderButton(icon: AppIcons.settings) {
-                    viewModel.showingSettingsSheet = true
+                subtitle: viewModel.subtitle ?? "",
+                rightView: {
+                    CoffeeHeaderButton(icon: AppIcons.settings) {
+                        viewModel.showingSettingsSheet = true
+                    }
                 }
-            }
+            )
             .sheet(isPresented: $showingEditProfile) {
                 EditProfileScreen(viewModel: viewModel)
             }

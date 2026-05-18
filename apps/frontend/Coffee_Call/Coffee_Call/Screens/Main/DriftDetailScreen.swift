@@ -6,52 +6,54 @@ struct DriftDetailScreen: View {
     @StateObject private var navManager = NavigationManager.shared
     
     var body: some View {
-        VStack(spacing: 0) {
-            SubPageHeader {
-                SubHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
-                SubHeaderButton(icon: AppIcons.bookmark) { viewModel.saveDrift() }
-                SubHeaderButton(icon: "bell.badge.fill", color: .brandPrimary) { viewModel.setReminder() }
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            heroSection
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.top, 20) // Pushed up under the VStack header
             
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    heroSection
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.top, 20) // Pushed up under the VStack header
-                    
-                    // Summary Info Grid
-                    summaryInfoGrid
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.top, AppConstants.Layout.sectionSpacing)
-                    
-                    VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
-                        // About Section
-                        aboutSection
-                        
-                        // Hosted By Section
-                        hostSection
-                        
-                        // Who's Coming Section
-                        participantsSection
-                        
-                        // Details List Section
-                        detailsListSection
-                        
-                        // Safety Banner
-                        safetyBanner
-                    }
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    .padding(.top, AppConstants.Layout.sectionSpacing + 4)
-                    
-                    Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 60)
+            // Summary Info Grid
+            summaryInfoGrid
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.top, AppConstants.Layout.sectionSpacing)
+            
+            VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
+                // About Section
+                aboutSection
+                
+                // Hosted By Section
+                hostSection
+                
+                // Who's Coming Section
+                participantsSection
+                
+                // Details List Section
+                detailsListSection
+                
+                // Safety Banner
+                safetyBanner
+            }
+            .padding(.horizontal, AppConstants.Layout.standardPadding)
+            .padding(.top, AppConstants.Layout.sectionSpacing + 4)
+            
+            Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100) // Padding for overlay sticky CTA
+        }
+        .asCoffeePage(
+            .sub,
+            title: viewModel.drift.title,
+            subtitle: viewModel.drift.category.rawValue.capitalized,
+            categoryIcon: viewModel.drift.category.icon,
+            categoryColor: viewModel.drift.category.color,
+            rightView: {
+                HStack(spacing: 8) {
+                    CoffeeHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
+                    CoffeeHeaderButton(icon: AppIcons.bookmark) { viewModel.saveDrift() }
+                    CoffeeHeaderButton(icon: "bell.badge.fill", color: .brandPrimary) { viewModel.setReminder() }
                 }
             }
-            
-            // Sticky CTA Footer is still managed locally if needed, 
-            // but we can also put it in the VStack if it shd be fixed
+        )
+        .overlay(alignment: .bottom) {
             stickyCTAFooter
         }
-        .background(Color.backgroundMain.ignoresSafeArea())
         .navigationBarHidden(true)
         .onAppear {
             navManager.isTabBarHidden = true
@@ -67,18 +69,6 @@ struct DriftDetailScreen: View {
         HStack(alignment: .top, spacing: 20) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 8) {
-                    // Category Badge
-                    HStack(spacing: 4) {
-                        Image(systemName: viewModel.drift.category.icon)
-                        Text(viewModel.drift.category.rawValue.capitalized)
-                    }
-                    .font(.system(size: AppConstants.Typography.sizeMicro + 2, weight: .bold))
-                    .foregroundColor(.brandPrimary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
-                    .cornerRadius(20)
-                    
                     // Status Badge
                     HStack(spacing: 4) {
                         Circle().fill(viewModel.drift.status.color).frame(width: 6, height: 6)
@@ -91,11 +81,6 @@ struct DriftDetailScreen: View {
                     .background(viewModel.drift.status.color.opacity(AppConstants.UI.opacityLight))
                     .cornerRadius(20)
                 }
-                
-                Text(viewModel.drift.title)
-                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
-                    .foregroundColor(.textPrimary)
-                    .lineLimit(2)
                 
                 Text(viewModel.drift.description.split(separator: ".").first ?? "")
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))

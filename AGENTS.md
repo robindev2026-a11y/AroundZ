@@ -81,11 +81,21 @@ Before UI implementation, search active docs for conflicts and state the active 
 8. **Preserve Backward Compatibility**: Retain legacy layout wrappers (like `CoffeeHeaderButton`) temporarily during migrations to avoid breaking the rest of the application.
 9. **Align with Design Language**: SwiftUI views must feel premium, modern, social, soft, layered, and human-centered.
 10. **Lightweight Composable Wrappers**: Custom page structures must be lightweight, modular lego blocks, not rigid protocol-bound configuration systems.
+11. **Refactor the Core, Never Create Exceptions**: Never create ad-hoc layouts (such as manual scroll wrappers or local sub-page headers) to solve a single layout variation. If a root component or unified modifier (e.g., `.asCoffeePage`) lacks a needed parameter (such as non-scrollable behavior or zero safe area padding), refactor the core modifier itself rather than writing a file-specific layout exception. Keep the application 100% DRY.
+12. **Pure Stateless Zero-Exception Architecture**: Ensure all main views and drill-down subviews adhere strictly to the central styling modifiers without legacy typealiases or custom wrappers. The core modifiers must be robust enough to handle all page layouts natively.
 
 * **Final Rule**: Build SwiftUI like Lego blocks — small, composable, type-safe components — not like a locked configuration system.
+
+## Centralized Learning & Skills Vault
+
+To prevent repository clutter while maintaining deep architectural, styling, and engineering memory:
+* **The Vault Location**: `/Users/developer/Documents/Projects/ObsidianVault/`
+* **Your Action**: Before making any UI, typography, or architectural changes, read the markdown notes inside this Obsidian vault (specifically under `Software Engineering/SwiftUI/` and `Software Engineering/Apple HIG/`).
+* **Your Contribution**: Whenever you discover a new reusable pattern, design principle, or coding standard during development, **always write or update a corresponding markdown note inside the Obsidian vault** with proper categories and frontmatter tags (e.g., `#swiftui`, `#architecture`).
 
 ## Verification
 
 - For UI work, provide screenshot/build verification when practical.
 - For doc work, run markdown inventory and stale-guidance searches.
 - If a task cannot be verified, state the gap clearly.
+

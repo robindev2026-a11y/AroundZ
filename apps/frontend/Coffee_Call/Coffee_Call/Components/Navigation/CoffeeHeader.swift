@@ -6,13 +6,16 @@ struct CoffeeBasePage<Header: View, Content: View>: View {
     private let topPadding: CGFloat
     private let header: Header
     private let content: Content
+    private let scrollable: Bool
 
     init(
         topPadding: CGFloat = 156,
+        scrollable: Bool = true,
         @ViewBuilder header: () -> Header,
         @ViewBuilder content: () -> Content
     ) {
         self.topPadding = topPadding
+        self.scrollable = scrollable
         self.header = header()
         self.content = content()
     }
@@ -21,12 +24,17 @@ struct CoffeeBasePage<Header: View, Content: View>: View {
         ZStack(alignment: .top) {
             Color.backgroundMain.ignoresSafeArea()
 
-            ScrollView(showsIndicators: false) {
+            if scrollable {
+                ScrollView(showsIndicators: false) {
+                    content
+                        .padding(.top, topPadding)
+                        .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
+                }
+                .ignoresSafeArea()
+            } else {
                 content
                     .padding(.top, topPadding)
-                    .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
             }
-            .ignoresSafeArea()
 
             header
         }
@@ -133,13 +141,22 @@ extension CoffeeHeader where RightView == NotificationIconButton {
 
 struct CoffeeSubHeader<Trailing: View>: View {
     let title: String?
+    let subtitle: String?
+    let categoryIcon: String?
+    let categoryColor: Color?
     let trailing: Trailing
 
     init(
         title: String? = nil,
+        subtitle: String? = nil,
+        categoryIcon: String? = nil,
+        categoryColor: Color? = nil,
         @ViewBuilder trailing: () -> Trailing = { EmptyView() }
     ) {
         self.title = title
+        self.subtitle = subtitle
+        self.categoryIcon = categoryIcon
+        self.categoryColor = categoryColor
         self.trailing = trailing()
     }
 
@@ -165,11 +182,71 @@ struct CoffeeSubHeader<Trailing: View>: View {
             HStack(spacing: 12) {
                 CoffeeBackButton()
 
-                if let title {
-                    Text(title)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.textPrimary)
-                        .lineLimit(1)
+              
+
+                if let categoryIcon, let categoryColor {
+//
+                    
+                    // Rich Middle Content Capsule (Generic layout for chats/rich subpages)
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(categoryColor.opacity(AppConstants.UI.opacityLight))
+                                .frame(width: 42, height: 42)
+                            Image(systemName: categoryIcon)
+                                .font(.system(size: 18))
+                                .foregroundColor(categoryColor)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            if let title {
+                                Text(title)
+                                    .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
+                                    .foregroundColor(.textPrimary)
+                                    .lineLimit(1)
+                            }
+                            
+                            if let subtitle {
+                                TruncatableSubtitleView(
+                                    subtitle: subtitle,
+                                    font: .system(size: AppConstants.Typography.sizeCaption, weight: .bold),
+                                    color: .textSecondary
+                                )
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+//                    .background(Color.surfaceMain)
+                    .cornerRadius(AppConstants.UI.cornerRadiusLarge - 6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge - 6)
+                            .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+                    
+//                    Spacer()
+                } else {
+                    
+                    Spacer() // only this needed spacer
+                    
+                    // Standard Title Text with Optional Subtitle
+                    VStack(alignment: .leading, spacing: 2) {
+                        if let title {
+                            Text(title)
+                                .font(.system(size: 17, weight: .bold))
+                                .foregroundColor(.textPrimary)
+                                .lineLimit(1)
+                        }
+                        
+                        if let subtitle {
+                            TruncatableSubtitleView(
+                                subtitle: subtitle,
+                                font: .system(size: 12, weight: .semibold),
+                                color: .textSecondary
+                            )
+                        }
+                    }
                 }
 
                 Spacer()
@@ -190,74 +267,6 @@ struct CoffeeSubHeader<Trailing: View>: View {
             .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 6)
         }
         .zIndex(20)
-    }
-}
-
-// MARK: - Coffee Chat Header
-
-struct CoffeeChatHeader<Trailing: View>: View {
-    let categoryIcon: String
-    let categoryColor: Color
-    let title: String
-    let subtitle: String
-    let trailing: Trailing
-
-    init(
-        categoryIcon: String,
-        categoryColor: Color,
-        title: String,
-        subtitle: String,
-        @ViewBuilder trailing: () -> Trailing
-    ) {
-        self.categoryIcon = categoryIcon
-        self.categoryColor = categoryColor
-        self.title = title
-        self.subtitle = subtitle
-        self.trailing = trailing()
-    }
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Reusable Back Button
-            CoffeeBackButton()
-            
-            // Middle Content Capsule
-            HStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(categoryColor.opacity(AppConstants.UI.opacityLight))
-                        .frame(width: 42, height: 42)
-                    Image(systemName: categoryIcon)
-                        .font(.system(size: 18))
-                        .foregroundColor(categoryColor)
-                }
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
-                        .foregroundColor(.textPrimary)
-                        .lineLimit(1)
-                    
-                    Text(subtitle)
-                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
-                        .foregroundColor(.textSecondary)
-                        .lineLimit(1)
-                }
-                Spacer()
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.surfaceMain)
-            .cornerRadius(AppConstants.UI.cornerRadiusLarge - 6)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge - 6)
-                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
-            
-            // Trailing view (e.g. Info Button)
-            trailing
-        }
     }
 }
 
@@ -350,7 +359,7 @@ struct HeaderIconButton: View {
 struct CoffeeHeaderButton: View {
     let icon: String
     var minSize: CGFloat = 40
-    var maxSize: CGFloat = 120
+    var maxSize: CGFloat = 40
     var iconSize: CGFloat = 16
     var color: Color = .brandPrimary
     let action: () -> Void
@@ -394,59 +403,189 @@ struct IconCircle: View {
     }
 }
 
-// MARK: - Convenience Extensions
-
-extension View {
-    // 1. General Main Page Extension supporting ANY Custom Right Hand View (e.g. Search, Settings)
-    func asCoffeeMainPage<RightView: View>(
-        title: String,
-        subtitle: String,
-        @ViewBuilder rightView: @escaping () -> RightView
-    ) -> some View {
-        CoffeeBasePage {
-            CoffeeHeader(
-                title: title,
-                subtitle: subtitle,
-                rightView: rightView
-            )
-        } content: {
-            self
+struct CrossFadingText: View {
+    let part1: String
+    let part2: String
+    let font: Font
+    let color: Color
+    
+    @State private var showPart2 = false
+    private let timer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
+    
+    var body: some View {
+        ZStack(alignment: .leading) {
+            if !showPart2 {
+                Text(part1)
+                    .font(font)
+                    .foregroundColor(color)
+                    .lineLimit(1)
+                    .transition(
+                        .asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .trailing)),
+                            removal: .opacity.combined(with: .move(edge: .leading))
+                        )
+                    )
+            } else {
+                Text(part2)
+                    .font(font)
+                    .foregroundColor(color)
+                    .lineLimit(1)
+                    .transition(
+                        .asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .trailing)),
+                            removal: .opacity.combined(with: .move(edge: .leading))
+                        )
+                    )
+            }
         }
-    }
-
-    // 2. Convenience Overload utilizing your default Notification bell
-    func asCoffeeMainPage(
-        title: String,
-        subtitle: String,
-        notificationCount: Int = 0,
-        onNotificationTap: @escaping () -> Void = {}
-    ) -> some View {
-        self.asCoffeeMainPage(title: title, subtitle: subtitle) {
-            NotificationIconButton(
-                count: notificationCount,
-                action: onNotificationTap
-            )
-        }
-    }
-
-    // 3. Sub Page Extension
-    func asCoffeeSubPage<Trailing: View>(
-        title: String? = nil,
-        topPadding: CGFloat = 96,
-        @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
-    ) -> some View {
-        CoffeeBasePage(topPadding: topPadding) {
-            CoffeeSubHeader(title: title, trailing: trailing)
-        } content: {
-            self
+        .onReceive(timer) { _ in
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0)) {
+                showPart2.toggle()
+            }
         }
     }
 }
 
-// MARK: - Legacy Compatibility Typealiases (Rule 8)
+struct TruncatableSubtitleView: View {
+    let subtitle: String
+    let font: Font
+    let color: Color
+    
+    @State private var isTruncated = false
+    @State private var containerWidth: CGFloat = 0
+    @State private var naturalWidth: CGFloat = 0
+    
+    var body: some View {
+        Group {
+            if subtitle.contains(" • ") && isTruncated {
+                let parts = subtitle.components(separatedBy: " • ")
+                if parts.count >= 2 {
+                    CrossFadingText(
+                        part1: parts[0],
+                        part2: parts[1],
+                        font: font,
+                        color: color
+                    )
+                } else {
+                    staticTextView
+                }
+            } else {
+                staticTextView
+            }
+        }
+        // Helper hidden overlay to measure full unconstrained width
+        .background(
+            Text(subtitle)
+                .font(font)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .background(
+                    GeometryReader { textGeo in
+                        Color.clear
+                            .onAppear {
+                                naturalWidth = textGeo.size.width
+                                checkTruncation()
+                            }
+                    }
+                )
+                .opacity(0)
+        )
+        // Measure active container width
+        .background(
+            GeometryReader { containerGeo in
+                Color.clear
+                    .onAppear {
+                        containerWidth = containerGeo.size.width
+                        checkTruncation()
+                    }
+                    .onChange(of: containerGeo.size.width) { newWidth in
+                        containerWidth = newWidth
+                        checkTruncation()
+                    }
+            }
+        )
+    }
+    
+    private var staticTextView: some View {
+        Text(subtitle)
+            .font(font)
+            .foregroundColor(color)
+            .lineLimit(1)
+    }
+    
+    private func checkTruncation() {
+        if naturalWidth > 0 && containerWidth > 0 {
+            isTruncated = naturalWidth > containerWidth
+        }
+    }
+}
 
-typealias SubPageHeader<Trailing: View> = CoffeeSubHeader<Trailing>
-typealias SubHeaderButton = HeaderIconButton
+// MARK: - Convenience Extensions
+
+enum CoffeePageStyle {
+    case main
+    case sub
+}
+
+extension View {
+    // 1. New Unified Page Modifier
+    func asCoffeePage<RightView: View>(
+        _ style: CoffeePageStyle,
+        title: String,
+        subtitle: String = "",
+        categoryIcon: String? = nil,
+        categoryColor: Color? = nil,
+        topPadding: CGFloat? = nil,
+        scrollable: Bool = true,
+        @ViewBuilder rightView: @escaping () -> RightView = { EmptyView() }
+    ) -> some View {
+        let resolvedTopPadding: CGFloat = topPadding ?? {
+            switch style {
+            case .main: return 156
+            case .sub: return (categoryIcon != nil) ? 110 : 96
+            }
+        }()
+        
+        return CoffeeBasePage(topPadding: resolvedTopPadding, scrollable: scrollable) {
+            Group {
+                switch style {
+                case .main:
+                    CoffeeHeader(
+                        title: title,
+                        subtitle: subtitle,
+                        rightView: rightView
+                    )
+                case .sub:
+                    CoffeeSubHeader<RightView>(
+                        title: title.isEmpty ? nil : title,
+                        subtitle: subtitle.isEmpty ? nil : subtitle,
+                        categoryIcon: categoryIcon,
+                        categoryColor: categoryColor,
+                        trailing: rightView
+                    )
+                }
+            }
+        } content: {
+            self
+        }
+    }
+    
+    // Convenience overload for page without right view
+    func asCoffeePage(
+        _ style: CoffeePageStyle,
+        title: String,
+        subtitle: String = "",
+        categoryIcon: String? = nil,
+        categoryColor: Color? = nil,
+        topPadding: CGFloat? = nil,
+        scrollable: Bool = true
+    ) -> some View {
+        self.asCoffeePage(style, title: title, subtitle: subtitle, categoryIcon: categoryIcon, categoryColor: categoryColor, topPadding: topPadding, scrollable: scrollable) {
+            EmptyView()
+        }
+    }
+
+}
 
 // MARK: - Preview
 
@@ -454,12 +593,16 @@ typealias SubHeaderButton = HeaderIconButton
     VStack {
         Text("Discover content here")
     }
-    .asCoffeeMainPage(
+    .asCoffeePage(
+        .sub,
         title: AppStrings.Discovery.title,
-        subtitle: AppStrings.Discovery.subtitleDefault,
+        subtitle: "People nearby are Open to plans",
+        categoryIcon: "d",
+        categoryColor: .red,
         rightView: {
-            CoffeeHeaderButton(icon: AppIcons.search) {}
-            CoffeeHeaderButton(icon: AppIcons.filter) {}
+       
+//                CoffeeHeaderButton(icon: AppIcons.search) {}
+                CoffeeHeaderButton(icon: AppIcons.filter) {}
         }
     )
 }

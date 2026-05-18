@@ -47,6 +47,29 @@ Do not design CoffeeCall like a dating app, coffee ordering app, enterprise dash
   - Micro (micro): 9pt, Black (SF Pro System), relative to `.caption2`.
   - Button (buttonText): 17pt, Black (Outfit), relative to `.headline`.
 
+### Engineering Rules for Dynamic Type Scaling
+
+To support Dynamic Type scaling without breaking layouts, all screens must adhere to these engineering rules:
+
+1. **Never Rigidly Set Frame Heights on Text Containers**:
+   Avoid setting absolute `.frame(height: 50)` on buttons, text rows, or input fields. Use vertical padding so the container naturally expands as font size scales:
+   ```swift
+   // ❌ WRONG (crops text when system text scales):
+   Text("Join Drift").frame(height: 50)
+   
+   // ✅ CORRECT (expands naturally):
+   Text("Join Drift").padding(.vertical, 16)
+   ```
+
+2. **Scale Spacing Dynamically Using @ScaledMetric**:
+   If layout spacing or custom paddings are hardcoded, larger text sizes will cause overlapping. Wrap layout spacing in a `@ScaledMetric` so it grows with the text:
+   ```swift
+   @ScaledMetric(relativeTo: .body) var cardPadding: CGFloat = 16
+   ```
+
+3. **Wrap Long Text in Responsive Layouts**:
+   Ensure text views are allowed to wrap by avoiding unnecessary `.lineLimit(1)` on body copy, and use flexible stacks (`VStack` instead of rigid `HStack`) for metadata tags.
+
 ## Spacing, Radius, And Effects
 
 - **Core Rule: Never write raw/hardcoded visual padding, margins, heights, or spacing values inside screen views.** Every size must be referenced semantically through the centralized `AppConstants.Layout` or `AppConstants.UI` tokens, maintaining a strict Hybrid Scale System under the hood.

@@ -1,5 +1,6 @@
 import Foundation
 import CoreGraphics
+import SwiftUI
 
 enum AppConstants {
     // MARK: - Private 8-Point Grid Scales (Single Source of Truth)
@@ -113,5 +114,29 @@ enum AppConstants {
         static let userInitials = "AR"
         static let userName = "Arjun R."
         static let userBio = "Usually up for walks, coffee, and casual food plans."
+        
+        static let chatParticipants: [ParticipantInfo] = [
+            ParticipantInfo(initials: "M", name: "Mira", color: .brandPrimary, isHost: true, isMe: false),
+            ParticipantInfo(initials: "R", name: "Rahul", color: .brandPurple, isHost: false, isMe: false),
+            ParticipantInfo(initials: "A", name: "Aditi", color: .brandSecondary, isHost: false, isMe: false),
+            ParticipantInfo(initials: "N", name: "Neel", color: .blue, isHost: false, isMe: false),
+            ParticipantInfo(initials: "Y", name: "You", color: .brandPrimary, isHost: false, isMe: true)
+        ]
+        
+        static var chatSystemMessages: [SystemMessage] {
+            [
+                SystemMessage(content: "Arjun (Host) created this Drift", icon: AppIcons.person, timestamp: Date().addingTimeInterval(-3600)),
+                SystemMessage(content: "Maya joined the Drift", icon: AppIcons.verified, timestamp: Date().addingTimeInterval(-3000)),
+                SystemMessage(content: "Drift starts in 30 mins", icon: AppIcons.clockFill, timestamp: Date().addingTimeInterval(-2400))
+            ]
+        }
+        
+        static var chatHistoryMessages: [ChatMessage] {
+            [
+                ChatMessage(senderId: "host_1", senderName: "Arjun (Host)", senderInitials: "AR", content: "Hi everyone! Looking forward to a relaxing evening walk. See you there! 🌿", timestamp: Date().addingTimeInterval(-1800), isSelf: false),
+                ChatMessage(senderId: "user_2", senderName: "Sneha R.", senderInitials: "SR", content: "Excited to join! I'll be there.", timestamp: Date().addingTimeInterval(-1500), isSelf: false),
+                ChatMessage(senderId: "user_3", senderName: "Karthik M.", senderInitials: "KM", content: "I might be a few minutes late. See you soon!", timestamp: Date().addingTimeInterval(-1200), isSelf: true)
+            ]
+        }
     }
 }

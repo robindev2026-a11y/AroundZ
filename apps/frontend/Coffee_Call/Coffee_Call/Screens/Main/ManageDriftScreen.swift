@@ -6,48 +6,48 @@ struct ManageDriftScreen: View {
     @StateObject private var navManager = NavigationManager.shared
     
     var body: some View {
-        VStack(spacing: 0) {
-            SubPageHeader {
-                SubHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
-                SubHeaderButton(icon: AppIcons.ellipsis) { }
+        VStack(spacing: AppConstants.Layout.standardPadding) {
+            // MARK: - Navigation Space & Title
+            HStack {
+                Text(AppStrings.Manage.title)
+                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
+                    .foregroundColor(.textPrimary)
+                Spacer()
+            }
+            .padding(.top, 20) // Tight spacing under the VStack header
+            
+            // MARK: - Overview Card
+            driftOverviewCard
+            
+            // MARK: - Host Actions
+            hostActionsRow
+            
+            // MARK: - Join Requests
+            if !viewModel.drift.pendingRequests.isEmpty {
+                joinRequestsSection
             }
             
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: AppConstants.Layout.standardPadding) {
-                    // MARK: - Navigation Space & Title
-                    HStack {
-                        Text(AppStrings.Manage.title)
-                            .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
-                            .foregroundColor(.textPrimary)
-                        Spacer()
-                    }
-                    .padding(.top, 20) // Tight spacing under the VStack header
-                    
-                    // MARK: - Overview Card
-                    driftOverviewCard
-                    
-                    // MARK: - Host Actions
-                    hostActionsRow
-                    
-                    // MARK: - Join Requests
-                    if !viewModel.drift.pendingRequests.isEmpty {
-                        joinRequestsSection
-                    }
-                    
-                    // MARK: - Joined Participants
-                    joinedParticipantsSection
-                    
-                    // MARK: - Primary Action
-                    openChatButton
-                    
-                    // MARK: - Safety Reminder
-                    safetyReminderBanner
-                }
-                .padding(.horizontal, AppConstants.Layout.standardPadding)
-                .padding(.bottom, AppConstants.Layout.screenBottomSpacer + 40)
-            }
+            // MARK: - Joined Participants
+            joinedParticipantsSection
+            
+            // MARK: - Primary Action
+            openChatButton
+            
+            // MARK: - Safety Reminder
+            safetyReminderBanner
         }
-        .background(Color.backgroundMain.ignoresSafeArea())
+        .padding(.horizontal, AppConstants.Layout.standardPadding)
+        .padding(.bottom, AppConstants.Layout.screenBottomSpacer + 40)
+        .asCoffeePage(
+            .sub,
+            title: "",
+            rightView: {
+                HStack(spacing: 8) {
+                    CoffeeHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
+                    CoffeeHeaderButton(icon: AppIcons.ellipsis) { }
+                }
+            }
+        )
         .navigationBarHidden(true)
         .onAppear {
             navManager.isTabBarHidden = true
