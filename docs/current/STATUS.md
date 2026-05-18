@@ -107,6 +107,7 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Extended `CoffeeHeader` with a default `RightView == NotificationIconButton` convenience initializer to allow direct, compile-time safe instantiation with `notificationCount` (restoring clean compatibility with `DiscoveryScreen`).
   - Added backward-compatible typealiases `SubPageHeader` and `SubHeaderButton` to `CoffeeHeader.swift` to align with SwiftUI Composable Design Rule 8 (Preserve Backward Compatibility) and restore seamless building on `ManageDriftScreen` and `DriftDetailScreen`.
   - Committed user custom header height and shadow tweaks, and resolved scrollview overlapping by raising the default `topPadding` in `CoffeeBasePage` to `156` pt to align content perfectly below the floating card.
+  - Made `CoffeeHeaderButton`'s dimensions fully adjustable (added `size` and `iconSize` parameters) and reduced default size to an elegant, high-end `44` pt to unify the header controls and ensure comfortable tap targets (matching standard Apple specifications).
 - Files touched: `CoffeeHeader.swift`, `ProfileScreen.swift`, `ChatsListScreen.swift`, `DriftsScreen.swift`, `ProfileViewModel.swift`, `DriftsViewModel.swift`, `ChatsViewModel.swift`, `STATUS.md`.
 - Verification performed: Verified syntax accuracy across all affected files and confirmed compilation is clean, free of AnyView in view models, and fully responsive.
 - Remaining gaps: None.
