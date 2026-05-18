@@ -1011,3 +1011,8 @@ struct ToggleRow: View {
         .padding(.vertical, 14)
     }
 }
+
+#Preview {
+    ProfileScreen()
+        .environmentObject(AuthViewModel())
+}
