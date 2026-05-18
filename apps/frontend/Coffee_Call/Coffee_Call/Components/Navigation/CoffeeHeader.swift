@@ -276,7 +276,8 @@ struct HeaderIconButton: View {
 
 struct CoffeeHeaderButton: View {
     let icon: String
-    var size: CGFloat = 44
+    var minSize: CGFloat = 44
+    var maxSize: CGFloat = 120
     var iconSize: CGFloat = 16
     var color: Color = .brandPrimary
     let action: () -> Void
@@ -286,11 +287,13 @@ struct CoffeeHeaderButton: View {
             Image(systemName: icon)
                 .font(.system(size: iconSize, weight: .bold))
                 .foregroundColor(color)
-                .frame(width: size, height: size)
+                .padding(12) // Dynamic padding for safe interior bounds
+                .frame(minWidth: minSize, minHeight: minSize) // Guarantees comfortable tap area
+                .frame(maxWidth: maxSize, maxHeight: minSize) // Prevents oversized expanding
                 .background(.ultraThinMaterial)
-                .clipShape(Circle())
+                .clipShape(Capsule()) // Fluid shape that handles wider content seamlessly
                 .overlay(
-                    Circle()
+                    Capsule()
                         .stroke(Color.white.opacity(0.4), lineWidth: 1)
                 )
                 .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
