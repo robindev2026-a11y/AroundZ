@@ -105,7 +105,7 @@ struct ProfileScreen: View {
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(viewModel.name)
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.textPrimary)
                     
                     HStack(spacing: 4) {
@@ -114,7 +114,7 @@ struct ProfileScreen: View {
                             .foregroundColor(.textSecondary)
                         
                         Text("Bengaluru • 10 km radius")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.textSecondary)
                     }
                     
@@ -125,7 +125,7 @@ struct ProfileScreen: View {
                             .foregroundColor(.brandPrimary)
                         
                         Text("Verified phone")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 9, weight: .bold))
                             .foregroundColor(.brandPrimaryDark)
                     }
                     .padding(.horizontal, 8)
@@ -171,7 +171,7 @@ struct ProfileScreen: View {
                         Text("Edit profile")
                         Image(systemName: "pencil")
                     }
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.brandPrimary)
                 }
                 .pressScale(0.92)
@@ -191,7 +191,7 @@ struct ProfileScreen: View {
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Your stats")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .foregroundColor(.textPrimary)
             
             VStack(spacing: 12) {
@@ -235,11 +235,11 @@ struct ProfileScreen: View {
             // Privacy Caption
             HStack(spacing: 6) {
                 Image(systemName: AppIcons.lock)
-                    .font(.system(size: 12, weight: .bold))
+                    .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.textSecondary)
                 
                 Text("Stats are private to you.")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
             .padding(.leading, 4)
@@ -261,12 +261,12 @@ struct ProfileScreen: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(count)
-                    .font(.system(size: count == "Coming soon" ? 14 : 26, weight: .bold))
+                    .font(.system(size: count == "Coming soon" ? 12 : 22, weight: .bold))
                     .foregroundColor(count == "Coming soon" ? .textSecondary : .textPrimary)
                     .lineLimit(1)
                 
                 Text(label)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
                     .lineLimit(1)
             }
@@ -289,7 +289,7 @@ struct ProfileScreen: View {
     private var preferencesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Preferences")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .foregroundColor(.textPrimary)
             
             VStack(spacing: 0) {
@@ -352,7 +352,7 @@ struct ProfileScreen: View {
     private var accountSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Account")
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .foregroundColor(.textPrimary)
             
             VStack(spacing: 0) {
@@ -414,14 +414,14 @@ struct ProfileScreen: View {
                 }
                 
                 Text(title)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundColor(isDestructive ? Color.statusError : .textPrimary)
                 
                 Spacer()
                 
                 if let value = value {
                     Text(value)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.textSecondary)
                 }
                 
