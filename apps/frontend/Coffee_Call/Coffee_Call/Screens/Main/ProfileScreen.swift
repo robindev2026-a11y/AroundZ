@@ -124,7 +124,7 @@ struct ProfileScreen: View {
                             .font(.system(size: 9, weight: .black))
                             .foregroundColor(.brandPrimary)
                         
-                        Text("Verified phone")
+                        Text(AppStrings.Profile.verifiedPhone)
                             .font(.system(size: 9, weight: .bold))
                             .foregroundColor(.brandPrimaryDark)
                     }
@@ -168,7 +168,7 @@ struct ProfileScreen: View {
                 // Edit Profile Button pushed cleanly to the bottom right of the card
                 Button(action: { showingEditProfile = true }) {
                     HStack(spacing: 4) {
-                        Text("Edit profile")
+                        Text(AppStrings.Profile.editProfile)
                         Image(systemName: AppIcons.edit)
                     }
                     .font(.system(size: 12, weight: .bold))
@@ -190,7 +190,7 @@ struct ProfileScreen: View {
     // MARK: - Private Stats Grid
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Your stats")
+            Text(AppStrings.Profile.statsHeader)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(.textPrimary)
             
@@ -201,7 +201,7 @@ struct ProfileScreen: View {
                         icon: AppIcons.coffeeFill,
                         color: Color.brandPrimary,
                         count: "\(viewModel.driftsHosted)",
-                        label: "Hosted"
+                        label: AppStrings.Profile.hostedLabel
                     )
                     
                     // Tile 2: People Joined
@@ -209,7 +209,7 @@ struct ProfileScreen: View {
                         icon: AppIcons.participants,
                         color: Color.brandPurple,
                         count: "\(viewModel.driftsJoined)",
-                        label: "People joined"
+                        label: AppStrings.Profile.joinedLabel
                     )
                 }
                 
@@ -219,7 +219,7 @@ struct ProfileScreen: View {
                         icon: AppIcons.calendar,
                         color: Color.brandSecondary,
                         count: "\(viewModel.noShowsCount)",
-                        label: "No-shows"
+                        label: AppStrings.Profile.noShowsLabel
                     )
                     
                     // Tile 4: Score (Coming soon)
@@ -227,7 +227,7 @@ struct ProfileScreen: View {
                         icon: AppIcons.clockFill,
                         color: Color.textSecondary,
                         count: viewModel.score,
-                        label: "Score"
+                        label: AppStrings.Profile.scoreLabel
                     )
                 }
             }
@@ -238,7 +238,7 @@ struct ProfileScreen: View {
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.textSecondary)
                 
-                Text("Stats are private to you.")
+                Text(AppStrings.Profile.statsPrivate)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
@@ -288,7 +288,7 @@ struct ProfileScreen: View {
     // MARK: - Preferences List
     private var preferencesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Preferences")
+            Text(AppStrings.Profile.preferences)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(.textPrimary)
             
@@ -297,7 +297,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.heartFill,
                     color: Color.brandPrimary,
-                    title: "Interests",
+                    title: AppStrings.Profile.interests,
                     value: viewModel.interests.isEmpty ? "None" : viewModel.interests.map { $0.rawValue.capitalized }.joined(separator: ", ")
                 ) {
                     showingInterestsSheet = true
@@ -309,7 +309,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.clockFill,
                     color: Color.brandPurple,
-                    title: "Availability",
+                    title: AppStrings.Profile.availability,
                     value: viewModel.availabilitySummary
                 ) {
                     showingAvailabilitySheet = true
@@ -321,7 +321,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.bellFill,
                     color: Color.brandSecondary,
-                    title: "Notifications",
+                    title: AppStrings.Profile.notifications,
                     value: viewModel.notificationsSummary
                 ) {
                     showingNotificationsSheet = true
@@ -333,7 +333,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.shieldVerified,
                     color: Color.brandPrimary,
-                    title: "Privacy & Safety",
+                    title: AppStrings.Profile.safety,
                     value: viewModel.privacySummary
                 ) {
                     showingPrivacySheet = true
@@ -351,7 +351,7 @@ struct ProfileScreen: View {
     // MARK: - Account List
     private var accountSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Account")
+            Text(AppStrings.Profile.accountHeader)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(.textPrimary)
             
@@ -360,7 +360,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.mappinCircle,
                     color: Color.brandPrimary,
-                    title: "Location",
+                    title: AppStrings.Profile.locationLabel,
                     value: viewModel.location
                 ) {
                     showingLocationSheet = true
@@ -372,7 +372,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.help,
                     color: Color.brandPurple,
-                    title: "Help"
+                    title: AppStrings.Profile.help
                 ) {
                     showingHelpSheet = true
                 }
@@ -383,7 +383,7 @@ struct ProfileScreen: View {
                 preferenceRow(
                     icon: AppIcons.logoutFill,
                     color: Color.statusError,
-                    title: "Sign out",
+                    title: AppStrings.Profile.signOut,
                     isDestructive: true
                 ) {
                     showingSignOutAlert = true
@@ -440,12 +440,12 @@ struct ProfileScreen: View {
     // MARK: - Activity Log
     private var activityLogSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Activity Log")
+            Text(AppStrings.Profile.activityLog)
                 .font(.bodyBold)
                 .foregroundColor(.textPrimary)
             
             if viewModel.historyDrifts.isEmpty {
-                Text("No past activities yet.")
+                Text(AppStrings.Profile.noActivities)
                     .font(.bodyStandard)
                     .foregroundColor(.textSecondary)
                     .padding(.vertical, 8)
@@ -496,7 +496,7 @@ struct ProfileScreen: View {
             Divider().background(Color.appBorder.opacity(0.6))
             
             HStack {
-                Image(systemName: "calendar")
+                Image(systemName: AppIcons.calendar)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.textSecondary)
                 

@@ -308,6 +308,20 @@ enum AppStrings {
         static let visibleDesc = "Who can see your availability"
         static let changePhoto = "Change Photo"
         static let bioLabel = "BIO"
+        
+        static let verifiedPhone = "Verified phone"
+        static let statsHeader = "Your stats"
+        static let statsPrivate = "Stats are private to you."
+        static let hostedLabel = "Hosted"
+        static let joinedLabel = "People joined"
+        static let noShowsLabel = "No-shows"
+        static let scoreLabel = "Score"
+        static let locationLabel = "Location"
+        static let help = "Help"
+        static let activityLog = "Activity Log"
+        static let noActivities = "No past activities yet."
+        static let preferences = "Preferences"
+        static let accountHeader = "Account"
     }
     
     enum Common {
