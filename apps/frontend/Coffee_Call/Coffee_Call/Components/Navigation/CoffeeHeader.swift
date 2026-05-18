@@ -84,9 +84,10 @@ struct CoffeeHeader<RightView: View>: View {
 
                     Spacer()
 
-                    HStack(spacing: AppConstants.Layout.miniPadding) {
+                    HStack(spacing: 2) {
                         rightView()
                     }
+                    .fixedSize(horizontal: true, vertical: true)
                 }
                 .padding(.horizontal, 20)
                 .frame(height: AppConstants.Layout.headerHeight)
