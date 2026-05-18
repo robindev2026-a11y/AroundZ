@@ -126,6 +126,7 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Added a horizontal Activity Log (past physical drifts list) gallery at the bottom to represent user physical meetups history.
   - Refactored all profile visual components (Identity Card, Interest Tags, Stats Grid, and Activity Log cards) to discard custom `.system(size:)` literals and instead use standardized Font design tokens from `Font+Extensions.swift`.
   - Exactly aligned and further reduced all typography sizes and weights with the approved visual mockup: Name set to an ultra-clean size 18 bold system font, sub-headers to size 16 bold, stat counts to size 22 bold (or size 12 bold for empty states), stat labels to size 11 medium, and preference list row titles/values to size 14 bold / 13 medium gray, creating an absolutely gorgeous, high-density, and compact native experience.
+  - Integrated a modern SwiftUI `#Preview` block at the bottom of `ProfileScreen.swift` wired to `AuthViewModel()` to support live Xcode Canvas previews during subsequent features iteration.
 - Implemented Fully Persistent Profile CRUD Operations:
   - Overhauled `ProfileViewModel.swift` to introduce a secure, local persistence layer using `UserDefaults` to save and load profile details (name, bio, location, interests, availability weekday/weekend toggles).
   - Wired `computeInitials(name:)` helper to auto-compute display initials when saving the profile card name.
