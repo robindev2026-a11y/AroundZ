@@ -37,6 +37,7 @@ struct ChatsListScreen: View {
                 .main,
                 title: viewModel.title,
                 subtitle: viewModel.subtitle ?? AppStrings.Chat.subtitle,
+                scrollable: false,
                 rightView: {
                     // Shared Floating Glass Header Right Action: View Toggle Button
                     CoffeeHeaderButton(
