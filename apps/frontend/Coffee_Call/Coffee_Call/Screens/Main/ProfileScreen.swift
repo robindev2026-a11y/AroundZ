@@ -109,18 +109,18 @@ struct ProfileScreen: View {
                         .foregroundColor(.textPrimary)
                     
                     HStack(spacing: 4) {
-                        Image(systemName: "mappin.and.ellipse")
+                        Image(systemName: AppIcons.mappin)
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.textSecondary)
                         
-                        Text("Bengaluru • 10 km radius")
+                        Text("\(viewModel.location.components(separatedBy: \",\").first ?? viewModel.location) • 10 km radius")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.textSecondary)
                     }
                     
                     // Small Mint Phone Verification Pill (Hides phone number)
                     HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle.fill")
+                        Image(systemName: AppIcons.checkCircleFill)
                             .font(.system(size: 9, weight: .black))
                             .foregroundColor(.brandPrimary)
                         
@@ -169,7 +169,7 @@ struct ProfileScreen: View {
                 Button(action: { showingEditProfile = true }) {
                     HStack(spacing: 4) {
                         Text("Edit profile")
-                        Image(systemName: "pencil")
+                        Image(systemName: AppIcons.edit)
                     }
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.brandPrimary)
@@ -198,7 +198,7 @@ struct ProfileScreen: View {
                 HStack(spacing: 12) {
                     // Tile 1: Hosted
                     statTile(
-                        icon: "cup.and.saucer.fill",
+                        icon: AppIcons.coffeeFill,
                         color: Color.brandPrimary,
                         count: "\(viewModel.driftsHosted)",
                         label: "Hosted"
@@ -206,7 +206,7 @@ struct ProfileScreen: View {
                     
                     // Tile 2: People Joined
                     statTile(
-                        icon: "person.2.fill",
+                        icon: AppIcons.participants,
                         color: Color.brandPurple,
                         count: "\(viewModel.driftsJoined)",
                         label: "People joined"
@@ -216,17 +216,17 @@ struct ProfileScreen: View {
                 HStack(spacing: 12) {
                     // Tile 3: No-shows
                     statTile(
-                        icon: "calendar",
+                        icon: AppIcons.calendar,
                         color: Color.brandSecondary,
-                        count: "0",
+                        count: "\(viewModel.noShowsCount)",
                         label: "No-shows"
                     )
                     
                     // Tile 4: Score (Coming soon)
                     statTile(
-                        icon: "clock.fill",
+                        icon: AppIcons.clockFill,
                         color: Color.textSecondary,
-                        count: "Coming soon",
+                        count: viewModel.score,
                         label: "Score"
                     )
                 }
@@ -295,7 +295,7 @@ struct ProfileScreen: View {
             VStack(spacing: 0) {
                 // Row 1: Interests
                 preferenceRow(
-                    icon: "heart.fill",
+                    icon: AppIcons.heartFill,
                     color: Color.brandPrimary,
                     title: "Interests",
                     value: viewModel.interests.isEmpty ? "None" : viewModel.interests.map { $0.rawValue.capitalized }.joined(separator: ", ")
@@ -307,7 +307,7 @@ struct ProfileScreen: View {
                 
                 // Row 2: Availability
                 preferenceRow(
-                    icon: "clock.fill",
+                    icon: AppIcons.clockFill,
                     color: Color.brandPurple,
                     title: "Availability",
                     value: viewModel.availabilitySummary
@@ -319,10 +319,10 @@ struct ProfileScreen: View {
                 
                 // Row 3: Notifications
                 preferenceRow(
-                    icon: "bell.fill",
+                    icon: AppIcons.bellFill,
                     color: Color.brandSecondary,
                     title: "Notifications",
-                    value: "Push, In-app"
+                    value: viewModel.notificationsSummary
                 ) {
                     showingNotificationsSheet = true
                 }
@@ -331,10 +331,10 @@ struct ProfileScreen: View {
                 
                 // Row 4: Privacy & Safety
                 preferenceRow(
-                    icon: "checkmark.shield.fill",
+                    icon: AppIcons.shieldVerified,
                     color: Color.brandPrimary,
                     title: "Privacy & Safety",
-                    value: "Your data, safety tools"
+                    value: viewModel.privacySummary
                 ) {
                     showingPrivacySheet = true
                 }
@@ -358,7 +358,7 @@ struct ProfileScreen: View {
             VStack(spacing: 0) {
                 // Row 1: Location
                 preferenceRow(
-                    icon: "mappin.circle.fill",
+                    icon: AppIcons.mappinCircle,
                     color: Color.brandPrimary,
                     title: "Location",
                     value: viewModel.location
@@ -370,7 +370,7 @@ struct ProfileScreen: View {
                 
                 // Row 2: Help
                 preferenceRow(
-                    icon: "questionmark.circle.fill",
+                    icon: AppIcons.help,
                     color: Color.brandPurple,
                     title: "Help"
                 ) {
@@ -381,7 +381,7 @@ struct ProfileScreen: View {
                 
                 // Row 3: Sign out
                 preferenceRow(
-                    icon: "arrow.right.square.fill",
+                    icon: AppIcons.logoutFill,
                     color: Color.statusError,
                     title: "Sign out",
                     isDestructive: true

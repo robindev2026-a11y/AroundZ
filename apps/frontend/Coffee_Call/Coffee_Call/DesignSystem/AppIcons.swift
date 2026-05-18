@@ -80,9 +80,13 @@ enum AppIcons {
     // MARK: - Settings & Profile
     static let settings = "gearshape"
     static let logout = "arrow.right.square"
+    static let logoutFill = "arrow.right.square.fill"
     static let block = "nosign"
     static let report = "exclamationmark.shield"
     static let visibility = "eye"
     static let account = "person.badge.key"
     static let privacy = "hand.raised.fill"
+    static let edit = "pencil"
+    static let mappinCircle = "mappin.circle.fill"
+    static let help = "questionmark.circle.fill"
 }

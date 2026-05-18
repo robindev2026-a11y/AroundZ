@@ -42,9 +42,15 @@ class ProfileViewModel: ObservableObject {
     // Stats & History
     @Published var driftsJoined: Int = 24
     @Published var driftsHosted: Int = 8
+    @Published var noShowsCount: Int = 4
+    @Published var score: String = "Coming soon"
     @Published var pastDriftsCount: Int = 16
     @Published var historyDrifts: [Drift] = []
     @Published var selectedHistoryTab: Int = 0
+    
+    // Preferences Summaries
+    var notificationsSummary: String { "Push, In-app" }
+    var privacySummary: String { "Your data, safety tools" }
     
     var availabilitySummary: String {
         var active: [String] = []
