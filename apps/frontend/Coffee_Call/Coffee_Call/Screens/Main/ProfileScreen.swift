@@ -24,10 +24,13 @@ struct ProfileScreen: View {
                 // 2. Private Stats Grid
                 statsSection
                 
-                // 3. Preferences List
+                // 3. Activity Log
+                activityLogSection
+                
+                // 4. Preferences List
                 preferencesSection
                 
-                // 4. Account Control List
+                // 5. Account Control List
                 accountSection
             }
             .padding(.horizontal, AppConstants.Layout.standardPadding)
@@ -133,6 +136,28 @@ struct ProfileScreen: View {
                 Spacer()
             }
             
+            // Active Interests Capsule Tag Cloud
+            if !viewModel.interests.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: AppConstants.Layout.miniPadding * 2) {
+                        ForEach(viewModel.interests, id: \.self) { category in
+                            HStack(spacing: 4) {
+                                Image(systemName: category.icon)
+                                    .font(.system(size: AppConstants.Typography.sizeCaption - 1, weight: .bold))
+                                Text(category.rawValue.capitalized)
+                                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                            }
+                            .foregroundColor(category.color)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(category.color.opacity(0.12))
+                            .clipShape(Capsule())
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+            
             Divider()
                 .background(Color.appBorder.opacity(0.6))
             
@@ -174,7 +199,7 @@ struct ProfileScreen: View {
                     statTile(
                         icon: "cup.and.saucer.fill",
                         color: Color.brandPrimary,
-                        count: "12",
+                        count: "\(viewModel.driftsHosted)",
                         label: "Hosted"
                     )
                     
@@ -182,7 +207,7 @@ struct ProfileScreen: View {
                     statTile(
                         icon: "person.2.fill",
                         color: Color.brandPurple,
-                        count: "86",
+                        count: "\(viewModel.driftsJoined)",
                         label: "People joined"
                     )
                 }
@@ -192,7 +217,7 @@ struct ProfileScreen: View {
                     statTile(
                         icon: "calendar",
                         color: Color.brandSecondary,
-                        count: "4",
+                        count: "0",
                         label: "No-shows"
                     )
                     
@@ -409,6 +434,85 @@ struct ProfileScreen: View {
         }
         .buttonStyle(PlainButtonStyle())
         .pressScale(0.98)
+    }
+    
+    // MARK: - Activity Log
+    private var activityLogSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Activity Log")
+                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
+                .foregroundColor(.textPrimary)
+            
+            if viewModel.historyDrifts.isEmpty {
+                Text("No past activities yet.")
+                    .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
+                    .foregroundColor(.textSecondary)
+                    .padding(.vertical, 8)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(viewModel.historyDrifts) { drift in
+                            activityCard(drift: drift)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+    }
+    
+    private func activityCard(drift: Drift) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(drift.category.color.opacity(0.12))
+                        .frame(width: 32, height: 32)
+                    
+                    Image(systemName: drift.category.icon)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(drift.category.color)
+                }
+                
+                Spacer()
+                
+                // Status badge
+                Text(drift.status.rawValue)
+                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
+                    .foregroundColor(drift.status.color)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(drift.status.color.opacity(0.12))
+                    .clipShape(Capsule())
+            }
+            
+            Text(drift.title)
+                .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .black))
+                .foregroundColor(.textPrimary)
+                .lineLimit(2)
+                .frame(height: 38, alignment: .topLeading)
+            
+            Divider().background(Color.appBorder.opacity(0.6))
+            
+            HStack {
+                Image(systemName: "calendar")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.textSecondary)
+                
+                Text(drift.location) // This has e.g. "Open • Yesterday" or "Ended • 5 days ago"
+                    .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
+                    .foregroundColor(.textSecondary)
+            }
+        }
+        .padding(12)
+        .frame(width: 160, height: 136)
+        .background(Color.surfaceMain)
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
+                .stroke(Color.appBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.textPrimary.opacity(0.02), radius: 6, x: 0, y: 3)
     }
 }
 
