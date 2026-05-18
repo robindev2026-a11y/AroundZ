@@ -106,6 +106,7 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Refactored `DriftsScreen` to render switchers and segment tabs directly in the layout body as composable SwiftUI Lego blocks.
   - Extended `CoffeeHeader` with a default `RightView == NotificationIconButton` convenience initializer to allow direct, compile-time safe instantiation with `notificationCount` (restoring clean compatibility with `DiscoveryScreen`).
   - Added backward-compatible typealiases `SubPageHeader` and `SubHeaderButton` to `CoffeeHeader.swift` to align with SwiftUI Composable Design Rule 8 (Preserve Backward Compatibility) and restore seamless building on `ManageDriftScreen` and `DriftDetailScreen`.
+  - Committed user custom header height and shadow tweaks, and resolved scrollview overlapping by raising the default `topPadding` in `CoffeeBasePage` to `156` pt to align content perfectly below the floating card.
 - Files touched: `CoffeeHeader.swift`, `ProfileScreen.swift`, `ChatsListScreen.swift`, `DriftsScreen.swift`, `ProfileViewModel.swift`, `DriftsViewModel.swift`, `ChatsViewModel.swift`, `STATUS.md`.
 - Verification performed: Verified syntax accuracy across all affected files and confirmed compilation is clean, free of AnyView in view models, and fully responsive.
 - Remaining gaps: None.
