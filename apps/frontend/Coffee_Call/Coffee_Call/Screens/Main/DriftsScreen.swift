@@ -38,11 +38,10 @@ struct DriftsScreen: View {
             }
             .asCoffeeMainPage(
                 title: viewModel.title,
-                subtitle: viewModel.subtitle ?? ""
-            ) {
+                subtitle: viewModel.subtitle ?? "", rightView: {
                 CoffeeHeaderButton(icon: AppIcons.search) {}
                 CoffeeHeaderButton(icon: AppIcons.filter) {}
-            }
+            })
             .navigationDestination(for: Drift.self) { drift in
                 if viewModel.selectedMode == .mine {
                     ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))

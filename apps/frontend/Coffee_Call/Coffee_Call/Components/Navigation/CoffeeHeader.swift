@@ -280,7 +280,7 @@ struct HeaderIconButton: View {
 
 struct CoffeeHeaderButton: View {
     let icon: String
-    var minSize: CGFloat = 20
+    var minSize: CGFloat = 40
     var maxSize: CGFloat = 120
     var iconSize: CGFloat = 16
     var color: Color = .brandPrimary
@@ -292,15 +292,15 @@ struct CoffeeHeaderButton: View {
                 .font(.system(size: iconSize, weight: .bold))
                 .foregroundColor(color)
                 .padding(12) // Dynamic padding for safe interior bounds
-                .frame(minWidth: minSize, minHeight: minSize) // Guarantees comfortable tap area
-                .frame(maxWidth: maxSize, maxHeight: minSize) // Prevents oversized expanding
+                .frame(minWidth: minSize,maxWidth: maxSize,minHeight: minSize, maxHeight: minSize) // Guarantees comfortable tap area
+//                .frame(maxWidth: maxSize, maxHeight: minSize) // Prevents oversized expanding
                 .background(.ultraThinMaterial)
                 .clipShape(Circle()) // Keep Circle shape!
                 .overlay(
                     Circle()
                         .stroke(Color.white.opacity(0.4), lineWidth: 1)
                 )
-                .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.09), radius: 8, x: 0, y: 4)
         }
         .pressScale(0.9)
     }
@@ -388,7 +388,10 @@ typealias SubHeaderButton = HeaderIconButton
     .asCoffeeMainPage(
         title: AppStrings.Discovery.title,
         subtitle: AppStrings.Discovery.subtitleDefault,
-        notificationCount: 3
+        rightView: {
+            CoffeeHeaderButton(icon: AppIcons.search) {}
+            CoffeeHeaderButton(icon: AppIcons.filter) {}
+        }
     )
 }
 
