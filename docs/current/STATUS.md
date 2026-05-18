@@ -20,7 +20,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 | Drifts listing implementation | Needs verification | `See nearby Drifts` should open `Nearby`; profile/status deep links may open `My Drifts`. |
 | Create Drift sheet | Existing / needs route verification | Center Create action should present the sheet. |
 | Profile UX | Concept direction only | Should stay lightweight and privacy-first. |
-| Chats UX | Spec created | Chats list + thread + info sheet defined in `docs/current/DESIGN.md`. |
+| Chats UX | Updated spec | Chats Home is now Drift Rooms Bubble Field + List fallback + Thread in `docs/current/DESIGN.md`. |
 
 ## App Status
 
@@ -59,6 +59,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 
 - Added the active Chats UX contract to `docs/current/DESIGN.md`.
 - Defined Chats List, Chat Thread, and Chat Info sheet with Drift-tied gating and safety guardrails.
+- Updated Chats UX to add Drift Rooms Bubble Field as the default Chats Home, with a list fallback and gentle live-ness indicators.
 - Designed and implemented the high-fidelity iOS "You" (Profile) screen following the Social Refresh design.
 - Replaced the old profile layout with a privacy-first identity card, 2x2 private stats grid, preferences rows, and destructive sign-out alerts.
 - Files touched: `ProfileScreen.swift`, `ProfileViewModel.swift`, `CoffeeHeader.swift`.
@@ -136,7 +137,12 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Created a robust delete/sign-out reset action inside `ProfileViewModel.swift` to flush all local storage values when resetting data on demand.
 - Files touched: `ProfileScreen.swift`, `ProfileViewModel.swift`, `STATUS.md`.
 - Verification performed: Syntax reviewed, git committed, confirmed compilation clean.
-- Remaining gaps: None.
+- Purged 100% of hardcoded strings, messages, alert text, and sheet modal labels:
+  - Added new localized tokens in `AppStrings.swift` under `AppStrings.Profile` and `AppStrings.Common` for alerts, Settings details, Interests details, Availability, Notifications description, Privacy Safety details, Location updates, and Help guideline items.
+  - Replaced all raw hardcoded text and icon literals in `ProfileScreen.swift`'s sheet views (`SettingsSheetView`, `InterestsSheetView`, `AvailabilitySheetView`, `NotificationsSheetView`, `PrivacySheetView`, `LocationSheetView`, `HelpSheetView`) and the destructively styled Sign Out alert modifier with their standardized localized equivalents.
+  - Fully resolved a syntax string interpolation escape error in the location suffix parsing to restore compilation sanity.
+- Files touched: `ProfileScreen.swift`, `AppStrings.swift`, `STATUS.md`.
+- Verification performed: Successfully ran full compiler building (`xcodebuild`) checks with absolute zero errors.
 
 ## How To Update This File
 
