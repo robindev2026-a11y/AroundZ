@@ -8,7 +8,7 @@ struct CoffeeBasePage<Header: View, Content: View>: View {
     private let content: Content
 
     init(
-        topPadding: CGFloat = 118,
+        topPadding: CGFloat = 156,
         @ViewBuilder header: () -> Header,
         @ViewBuilder content: () -> Content
     ) {
@@ -69,7 +69,7 @@ struct CoffeeHeader<RightView: View>: View {
                         )
                     )
                     .ignoresSafeArea(edges: .top)
-                    .frame(height: 60)
+                    .frame(height: AppConstants.Layout.headerHeight)
 
                 HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -94,7 +94,7 @@ struct CoffeeHeader<RightView: View>: View {
                         style: .continuous
                     )
                     .fill(.ultraThinMaterial)
-                    .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 8)
+                    .shadow(color: .black.opacity(0.4), radius: 15, x: 0, y: 5)
                 )
                 .padding(.horizontal, AppConstants.Layout.standardPadding)
                 .padding(.top, AppConstants.Layout.headerTopPadding - 6)
