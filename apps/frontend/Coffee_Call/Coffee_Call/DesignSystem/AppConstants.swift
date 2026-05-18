@@ -37,6 +37,7 @@ enum AppConstants {
         static let headerTopPadding: CGFloat = Grid.step8
         static let floatingTabBarBottomPadding: CGFloat = Grid.step20
         static let screenBottomSpacer: CGFloat = Grid.step80
+        static let miniPadding: CGFloat = Grid.step4
         
         // Spacing & layout gaps
         static let sectionSpacing: CGFloat = Grid.step24
