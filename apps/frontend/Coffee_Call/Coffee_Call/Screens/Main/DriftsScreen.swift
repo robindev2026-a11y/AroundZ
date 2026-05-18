@@ -6,6 +6,16 @@ struct DriftsScreen: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
+                // Interactive Mode Switch & Time Tabs (Lego Blocks!)
+                VStack(spacing: 8) {
+                    DriftModeSwitch(selectedMode: $viewModel.selectedMode)
+                        .padding(.horizontal, AppConstants.Layout.standardPadding)
+                        .padding(.top, 4)
+                    
+                    TimeStateTabs(selectedState: $viewModel.selectedTimeState)
+                }
+                .padding(.bottom, 8)
+                
                 if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all {
                     // Featured Section
                     if let first = viewModel.drifts.first {
@@ -26,8 +36,15 @@ struct DriftsScreen: View {
                 // Section: Later today
                 driftSection(title: AppStrings.Drifts.laterToday, drifts: viewModel.filteredDrifts.filter { $0.status == .tonight })
             }
-            .padding(.top, AppConstants.Layout.sectionSpacing * 1.5)
-            .asCoffeeScreen(config: viewModel)
+            .asCoffeeMainPage(
+                title: viewModel.title,
+                subtitle: viewModel.subtitle ?? ""
+            ) {
+                HStack(spacing: 12) {
+                    CoffeeHeaderButton(icon: AppIcons.search) {}
+                    CoffeeHeaderButton(icon: AppIcons.filter) {}
+                }
+            }
             .navigationDestination(for: Drift.self) { drift in
                 if viewModel.selectedMode == .mine {
                     ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))

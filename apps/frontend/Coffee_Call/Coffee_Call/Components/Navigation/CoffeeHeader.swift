@@ -1,207 +1,198 @@
 import SwiftUI
 
-// MARK: - Protocol Oriented Design
-enum CoffeeScreenType {
-    case main
-    case sub
-}
-
-protocol CoffeeScreenConfiguration {
-    var screenType: CoffeeScreenType { get }
-    var title: String { get }
-    var subtitle: String? { get }
-    var trailingActions: AnyView? { get }
-    var showNotificationIndicator: Bool { get }
-    var pinnedHeader: AnyView? { get }
-}
-
-extension CoffeeScreenConfiguration {
-    var screenType: CoffeeScreenType { .main }
-    var subtitle: String? { nil }
-    var trailingActions: AnyView? { nil }
-    var showNotificationIndicator: Bool { false }
-    var pinnedHeader: AnyView? { nil }
-}
-
 // MARK: - Reusable Base Page
-struct CoffeeBasePage<Content: View>: View {
-    let config: CoffeeScreenConfiguration
-    let content: () -> Content
-    
+
+struct CoffeeBasePage<Header: View, Content: View>: View {
+    private let topPadding: CGFloat
+    private let header: Header
+    private let content: Content
+
+    init(
+        topPadding: CGFloat = 118,
+        @ViewBuilder header: () -> Header,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.topPadding = topPadding
+        self.header = header()
+        self.content = content()
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             Color.backgroundMain.ignoresSafeArea()
-            
+
             ScrollView(showsIndicators: false) {
-                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    content()
-                }
-                .padding(.top, config.pinnedHeader == nil ? 110 : 235)
-                .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
+                content
+                    .padding(.top, topPadding)
+                    .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
             }
             .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                switch config.screenType {
-                case .main:
-                    CoffeeHeader(
-                        title: config.title,
-                        subtitle: config.subtitle ?? "",
-                        notificationCount: config.showNotificationIndicator ? 3 : 0,
-                        customRightButton: config.trailingActions,
-                        isFloating: false
-                    )
-                case .sub:
-                    SubPageHeader {
-                        // Add any trailing actions if needed
-                        if let actions = config.trailingActions {
-                            actions
-                        }
-                    }
-                }
-                
-                if let pinned = config.pinnedHeader {
-                    pinned
-                        .background(.ultraThinMaterial)
-                        .overlay(
-                            Divider().opacity(0.1),
-                            alignment: .bottom
-                        )
-                }
-            }
+
+            header
         }
         .toolbar(.hidden, for: .navigationBar)
     }
 }
 
-// MARK: - Social Refresh Main Header
-struct CoffeeHeader: View {
+// MARK: - Main Header
+
+struct CoffeeHeader<RightView: View>: View {
     let title: String
     let subtitle: String
-    var notificationCount: Int = 0
-    var onNotificationTap: () -> Void = {}
-    var customRightButton: AnyView? = nil
-    var isFloating: Bool = true // Default is true for plug-and-play overlay mode
-    
+    let rightView: RightView
+
+    init(
+        title: String,
+        subtitle: String,
+        @ViewBuilder rightView: () -> RightView
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.rightView = rightView()
+    }
+
     var body: some View {
-        let card = HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
-                    .foregroundColor(.textPrimary)
-                
-                Text(subtitle)
-                    .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .bold)) // 14pt
-                    .foregroundColor(.textSecondary)
-            }
-            
-            Spacer()
-            
-            if let customRightButton = customRightButton {
-                customRightButton
-            } else {
-                // Notification Button
-                Button(action: onNotificationTap) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.surfaceMain)
-                            .frame(width: 56, height: 56)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
-                            )
-                        
-                        Image(systemName: AppIcons.bell)
-                            .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
-                            .foregroundColor(.textPrimary)
-                        
-                        if notificationCount > 0 {
-                            Circle()
-                                .fill(Color.brandPrimary)
-                                .frame(width: 18, height: 18)
-                                .overlay(
-                                    Text("\(notificationCount)")
-                                        .font(.system(size: 9, weight: .black))
-                                        .foregroundColor(.white)
-                                )
-                                .offset(x: 12, y: -12)
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 20)
-        .frame(height: AppConstants.Layout.headerHeight)
-        .background(
-            RoundedRectangle(cornerRadius: AppConstants.Layout.headerRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
-        )
-        .padding(.horizontal, AppConstants.Layout.standardPadding) // Screen horizontal margins
-        .padding(.top, AppConstants.Layout.headerTopPadding - 6)   // Safe area clearance
-        
-        if isFloating {
-            VStack(spacing: 0) {
-                ZStack(alignment: .top) {
-                    // Top Safe Area Glassmorphic Blur Backing Strip
-                    Color.clear
-                        .background(.ultraThinMaterial)
-                        .ignoresSafeArea(edges: .top)
-                        .frame(height: 142) // Covers status bar (47pt-59pt) + card padding + card height (82pt)
-                        .overlay(
-                            VStack {
-                                Spacer()
-                                Divider().opacity(0.15) // Subtle premium native bottom border
-                            }
+        VStack(spacing: 0) {
+            ZStack(alignment: .top) {
+                // Top Safe Area Glassmorphic Blur Backing Strip
+                Color.clear
+                    .background(.ultraThinMaterial)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .black, location: 0.0),
+                                .init(color: .black, location: 0.65),
+                                .init(color: .black.opacity(0), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
                         )
-                    
-                    card
+                    )
+                    .ignoresSafeArea(edges: .top)
+                    .frame(height: 60)
+
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(title)
+                            .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
+                            .foregroundColor(.textPrimary)
+
+                        Text(subtitle)
+                            .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .bold))
+                            .foregroundColor(.textSecondary)
+                    }
+
+                    Spacer()
+
+                    rightView
                 }
-                Spacer()
+                .padding(.horizontal, 20)
+                .frame(height: AppConstants.Layout.headerHeight)
+                .background(
+                    RoundedRectangle(
+                        cornerRadius: AppConstants.Layout.headerRadius,
+                        style: .continuous
+                    )
+                    .fill(.ultraThinMaterial)
+                    .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 8)
+                )
+                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                .padding(.top, AppConstants.Layout.headerTopPadding - 6)
             }
-            .zIndex(20) // Built-in layering
-        } else {
-            card
-        }
-    }
-}
 
-// MARK: - SubPage Header (For Detail Views)
-struct SubPageHeader<Trailing: View>: View {
-    let trailing: () -> Trailing
-    
-    init(@ViewBuilder trailing: @escaping () -> Trailing) {
-        self.trailing = trailing
-    }
-    
-    var body: some View {
-        HStack {
-            CoffeeBackButton()
-            
             Spacer()
-            
-            HStack(spacing: 8) {
-                trailing()
-            }
         }
-        .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .frame(height: 56)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge, style: .continuous))
-        .padding(.horizontal, 20)
+        .zIndex(20)
     }
 }
 
-extension SubPageHeader where Trailing == EmptyView {
-    init() {
-        self.init(trailing: { EmptyView() })
+// MARK: - Default Notification Header Extension
+
+extension CoffeeHeader where RightView == NotificationIconButton {
+    init(
+        title: String,
+        subtitle: String,
+        notificationCount: Int = 0,
+        onNotificationTap: @escaping () -> Void = {}
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.rightView = NotificationIconButton(
+            count: notificationCount,
+            action: onNotificationTap
+        )
     }
 }
 
-// MARK: - Subcomponents
+// MARK: - Sub Page Header
+
+struct CoffeeSubHeader<Trailing: View>: View {
+    let title: String?
+    let trailing: Trailing
+
+    init(
+        title: String? = nil,
+        @ViewBuilder trailing: () -> Trailing = { EmptyView() }
+    ) {
+        self.title = title
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            // Top Safe Area Glassmorphic Blur Backing Strip (Rule 8 & premium scroll alignment)
+            Color.clear
+                .background(.ultraThinMaterial)
+                .mask(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: .black, location: 0.0),
+                            .init(color: .black, location: 0.65),
+                            .init(color: .black.opacity(0), location: 1.0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .ignoresSafeArea(edges: .top)
+                .frame(height: AppConstants.Layout.headerTopPadding)
+
+            HStack(spacing: 12) {
+                CoffeeBackButton()
+
+                if let title {
+                    Text(title)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                trailing
+            }
+            .padding(.horizontal, AppConstants.Layout.standardPadding)
+            .frame(height: 56)
+            .background(.ultraThinMaterial)
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: AppConstants.UI.cornerRadiusLarge,
+                    style: .continuous
+                )
+            )
+            .padding(.horizontal, 20)
+            .padding(.top, AppConstants.Layout.headerTopPadding)
+            .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 6)
+        }
+        .zIndex(20)
+    }
+}
+
+// MARK: - Buttons
+
 struct CoffeeBackButton: View {
-    @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         Button(action: { dismiss() }) {
             Image(systemName: AppIcons.back)
@@ -209,35 +200,81 @@ struct CoffeeBackButton: View {
                 .foregroundColor(.textPrimary)
                 .frame(width: 44, height: 44)
                 .background(Circle().fill(Color.surfaceMain))
-                .overlay(Circle().stroke(Color.appBorder.opacity(0.3), lineWidth: 1))
-                .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+                .overlay(
+                    Circle()
+                        .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 2)
         }
         .pressScale(0.9)
     }
 }
 
-struct SubHeaderButton: View {
+struct NotificationIconButton: View {
+    var count: Int = 0
+    var action: () -> Void = {}
+
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(Color.surfaceMain)
+                    .frame(width: 56, height: 56)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+                    )
+
+                Image(systemName: AppIcons.bell)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.textPrimary)
+
+                if count > 0 {
+                    Text("\(min(count, 99))")
+                        .font(.system(size: 9, weight: .black))
+                        .foregroundColor(.white)
+                        .frame(width: 18, height: 18)
+                        .background(Color.brandPrimary)
+                        .clipShape(Circle())
+                        .offset(x: 12, y: -12)
+                }
+            }
+        }
+        .pressScale(0.9)
+    }
+}
+
+struct HeaderIconButton: View {
     let icon: String
-    var color: Color = .textPrimary
+    var color: Color = .brandPrimary
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: 18, weight: .bold))
                 .foregroundColor(color)
                 .frame(width: 44, height: 44)
                 .background(Color.surfaceMain)
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: AppConstants.UI.cornerRadiusSmall,
+                        style: .continuous
+                    )
+                )
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                        .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+                    RoundedRectangle(
+                        cornerRadius: AppConstants.UI.cornerRadiusSmall,
+                        style: .continuous
+                    )
+                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
                 )
         }
         .pressScale(0.9)
     }
 }
 
+// Kept for backward compatibility with view model headers
 struct CoffeeHeaderButton: View {
     let icon: String
     var color: Color = .brandPrimary
@@ -261,65 +298,89 @@ struct CoffeeHeaderButton: View {
     }
 }
 
-struct NotificationIconButton: View {
-    var showIndicator: Bool = false
-    var action: () -> Void = {}
-    
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(Color.surfaceMain)
-                    .frame(width: 56, height: 56)
-                    .overlay(
-                        Circle()
-                            .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
-                    )
-                
-                Image(systemName: AppIcons.bell)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.textPrimary)
-                
-                if showIndicator {
-                    Circle()
-                        .fill(Color.brandPrimary)
-                        .frame(width: 18, height: 18)
-                        .overlay(
-                            Text("3") // Mocked badge count
-                                .font(.system(size: 9, weight: .black))
-                                .foregroundColor(.white)
-                        )
-                        .offset(x: 12, y: -12)
-                }
-            }
-        }
-        .pressScale(0.9)
-    }
-}
-
 struct IconCircle: View {
     let icon: String
     var size: CGFloat = 56
     var color: Color = .brandPrimary
     var iconSize: CGFloat? = nil
-    
+
     var body: some View {
         ZStack {
             Circle()
                 .fill(color.opacity(AppConstants.UI.opacityLight))
                 .frame(width: size, height: size)
-            
+
             Image(systemName: icon)
-                .font(.system(size: iconSize ?? (size * 0.4), weight: .bold))
+                .font(.system(size: iconSize ?? size * 0.4, weight: .bold))
                 .foregroundColor(color)
         }
     }
 }
 
+// MARK: - Convenience Extensions
+
 extension View {
-    func asCoffeeScreen(config: CoffeeScreenConfiguration) -> some View {
-        CoffeeBasePage(config: config) {
+    // 1. General Main Page Extension supporting ANY Custom Right Hand View (e.g. Search, Settings)
+    func asCoffeeMainPage<RightView: View>(
+        title: String,
+        subtitle: String,
+        @ViewBuilder rightView: @escaping () -> RightView
+    ) -> some View {
+        CoffeeBasePage {
+            CoffeeHeader(
+                title: title,
+                subtitle: subtitle,
+                rightView: rightView
+            )
+        } content: {
+            self
+        }
+    }
+
+    // 2. Convenience Overload utilizing your default Notification bell
+    func asCoffeeMainPage(
+        title: String,
+        subtitle: String,
+        notificationCount: Int = 0,
+        onNotificationTap: @escaping () -> Void = {}
+    ) -> some View {
+        self.asCoffeeMainPage(title: title, subtitle: subtitle) {
+            NotificationIconButton(
+                count: notificationCount,
+                action: onNotificationTap
+            )
+        }
+    }
+
+    // 3. Sub Page Extension
+    func asCoffeeSubPage<Trailing: View>(
+        title: String? = nil,
+        topPadding: CGFloat = 96,
+        @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
+    ) -> some View {
+        CoffeeBasePage(topPadding: topPadding) {
+            CoffeeSubHeader(title: title, trailing: trailing)
+        } content: {
             self
         }
     }
 }
+
+// MARK: - Legacy Compatibility Typealiases (Rule 8)
+
+typealias SubPageHeader<Trailing: View> = CoffeeSubHeader<Trailing>
+typealias SubHeaderButton = HeaderIconButton
+
+// MARK: - Preview
+
+#Preview {
+    VStack {
+        Text("Discover content here")
+    }
+    .asCoffeeMainPage(
+        title: AppStrings.Discovery.title,
+        subtitle: AppStrings.Discovery.subtitleDefault,
+        notificationCount: 3
+    )
+}
+

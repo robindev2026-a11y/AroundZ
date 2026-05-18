@@ -1,7 +1,7 @@
 # CoffeeCall AI Working Rules
 
 Status: ACTIVE
-Last updated: 2026-05-16
+Last updated: 2026-05-18
 
 This file applies to every AI agent working in this repository.
 
@@ -68,6 +68,21 @@ Before UI implementation, search active docs for conflicts and state the active 
 - Do not commit unless the user asks.
 - Use semantic SwiftUI design tokens and local helpers where practical.
 - For meaningful work, update `docs/current/STATUS.md`.
+
+### SwiftUI Composable Design Principles
+
+1. **Avoid Early Over-Engineering**: Do not create protocols, enums, and `AnyView`-based configuration layers unless high structural complexity is truly required.
+2. **Prefer Generic Composition**: Build with generic view parameters (e.g., `Header: View`, `Content: View`, `RightView: View`) to keep views compile-time type-safe and highly reusable.
+3. **Avoid `AnyView`**: `AnyView` erases compiler type information and slows down rendering performance. Prefer `@ViewBuilder` and generic type constraints.
+4. **Flexible & Simple APIs**: Design components to support both a simple default implementation and custom advanced overrides (e.g., a default notification header overload alongside custom right-action slot builders).
+5. **No Hardcoded Mock Data**: Reusable layout elements must receive data dynamically from state, models, or bindings rather than using fixed constants.
+6. **No Debug Visuals in Production**: Purge debugging highlights like `Color.red` and testing visuals before closing a task.
+7. **Consolidate Duplicate Views**: Merge views with highly overlapping responsibilities or clearly separate them into focused components.
+8. **Preserve Backward Compatibility**: Retain legacy layout wrappers (like `CoffeeHeaderButton`) temporarily during migrations to avoid breaking the rest of the application.
+9. **Align with Design Language**: SwiftUI views must feel premium, modern, social, soft, layered, and human-centered.
+10. **Lightweight Composable Wrappers**: Custom page structures must be lightweight, modular lego blocks, not rigid protocol-bound configuration systems.
+
+* **Final Rule**: Build SwiftUI like Lego blocks — small, composable, type-safe components — not like a locked configuration system.
 
 ## Verification
 

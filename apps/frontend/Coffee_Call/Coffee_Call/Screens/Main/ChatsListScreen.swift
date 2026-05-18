@@ -27,7 +27,15 @@ struct ChatsListScreen: View {
                     chatSection(title: AppStrings.Chat.past, count: viewModel.pastDrifts.count, drifts: viewModel.pastDrifts)
                 }
             }
-            .asCoffeeScreen(config: viewModel)
+            .asCoffeeMainPage(
+                title: viewModel.title,
+                subtitle: viewModel.subtitle ?? ""
+            ) {
+                HStack(spacing: 12) {
+                    CoffeeHeaderButton(icon: AppIcons.search) {}
+                    CoffeeHeaderButton(icon: AppIcons.filter) {}
+                }
+            }
             .navigationDestination(for: Drift.self) { drift in
                 DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
             }

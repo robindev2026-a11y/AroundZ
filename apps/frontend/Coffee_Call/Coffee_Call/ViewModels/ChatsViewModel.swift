@@ -1,18 +1,9 @@
 import SwiftUI
 import Combine
 
-class ChatsViewModel: ObservableObject, CoffeeScreenConfiguration {
-    // CoffeeScreenConfiguration Conformance
+class ChatsViewModel: ObservableObject {
     var title: String { AppStrings.Chat.title }
     var subtitle: String? { AppStrings.Chat.subtitle }
-    var trailingActions: AnyView? {
-        AnyView(
-            HStack(spacing: 12) {
-                CoffeeHeaderButton(icon: AppIcons.search, action: {})
-                CoffeeHeaderButton(icon: AppIcons.filter, action: {})
-            }
-        )
-    }
     
     @Published var activeDrifts: [Drift] = []
     @Published var upcomingDrifts: [Drift] = []

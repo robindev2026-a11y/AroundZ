@@ -1,17 +1,9 @@
 import SwiftUI
 import Combine
 
-class ProfileViewModel: ObservableObject, CoffeeScreenConfiguration {
-    // CoffeeScreenConfiguration Conformance
+class ProfileViewModel: ObservableObject {
     var title: String { AppStrings.Profile.title }
     var subtitle: String? { "Your profile" }
-    var trailingActions: AnyView? {
-        AnyView(
-            CoffeeHeaderButton(icon: AppIcons.settings, action: { [weak self] in
-                self?.showingSettingsSheet = true
-            })
-        )
-    }
     
     @Published var showingSettingsSheet = false
     

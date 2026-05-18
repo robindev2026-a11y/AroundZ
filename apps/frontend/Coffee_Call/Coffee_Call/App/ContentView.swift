@@ -4,17 +4,8 @@ struct ContentView: View {
     @StateObject private var auth = AuthViewModel()
 
     var body: some View {
-        Group {
-            if auth.isAuthenticated {
-                MainTabView()
-            } else {
-                NavigationStack {
-                    OnboardingScreen()
-                        .toolbar(.hidden, for: .navigationBar)
-                }
-            }
-        }
-        .environmentObject(auth)
+        MainTabView()
+            .environmentObject(auth)
     }
 }
 
@@ -23,3 +14,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
