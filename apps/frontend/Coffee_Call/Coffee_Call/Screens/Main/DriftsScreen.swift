@@ -40,10 +40,8 @@ struct DriftsScreen: View {
                 title: viewModel.title,
                 subtitle: viewModel.subtitle ?? ""
             ) {
-                HStack(spacing: 12) {
-                    CoffeeHeaderButton(icon: AppIcons.search) {}
-                    CoffeeHeaderButton(icon: AppIcons.filter) {}
-                }
+                CoffeeHeaderButton(icon: AppIcons.search) {}
+                CoffeeHeaderButton(icon: AppIcons.filter) {}
             }
             .navigationDestination(for: Drift.self) { drift in
                 if viewModel.selectedMode == .mine {

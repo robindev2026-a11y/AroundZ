@@ -84,7 +84,9 @@ struct CoffeeHeader<RightView: View>: View {
 
                     Spacer()
 
-                    rightView
+                    HStack(spacing: AppConstants.Layout.miniPadding) {
+                        rightView
+                    }
                 }
                 .padding(.horizontal, 20)
                 .frame(height: AppConstants.Layout.headerHeight)
@@ -276,7 +278,7 @@ struct HeaderIconButton: View {
 
 struct CoffeeHeaderButton: View {
     let icon: String
-    var minSize: CGFloat = 44
+    var minSize: CGFloat = 20
     var maxSize: CGFloat = 120
     var iconSize: CGFloat = 16
     var color: Color = .brandPrimary
@@ -291,9 +293,9 @@ struct CoffeeHeaderButton: View {
                 .frame(minWidth: minSize, minHeight: minSize) // Guarantees comfortable tap area
                 .frame(maxWidth: maxSize, maxHeight: minSize) // Prevents oversized expanding
                 .background(.ultraThinMaterial)
-                .clipShape(Capsule()) // Fluid shape that handles wider content seamlessly
+                .clipShape(Circle()) // Keep Circle shape!
                 .overlay(
-                    Capsule()
+                    Circle()
                         .stroke(Color.white.opacity(0.4), lineWidth: 1)
                 )
                 .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
