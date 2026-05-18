@@ -20,6 +20,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 | Drifts listing implementation | Needs verification | `See nearby Drifts` should open `Nearby`; profile/status deep links may open `My Drifts`. |
 | Create Drift sheet | Existing / needs route verification | Center Create action should present the sheet. |
 | Profile UX | Concept direction only | Should stay lightweight and privacy-first. |
+| Chats UX | Spec created | Chats list + thread + info sheet defined in `docs/current/DESIGN.md`. |
 
 ## App Status
 
@@ -53,6 +54,11 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Defined required `Nearby` and `My Drifts` access, card states, empty states, and chat gating.
 - No Swift, Firebase, Xcode, or implementation files were changed for this UX pass.
 - Standardized the reusable Floating Glass Top Header in `docs/current/DESIGN.md` so primary screens share one header contract.
+
+2026-05-18:
+
+- Added the active Chats UX contract to `docs/current/DESIGN.md`.
+- Defined Chats List, Chat Thread, and Chat Info sheet with Drift-tied gating and safety guardrails.
 - Designed and implemented the high-fidelity iOS "You" (Profile) screen following the Social Refresh design.
 - Replaced the old profile layout with a privacy-first identity card, 2x2 private stats grid, preferences rows, and destructive sign-out alerts.
 - Files touched: `ProfileScreen.swift`, `ProfileViewModel.swift`, `CoffeeHeader.swift`.
@@ -119,7 +125,7 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Linked private stats grid dynamically to the underlying view model parameters instead of using static mock hardcoded text values.
   - Added a horizontal Activity Log (past physical drifts list) gallery at the bottom to represent user physical meetups history.
   - Refactored all profile visual components (Identity Card, Interest Tags, Stats Grid, and Activity Log cards) to discard custom `.system(size:)` literals and instead use standardized Font design tokens from `Font+Extensions.swift`.
-  - Exactly aligned all typography sizes and weights with the approved visual mockup: Name set to size 22 bold system font, sub-headers to size 18 bold system font, stat counts to size 26 bold, stat labels to size 13 medium gray, and preference list row values to size 14 medium gray, creating an absolutely gorgeous, clean native experience.
+  - Exactly aligned and further reduced all typography sizes and weights with the approved visual mockup: Name set to an ultra-clean size 18 bold system font, sub-headers to size 16 bold, stat counts to size 22 bold (or size 12 bold for empty states), stat labels to size 11 medium, and preference list row titles/values to size 14 bold / 13 medium gray, creating an absolutely gorgeous, high-density, and compact native experience.
 - Implemented Fully Persistent Profile CRUD Operations:
   - Overhauled `ProfileViewModel.swift` to introduce a secure, local persistence layer using `UserDefaults` to save and load profile details (name, bio, location, interests, availability weekday/weekend toggles).
   - Wired `computeInitials(name:)` helper to auto-compute display initials when saving the profile card name.
