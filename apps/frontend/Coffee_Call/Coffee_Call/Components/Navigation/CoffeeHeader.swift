@@ -39,16 +39,16 @@ struct CoffeeBasePage<Header: View, Content: View>: View {
 struct CoffeeHeader<RightView: View>: View {
     let title: String
     let subtitle: String
-    let rightView: RightView
+    let rightView: () -> RightView
 
     init(
         title: String,
         subtitle: String,
-        @ViewBuilder rightView: () -> RightView
+        @ViewBuilder rightView: @escaping () -> RightView
     ) {
         self.title = title
         self.subtitle = subtitle
-        self.rightView = rightView()
+        self.rightView = rightView
     }
 
     var body: some View {
@@ -85,7 +85,7 @@ struct CoffeeHeader<RightView: View>: View {
                     Spacer()
 
                     HStack(spacing: AppConstants.Layout.miniPadding) {
-                        rightView
+                        rightView()
                     }
                 }
                 .padding(.horizontal, 20)
@@ -119,10 +119,12 @@ extension CoffeeHeader where RightView == NotificationIconButton {
     ) {
         self.title = title
         self.subtitle = subtitle
-        self.rightView = NotificationIconButton(
-            count: notificationCount,
-            action: onNotificationTap
-        )
+        self.rightView = {
+            NotificationIconButton(
+                count: notificationCount,
+                action: onNotificationTap
+            )
+        }
     }
 }
 
