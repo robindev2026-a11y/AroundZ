@@ -105,7 +105,7 @@ struct ProfileScreen: View {
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(viewModel.name)
-                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
+                        .font(.heading2)
                         .foregroundColor(.textPrimary)
                     
                     HStack(spacing: 4) {
@@ -114,7 +114,7 @@ struct ProfileScreen: View {
                             .foregroundColor(.textSecondary)
                         
                         Text("Bengaluru • 10 km radius")
-                            .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                            .font(.captionText)
                             .foregroundColor(.textSecondary)
                     }
                     
@@ -125,7 +125,7 @@ struct ProfileScreen: View {
                             .foregroundColor(.brandPrimary)
                         
                         Text("Verified phone")
-                            .font(.system(size: AppConstants.Typography.sizeMicro, weight: .bold))
+                            .font(.metadata)
                             .foregroundColor(.brandPrimaryDark)
                     }
                     .padding(.horizontal, 8)
@@ -144,9 +144,9 @@ struct ProfileScreen: View {
                         ForEach(viewModel.interests, id: \.self) { category in
                             HStack(spacing: 4) {
                                 Image(systemName: category.icon)
-                                    .font(.system(size: AppConstants.Typography.sizeCaption - 1, weight: .bold))
+                                    .font(.captionText)
                                 Text(category.rawValue.capitalized)
-                                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                                    .font(.captionText)
                             }
                             .foregroundColor(category.color)
                             .padding(.horizontal, 10)
@@ -171,7 +171,7 @@ struct ProfileScreen: View {
                         Text("Edit profile")
                         Image(systemName: "pencil")
                     }
-                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
+                    .font(.captionText)
                     .foregroundColor(.brandPrimary)
                 }
                 .pressScale(0.92)
@@ -239,7 +239,7 @@ struct ProfileScreen: View {
                     .foregroundColor(.textSecondary)
                 
                 Text("Stats are private to you.")
-                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                    .font(.captionText)
                     .foregroundColor(.textSecondary)
             }
             .padding(.leading, 4)
@@ -261,12 +261,12 @@ struct ProfileScreen: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(count)
-                    .font(.system(size: count == "Coming soon" ? AppConstants.Typography.sizeCaption : AppConstants.Typography.sizeHeadline + 1, weight: .black))
+                    .font(count == "Coming soon" ? .captionText : .heading2)
                     .foregroundColor(count == "Coming soon" ? .textSecondary : .textPrimary)
                     .lineLimit(1)
                 
                 Text(label)
-                    .font(.system(size: AppConstants.Typography.sizeCaption - 1, weight: .bold))
+                    .font(.metadata)
                     .foregroundColor(.textSecondary)
                     .lineLimit(1)
             }
@@ -441,12 +441,12 @@ struct ProfileScreen: View {
     private var activityLogSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Activity Log")
-                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
+                .font(.bodyBold)
                 .foregroundColor(.textPrimary)
             
             if viewModel.historyDrifts.isEmpty {
                 Text("No past activities yet.")
-                    .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
+                    .font(.bodyStandard)
                     .foregroundColor(.textSecondary)
                     .padding(.vertical, 8)
             } else {
@@ -479,7 +479,7 @@ struct ProfileScreen: View {
                 
                 // Status badge
                 Text(drift.status.rawValue)
-                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
+                    .font(.micro)
                     .foregroundColor(drift.status.color)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
@@ -488,7 +488,7 @@ struct ProfileScreen: View {
             }
             
             Text(drift.title)
-                .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .black))
+                .font(.captionText)
                 .foregroundColor(.textPrimary)
                 .lineLimit(2)
                 .frame(height: 38, alignment: .topLeading)
@@ -501,7 +501,7 @@ struct ProfileScreen: View {
                     .foregroundColor(.textSecondary)
                 
                 Text(drift.location) // This has e.g. "Open • Yesterday" or "Ended • 5 days ago"
-                    .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
+                    .font(.metadata)
                     .foregroundColor(.textSecondary)
             }
         }
