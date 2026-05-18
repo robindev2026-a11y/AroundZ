@@ -52,7 +52,7 @@ struct ProfileScreen: View {
                 InterestsSheetView(viewModel: viewModel)
             }
             .sheet(isPresented: $showingAvailabilitySheet) {
-                AvailabilitySheetView()
+                AvailabilitySheetView(viewModel: viewModel)
             }
             .sheet(isPresented: $showingNotificationsSheet) {
                 NotificationsSheetView()
@@ -61,7 +61,7 @@ struct ProfileScreen: View {
                 PrivacySheetView()
             }
             .sheet(isPresented: $showingLocationSheet) {
-                LocationSheetView()
+                LocationSheetView(viewModel: viewModel)
             }
             .sheet(isPresented: $showingHelpSheet) {
                 HelpSheetView()
@@ -69,6 +69,7 @@ struct ProfileScreen: View {
             .alert("Sign out", isPresented: $showingSignOutAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Sign out", role: .destructive) {
+                    viewModel.signOut()
                     auth.signOut()
                 }
             } message: {
@@ -297,7 +298,7 @@ struct ProfileScreen: View {
                     icon: "heart.fill",
                     color: Color.brandPrimary,
                     title: "Interests",
-                    value: "Coffee, Walks, Food"
+                    value: viewModel.interests.isEmpty ? "None" : viewModel.interests.map { $0.rawValue.capitalized }.joined(separator: ", ")
                 ) {
                     showingInterestsSheet = true
                 }
@@ -309,7 +310,7 @@ struct ProfileScreen: View {
                     icon: "clock.fill",
                     color: Color.brandPurple,
                     title: "Availability",
-                    value: "Weekdays evenings"
+                    value: viewModel.availabilitySummary
                 ) {
                     showingAvailabilitySheet = true
                 }
@@ -360,7 +361,7 @@ struct ProfileScreen: View {
                     icon: "mappin.circle.fill",
                     color: Color.brandPrimary,
                     title: "Location",
-                    value: "Bengaluru, India"
+                    value: viewModel.location
                 ) {
                     showingLocationSheet = true
                 }
@@ -693,9 +694,7 @@ struct InterestsSheetView: View {
 // MARK: - Availability Sheet View
 struct AvailabilitySheetView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var weekdayEvenings = true
-    @State private var weekends = true
-    @State private var daytime = false
+    @ObservedObject var viewModel: ProfileViewModel
     
     var body: some View {
         NavigationStack {
@@ -711,11 +710,11 @@ struct AvailabilitySheetView: View {
                             .padding(.top, 12)
                         
                         VStack(spacing: 0) {
-                            ToggleRow(title: "Weekday evenings", isOn: $weekdayEvenings)
+                            ToggleRow(title: "Weekday evenings", isOn: $viewModel.availabilityWeekdayEvenings)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "Weekends", isOn: $weekends)
+                            ToggleRow(title: "Weekends", isOn: $viewModel.availabilityWeekends)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "Daytime / Lunch", isOn: $daytime)
+                            ToggleRow(title: "Daytime / Lunch", isOn: $viewModel.availabilityDaytime)
                         }
                         .background(Color.surfaceMain)
                         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
@@ -849,8 +848,8 @@ struct PrivacySheetView: View {
 // MARK: - Location Sheet View
 struct LocationSheetView: View {
     @Environment(\.dismiss) var dismiss
+    @ObservedObject var viewModel: ProfileViewModel
     @State private var isUpdating = false
-    @State private var locationName = "Bengaluru, India"
     
     var body: some View {
         NavigationStack {
@@ -871,7 +870,7 @@ struct LocationSheetView: View {
                     }
                     
                     VStack(spacing: 8) {
-                        Text(locationName)
+                        Text(viewModel.location)
                             .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                             .foregroundColor(.textPrimary)
                         
@@ -884,7 +883,7 @@ struct LocationSheetView: View {
                         isUpdating = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             isUpdating = false
-                            locationName = "Bengaluru, Karnataka"
+                            viewModel.location = "Bengaluru, Karnataka"
                         }
                     }) {
                         HStack(spacing: 8) {
