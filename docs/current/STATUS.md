@@ -118,7 +118,8 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Integrated active interest capsule tags cloud directly inside the primary profile identity card.
   - Linked private stats grid dynamically to the underlying view model parameters instead of using static mock hardcoded text values.
   - Added a horizontal Activity Log (past physical drifts list) gallery at the bottom to represent user physical meetups history.
-  - Refactored all profile visual components (Identity Card, Interest Tags, Stats Grid, and Activity Log cards) to discard custom `.system(size:)` literals and instead use standardized Font design tokens (`.heading2`, `.bodyBold`, `.bodyStandard`, `.captionText`, `.metadata`, and `.micro`) from `Font+Extensions.swift` to ensure perfect native scaling and compact presentation.
+  - Refactored all profile visual components (Identity Card, Interest Tags, Stats Grid, and Activity Log cards) to discard custom `.system(size:)` literals and instead use standardized Font design tokens from `Font+Extensions.swift`.
+  - Exactly aligned all typography sizes and weights with the approved visual mockup: Name set to size 22 bold system font, sub-headers to size 18 bold system font, stat counts to size 26 bold, stat labels to size 13 medium gray, and preference list row values to size 14 medium gray, creating an absolutely gorgeous, clean native experience.
 - Implemented Fully Persistent Profile CRUD Operations:
   - Overhauled `ProfileViewModel.swift` to introduce a secure, local persistence layer using `UserDefaults` to save and load profile details (name, bio, location, interests, availability weekday/weekend toggles).
   - Wired `computeInitials(name:)` helper to auto-compute display initials when saving the profile card name.
