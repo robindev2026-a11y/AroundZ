@@ -274,18 +274,19 @@ struct HeaderIconButton: View {
     }
 }
 
-// Kept for backward compatibility with view model headers
 struct CoffeeHeaderButton: View {
     let icon: String
+    var size: CGFloat = 44
+    var iconSize: CGFloat = 16
     var color: Color = .brandPrimary
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: iconSize, weight: .bold))
                 .foregroundColor(color)
-                .frame(width: 56, height: 56)
+                .frame(width: size, height: size)
                 .background(.ultraThinMaterial)
                 .clipShape(Circle())
                 .overlay(
