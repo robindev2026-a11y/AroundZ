@@ -361,6 +361,267 @@ My Drifts empty state:
 - Avoid dense enterprise table layouts.
 - Avoid oversized marketing-style hero blocks.
 
+## Chats: Active Chat Screens
+
+Chats are Drift-tied conversations for coordination only. There is no direct person-to-person cold messaging in MVP. Every chat thread must be associated with a Drift the user is hosting or has joined.
+
+### Intent
+
+Chats should make it effortless to:
+
+- continue coordination for a Drift the user is part of,
+- find the right Drift thread quickly,
+- view key Drift context without leaving the thread,
+- keep the experience safe and activity-first.
+
+### Screen Set
+
+Chats has three primary screens:
+
+1. Chats Home (Bubble Field)
+2. Chat Thread (Conversation) (Drift Room)
+3. Chat Detail (Info Sheet)
+
+Optional (MVP-safe) supporting sheets:
+
+- Attachment picker (system)
+
+### Entry Points
+
+- Bottom nav `Chats` opens Chats Home (Bubble Field).
+- A Drift Detail screen may deep link directly into the Chat Thread only after the user is hosting or joined.
+- Notifications for new messages open the Chat Thread.
+
+### Shared Components
+
+- Use the shared Floating Glass Top Header on Chats Home.
+- Use the shared floating bottom nav on Chats Home.
+- Chat Thread uses a standard navigation header (or a compact glass header) but must preserve the same typography/tokens and avoid a new visual style.
+
+### Chats Home (Bubble Field)
+
+Purpose: make chats feel alive and Drift-first without looking like a generic messaging app. The “bubble field” communicates active plans forming nearby, and each bubble represents a Drift room.
+
+#### Top Header
+
+- Use the shared Floating Glass Top Header.
+- Title: `Chats`.
+- Subtitle: `Drift rooms`.
+- Right action: circular view toggle button (52-56pt) that switches `Bubbles` <-> `List`.
+  - In Bubble view, show a list icon.
+  - In List view, show a bubble icon.
+  - This toggle controls only the presentation, not what content is available.
+
+#### Layout
+
+Target iPhone planning size: 393 x 852pt.
+
+1. Floating glass top header.
+2. Drift status filter row.
+3. Bubble Field (primary content) OR Compact Rooms List (list mode).
+5. Floating glass bottom navigation.
+
+#### Drift Status Filter Row
+
+This row separates Drift-based chats by the user's relationship/state. It is not a social filter and must not introduce people browsing.
+
+- Horizontal chips row (preferred) under the header.
+- Horizontal margin: 20pt.
+- Height: 36-40pt.
+- Chip radius: 18-20pt.
+- Chips:
+  - `Active` (default)
+  - `Joined`
+  - `Hosted`
+  - `Expired`
+- Active chip uses mint-tinted fill + mint text.
+- Inactive chips use card surface with border `#E7DED4` and secondary text.
+
+Definitions:
+
+- `Active`: Drifts the user is Hosting or Joined and that are currently active/upcoming.
+- `Joined`: Drifts where the user is Joined (not Hosting).
+- `Hosted`: Drifts where the user is Hosting.
+- `Expired`: Drifts that have ended or been archived. This replaces the older `Archived` concept for Chats.
+
+#### Presentation Mode
+
+- Default is Bubble Field.
+- The header toggle switches between:
+  - Bubble Field (alive, ambient)
+  - Compact Rooms List (scan-friendly)
+
+#### Bubble Field
+
+The Bubble Field occupies most of the screen and contains 8-12 bubbles on a warm background.
+
+Bubble rules:
+
+- Each bubble = one Drift room the user is `Hosting` or `Joined`, filtered by the Drift status filter row.
+- Requested/pending Drifts must not appear.
+- No bubbles represent people. No avatars, no faces, no profile entry points.
+
+Field sizing:
+
+- Top spacing: 12-16pt below the mode strip (or header if mode strip omitted).
+- Bottom spacing: ensure the field leaves breathing room above the floating bottom nav.
+
+Bubble sizes:
+
+- Small: 56-64pt.
+- Medium: 72-88pt.
+- Large: 96-120pt.
+- Only 1-2 large bubbles on screen at a time.
+
+Bubble visuals:
+
+- Surface: glassy card surface with subtle blur, very soft highlight stroke, and slate-tinted shadow.
+- Category accent: thin ring or inner glow using mint/lavender/peach depending on the Drift category.
+- Content inside bubble:
+  - Category icon (centered, simple).
+  - Short label (1 line) below icon for medium/large bubbles, e.g. `Coffee`, `Walks`, `Food`, `Movie`.
+  - For large bubbles only, optionally include a second line: time chip like `Today 6:30`.
+
+Live-ness indicators (subtle):
+
+- Unread pulse dot: tiny mint dot at the bubble’s upper-right edge if unread messages exist.
+- Activity badge (optional): `+3` as a tiny pill if many unread; cap at `99+`.
+- “Starting soon” halo (optional): very subtle glow ring if Drift starts within 60 minutes.
+
+Motion / interaction (must be gentle, not distracting):
+
+- Ambient drift: slow, calm movement (floating) across a small range.
+- Soft repulsion: bubbles gently separate when they overlap.
+- Parallax: minimal device-tilt or scroll-based parallax if available.
+- Tap bubble: opens the Chat Thread for that Drift.
+- Long press bubble: opens a small action sheet:
+  - `Open Room`
+  - `Info`
+  - `Mute`
+  - `Archive` (optional)
+
+#### Compact Rooms List (List Mode)
+
+List mode is the scan-friendly view that matches an Instagram-style message list, but each row is still a Drift room.
+
+Row rules:
+
+- Threads represent Drift rooms only (no global DMs, no people directory).
+- Only Drifts where the user is `Hosting` or `Joined` appear, filtered by the Drift status chips.
+
+Row sizing (compact):
+
+- Row height: 56-64pt (target 60pt).
+- Horizontal margin: 20pt.
+- Row radius: 18-20pt.
+- Leading icon well: 36-40pt circle.
+- Title: 16-17pt semibold, 1 line.
+- Preview: 13-14pt secondary, 1 line.
+- Trailing time: 12pt secondary.
+- Unread indicator: mint dot preferred; tiny count pill allowed for >1 unread.
+
+Tap row opens Chat Thread.
+
+Empty state (when filter has no rooms):
+
+- Title: `No Drift chats yet`.
+- Body: `Chats appear after you join or host a Drift.`
+- Secondary action: `Browse Drifts` routes to Drifts (Nearby).
+
+### Chat Thread (Conversation)
+
+This is the Drift room conversation screen.
+
+#### Thread Header (Compact)
+
+Purpose: provide Drift context without encouraging person browsing.
+
+- Title: Drift purpose, e.g. `Coffee after work`.
+- Subtitle: `Today 6:30 PM • Location unlocked` (since this screen only exists for joined/hosting).
+- Right action: `Info` button opens Chat Detail (Info Sheet).
+
+#### Context Strip (Optional but Recommended)
+
+A compact "Drift Context" strip at the top of the message list:
+
+- Shows: time, approximate/unlocked location, participant count, and status (Hosting/Joined).
+- Height: 44-52pt.
+- Uses card surface with subtle border.
+- Tapping opens Drift Detail (read-only summary) or Chat Detail sheet.
+
+#### Message List
+
+- Standard bubble list with comfortable spacing.
+- Use neutral bubbles with subtle tints:
+  - Incoming: card surface / light neutral.
+  - Outgoing: mint-tinted subtle fill (not fully saturated mint).
+- Timestamp separators are subtle secondary text.
+- Sender identity:
+  - For group rooms, show first name or initial as a small label above the bubble when needed.
+  - Avoid avatar stacks that turn the screen into a people UI.
+
+#### Composer
+
+- Fixed input at bottom, above safe area.
+- Components:
+  - Text field (card surface, 16-20pt radius).
+  - Send button (mint circular or rounded, pressed mint on press).
+  - Optional attachment icon (paperclip) if attachments exist; otherwise omit.
+- No call button, no share phone number, no "DM user" affordance.
+
+#### Safety / Guardrails
+
+- A small inline system note can appear once per thread: `Keep details in-app. No phone numbers.` (optional, MVP-safe).
+- Report/Block is available only via Chat Detail, not as a visible main action.
+
+### Chat Detail (Info Sheet)
+
+Purpose: show Drift context, participants, and safety controls without exposing a social directory.
+
+Presentation:
+
+- Bottom sheet presentation from the Chat Thread.
+- Height: ~70-80% of screen.
+- Corner radius: 28-32pt.
+
+Header:
+
+- Title: `About this Drift`.
+- Subtitle: drift purpose (small).
+- Close button: `X`.
+
+Section: Drift Details (card)
+
+- Purpose, time, location state (`Location unlocked`).
+- Optional host note / rules (1-3 lines).
+- Actions:
+  - Primary: `View Drift` (opens Drift detail).
+  - Secondary: `Mute room`.
+
+Section: Participants (card)
+
+- Title: `Participants (N)`.
+- List: first names or initials (no full social profile).
+- Host label: `(Host)` for the host.
+- Optional “Message in context” action:
+  - If enabled, allow 1:1 only inside the same Drift context.
+  - This must not create a global DM directory or cold messaging surface.
+  - Keep it low emphasis (icon-only) and never the primary call to action.
+
+Section: Safety & Controls (card)
+
+- `Report Drift` (destructive).
+- `Block user` (destructive; opens picker).
+- `Leave Drift` (destructive) if supported.
+
+No profile deep links, no follower actions.
+
+### Interaction Rules
+
+- Users can only see threads for Drifts they are hosting or joined.
+- Users can only send messages in those threads.
+- Requested/pending join state must not show Chat; it can show "Awaiting acceptance" on Drift Detail.
+
 ## Other Screen Direction
 
 - Drifts: follow the active Drifts screen spec above. Pre-join shows approximate location; post-join unlocks exact coordination.

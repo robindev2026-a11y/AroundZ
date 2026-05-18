@@ -88,10 +88,10 @@ enum DriftCategory: String, Hashable, CaseIterable {
         case .walk:   return AppIcons.walk
         case .movie:  return AppIcons.movie
         case .food:   return AppIcons.food
-        case .study:  return AppIcons.notes
+        case .study:  return "book"
         case .gaming: return "gamecontroller"
         case .music: return "music.note"
-        case .yoga: return "figure.yoga"
+        case .yoga: return "dumbbell.fill"
         case .event: return AppIcons.calendar
         }
     }
@@ -99,14 +99,14 @@ enum DriftCategory: String, Hashable, CaseIterable {
     var color: Color {
         switch self {
         case .coffee: return .brandPrimary
-        case .walk:   return .brandPrimaryDark
+        case .walk:   return .brandPurple
         case .movie:  return .brandPurple
         case .food:   return .brandSecondary
         case .study:  return .brandPrimary
-        case .gaming: return .brandPurple
+        case .gaming: return .brandSecondary
         case .music: return .brandPurple
-        case .yoga: return .brandSecondary
-        case .event: return .brandPrimary
+        case .yoga: return .brandPrimary
+        case .event: return .brandSecondary
         }
     }
 }

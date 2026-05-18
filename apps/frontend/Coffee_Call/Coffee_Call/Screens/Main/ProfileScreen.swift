@@ -13,6 +13,10 @@ struct ProfileScreen: View {
     @State private var showingLocationSheet = false
     @State private var showingHelpSheet = false
     
+    // Stats Details State
+    @State private var showingStatsSheet = false
+    @State private var selectedStatType: StatType? = nil
+    
     @EnvironmentObject var auth: AuthViewModel
     
     var body: some View {
@@ -65,6 +69,14 @@ struct ProfileScreen: View {
             }
             .sheet(isPresented: $showingHelpSheet) {
                 HelpSheetView()
+            }
+            .sheet(isPresented: $showingStatsSheet) {
+                if let selectedStatType {
+                    StatsDetailSheetView(
+                        type: selectedStatType,
+                        count: countForStat(selectedStatType)
+                    )
+                }
             }
             .alert(AppStrings.Profile.signOut, isPresented: $showingSignOutAlert) {
                 Button(AppStrings.Common.cancel, role: .cancel) {}
@@ -197,38 +209,18 @@ struct ProfileScreen: View {
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     // Tile 1: Hosted
-                    statTile(
-                        icon: AppIcons.coffeeFill,
-                        color: Color.brandPrimary,
-                        count: "\(viewModel.driftsHosted)",
-                        label: AppStrings.Profile.hostedLabel
-                    )
+                    statTile(type: .hosted, count: "\(viewModel.driftsHosted)")
                     
                     // Tile 2: People Joined
-                    statTile(
-                        icon: AppIcons.participants,
-                        color: Color.brandPurple,
-                        count: "\(viewModel.driftsJoined)",
-                        label: AppStrings.Profile.joinedLabel
-                    )
+                    statTile(type: .joined, count: "\(viewModel.driftsJoined)")
                 }
                 
                 HStack(spacing: 12) {
                     // Tile 3: No-shows
-                    statTile(
-                        icon: AppIcons.calendar,
-                        color: Color.brandSecondary,
-                        count: "\(viewModel.noShowsCount)",
-                        label: AppStrings.Profile.noShowsLabel
-                    )
+                    statTile(type: .noShows, count: "\(viewModel.noShowsCount)")
                     
                     // Tile 4: Score (Coming soon)
-                    statTile(
-                        icon: AppIcons.clockFill,
-                        color: Color.textSecondary,
-                        count: viewModel.score,
-                        label: AppStrings.Profile.scoreLabel
-                    )
+                    statTile(type: .score, count: viewModel.score)
                 }
             }
             
@@ -246,43 +238,59 @@ struct ProfileScreen: View {
         }
     }
     
-    private func statTile(icon: String, color: Color, count: String, label: String) -> some View {
-        HStack(spacing: 8) { // Reduced spacing from 12 to 8
-            // Icon circle well (38x38) - Reduced from 46x46
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.12))
-                    .frame(width: 38, height: 38)
+    private func statTile(type: StatType, count: String) -> some View {
+        Button(action: {
+            selectedStatType = type
+            showingStatsSheet = true
+        }) {
+            HStack(spacing: 8) {
+                // Icon circle well (38x38)
+                ZStack {
+                    Circle()
+                        .fill(type.color.opacity(0.12))
+                        .frame(width: 38, height: 38)
+                    
+                    Image(systemName: type.icon)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(type.color)
+                }
                 
-                Image(systemName: icon)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(color)
-            }
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(count)
-                    .font(.system(size: count == "Coming soon" ? 12 : 22, weight: .bold))
-                    .foregroundColor(count == "Coming soon" ? .textSecondary : .textPrimary)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(count)
+                        .font(.system(size: count == "Coming soon" ? 12 : 22, weight: .bold))
+                        .foregroundColor(count == "Coming soon" ? .textSecondary : .textPrimary)
+                        .lineLimit(1)
+                    
+                    Text(type.title)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.textSecondary)
+                        .lineLimit(1)
+                }
                 
-                Text(label)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.textSecondary)
-                    .lineLimit(1)
+                Spacer(minLength: 0)
             }
-            
-            Spacer(minLength: 0)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .frame(height: 70)
+            .background(Color.surfaceMain)
+            .cornerRadius(AppConstants.UI.cornerRadiusMedium + 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium + 2)
+                    .stroke(Color.appBorder, lineWidth: 1)
+            )
         }
-        .padding(.horizontal, 10) // Reduced horizontal padding from 16 to 10
-        .padding(.vertical, 12)   // Reduced vertical padding from 14 to 12
-        .frame(maxWidth: .infinity)
-        .frame(height: 70)        // Reduced height from 74 to 70 for standard compact UI
-        .background(Color.surfaceMain)
-        .cornerRadius(AppConstants.UI.cornerRadiusMedium + 2) // radius 22pt
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium + 2)
-                .stroke(Color.appBorder, lineWidth: 1)
-        )
+        .buttonStyle(PlainButtonStyle())
+        .pressScale(0.96)
+    }
+    
+    private func countForStat(_ type: StatType) -> String {
+        switch type {
+        case .hosted: return "\(viewModel.driftsHosted)"
+        case .joined: return "\(viewModel.driftsJoined)"
+        case .noShows: return "\(viewModel.noShowsCount)"
+        case .score: return viewModel.score
+        }
     }
     
     // MARK: - Preferences List
@@ -433,7 +441,6 @@ struct ProfileScreen: View {
             .padding(.vertical, 14)
             .contentShape(Rectangle())
         }
-        .buttonStyle(PlainButtonStyle())
         .pressScale(0.98)
     }
     
@@ -1009,6 +1016,150 @@ struct ToggleRow: View {
         .tint(.brandPrimary)
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
+    }
+}
+
+// MARK: - Stat Type Enum
+enum StatType: String, CaseIterable, Identifiable {
+    case hosted
+    case joined
+    case noShows
+    case score
+    
+    var id: String { self.rawValue }
+    
+    var title: String {
+        switch self {
+        case .hosted: return AppStrings.Profile.hostedDetailTitle
+        case .joined: return AppStrings.Profile.joinedDetailTitle
+        case .noShows: return AppStrings.Profile.noShowsDetailTitle
+        case .score: return AppStrings.Profile.scoreDetailTitle
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .hosted: return AppIcons.coffeeFill
+        case .joined: return AppIcons.participants
+        case .noShows: return AppIcons.calendar
+        case .score: return AppIcons.clockFill
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .hosted: return .brandPrimary
+        case .joined: return .brandPurple
+        case .noShows: return .brandSecondary
+        case .score: return .textSecondary
+        }
+    }
+}
+
+// MARK: - Stats Detail Sheet View
+struct StatsDetailSheetView: View {
+    @Environment(\.dismiss) var dismiss
+    let type: StatType
+    let count: String
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.backgroundMain.ignoresSafeArea()
+                
+                VStack(spacing: AppConstants.Layout.sectionSpacing) {
+                    Spacer()
+                    
+                    // Large Premium Icon Visual
+                    ZStack {
+                        Circle()
+                            .fill(type.color.opacity(0.12))
+                            .frame(width: 100, height: 100)
+                        
+                        Image(systemName: type.icon)
+                            .font(.system(size: 44, weight: .bold))
+                            .foregroundColor(type.color)
+                    }
+                    .shadow(color: type.color.opacity(0.1), radius: 10, x: 0, y: 5)
+                    
+                    VStack(spacing: 8) {
+                        Text(count)
+                            .font(.system(size: count == "Coming soon" ? 20 : 44, weight: .black))
+                            .foregroundColor(.textPrimary)
+                        
+                        Text(type.title)
+                            .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
+                            .foregroundColor(.textSecondary)
+                    }
+                    
+                    // Stat Card with beautiful description
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(spacing: 8) {
+                            Image(systemName: AppIcons.shieldVerified)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.brandPrimary)
+                            
+                            Text("About \(type.title)")
+                                .font(.system(size: 14, weight: .black))
+                                .foregroundColor(.brandPrimaryDark)
+                        }
+                        
+                        Text(description(for: type))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.textSecondary)
+                            .lineSpacing(4)
+                    }
+                    .padding(20)
+                    .background(Color.surfaceMain)
+                    .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
+                            .stroke(Color.appBorder, lineWidth: 1)
+                    )
+                    .padding(.horizontal, 20)
+                    
+                    Spacer()
+                    
+                    // Dismiss Button
+                    Button(action: { dismiss() }) {
+                        Text(AppStrings.Common.done)
+                            .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.brandPrimary)
+                            .cornerRadius(28)
+                            .shadow(color: Color.brandPrimary.opacity(0.2), radius: 8, x: 0, y: 4)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+                }
+            }
+            .navigationTitle(type.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(AppStrings.Common.close) {
+                        dismiss()
+                    }
+                    .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
+                    .foregroundColor(.brandPrimary)
+                }
+            }
+        }
+    }
+    
+    private func description(for type: StatType) -> String {
+        switch type {
+        case .hosted:
+            return AppStrings.Profile.hostedDetailDesc
+        case .joined:
+            return AppStrings.Profile.joinedDetailDesc
+        case .noShows:
+            return AppStrings.Profile.noShowsDetailDesc
+        case .score:
+            return AppStrings.Profile.scoreDetailDesc
+        }
     }
 }
 

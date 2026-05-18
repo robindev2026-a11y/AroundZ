@@ -22,6 +22,9 @@ enum AppColors: String {
     case error = "coffeeError"
     
     var color: Color {
-        Color(self.rawValue)
+        if self == .error {
+            return Color(red: 0.86, green: 0.25, blue: 0.25) // Beautiful warm brand error red
+        }
+        return Color(self.rawValue)
     }
 }

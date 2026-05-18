@@ -29,22 +29,15 @@ enum CoffeeAnimation {
     static let longDuration: Double = 0.5
 }
 
-// MARK: - Button Press Scale Modifier
-/// Replicates the subtle scale-down on press seen in the Figma design
-struct PressScaleModifier: ViewModifier {
+// MARK: - Button Press Scale Style
+/// Replicates the subtle scale-down on press seen in the Figma design without blocking scroll gestures
+struct PressScaleButtonStyle: ButtonStyle {
     var scale: CGFloat = 0.96
 
-    @State private var isPressed = false
-
-    func body(content: Content) -> some View {
-        content
-            .scaleEffect(isPressed ? scale : 1.0)
-            .animation(CoffeeAnimation.springSnap, value: isPressed)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in isPressed = true }
-                    .onEnded   { _ in isPressed = false }
-            )
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? scale : 1.0)
+            .animation(CoffeeAnimation.springSnap, value: configuration.isPressed)
     }
 }
 
@@ -86,7 +79,7 @@ struct FadeInModifier: ViewModifier {
 extension View {
     /// Scale down on press — Figma button feedback
     func pressScale(_ scale: CGFloat = 0.96) -> some View {
-        modifier(PressScaleModifier(scale: scale))
+        self.buttonStyle(PressScaleButtonStyle(scale: scale))
     }
 
     /// Slide up and fade in on appear

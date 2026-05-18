@@ -193,6 +193,74 @@ struct CoffeeSubHeader<Trailing: View>: View {
     }
 }
 
+// MARK: - Coffee Chat Header
+
+struct CoffeeChatHeader<Trailing: View>: View {
+    let categoryIcon: String
+    let categoryColor: Color
+    let title: String
+    let subtitle: String
+    let trailing: Trailing
+
+    init(
+        categoryIcon: String,
+        categoryColor: Color,
+        title: String,
+        subtitle: String,
+        @ViewBuilder trailing: () -> Trailing
+    ) {
+        self.categoryIcon = categoryIcon
+        self.categoryColor = categoryColor
+        self.title = title
+        self.subtitle = subtitle
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Reusable Back Button
+            CoffeeBackButton()
+            
+            // Middle Content Capsule
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(categoryColor.opacity(AppConstants.UI.opacityLight))
+                        .frame(width: 42, height: 42)
+                    Image(systemName: categoryIcon)
+                        .font(.system(size: 18))
+                        .foregroundColor(categoryColor)
+                }
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+                    
+                    Text(subtitle)
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                        .foregroundColor(.textSecondary)
+                        .lineLimit(1)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.surfaceMain)
+            .cornerRadius(AppConstants.UI.cornerRadiusLarge - 6)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge - 6)
+                    .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+            
+            // Trailing view (e.g. Info Button)
+            trailing
+        }
+    }
+}
+
 // MARK: - Buttons
 
 struct CoffeeBackButton: View {

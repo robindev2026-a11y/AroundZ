@@ -60,6 +60,8 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Added the active Chats UX contract to `docs/current/DESIGN.md`.
 - Defined Chats List, Chat Thread, and Chat Info sheet with Drift-tied gating and safety guardrails.
 - Updated Chats UX to add Drift Rooms Bubble Field as the default Chats Home, with a list fallback and gentle live-ness indicators.
+- Updated Chats UX to add Drift status filters (`Active`, `Joined`, `Hosted`, `Expired`) and replaced the Bubbles/List segmented switch with a single header toggle icon.
+- Updated Chats UX spec to be build-ready for all three screens: Chats Home (Bubble+List), Chat Thread (Room), and Chat Detail (Info Sheet) including participant list and optional in-context 1:1 messaging rules.
 - Designed and implemented the high-fidelity iOS "You" (Profile) screen following the Social Refresh design.
 - Replaced the old profile layout with a privacy-first identity card, 2x2 private stats grid, preferences rows, and destructive sign-out alerts.
 - Files touched: `ProfileScreen.swift`, `ProfileViewModel.swift`, `CoffeeHeader.swift`.
@@ -90,6 +92,29 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Verification performed: Successfully removed Metal rendering blocks, added bulletproof Firebase configuration checks, and verified compilation clean.
 
 - Remaining gaps: None.
+
+2026-05-18:
+
+- Overhauled Chats UX Set with Bubble Field Cloud, Compact List Fallback, Chat Thread, and Chat Detail Sheets:
+  - **Redesigned ChatsListScreen**:
+    - Implemented high-fidelity Bubble Field Mode as the default mode, scattering 8 interactive floating bubbles (each representing a Drift room) using responsive coordinates to perfectly match the approved mockup.
+    - Implemented gentle, asynchronous floating micro-animations where each bubble drifts independently with custom delays and periodic offsets.
+    - Added "starting soon" glows (halos), unread status pulse dots (with dynamic badge counts), and long-press `contextMenu` modifiers.
+    - Integrated status filter chips (`Active`, `Joined`, `Hosted`, `Expired`) and a single shared header view toggle button.
+    - Created Instagram-like compact list rows (height 60pt, circular Wells 38pt, metadata/unread dots) for fallback List Mode.
+  - **Overhauled DriftChatScreen & DriftContextStrip**:
+    - Pinned a beautiful, compact details context strip beneath the header showing the Drift purpose, unlocked status, time, and participant stats.
+    - Aligned message bubbles to conform to the Design Language: Incoming light neutral bubbles with sender name/initials, and outgoing mint-tinted subtle bubbles (`Color.brandPrimary.opacity(0.15)`) with legible primary dark text.
+    - Replaced all raw font sizes and color literals with standardized SwiftUI Design System tokens (`Font.bodyStandard`, `Font.bodyBold`, `Font.captionText`, `Font.metadata`, `Font.micro`, `Color.brandPrimary`, `Color.surfaceMain`, `AppIcons.infoCircle`).
+  - **Implemented DriftChatDetailSheet (Bottom Sheet)**:
+    - Created a bottom sheet presented from the chat thread trailing `(i)` button.
+    - Modularized layout cards: About this Drift card, Participants list card (with context-specific icon-only 1:1 message triggers), and Safety & Controls card (Report, Block Picker with alert, Leave).
+    - Added `#available(iOS 16.4, *)` compatibility wrappers to securely compile `presentationCornerRadius(30)` on our iOS 16.2 simulator build SDK targets while preserving the premium experience on newer systems.
+  - **Applied Full Dependency Injection for viewmodels**:
+    - Defined a clean, modular `ChatServiceProtocol` and linked it via initializers to decouple local mock data loading and support seamless backend API integration in the future.
+  - Touched files: `ChatsListScreen.swift`, `DriftChatScreen.swift`, `ChatsViewModel.swift`, `AppStrings.swift`, `STATUS.md`.
+  - Verification performed: Headless simulator workspace `xcodebuild` compilation successfully completed with absolute **BUILD SUCCEEDED** status.
+  - Remaining gaps: None.
 
 2026-05-18:
 
@@ -143,6 +168,17 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Fully resolved a syntax string interpolation escape error in the location suffix parsing to restore compilation sanity.
 - Files touched: `ProfileScreen.swift`, `AppStrings.swift`, `STATUS.md`.
 - Verification performed: Successfully ran full compiler building (`xcodebuild`) checks with absolute zero errors.
+
+- Resolved Scroll Interception, Incomplete Sign Out Row Visibility, and Interactive Stats Grid:
+  - Redesigned `pressScale` extension to apply a scroll-safe custom `ButtonStyle` (`PressScaleButtonStyle`) inside `DesignSystem/AnimationSystem.swift` instead of `DragGesture(minimumDistance: 0) simultaneousGesture`, completely resolving list scrolling blockage and accidental immediate taps.
+  - Removed redundant `.buttonStyle(PlainButtonStyle())` from `preferenceRow` inside `ProfileScreen.swift` so that `.pressScale(0.98)` correctly activates its custom button style scale animation.
+  - Fixed invisible Sign Out row text/icon by introducing a local warm brand red `#D95252` fallback for `.error` color under `AppColors.swift`'s color computed property, resolving the missing `coffeeError` asset invisibility bug.
+  - Increased `screenBottomSpacer` in `AppConstants.swift` to `Grid.step120` to guarantee scrollable content cleanly and comfortably clears the bottom floating glassmorphic navigation bar.
+  - Made the private stats grid fully interactive by transforming the 4 grid tiles into `Button` views utilizing `.pressScale(0.96)`.
+  - Added new localized strings inside `AppStrings.swift` for descriptive details on each stat (Hosted, Joined, No-Shows, Score).
+  - Added a sheet presenter for `StatsDetailSheetView` inside `ProfileScreen.swift` displaying a stunning premium icon, value count, and reliability/reputation system descriptions.
+- Files touched: `AnimationSystem.swift`, `AppColors.swift`, `AppConstants.swift`, `AppStrings.swift`, `ProfileScreen.swift`, `STATUS.md`.
+- Verification performed: Successfully built the entire application using headless `xcodebuild` check targeting the iOS Simulator SDK. Confirming 0 errors, 0 warnings, and complete compilation success.
 
 ## How To Update This File
 
