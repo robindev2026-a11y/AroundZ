@@ -78,7 +78,7 @@ struct CoffeeHeader<RightView: View>: View {
                             .foregroundColor(.textPrimary)
 
                         Text(subtitle)
-                            .font(.system(size: AppConstants.Typography.sizeBody - 2, weight: .bold))
+                            .font(.system(size: AppConstants.Typography.sizeCaption , weight: .bold))
                             .foregroundColor(.textSecondary)
                     }
 
