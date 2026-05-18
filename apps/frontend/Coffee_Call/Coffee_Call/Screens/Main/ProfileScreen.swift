@@ -66,14 +66,14 @@ struct ProfileScreen: View {
             .sheet(isPresented: $showingHelpSheet) {
                 HelpSheetView()
             }
-            .alert("Sign out", isPresented: $showingSignOutAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Sign out", role: .destructive) {
+            .alert(AppStrings.Profile.signOut, isPresented: $showingSignOutAlert) {
+                Button(AppStrings.Common.cancel, role: .cancel) {}
+                Button(AppStrings.Profile.signOut, role: .destructive) {
                     viewModel.signOut()
                     auth.signOut()
                 }
             } message: {
-                Text("Are you sure you want to sign out of your account?")
+                Text(AppStrings.Profile.signOutConfirmation)
             }
         }
     }
@@ -113,7 +113,7 @@ struct ProfileScreen: View {
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.textSecondary)
                         
-                        Text("\(viewModel.location.components(separatedBy: \",\").first ?? viewModel.location) • 10 km radius")
+                        Text("\(viewModel.location.components(separatedBy: ",").first ?? viewModel.location)\(AppStrings.Profile.tenKmRadiusSuffix)")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.textSecondary)
                     }
@@ -534,27 +534,27 @@ struct SettingsSheetView: View {
                                     .fill(Color.brandPrimary.opacity(0.12))
                                     .frame(width: 80, height: 80)
                                 
-                                Image(systemName: "cup.and.saucer.fill")
+                                Image(systemName: AppIcons.coffeeFill)
                                     .font(.system(size: 36, weight: .bold))
                                     .foregroundColor(.brandPrimary)
                             }
                             
-                            Text("CoffeeCall")
+                            Text(AppStrings.Common.appName)
                                 .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                                 .foregroundColor(.textPrimary)
                             
-                            Text("Version 1.0.0 (Beta)")
+                            Text(AppStrings.Common.appVersion)
                                 .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                                 .foregroundColor(.textSecondary)
                         }
                         .padding(.top, 24)
                         
                         VStack(spacing: 0) {
-                            settingsDetailRow(title: "Environment", value: "Production")
+                            settingsDetailRow(title: AppStrings.Common.environment, value: AppStrings.Common.production)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            settingsDetailRow(title: "Client ID", value: "iOS-MVP-2026")
+                            settingsDetailRow(title: AppStrings.Common.clientIdLabel, value: AppStrings.Common.clientIdValue)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            settingsDetailRow(title: "Build Phase", value: "Release Verification")
+                            settingsDetailRow(title: AppStrings.Common.buildPhaseLabel, value: AppStrings.Common.buildPhaseValue)
                         }
                         .background(Color.surfaceMain)
                         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
@@ -564,18 +564,18 @@ struct SettingsSheetView: View {
                         )
                         .padding(.horizontal, 20)
                         
-                        Text("© 2026 CoffeeCall Inc. All rights reserved.")
+                        Text(AppStrings.Common.copyright)
                             .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
                             .foregroundColor(.textSecondary)
                             .padding(.top, 12)
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(AppStrings.Profile.settings)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Close") {
+                    Button(AppStrings.Common.close) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -614,7 +614,7 @@ struct InterestsSheetView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Select what you are open to today. This updates your discovery filter.")
+                        Text(AppStrings.Profile.interestsDescription)
                             .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .medium))
                             .foregroundColor(.textSecondary)
                             .padding(.horizontal, 20)
@@ -647,7 +647,7 @@ struct InterestsSheetView: View {
                                         Spacer()
                                         
                                         if viewModel.interests.contains(category) {
-                                            Image(systemName: "checkmark.circle.fill")
+                                            Image(systemName: AppIcons.checkCircleFill)
                                                 .font(.system(size: 20, weight: .bold))
                                                 .foregroundColor(.brandPrimary)
                                         } else {
@@ -676,11 +676,11 @@ struct InterestsSheetView: View {
                     }
                 }
             }
-            .navigationTitle("Interests")
+            .navigationTitle(AppStrings.Profile.interests)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(AppStrings.Common.done) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -703,18 +703,18 @@ struct AvailabilitySheetView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Let others know when you are generally free for nearby activities.")
+                        Text(AppStrings.Profile.availabilityDescription)
                             .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .medium))
                             .foregroundColor(.textSecondary)
                             .padding(.horizontal, 20)
                             .padding(.top, 12)
                         
                         VStack(spacing: 0) {
-                            ToggleRow(title: "Weekday evenings", isOn: $viewModel.availabilityWeekdayEvenings)
+                            ToggleRow(title: AppStrings.Profile.weekdayEvenings, isOn: $viewModel.availabilityWeekdayEvenings)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "Weekends", isOn: $viewModel.availabilityWeekends)
+                            ToggleRow(title: AppStrings.Profile.weekends, isOn: $viewModel.availabilityWeekends)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "Daytime / Lunch", isOn: $viewModel.availabilityDaytime)
+                            ToggleRow(title: AppStrings.Profile.daytimeLunch, isOn: $viewModel.availabilityDaytime)
                         }
                         .background(Color.surfaceMain)
                         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
@@ -726,11 +726,11 @@ struct AvailabilitySheetView: View {
                     }
                 }
             }
-            .navigationTitle("Availability")
+            .navigationTitle(AppStrings.Profile.availability)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(AppStrings.Common.done) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -755,18 +755,18 @@ struct NotificationsSheetView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Choose what system notifications you want to receive.")
+                        Text(AppStrings.Profile.notificationsDescription)
                             .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .medium))
                             .foregroundColor(.textSecondary)
                             .padding(.horizontal, 20)
                             .padding(.top, 12)
                         
                         VStack(spacing: 0) {
-                            ToggleRow(title: "Push Notifications", isOn: $pushAlerts)
+                            ToggleRow(title: AppStrings.Profile.pushNotifications, isOn: $pushAlerts)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "In-App Alerts", isOn: $inAppAlerts)
+                            ToggleRow(title: AppStrings.Profile.inAppAlerts, isOn: $inAppAlerts)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "Nearby Drift Alerts (<10km)", isOn: $nearbyDriftsAlerts)
+                            ToggleRow(title: AppStrings.Profile.nearbyDriftsLabel, isOn: $nearbyDriftsAlerts)
                         }
                         .background(Color.surfaceMain)
                         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
@@ -778,11 +778,11 @@ struct NotificationsSheetView: View {
                     }
                 }
             }
-            .navigationTitle("Notifications")
+            .navigationTitle(AppStrings.Profile.notifications)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(AppStrings.Common.done) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -806,7 +806,7 @@ struct PrivacySheetView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        Text("Safety is our top priority. We never share phone numbers or exact locations in the discovery radar.")
+                        Text(AppStrings.Profile.privacyDescription)
                             .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .bold))
                             .foregroundColor(.brandPrimaryDark)
                             .padding(16)
@@ -816,9 +816,9 @@ struct PrivacySheetView: View {
                             .padding(.top, 12)
                         
                         VStack(spacing: 0) {
-                            ToggleRow(title: "Show approximate distance only", isOn: $shareApproxLoc)
+                            ToggleRow(title: AppStrings.Profile.approxDistanceLabel, isOn: $shareApproxLoc)
                             Divider().background(Color.appBorder).padding(.horizontal, 16)
-                            ToggleRow(title: "Keep stats private to me", isOn: $privateStats)
+                            ToggleRow(title: AppStrings.Profile.keepStatsPrivate, isOn: $privateStats)
                         }
                         .background(Color.surfaceMain)
                         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
@@ -830,11 +830,11 @@ struct PrivacySheetView: View {
                     }
                 }
             }
-            .navigationTitle("Privacy & Safety")
+            .navigationTitle(AppStrings.Profile.privacySafetyHeader)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(AppStrings.Common.done) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -864,7 +864,7 @@ struct LocationSheetView: View {
                             .fill(Color.brandPrimary.opacity(0.12))
                             .frame(width: 100, height: 100)
                         
-                        Image(systemName: "mappin.and.ellipse")
+                        Image(systemName: AppIcons.mappin)
                             .font(.system(size: 48, weight: .bold))
                             .foregroundColor(.brandPrimary)
                     }
@@ -874,7 +874,7 @@ struct LocationSheetView: View {
                             .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
                             .foregroundColor(.textPrimary)
                         
-                        Text("Search is fixed to a 10 km discovery radius.")
+                        Text(AppStrings.Profile.fixedRadiusLabel)
                             .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                             .foregroundColor(.textSecondary)
                     }
@@ -891,10 +891,10 @@ struct LocationSheetView: View {
                                 ProgressView()
                                     .tint(.white)
                             } else {
-                                Image(systemName: "location.fill")
+                                Image(systemName: AppIcons.location)
                             }
                             
-                            Text(isUpdating ? "Updating location..." : "Update current location")
+                            Text(isUpdating ? AppStrings.Profile.updatingLoc : AppStrings.Profile.updateLoc)
                         }
                         .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
                         .foregroundColor(.white)
@@ -910,11 +910,11 @@ struct LocationSheetView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle("Location")
+            .navigationTitle(AppStrings.Profile.locationLabel)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(AppStrings.Common.done) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -937,11 +937,11 @@ struct HelpSheetView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Welcome to CoffeeCall!")
+                            Text(AppStrings.Profile.welcomeLabel)
                                 .font(.system(size: AppConstants.Typography.sizeTitle - 2, weight: .black))
                                 .foregroundColor(.textPrimary)
                             
-                            Text("CoffeeCall helps you turn nearby interests into real-world meetups. Here's how to stay safe and have fun:")
+                            Text(AppStrings.Profile.helpDescription)
                                 .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .medium))
                                 .foregroundColor(.textSecondary)
                                 .lineSpacing(4)
@@ -950,21 +950,21 @@ struct HelpSheetView: View {
                         .padding(.top, 16)
                         
                         VStack(alignment: .leading, spacing: 16) {
-                            helpItem(title: "1. The Drift is the unit of action", desc: "Always coordinate through Drifts. There are no cold direct messages or private browsing lists. Everything revolves around physical plans.")
+                            helpItem(title: AppStrings.Profile.helpTitle1, desc: AppStrings.Profile.helpDesc1)
                             
-                            helpItem(title: "2. Keep details inside pre-meetup chats", desc: "Exact meeting locations and details remain locked in the chat room until a user has hosted or successfully joined the Drift.")
+                            helpItem(title: AppStrings.Profile.helpTitle2, desc: AppStrings.Profile.helpDesc2)
                             
-                            helpItem(title: "3. Safe and respectful spaces", desc: "Meet in well-populated public places (e.g. popular local coffee houses, parks, study hubs). Be reliable and keep your no-show rates low.")
+                            helpItem(title: AppStrings.Profile.helpTitle3, desc: AppStrings.Profile.helpDesc3)
                         }
                         .padding(.horizontal, 20)
                     }
                 }
             }
-            .navigationTitle("Help & Guidelines")
+            .navigationTitle(AppStrings.Profile.helpGuidelinesHeader)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Close") {
+                    Button(AppStrings.Common.close) {
                         dismiss()
                     }
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
