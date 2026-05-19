@@ -147,48 +147,23 @@ struct RadarView: View {
                     .zIndex(isSelected ? 50 : 1)
                 }
                 
-                // MARK: - Selected Person Interest Card (Anchored near the bottom)
+                // MARK: - Selected Person Dynamic Tooltip
                 if let person = selectedPerson {
-                    VStack {
-                        Spacer()
-                        
-                        HStack(spacing: AppConstants.Layout.elementSpacing) {
-                            ZStack {
-                                Circle()
-                                    .fill(person.color.opacity(0.12))
-                                    .frame(width: 36, height: 36)
-                                
-                                AppIcons.sparklesImage
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(person.color)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(person.interests.joined(separator: " & "))
-                                    .font(.bodyBold)
-                                    .foregroundColor(.textPrimary)
-                                
-                                Text(AppStrings.Discovery.anonymousSignal)
-                                    .font(.metadata)
-                                    .foregroundColor(.textSecondary)
-                            }
-                            
-                            Spacer()
-                        }
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.vertical, AppConstants.Layout.elementSpacing + 4)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
-                                .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
-                        )
-                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
-                        .padding(.horizontal, AppConstants.Layout.standardPadding)
-                        .padding(.bottom, AppConstants.Layout.elementSpacing)
-                        .transition(.asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity), removal: .opacity))
-                    }
-                    .zIndex(100)
+                    let bubbleX = cos(person.angle * .pi / 180) * (person.distance * 210)
+                    let bubbleY = sin(person.angle * .pi / 180) * (person.distance * 210)
+                    
+                    let isBelow = bubbleY < -30
+                    let tooltipY = isBelow ? bubbleY + 54 : bubbleY - 54
+                    
+                    let tooltipWidth: CGFloat = 190
+                    let maxTooltipX = max((geo.size.width / 2) - (tooltipWidth / 2) - 16, 0)
+                    let tooltipX = min(max(bubbleX, -maxTooltipX), maxTooltipX)
+                    let arrowX = min(max(bubbleX - tooltipX, -70), 70)
+                    
+                    ActivityTooltipView(person: person, isBelow: isBelow, arrowX: arrowX)
+                        .offset(x: tooltipX, y: tooltipY)
+                        .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
+                        .zIndex(100)
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height)
@@ -223,3 +198,83 @@ struct RadarView: View {
         self.particles = newParticles
     }
 }
+
+struct ActivityTooltipView: View {
+    let person: RadarPerson
+    let isBelow: Bool
+    let arrowX: CGFloat
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            if isBelow {
+                // Triangle pointer on top pointing UP
+                Image(systemName: "triangle.fill")
+                    .resizable()
+                    .frame(width: 12, height: 6)
+                    .foregroundColor(.surfaceMain)
+                    .offset(x: arrowX, y: 1)
+                    .zIndex(10)
+            }
+            
+            HStack(spacing: AppConstants.Layout.miniPadding * 2) {
+                // Icon circle well (28x28)
+                ZStack {
+                    Circle()
+                        .fill(person.color.opacity(0.12))
+                        .frame(width: 28, height: 28)
+                    
+                    getIcon(for: person.interests.first ?? "")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(person.color)
+                }
+                
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(person.interests.joined(separator: " & "))
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+                    
+                    Text(AppStrings.Discovery.anonymousSignal)
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(.textSecondary)
+                        .lineLimit(1)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(Color.surfaceMain)
+            .cornerRadius(AppConstants.Layout.tooltipRadius)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.Layout.tooltipRadius)
+                    .stroke(Color.appBorder, lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+            
+            if !isBelow {
+                // Triangle pointer on bottom pointing DOWN
+                Image(systemName: "triangle.fill")
+                    .resizable()
+                    .frame(width: 12, height: 6)
+                    .foregroundColor(.surfaceMain)
+                    .rotationEffect(.degrees(180))
+                    .offset(x: arrowX, y: -1)
+                    .zIndex(10)
+            }
+        }
+        .frame(width: 190)
+    }
+    
+    private func getIcon(for interest: String) -> Image {
+        switch interest.lowercased() {
+        case "walks", "walk":
+            return AppIcons.walkImage
+        case "coffee":
+            return AppIcons.coffeeImage
+        case "movies", "movie":
+            return AppIcons.movieImage
+        default:
+            return AppIcons.sparklesImage
+        }
+    }
+}
+

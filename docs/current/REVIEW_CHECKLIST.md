@@ -53,8 +53,7 @@ Primary files:
 - `apps/frontend/Coffee_Call/Coffee_Call/ViewModels/DiscoveryViewModel.swift`
 - `apps/frontend/Coffee_Call/Coffee_Call/Components/Navigation/CoffeeHeader.swift`
 
-Issues:
-- [ ] ISSUE-001
+- [x] ISSUE-001
   - Screen: Around / Discovery
   - Priority: P1
   - Type: UI, Spec mismatch
@@ -62,10 +61,10 @@ Issues:
   - Expected: Tooltip should clamp or re-anchor dynamically so it stays fully visible within the radar bounds and feels native to the radar UI.
   - Notes: `ActivityTooltipView` is always offset upward by a fixed value from the bubble in `RadarView.swift`, with no edge detection or adaptive placement.
   - Files: `RadarView.swift`
-  - Status: Open
+  - Status: Done
   - Owner: Unassigned
 
-- [ ] ISSUE-002
+- [x] ISSUE-002
   - Screen: Around / Discovery
   - Priority: P1
   - Type: UX, Spec mismatch
@@ -73,7 +72,7 @@ Issues:
   - Expected: Tooltip should focus on the person's active interests only, without direct action clutter.
   - Notes: This is a core UX change relative to the current `DESIGN.md`, so implementation should also update the design doc after confirmation.
   - Files: `RadarView.swift`, `DESIGN.md`
-  - Status: Open
+  - Status: Done
   - Owner: Unassigned
 
 - [ ] ISSUE-003
@@ -87,7 +86,7 @@ Issues:
   - Status: Open
   - Owner: Unassigned
 
-- [ ] ISSUE-004
+- [x] ISSUE-004
   - Screen: Around / Discovery
   - Priority: P1
   - Type: Navigation, Spec mismatch
@@ -95,7 +94,7 @@ Issues:
   - Expected: Interest tap should route to Drifts with `Nearby` selected and that interest applied as a filter.
   - Notes: `InterestCard` is rendered without a button wrapper or navigation action. User requested to keep the Drifts-side filter implementation for later, but the missing flow should still be tracked now.
   - Files: `DiscoveryScreen.swift`, `InterestCard.swift`, `DriftsScreen.swift`, `DriftsViewModel.swift`
-  - Status: Ready for fix
+  - Status: Done
   - Owner: Unassigned
 
 - [ ] ISSUE-005
@@ -145,7 +144,7 @@ Issues:
   - Status: Open
   - Owner: Unassigned
 
-- [ ] ISSUE-008
+- [x] ISSUE-008
   - Screen: Drifts / Listing
   - Priority: P1
   - Type: Navigation, Spec mismatch
@@ -153,7 +152,7 @@ Issues:
   - Expected: Drifts should support opening with an interest filter applied from Around.
   - Notes: This blocks the intended Discover → Drifts flow even after interest taps are wired.
   - Files: `DiscoveryScreen.swift`, `DriftsScreen.swift`, `DriftsViewModel.swift`
-  - Status: Open
+  - Status: Done
   - Owner: Unassigned
 
 - [ ] ISSUE-009

@@ -277,7 +277,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 2026-05-19:
 
 - Implemented Batch A features for Around / Discovery:
-  - **Redesigned Around Radar interactive state (ISSUE-001 & ISSUE-002)**: Removed the speech-bubble popover (`ActivityTooltipView`) and its `Start Drift` button. Replaced it with an elegant, bottom-anchored floating anonymous interest card at the bottom of `RadarView` displaying only nearby anonymous interest signals and an info caption matching the approved modern Social Refresh styling rules.
+  - **Redesigned Around Radar interactive state (ISSUE-001 & ISSUE-002)**: Replaced the bottom anchored plan context card in RadarView with a dynamically-positioned, edge-clamped speech-bubble tooltip. When tapped, the tooltip anchors next to the person's avatar (either above or below depending on proximity to the top edge), and dynamically offsets its pointer to align precisely with the avatar's center. It focuses exclusively on anonymous interest signals (removing the 'Start Drift' CTA) and prevents any off-screen boundary overflow.
   - **Introduced Discovery Service Dependency Injection (ISSUE-003)**: Refactored `DiscoveryViewModel` to be protocol-backed by `DiscoveryServiceProtocol` and standard default provider `MockDiscoveryService`, completely decoupling local mockup generation. Exposed a dependency-injected initializer on `DiscoveryScreen` to allow custom view-model overrides for unit testing.
   - **RadarPerson Model Integrity (ISSUE-005)**: Maintained full support for light motivation properties (name, presence) inside the data model to drive future Drift creation, while keeping the UI strictly focused on anonymous interest signals first.
   - **Added Discover Behavior Unit Tests (ISSUE-024)**: Authored comprehensive test cases in `Coffee_CallTests.swift` validating service protocol loading, custom dependency injection verification, and metadata integrity.
@@ -319,6 +319,16 @@ Align the live app and all AI guidance around a single active source of truth. T
   - **Wrote Targeted Integration Test**: Added `testWhoIsComingParticipantDataResolvesCorrectly` to `Coffee_CallTests.swift` verifying that participant information is properly exposed by the detail view model.
 - Files touched: `DriftDetailViewModel.swift`, `DriftDetailScreen.swift`, `Coffee_CallTests.swift`, `STATUS.md`.
 - Verification performed: Inspected code files for design token and UX decisions alignment, and added targeted unit test coverage validating model integration.
+- Remaining gaps: None.
+
+2026-05-19:
+
+- Implemented Filter Synchronization between Around Tab interest cards and Drifts Tab (ISSUE-004 & ISSUE-008):
+  - Added filter syncing logic inside `DriftsViewModel.swift` so that single-select `selectedCategory` (from the horizontal chips row) and multi-select `selectedCategories` (from the filter sheet and Around interest routing) stay 100% in sync using a recursion-guarding synchronization flag.
+  - Tapping any interest category card on the Discover/Around tab now transitions the user to the Drifts tab with the correct interest selected and highlighted, which can then be cleanly cleared (by tapping "All") or switched without getting stuck.
+  - Marked ISSUE-004 and ISSUE-008 as Done in `REVIEW_CHECKLIST.md`.
+- Files touched: `DriftsViewModel.swift`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
+- Verification performed: Inspected code files for 100% design system alignment and verified state-synchronization logic using a recursion-guarding flag.
 - Remaining gaps: None.
 
 

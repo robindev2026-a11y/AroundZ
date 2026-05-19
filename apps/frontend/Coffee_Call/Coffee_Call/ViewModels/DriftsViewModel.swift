@@ -10,7 +10,18 @@ class DriftsViewModel: ObservableObject {
     @Published var drifts: [Drift] = []
     @Published var selectedMode: DriftMode = .discover
     @Published var selectedTimeState: TimeState = .all
-    @Published var selectedCategory: DriftCategory? = nil
+    @Published var selectedCategory: DriftCategory? = nil {
+        didSet {
+            guard !isSyncingFilters else { return }
+            isSyncingFilters = true
+            if let selectedCategory {
+                selectedCategories = [interestForCategory(selectedCategory)]
+            } else {
+                selectedCategories = []
+            }
+            isSyncingFilters = false
+        }
+    }
     
     // Search properties (ISSUE-007)
     @Published var searchQuery: String = ""
@@ -35,11 +46,23 @@ class DriftsViewModel: ObservableObject {
             }
         }
     }
-    @Published var selectedCategories: Set<String> = []
+    @Published var selectedCategories: Set<String> = [] {
+        didSet {
+            guard !isSyncingFilters else { return }
+            isSyncingFilters = true
+            if selectedCategories.count == 1, let first = selectedCategories.first {
+                selectedCategory = categoryForInterest(first)
+            } else {
+                selectedCategory = nil
+            }
+            isSyncingFilters = false
+        }
+    }
     @Published var selectedTimeframe: String = "All"
     
     private let driftsService: DriftsServiceProtocol
     private var cancellables = Set<AnyCancellable>()
+    private var isSyncingFilters = false
     
     enum DriftMode: String, CaseIterable {
         case discover = "Discover"
@@ -176,6 +199,20 @@ class DriftsViewModel: ObservableObject {
         case "books", "study": return .study
         case "workout", "yoga": return .yoga
         default: return nil
+        }
+    }
+    
+    private func interestForCategory(_ category: DriftCategory) -> String {
+        switch category {
+        case .coffee: return "Coffee"
+        case .walk: return "Walks"
+        case .movie: return "Movies"
+        case .food: return "Food"
+        case .music: return "Music"
+        case .gaming: return "Gaming"
+        case .study: return "Books"
+        case .yoga: return "Workout"
+        default: return category.rawValue.capitalized
         }
     }
 }
