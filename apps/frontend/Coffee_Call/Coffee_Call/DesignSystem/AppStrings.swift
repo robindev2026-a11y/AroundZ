@@ -165,6 +165,7 @@ enum AppStrings {
             static let aboutHeader = "About this Drift"
             static let hostHeader = "Hosted by"
             static let participantsHeader = "Who's coming"
+            static let locationHeader = "Location"
             static let detailsHeader = "Details"
             static let timeLabel = "Time"
             static let meetingPointLabel = "Meeting point"
@@ -174,6 +175,17 @@ enum AppStrings {
             static let safetyTitle = "We keep it safe and respectful"
             static let safetySubtitle = "Meet in public places. No personal contact shared."
             static let coordinationNote = "Exact coordination happens in the Drift chat after joining."
+            
+            enum Location {
+                static let approxTitle = "Approximate Area"
+                static let unlockedSubtitle = "Unlocked after joining"
+                static let openMaps = "Open in Apple Maps"
+            }
+            
+            enum Confirmation {
+                static let sentSubtitle = "Your request to join '%@' has been sent to %@."
+                static let notifyNote = "You'll be notified once they accept."
+            }
             
             enum CTA {
                 static let join = "Join Drift"
@@ -192,16 +204,52 @@ enum AppStrings {
 
     enum Create {
         static let title = "Create Drift"
-        static let step1 = "1. What's the plan?"
-        static let step2 = "2. Plan title"
-        static let step3 = "3. When?"
-        static let step4 = "4. Where?"
-        static let step5 = "5. Capacity"
-        static let step6 = "6. Join mode"
-        
+        static let subtitle = "Plan something spontaneous"
+        static let activityTitle = "What’s the vibe?"
+        static let activitySubtitle = "Choose an activity"
+        static let planTitlePrompt = "What’s the plan called?"
+        static let timeTitle = "When is it?"
+        static let timeSubtitle = "Pick a time"
+        static let dateLabel = "Date"
+        static let timeLabel = "Time"
+        static let locationTitle = "Approximate location"
+        static let capacityTitle = "Capacity"
+        static let joinModeTitle = "Who can join?"
+        static let customActivity = "Custom"
+        static let customActivityTitle = "Custom Activity"
+        static let customActivityPlaceholder = "What activity is it?"
+        static let requiredMarker = "*"
+        static let hostRole = "Hosting this Drift"
+
         static let titlePlaceholder = "e.g. Evening walk at Cubbon Park"
-        static let locationApprox = "Approximate area"
-        static let locationNote = "Exact coordination happens in Drift chat after joining."
+        static let titleCounterFormat = "%d/60"
+        static let sampleLocation = "Indiranagar, Bengaluru"
+        static let locationApprox = "Approximate location shown."
+        static let locationNote = "Exact details shared in chat."
+        static let locationCardNote = "Exact details shared in chat."
+        static let optionalDetails = "Optional Details"
+        static let optionalDetailsCollapsed = "Add hook, vibe, or notes"
+        static let optionalDetailsSubtitle = "Add more flavor (optional)"
+        static let hookTitle = "Hook"
+        static let hookTitleShort = "Hook (one-line)"
+        static let hookPlaceholder = "e.g. Coffee on me"
+        static let vibeTitle = "Vibe"
+        static let vibeHelper = "Pick the feel of the plan."
+        static let vibeSelectionPlaceholder = "Select a vibe"
+        static let notesTitle = "Notes"
+        static let notesTitleShort = "Notes"
+        static let notesPlaceholder = "Additional info..."
+        static let joinModeOpen = "Anyone can join"
+        static let joinModeApproval = "Approve requests"
+        static let joinModeOpenSubtitle = "Open to everyone"
+        static let joinModeApprovalSubtitle = "You approve first"
+        static let privacyLinePrimary = "Your exact location and coordinate unlock in chat after people join."
+        static let privacyLineSecondary = "We keep your plans private and safe."
+        static let postAction = "Post Drift"
+        static let postingAction = "Posting Drift..."
+        static let successTitle = "Your Drift is live"
+        static let successSubtitle = "People nearby can now request to join."
+        static let footerNote = "You can edit or cancel anytime"
         static let manageDrift = "Manage Drift"
         static let creating = "Creating your Drift..."
         static let settingUp = "Setting things up for you"
@@ -213,6 +261,44 @@ enum AppStrings {
         static let discardMessage = "You have unsaved changes. If you go back now, they will be lost."
         static let discardAction = "Discard changes"
         static let continueEditing = "Continue editing"
+
+        enum Activity {
+            static let coffee = "Coffee"
+            static let walk = "Walk"
+            static let food = "Food"
+            static let movie = "Movie"
+            static let study = "Study"
+            static let fitness = "Fitness"
+            static let games = "Games"
+            static let music = "Music"
+            static let sports = "Sports"
+            static let drinks = "Drinks"
+            static let custom = "Custom"
+        }
+
+        enum Vibe {
+            static let casual = "Casual"
+            static let chill = "Chill"
+            static let friendly = "Friendly"
+            static let focused = "Focused"
+            static let adventurous = "Adventurous"
+            static let social = "Social"
+        }
+
+        enum Time {
+            static let now = "Now"
+            static let in30Mins = "In 30 mins"
+            static let tonight = "Tonight"
+            static let tomorrow = "Tomorrow"
+            static let custom = "Custom"
+        }
+
+        enum Capacity {
+            static let one = "1"
+            static let three = "3"
+            static let five = "5"
+            static let eightPlus = "8+"
+        }
     }
     
     enum Main {
@@ -234,6 +320,13 @@ enum AppStrings {
         static let requestsSubtitle = "Review people who want to join"
         static let reminder = "Safety Reminder"
         static let reminderSubtitle = "Meet in public and stay within the group chat for coordination."
+        static let otherPlans = "Other plans by %@"
+        static let noOtherPlans = "No other upcoming plans."
+        static let pastPlans = "Past completed plans"
+        static let activeSince = "Active since"
+        static let whoIsComing = "Who's Coming"
+        static let preciseLocationNote = "Precise meeting coordinate is unlocked"
+        static let joinToSeeParticipants = "Join to see participants"
         
         static func capacity(count: Int) -> String { "Open to \(count) people" }
         static func joinedCount(count: Int) -> String { "\(count) joined" }
@@ -387,6 +480,7 @@ enum AppStrings {
         static let done = "Done"
         static let delete = "Delete"
         static let close = "Close"
+        static let ok = "OK"
         static let appName = "CoffeeCall"
         static let appVersion = "Version 1.0.0 (Beta)"
         static let environment = "Environment"

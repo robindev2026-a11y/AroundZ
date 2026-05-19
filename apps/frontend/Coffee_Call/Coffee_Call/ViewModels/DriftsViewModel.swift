@@ -60,8 +60,18 @@ class DriftsViewModel: ObservableObject {
     }
     @Published var selectedTimeframe: String = "All"
     
+    var activeFilterCount: Int {
+        var count = 0
+        if selectedDistanceRadius < 10.0 { count += 1 }
+        if selectedTimeframe != "All" { count += 1 }
+        if !selectedCategories.isEmpty || selectedCategory != nil { count += 1 }
+        return count
+    }
+    
     private let driftsService: DriftsServiceProtocol
+    private let createdDriftStore = CreatedDriftStore.shared
     private var cancellables = Set<AnyCancellable>()
+    private var baseDrifts: [Drift] = []
     private var isSyncingFilters = false
     
     enum DriftMode: String, CaseIterable {
@@ -112,6 +122,13 @@ class DriftsViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
+
+        createdDriftStore.$createdDrifts
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.mergeDrifts()
+            }
+            .store(in: &cancellables)
             
         loadDrifts()
     }
@@ -120,9 +137,20 @@ class DriftsViewModel: ObservableObject {
         driftsService.fetchDrifts()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] drifts in
-                self?.drifts = drifts
+                self?.baseDrifts = drifts
+                self?.mergeDrifts()
             })
             .store(in: &cancellables)
+    }
+
+    private func mergeDrifts() {
+        var merged: [Drift] = []
+        for drift in baseDrifts + createdDriftStore.createdDrifts {
+            if !merged.contains(where: { $0.id == drift.id }) {
+                merged.append(drift)
+            }
+        }
+        drifts = merged
     }
     
     var filteredDrifts: [Drift] {

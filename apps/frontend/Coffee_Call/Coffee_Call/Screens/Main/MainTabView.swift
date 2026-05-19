@@ -5,7 +5,8 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab = 0
-    @State private var isShowingCreateSheet = false
+    @State private var showCreateDriftSheet = false
+    @StateObject private var driftsViewModel = DriftsViewModel()
     @StateObject private var navManager = NavigationManager.shared
 
     var body: some View {
@@ -14,7 +15,7 @@ struct MainTabView: View {
             Group {
                 switch selectedTab {
                 case 0: DiscoveryScreen(selectedTab: $selectedTab)
-                case 1: DriftsScreen()
+                case 1: DriftsScreen(viewModel: driftsViewModel)
                 case 2: ChatsListScreen()
                 case 3: ProfileScreen()
                 default: DiscoveryScreen(selectedTab: $selectedTab)
@@ -40,7 +41,9 @@ struct MainTabView: View {
                 // Floating tab bar
                 FloatingTabBar(
                     selectedTab: $selectedTab,
-                    onCreateTap: { isShowingCreateSheet = true }
+                    onCreateTap: {
+                        showCreateDriftSheet = true
+                    }
                 )
                 .padding(.bottom, AppConstants.Layout.floatingTabBarBottomPadding)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -48,13 +51,47 @@ struct MainTabView: View {
         }
         .ignoresSafeArea(edges: .bottom)
         .animation(.spring(), value: navManager.isTabBarHidden)
-        .sheet(isPresented: $isShowingCreateSheet) {
-            CreateDriftScreen()
+        .sheet(isPresented: $showCreateDriftSheet) {
+            if #available(iOS 16.4, *) {
+                CreateDriftSheet(onCreateSucceeded: {
+                    selectedTab = 1
+                    driftsViewModel.selectedMode = .mine
+                    driftsViewModel.selectedTimeState = .all
+                    driftsViewModel.selectedTimeframe = "All"
+                    driftsViewModel.selectedCategory = nil
+                    driftsViewModel.selectedCategories = []
+                    driftsViewModel.selectedDistanceRadius = 10.0
+                    driftsViewModel.searchQuery = ""
+                    driftsViewModel.debouncedSearchQuery = ""
+                    driftsViewModel.isSearchActive = false
+                    driftsViewModel.loadDrifts()
+                })
+                    .presentationDetents([.fraction(0.96)])
+                    .presentationCornerRadius(AppConstants.Layout.createSheetRadius)
+                    .presentationDragIndicator(.hidden)
+            } else {
+                CreateDriftSheet(onCreateSucceeded: {
+                    selectedTab = 1
+                    driftsViewModel.selectedMode = .mine
+                    driftsViewModel.selectedTimeState = .all
+                    driftsViewModel.selectedTimeframe = "All"
+                    driftsViewModel.selectedCategory = nil
+                    driftsViewModel.selectedCategories = []
+                    driftsViewModel.selectedDistanceRadius = 10.0
+                    driftsViewModel.searchQuery = ""
+                    driftsViewModel.debouncedSearchQuery = ""
+                    driftsViewModel.isSearchActive = false
+                    driftsViewModel.loadDrifts()
+                })
+                    .presentationDetents([.fraction(0.96)])
+                    .presentationDragIndicator(.hidden)
+            }
         }
     }
 }
 
 // MARK: - Preview
+// Force preview thunk refresh after DerivedData cleanup
 struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
         MainTabView()

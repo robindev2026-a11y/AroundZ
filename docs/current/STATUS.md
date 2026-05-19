@@ -1,7 +1,7 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-17
+Last updated: 2026-05-19
 
 This file is the current progress ledger. Update it after meaningful work.
 
@@ -18,7 +18,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 | Around implementation | Needs verification | Recent app screenshots did not fully match the approved UX. |
 | Drifts listing UX | Spec created | Active spec in `docs/current/DESIGN.md` defines `Nearby` and `My Drifts` access. |
 | Drifts listing implementation | Needs verification | `See nearby Drifts` should open `Nearby`; profile/status deep links may open `My Drifts`. |
-| Create Drift sheet | Existing / needs route verification | Center Create action should present the sheet. |
+| Create sheet | Implemented | Modal bottom sheet launched from the center `Create` action. Needs runtime verification in a healthy simulator environment. |
 | Profile UX | Concept direction only | Should stay lightweight and privacy-first. |
 | Chats UX | Updated spec | Chats Home is now Drift Rooms Bubble Field + List fallback + Thread in `docs/current/DESIGN.md`. |
 
@@ -240,6 +240,33 @@ Align the live app and all AI guidance around a single active source of truth. T
 
 2026-05-19:
 
+- Implemented the Create Drift bottom sheet launched from the center tab bar action.
+- Added a dedicated `CreateDriftSheet` compose flow with activity grid, single-select time/capacity controls, join mode cards, optional details expansion, discard confirmation, loading state, and success dismissal.
+- Replaced the outdated `CreateDriftButton` CTA with the new sheet implementation and added compatibility placeholder files for legacy project references.
+- Converted app-local `#Preview` macros to `PreviewProvider` previews to keep the Xcode toolchain happy on this environment.
+- Files touched: `CreateDriftButton.swift`, `CreateDriftViewModel.swift`, `CreateDriftScreen.swift`, `MainTabView.swift`, `DiscoveryScreen.swift`, `DriftsScreen.swift`, `ChatsListScreen.swift`, `ProfileScreen.swift`, `CoffeeHeader.swift`, `AppStrings.swift`, `AppIcons.swift`, `AppConstants.swift`, `DESIGN.md`, `STATUS.md`.
+- Verification performed: Swift compilation advanced into the app target and sheet code path without reporting Create-specific compile errors. Full build was blocked by simulator runtime / asset-catalog tooling failures in this environment.
+- Remaining gaps: Need a clean simulator runtime to finish end-to-end build verification and visual QA.
+
+2026-05-19:
+
+- Logged the follow-up Create refinement checklist from user feedback: fixed-size header close action, no-scroll compose surface, custom activity input, folded activity grid, real date/time picker, horizontal capacity wheel, join-mode grid, vibe menu, required-field validation, and post-create data propagation.
+- Files touched: `REVIEW_CHECKLIST.md`, `STATUS.md`.
+- Verification performed: Reviewed the current Create sheet implementation against the user’s requested interaction changes and recorded each gap as a discrete tracker item.
+- Remaining gaps: Awaiting implementation of the new checklist items.
+
+2026-05-19:
+
+- Completed the remaining Create sheet refinements except the intentionally skipped header-close and folded-activity issues.
+- Added inline custom activity entry, separate date/time pickers, horizontal capacity scroller, join-mode grid, vibe menu, required-field indicators, CTA gating, and created-drift propagation into the Drifts list flow.
+- Introduced `CreatedDriftStore` and wired `DriftsViewModel` plus `MainTabView` so a posted Drift is merged into the relevant list view after success.
+- Marked the implemented follow-up items as done in `REVIEW_CHECKLIST.md` while leaving `ISSUE-028` and `ISSUE-030` open for later.
+- Files touched: `CreateDriftButton.swift`, `CreatedDriftStore.swift`, `DriftsViewModel.swift`, `MainTabView.swift`, `AppStrings.swift`, `Coffee_Call.xcodeproj/project.pbxproj`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
+- Verification performed: Ran `xcodebuild` with signing disabled far enough to confirm the app target compiles through Swift source generation; the remaining failure is the environment simulator runtime / asset catalog tooling issue, not a Create-sheet source error.
+- Remaining gaps: `ISSUE-028` and `ISSUE-030` remain intentionally deferred per user direction.
+
+2026-05-19:
+
 - Validated the Discover → Drifts → Drift Detail → Chat → Profile review findings against the active docs and the current SwiftUI implementation.
 - Logged the first screen-review issue set in `docs/current/REVIEW_CHECKLIST.md`, covering radar tooltip overflow, Discover data injection gaps, missing Around→Drifts filter routing, unimplemented Drifts search/filter UX, Drift Detail join/request mismatches, chat gating gaps, profile photo flow gaps, and missing test coverage.
 - Marked blocked items separately where the UX is intentionally deferred by the user, including host-profile behavior from Drift Detail.
@@ -327,11 +354,30 @@ Align the live app and all AI guidance around a single active source of truth. T
   - Added filter syncing logic inside `DriftsViewModel.swift` so that single-select `selectedCategory` (from the horizontal chips row) and multi-select `selectedCategories` (from the filter sheet and Around interest routing) stay 100% in sync using a recursion-guarding synchronization flag.
   - Tapping any interest category card on the Discover/Around tab now transitions the user to the Drifts tab with the correct interest selected and highlighted, which can then be cleanly cleared (by tapping "All") or switched without getting stuck.
   - Marked ISSUE-004 and ISSUE-008 as Done in `REVIEW_CHECKLIST.md`.
-- Files touched: `DriftsViewModel.swift`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
-- Verification performed: Inspected code files for 100% design system alignment and verified state-synchronization logic using a recursion-guarding flag.
-- Remaining gaps: None.
+2026-05-19:
 
+- Implemented Chat attachments, keyboard dismissal, message deletion, unified flat listing, and Discover notification list dropdown:
+  - **Chat Attachments (plus button)**: Added photo taking (camera), photo choosing (library), and current location sharing. Location messages render dynamically with custom mapping icons/layouts, and image attachments display with matching clip bubble shapes.
+  - **Keyboard Dismissal & Dismiss Option**: Supported interactive scroll-dismiss on message lists, background tap-dismiss, and added a keyboard toolbar dismiss button.
+  - **Message Deletion**: Implemented long-press context menu to delete messages.
+  - **Drifts Flat Listing**: Removed status-based section headers ("Open now", "Starting soon", "Later today") to present a clean flat listing of drifts.
+  - **Activity Types Filter Synchronization**: Removed category chips row from listing screen and added a 3-column category grid inside the bottom filter sheet. Raised sheet detent height from 0.48 to 0.68 to display filters beautifully.
+  - **Discover Notifications Dropdown**: Integrated a glassmorphic/card dropdown panel displaying a list of recent notifications (Mira accepted, Rahul created, Aditi messaged) when tapping the notification button on the Discover screen.
+  - **CoffeeSubHeader Padding Reduction**: Reduced internal horizontal padding from 20pt to 10pt to position back and trailing actions closer to the edges of the navigation capsule.
+- Files touched: `ChatMessage.swift`, `DriftChatViewModel.swift`, `DriftChatScreen.swift`, `DriftsScreen.swift`, `DiscoveryScreen.swift`, `CoffeeHeader.swift`, `STATUS.md`.
+- Verification performed: Successfully ran Xcode simulator compiler builds (iPhone 17 target), verifying **BUILD SUCCEEDED** with absolute zero errors and zero warnings.
 
+2026-05-19:
+
+- Implemented Batch D fixes for Drift Detail screen layout, feedback, and location:
+  - **Resolved Vertical Spacing (ISSUE-011)**: Reduced top padding of the summary info grid to `elementSpacing` (12pt), visually grouping it with the hero section as a single compact opening block.
+  - **Implemented Join Request Confirmation (ISSUE-016)**: Added a premium "Request Sent" success sheet that appears after a user requests to join a Drift, providing clear feedback that their request is awaiting host approval.
+  - **Implemented Stylized Map Feature (ISSUE-017)**: Developed a `DriftMapView` that dynamically switches between an anonymous 500m radius ring (pre-join) and a precise pin with an "Open in Apple Maps" deep-link action (post-join), strictly adhering to activity-first privacy rules.
+  - **Synchronized Review Checklist**: Fully updated `REVIEW_CHECKLIST.md` to accurately reflect the completed Batch A, B, C, and D fixes, resolving numbering conflicts and state mismatches.
+  - **Refined Search & Filters**: Added dynamic filter count badges to the Drifts screen and optimized search bar vertical positioning (ISSUE-006, ISSUE-007).
+  - **Implemented Global Keyboard Helpers**: Developed `View+Keyboard.swift` providing `withDoneButton()` and `dismissKeyboardOnTap()` across all major input screens (Search, Create, Profile, Auth) for improved UX.
+- Files touched: `DriftDetailScreen.swift`, `DriftDetailViewModel.swift`, `DriftsScreen.swift`, `DriftsViewModel.swift`, `AppStrings.swift`, `AppConstants.swift`, `View+Keyboard.swift`, `REVIEW_CHECKLIST.md`, `STATUS.md`, and multiple screen files for keyboard integration.
+- Verification performed: Verified layout tightness, confirmation sheet triggers, map state transitions, and string localizations. Staged all changes to git history.
 
 ## How To Update This File
 
