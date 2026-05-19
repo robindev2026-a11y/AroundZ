@@ -47,6 +47,9 @@ class ProfileViewModel: ObservableObject {
     @Published var pastDriftsCount: Int = 16
     @Published var historyDrifts: [Drift] = []
     @Published var selectedHistoryTab: Int = 0
+    @Published var savedDrifts: [Drift] = []
+    
+    private var cancellables = Set<AnyCancellable>()
     
     // Preferences Summaries
     var notificationsSummary: String { "Push, In-app" }
@@ -64,6 +67,14 @@ class ProfileViewModel: ObservableObject {
     init() {
         loadPersistedData()
         loadMockHistory()
+        setupBookmarkSubscription()
+    }
+    
+    private func setupBookmarkSubscription() {
+        BookmarkManager.shared.$savedDrifts
+            .receive(on: RunLoop.main)
+            .assign(to: \.savedDrifts, on: self)
+            .store(in: &cancellables)
     }
     
     func loadPersistedData() {

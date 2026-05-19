@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3374CEE72FB732DB0020F28D /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEE82FB732DB0020F28D /* BookmarkManager.swift */; };
+		3374CEE92FB732DB0020F28D /* DriftsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEEA2FB732DB0020F28D /* DriftsService.swift */; };
 		08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD7CFF1D7FDD964F8005DB /* ReadyScreen.swift */; };
 		116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */; };
 		19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D8FE04C8A14626B4E6978 /* GlassmorphicCard.swift */; };
@@ -99,6 +101,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3374CEE82FB732DB0020F28D /* BookmarkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
+		3374CEEA2FB732DB0020F28D /* DriftsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DriftsService.swift; path = DriftsService.swift; sourceTree = "<group>"; };
 		1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTPVerificationScreen.swift; sourceTree = "<group>"; };
 		11C75F18AD0A56F05577934A /* PillBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PillBadge.swift; sourceTree = "<group>"; };
 		1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationPermissionScreen.swift; sourceTree = "<group>"; };
@@ -206,6 +210,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3374CEEB2FB732DB0020F28D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3374CEEA2FB732DB0020F28D /* DriftsService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		147D07BDA2FF4DF23D1993AE /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -270,6 +282,7 @@
 		33CA3A262FB33A3F008EF23C /* Coffee_Call */ = {
 			isa = PBXGroup;
 			children = (
+				3374CEEB2FB732DB0020F28D /* Services */,
 				EC5C2209D10A1787EA76F764 /* DesignSystem */,
 				2E9C5C7F8B1E4D0CB37D2C1A /* App */,
 				33CA3A2B2FB33A41008EF23C /* Assets.xcassets */,
@@ -363,6 +376,7 @@
 		994023EC0D7FE9DAA8687F3A /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				3374CEE82FB732DB0020F28D /* BookmarkManager.swift */,
 				33192FB02FB7838E00FBBEDE /* NavigationManager.swift */,
 				3374CEDF2FB725670020F28D /* CreateDriftViewModel.swift */,
 				3374CED32FB6FDF10020F28D /* ChatsViewModel.swift */,
@@ -559,6 +573,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3374CEE72FB732DB0020F28D /* BookmarkManager.swift in Sources */,
+				3374CEE92FB732DB0020F28D /* DriftsService.swift in Sources */,
 				23BCC639374942C9BC39CC46 /* CoffeeBottomSheet.swift in Sources */,
 				3374CEC82FB6F86A0020F28D /* ManageDriftScreen.swift in Sources */,
 				3374CEC62FB6E7CA0020F28D /* DriftDetailViewModel.swift in Sources */,

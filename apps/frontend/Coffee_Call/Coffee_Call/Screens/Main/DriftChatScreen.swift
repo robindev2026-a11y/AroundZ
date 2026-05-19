@@ -5,6 +5,7 @@ struct DriftChatScreen: View {
     @StateObject private var navManager = NavigationManager.shared
     @Environment(\.dismiss) var dismiss
     @State private var showInfoSheet = false
+    @State private var tabBarVisibilitySource = UUID().uuidString
     
     var body: some View {
         VStack(spacing: 0) {
@@ -57,21 +58,21 @@ struct DriftChatScreen: View {
         }
         .sheet(isPresented: $showInfoSheet) {
             if #available(iOS 16.4, *) {
-                DriftChatDetailSheet(drift: viewModel.drift)
+                DriftChatDetailSheet(drift: viewModel.drift, participants: viewModel.participants)
                     .presentationDetents([.fraction(0.85)])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(30)
             } else {
-                DriftChatDetailSheet(drift: viewModel.drift)
+                DriftChatDetailSheet(drift: viewModel.drift, participants: viewModel.participants)
                     .presentationDetents([.fraction(0.85)])
                     .presentationDragIndicator(.visible)
             }
         }
         .onAppear {
-            navManager.isTabBarHidden = true
+            navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
         }
         .onDisappear {
-            navManager.isTabBarHidden = false
+            navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
         }
         .asCoffeePage(
             .sub,
@@ -284,16 +285,17 @@ struct ChatComposer: View {
     
     var body: some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
-            Button(action: {}) {
-                AppIcons.paperclipImage
-                    .font(.system(size: 18))
+            TextField(
+                "",
+                text: $text,
+                prompt: Text(AppStrings.Chat.composerPlaceholder)
                     .foregroundColor(.textSecondary)
-            }
-            
-            TextField(AppStrings.Chat.composerPlaceholder, text: $text)
+            )
                 .font(.bodyStandard)
+                .foregroundColor(.textPrimary)
+                .tint(.brandPrimary)
                 .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
-                .frame(height: AppConstants.Layout.createDriftButtonHeight - 8)
+                .padding(.vertical, AppConstants.Layout.elementSpacing)
                 .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
                 .cornerRadius(AppConstants.UI.cornerRadiusLarge)
             
@@ -315,14 +317,11 @@ struct ChatComposer: View {
 // MARK: - Chat Detail bottom sheet
 struct DriftChatDetailSheet: View {
     let drift: Drift
+    let participants: [ParticipantInfo]
     @Environment(\.dismiss) var dismiss
     @State private var isMuted = false
     @State private var showBlockAlert = false
     @State private var selectedUserToBlock = ""
-    
-    var participants: [ParticipantInfo] {
-        AppConstants.MockData.chatParticipants
-    }
     
     var body: some View {
         VStack(spacing: 0) {

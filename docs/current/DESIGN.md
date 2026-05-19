@@ -162,7 +162,7 @@ Target iPhone planning size: 393 x 852pt.
 - Center bubble: 72 x 72pt, icon and label `You`.
 - Nearby anonymous bubbles: 46 x 46pt with initials such as `LM`, `DK`, `MR`, `NP`, `AL`.
 - Bubbles are interactive activity signals.
-- Tapping a radar element must not open a profile or direct message. Instead, it presents an anonymous "Activity Signal Tooltip" showing active interests (e.g., "Coffee & Walks") and routing the user to Create Drift.
+- Tapping a radar element must not open a profile or direct message. Instead, it presents a small floating interest card anchored near the bottom of the radar showing only the anonymous active interests (e.g., "Coffee & Walks").
 
 ### Refresh Control
 
@@ -593,6 +593,44 @@ No profile deep links, no follower actions.
 - Drift Detail: summary, host context, participant privacy, safety banner, and sticky join/request/joined state.
 - Chats: async Drift-tied coordination only.
 - You: lightweight profile, active involvement, privacy/settings. No social profile depth.
+
+## Detailed MVP Screen UX Specifications
+
+### 1. Host Context Card Bottom Sheet (ISSUE-013)
+- **Presentation**: Tapping the host name or avatar inside the Drift Detail screen triggers a compact slide-up sheet, not a full page transition.
+- **Content Gating**: First name, display initials, and a Verified Checkmark badge only. No phone numbers, no social links.
+- **Trust & History Stats Grid**: Renders a 2x2 miniature, Outfit-style stats card grid showing:
+  - **Hosted**: Total Drifts created by the user (e.g., `4 Hosted`).
+  - **Joined**: Total Drifts they participated in (e.g., `12 Joined`).
+  - **Verified Check**: A soft badge and checkmark confirming identity.
+  - **Reliability Metric**: Total completed physical check-ins (e.g., `16 Completed`).
+- **Synergy Signal**: Shows Outfit-styled tags of the host's selected interest capsules.
+- **Activity History & Active Drifts**:
+  - **Active Drifts**: A mini vertical card list of upcoming drifts scheduled by this host. Tapping any item routes to its Drift Detail screen.
+  - **Past Drifts Log**: A subtle horizontal scroll gallery of past completed meetups they hosted or joined (e.g., `"Walk in Indiranagar"`, `"Coffee chat"` with a grayed-out `"Completed"` state) to visually confirm physical real-world consistency.
+- **Safety Guardrail**: Structurally omits cold messaging, phone calls, and follower options to preserve activity-first boundaries.
+
+### 2. "Who’s Coming" Sheet (ISSUE-014)
+- **Presentation**: Triggered via the participants avatar strip on the Drift Detail screen.
+- **Icebreakers Row**: Next to each participant's first name, renders a horizontal row of their active interest icons.
+- **Strict Read-Only Gating**: Participants rows are completely static. Tapping on a participant has zero interaction, preventing social browsing or direct side-channel pings.
+
+### 3. Drift List Refinement (Tactile Filter Panel)
+- **Radius Bounds**: Renders a mint HSL-styled horizontal slider representing `1 km` to `10 km` (the MVP absolute discovery limit).
+- **Activity Tags Grid**: Renders a 2x4 tag grid displaying standard categories (Coffee, Walks, Movie, Dinner) to instantly refine the list.
+- **Demographic Exclusions**: STRUCTURALLY FORBIDDEN to filter by age, gender, occupation, or status.
+
+### 4. Saved Drifts Gallery & Watch-list
+- **Home Surface**: Located in the "You" tab as a horizontal row.
+- **Dynamic State Checking**: Renders bookmarked cards with live status badges. Expired/cancelled bookmarked items automatically fade and delete.
+
+### 5. Attendance Warnings & Vibe Confirmations
+- **Looming Alert**: 2 hours before a joined/hosted Drift starts, triggers a local notification and in-app banner.
+- **Confirmation State**: Tapping the alert displays a compact banner asking: *"Are you still good to go?"* with CTAs `"Yes, on my way!"` and `"Need to cancel"`.
+
+### 6. Activity-Centric Map/Location Bounds
+- **Pre-Join state**: Drift detail renders a circular, static vector map showcasing *only* a generic **500-meter radius colored highlight ring** centered on the drift neighborhood (e.g. Indiranagar, Kochi) with NO specific pin or street address.
+- **Post-Join state**: Renders a precise pin drop and an inline action `"Open in Maps"` to deep link into native Apple Maps.
 
 ## Design QA
 

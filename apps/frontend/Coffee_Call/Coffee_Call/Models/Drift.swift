@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-struct Drift: Identifiable, Hashable {
-    let id = UUID()
+struct Drift: Identifiable, Hashable, Codable {
+    var id: UUID = UUID()
     let title: String
     let description: String
     let location: String
@@ -14,13 +14,13 @@ struct Drift: Identifiable, Hashable {
     let status: DriftStatus
     let category: DriftCategory
     let hook: String?
-    let host: Host
+    var host: Host
     let peopleGoing: Int
     let spotsLeft: Int?
     let capacity: Int
     let vibeTags: [String]
     let whatToBring: [String]
-    let notes: String?
+    let notes: String? = nil
     var participantInitials: [String]
     let imageUrl: String?
     var pendingRequests: [JoinRequest] = []
@@ -28,6 +28,61 @@ struct Drift: Identifiable, Hashable {
     var lastMessage: String? = nil
     var lastMessageTime: String? = nil
     var unreadCount: Int = 0
+    
+    init(
+        id: UUID = UUID(),
+        title: String,
+        description: String,
+        location: String,
+        meetingPoint: String,
+        time: String,
+        endTime: String,
+        date: String,
+        distance: Double,
+        status: DriftStatus,
+        category: DriftCategory,
+        hook: String? = nil,
+        host: Host,
+        peopleGoing: Int = 1,
+        spotsLeft: Int? = nil,
+        capacity: Int = 5,
+        vibeTags: [String] = [],
+        whatToBring: [String] = [],
+        notes: String? = nil,
+        participantInitials: [String] = [],
+        imageUrl: String? = nil,
+        pendingRequests: [JoinRequest] = [],
+        isMine: Bool = false,
+        lastMessage: String? = nil,
+        lastMessageTime: String? = nil,
+        unreadCount: Int = 0
+    ) {
+        self.id = id
+        self.title = title
+        self.description = description
+        self.location = location
+        self.meetingPoint = meetingPoint
+        self.time = time
+        self.endTime = endTime
+        self.date = date
+        self.distance = distance
+        self.status = status
+        self.category = category
+        self.hook = hook
+        self.host = host
+        self.peopleGoing = peopleGoing
+        self.spotsLeft = spotsLeft
+        self.capacity = capacity
+        self.vibeTags = vibeTags
+        self.whatToBring = whatToBring
+        self.participantInitials = participantInitials
+        self.imageUrl = imageUrl
+        self.pendingRequests = pendingRequests
+        self.isMine = isMine
+        self.lastMessage = lastMessage
+        self.lastMessageTime = lastMessageTime
+        self.unreadCount = unreadCount
+    }
     
     // Hashable conformance (synthesized)
     func hash(into hasher: inout Hasher) {
@@ -39,12 +94,49 @@ struct Drift: Identifiable, Hashable {
     }
 }
 
-struct Host: Identifiable, Hashable {
-    let id = UUID()
+struct Host: Identifiable, Hashable, Codable {
+    let id: UUID
     let name: String
     let role: String
     let imageUrl: String?
     let isVerified: Bool
+    
+    // Rich details for ISSUE-013 (organic trust metrics & history)
+    let hostedCount: Int
+    let joinedCount: Int
+    let completedCount: Int
+    let verified: Bool
+    let otherActiveDrifts: [Drift]
+    let pastDrifts: [String]
+    let interests: [String]
+    
+    init(
+        id: UUID = UUID(),
+        name: String,
+        role: String,
+        imageUrl: String?,
+        isVerified: Bool,
+        hostedCount: Int = 4,
+        joinedCount: Int = 12,
+        completedCount: Int = 16,
+        verified: Bool = true,
+        otherActiveDrifts: [Drift] = [],
+        pastDrifts: [String] = ["Walk in Indiranagar", "Coffee chat"],
+        interests: [String] = ["Walks", "Coffee", "Movies"]
+    ) {
+        self.id = id
+        self.name = name
+        self.role = role
+        self.imageUrl = imageUrl
+        self.isVerified = isVerified
+        self.hostedCount = hostedCount
+        self.joinedCount = joinedCount
+        self.completedCount = completedCount
+        self.verified = verified
+        self.otherActiveDrifts = otherActiveDrifts
+        self.pastDrifts = pastDrifts
+        self.interests = interests
+    }
     
     var initials: String {
         name.components(separatedBy: " ")
@@ -63,7 +155,7 @@ struct Host: Identifiable, Hashable {
     }
 }
 
-enum DriftStatus: String, Hashable {
+enum DriftStatus: String, Hashable, Codable {
     case open = "OPEN"
     case startingSoon = "STARTING SOON"
     case tonight = "TONIGHT"
@@ -79,7 +171,7 @@ enum DriftStatus: String, Hashable {
     }
 }
 
-enum DriftCategory: String, Hashable, CaseIterable {
+enum DriftCategory: String, Hashable, CaseIterable, Codable {
     case coffee, walk, movie, food, study, gaming, music, yoga, event
     
     var icon: String {
@@ -111,8 +203,8 @@ enum DriftCategory: String, Hashable, CaseIterable {
     }
 }
 
-struct JoinRequest: Identifiable, Hashable {
-    let id = UUID()
+struct JoinRequest: Identifiable, Hashable, Codable {
+    var id: UUID = UUID()
     let userName: String
     let userInitials: String
     let userRole: String

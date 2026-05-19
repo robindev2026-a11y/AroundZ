@@ -4,8 +4,13 @@ struct DiscoveryScreen: View {
     
     // MARK: - State
     
-    @StateObject private var viewModel = DiscoveryViewModel()
+    @StateObject private var viewModel: DiscoveryViewModel
     @Binding var selectedTab: Int
+    
+    init(viewModel: DiscoveryViewModel = DiscoveryViewModel(), selectedTab: Binding<Int>) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        _selectedTab = selectedTab
+    }
     
     @State private var selectedPerson: RadarPerson? = nil
     
@@ -125,12 +130,23 @@ struct DiscoveryScreen: View {
                                 
                                 LazyVGrid(columns: columns, spacing: AppConstants.Layout.elementSpacing + 2) {
                                     ForEach(viewModel.interestCategories) { category in
-                                        InterestCard(
-                                            title: category.label,
-                                            icon: category.icon,
-                                            count: category.count,
-                                            color: category.color ?? .brandPrimary
-                                        )
+                                        Button(action: {
+                                            // Set active interest filter on global navigation singleton
+                                            NavigationManager.shared.activeInterestFilter = category.id
+                                            
+                                            // Route user to Drifts listing tab (index 1)
+                                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                                selectedTab = 1
+                                            }
+                                        }) {
+                                            InterestCard(
+                                                title: category.label,
+                                                icon: category.icon,
+                                                count: category.count,
+                                                color: category.color ?? .brandPrimary
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
                                     }
                                 }
                             }
@@ -155,6 +171,9 @@ struct DiscoveryScreen: View {
                 }
             }
         )
+        .onAppear {
+            NavigationManager.shared.resetTabBarVisibility()
+        }
     }
 }
 

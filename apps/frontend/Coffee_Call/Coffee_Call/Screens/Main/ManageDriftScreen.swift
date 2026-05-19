@@ -4,6 +4,7 @@ struct ManageDriftScreen: View {
     @StateObject var viewModel: ManageDriftViewModel
     @Environment(\.dismiss) var dismiss
     @StateObject private var navManager = NavigationManager.shared
+    @State private var tabBarVisibilitySource = UUID().uuidString
     
     var body: some View {
         VStack(spacing: AppConstants.Layout.standardPadding) {
@@ -50,10 +51,10 @@ struct ManageDriftScreen: View {
         )
         .navigationBarHidden(true)
         .onAppear {
-            navManager.isTabBarHidden = true
+            navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
         }
         .onDisappear {
-            navManager.isTabBarHidden = false
+            navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
         }
     }
     

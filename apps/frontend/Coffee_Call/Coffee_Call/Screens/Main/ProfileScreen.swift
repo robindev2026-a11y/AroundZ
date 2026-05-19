@@ -28,6 +28,9 @@ struct ProfileScreen: View {
                 // 2. Private Stats Grid
                 statsSection
                 
+                // Saved Drifts Row
+                savedDriftsSection
+                
                 // 3. Activity Log
                 activityLogSection
                 
@@ -48,6 +51,9 @@ struct ProfileScreen: View {
                     }
                 }
             )
+            .navigationDestination(for: Drift.self) { drift in
+                DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+            }
             .sheet(isPresented: $showingEditProfile) {
                 EditProfileScreen(viewModel: viewModel)
             }
@@ -238,6 +244,124 @@ struct ProfileScreen: View {
             }
             .padding(.leading, 4)
         }
+    }
+    
+    // MARK: - Saved Drifts Section
+    private var savedDriftsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Saved Drifts")
+                    .font(.heading2)
+                    .foregroundColor(.textPrimary)
+                
+                Spacer()
+                
+                if !viewModel.savedDrifts.isEmpty {
+                    Text("\(viewModel.savedDrifts.count)")
+                        .font(.captionText)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.brandPrimary)
+                        .clipShape(Capsule())
+                }
+            }
+            
+            if viewModel.savedDrifts.isEmpty {
+                VStack(spacing: AppConstants.Layout.subElementSpacing) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.brandPrimary.opacity(0.05))
+                            .frame(width: 48, height: 48)
+                        Image(systemName: AppIcons.bookmark)
+                            .font(.system(size: 18))
+                            .foregroundColor(.brandPrimary)
+                    }
+                    
+                    Text("Your bookmarked plans will appear here.")
+                        .font(.bodySmall)
+                        .foregroundColor(.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .background(Color.surfaceMain)
+                .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: AppConstants.Layout.elementSpacing) {
+                        ForEach(viewModel.savedDrifts) { drift in
+                            NavigationLink(value: drift) {
+                                savedDriftCard(drift)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+    }
+    
+    private func savedDriftCard(_ drift: Drift) -> some View {
+        HStack(spacing: AppConstants.Layout.elementSpacing) {
+            ZStack {
+                Circle()
+                    .fill(drift.category.color.opacity(AppConstants.UI.opacityLight * 1.5))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: drift.category.icon)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(drift.category.color)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .top) {
+                    Text(drift.title)
+                        .font(.custom("Outfit-Bold", size: AppConstants.Typography.sizeHeadline - 2))
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    Image(systemName: AppIcons.bookmarkFill)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.brandPrimary)
+                }
+                
+                Text("\(drift.date) \(drift.time)")
+                    .font(.captionText)
+                    .foregroundColor(.textSecondary)
+                    .lineLimit(1)
+                
+                HStack {
+                    Text(drift.status.rawValue)
+                        .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
+                        .foregroundColor(drift.status.color)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(drift.status.color.opacity(AppConstants.UI.opacityLight))
+                        .cornerRadius(AppConstants.UI.cornerRadiusTiny)
+                    
+                    Spacer()
+                }
+            }
+        }
+        .frame(width: 260)
+        .padding(14)
+        .background(Color.surfaceMain)
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
+                .stroke(Color.appBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.textPrimary.opacity(0.02), radius: 6, x: 0, y: 3)
+        .opacity(drift.status == .ended ? 0.4 : 1.0)
     }
     
     private func statTile(type: StatType, count: String) -> some View {
