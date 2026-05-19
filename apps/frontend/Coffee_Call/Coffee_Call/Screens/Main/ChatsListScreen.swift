@@ -9,7 +9,7 @@ struct ChatsListScreen: View {
             VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                 // 1. Status Filter Chips Row
                 statusChipsRow
-//                    .padding(.top, AppConstants.Layout.subElementSpacing)
+                    .padding(.top, AppConstants.Layout.subElementSpacing)
                 
                 // 2. Main Content Mode Selector
                 let chats = viewModel.filteredChats(for: selectedFilter)

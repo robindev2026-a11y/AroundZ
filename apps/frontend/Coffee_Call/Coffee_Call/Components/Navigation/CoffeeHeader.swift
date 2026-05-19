@@ -34,6 +34,7 @@ struct CoffeeBasePage<Header: View, Content: View>: View {
             } else {
                 content
                     .padding(.top, topPadding)
+                    .ignoresSafeArea(edges: .top)
             }
 
             header
