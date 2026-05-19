@@ -401,7 +401,7 @@ Chats should make it effortless to:
 
 Chats has three primary screens:
 
-1. Chats Home (Bubble Field)
+1. Chats Home (Compact Rooms List)
 2. Chat Thread (Conversation) (Drift Room)
 3. Chat Detail (Info Sheet)
 
@@ -411,7 +411,7 @@ Optional (MVP-safe) supporting sheets:
 
 ### Entry Points
 
-- Bottom nav `Chats` opens Chats Home (Bubble Field).
+- Bottom nav `Chats` opens Chats Home.
 - A Drift Detail screen may deep link directly into the Chat Thread only after the user is hosting or joined.
 - Notifications for new messages open the Chat Thread.
 
@@ -421,19 +421,16 @@ Optional (MVP-safe) supporting sheets:
 - Use the shared floating bottom nav on Chats Home.
 - Chat Thread uses a standard navigation header (or a compact glass header) but must preserve the same typography/tokens and avoid a new visual style.
 
-### Chats Home (Bubble Field)
+### Chats Home
 
-Purpose: make chats feel alive and Drift-first without looking like a generic messaging app. The “bubble field” communicates active plans forming nearby, and each bubble represents a Drift room.
+Purpose: provide a clean, scan-friendly list of all your active Drift conversations.
 
 #### Top Header
 
 - Use the shared Floating Glass Top Header.
 - Title: `Chats`.
 - Subtitle: `Drift rooms`.
-- Right action: circular view toggle button (52-56pt) that switches `Bubbles` <-> `List`.
-  - In Bubble view, show a list icon.
-  - In List view, show a bubble icon.
-  - This toggle controls only the presentation, not what content is available.
+
 
 #### Layout
 
@@ -441,7 +438,7 @@ Target iPhone planning size: 393 x 852pt.
 
 1. Floating glass top header.
 2. Drift status filter row.
-3. Bubble Field (primary content) OR Compact Rooms List (list mode).
+3. Compact Rooms List.
 5. Floating glass bottom navigation.
 
 #### Drift Status Filter Row
@@ -467,63 +464,7 @@ Definitions:
 - `Hosted`: Drifts where the user is Hosting.
 - `Expired`: Drifts that have ended or been archived. This replaces the older `Archived` concept for Chats.
 
-#### Presentation Mode
-
-- Default is Bubble Field.
-- The header toggle switches between:
-  - Bubble Field (alive, ambient)
-  - Compact Rooms List (scan-friendly)
-
-#### Bubble Field
-
-The Bubble Field occupies most of the screen and contains 8-12 bubbles on a warm background.
-
-Bubble rules:
-
-- Each bubble = one Drift room the user is `Hosting` or `Joined`, filtered by the Drift status filter row.
-- Requested/pending Drifts must not appear.
-- No bubbles represent people. No avatars, no faces, no profile entry points.
-
-Field sizing:
-
-- Top spacing: 12-16pt below the mode strip (or header if mode strip omitted).
-- Bottom spacing: ensure the field leaves breathing room above the floating bottom nav.
-
-Bubble sizes:
-
-- Small: 56-64pt.
-- Medium: 72-88pt.
-- Large: 96-120pt.
-- Only 1-2 large bubbles on screen at a time.
-
-Bubble visuals:
-
-- Surface: glassy card surface with subtle blur, very soft highlight stroke, and slate-tinted shadow.
-- Category accent: thin ring or inner glow using mint/lavender/peach depending on the Drift category.
-- Content inside bubble:
-  - Category icon (centered, simple).
-  - Short label (1 line) below icon for medium/large bubbles, e.g. `Coffee`, `Walks`, `Food`, `Movie`.
-  - For large bubbles only, optionally include a second line: time chip like `Today 6:30`.
-
-Live-ness indicators (subtle):
-
-- Unread pulse dot: tiny mint dot at the bubble’s upper-right edge if unread messages exist.
-- Activity badge (optional): `+3` as a tiny pill if many unread; cap at `99+`.
-- “Starting soon” halo (optional): very subtle glow ring if Drift starts within 60 minutes.
-
-Motion / interaction (must be gentle, not distracting):
-
-- Ambient drift: slow, calm movement (floating) across a small range.
-- Soft repulsion: bubbles gently separate when they overlap.
-- Parallax: minimal device-tilt or scroll-based parallax if available.
-- Tap bubble: opens the Chat Thread for that Drift.
-- Long press bubble: opens a small action sheet:
-  - `Open Room`
-  - `Info`
-  - `Mute`
-  - `Archive` (optional)
-
-#### Compact Rooms List (List Mode)
+#### Compact Rooms List
 
 List mode is the scan-friendly view that matches an Instagram-style message list, but each row is still a Drift room.
 

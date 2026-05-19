@@ -193,6 +193,24 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Verification performed: Headless Xcode compiler validation successfully built target simulator bundle with absolute zero errors and warnings (**BUILD SUCCEEDED**).
 - Remaining gaps: None.
 
+- Diagnosed and resolved massive CPU spike and Very High Energy Impact in `ChatsListScreen`:
+  - Isolated the continuous `.repeatForever()` unread pulse dot animation into a standalone `UnreadPulseDot` struct to prevent parent view re-evaluations.
+  - Wrapped the heavy static background layers (shadows, blurs, gradients) of `BubbleView` in a `.drawingGroup()` modifier to flatten them into a single Metal texture.
+  - Removed `.scrollDisabled(true)` and wrapped the bubbles in a full `ScrollView(.vertical)` with a 1.3x expanded canvas for panning.
+  - Applied `.buttonStyle(BubblePressStyle())` natively handling touch intent cancellation on scroll and adding haptic feedback.
+- Files touched: `ChatsListScreen.swift`, `STATUS.md`.
+- Verification performed: Verified UI interaction intent and successful compilation via headless Xcode build.
+- Remaining gaps: None.
+
+2026-05-19:
+
+- Removed the Drift Rooms Bubble Field UI entirely from `ChatsListScreen.swift` per user request for MVP scope reduction.
+- Simplified `ChatsListScreen` to strictly render the Compact Rooms List.
+- Removed all view modes, header toggles, ambient animations, and custom bubble layout modifiers to cleanly strip out the unneeded experimental bubble feature.
+- Updated `DESIGN.md` to reflect `Chats Home (Compact Rooms List)` as the standard interaction model.
+- Files touched: `ChatsListScreen.swift`, `DESIGN.md`, `STATUS.md`.
+- Verification performed: Clean headless compilation via `xcodebuild` confirming no orphaned modifiers.
+
 ## How To Update This File
 
 When an agent changes the project, add a short entry with:

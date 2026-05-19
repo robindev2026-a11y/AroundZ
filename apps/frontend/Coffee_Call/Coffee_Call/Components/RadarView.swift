@@ -22,7 +22,7 @@ struct RadarView: View {
     
     @State private var sweepRotation: Double = 0
     @State private var particles: [RadarParticle] = []
-    @State private var isFloating: Bool = false
+    @State private var twinklePhase: Double = 0
     
     var body: some View {
         GeometryReader { geo in
@@ -32,14 +32,11 @@ struct RadarView: View {
                 // Background Glow Dots
                 ForEach(particles) { particle in
                     Circle()
-                        .fill(particle.color.opacity(particle.opacity * (1.0 - progress)))
+                        // Twinkle via opacity only (cheap). Avoid animating offsets + blur, which is costly.
+                        .fill(particle.color.opacity(particle.opacity * (1.0 - progress) * (0.75 + 0.25 * sin(twinklePhase + Double(particle.id.uuidString.hashValue % 7)))))
                         .frame(width: particle.size, height: particle.size)
-                        .blur(radius: 1)
                         .scaleEffect(1.0 - (progress * 0.5))
-                        .offset(
-                            x: (particle.x + (isFloating ? particle.driftX : -particle.driftX)) * (1.0 + progress * 2.0),
-                            y: (particle.y + (isFloating ? particle.driftY : -particle.driftY)) * (1.0 + progress * 2.0)
-                        )
+                        .offset(x: particle.x * (1.0 + progress * 2.0), y: particle.y * (1.0 + progress * 2.0))
                         .scaleEffect(isScanning || selectedPerson != nil ? 1.4 : 1.0)
                 }
                 
@@ -167,10 +164,10 @@ struct RadarView: View {
                 if particles.isEmpty {
                     generateParticles()
                 }
-                
-                // Continuous Drift (Slow and low impact)
-                withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
-                    isFloating = true
+
+                // Single shared twinkle driver (low energy).
+                withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                    twinklePhase = .pi * 2
                 }
             }
         }
@@ -187,8 +184,8 @@ struct RadarView: View {
                 size: CGFloat.random(in: 4...8),
                 opacity: i % 2 == 0 ? 0.3 : 0.2,
                 color: i % 2 == 0 ? Color.brandPrimary : Color.brandPurple,
-                driftX: CGFloat.random(in: 10...30),
-                driftY: CGFloat.random(in: 10...30)
+                driftX: 0,
+                driftY: 0
             ))
         }
         self.particles = newParticles
