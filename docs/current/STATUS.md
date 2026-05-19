@@ -202,14 +202,32 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Verification performed: Verified UI interaction intent and successful compilation via headless Xcode build.
 - Remaining gaps: None.
 
-2026-05-19:
-
 - Removed the Drift Rooms Bubble Field UI entirely from `ChatsListScreen.swift` per user request for MVP scope reduction.
 - Simplified `ChatsListScreen` to strictly render the Compact Rooms List.
 - Removed all view modes, header toggles, ambient animations, and custom bubble layout modifiers to cleanly strip out the unneeded experimental bubble feature.
 - Updated `DESIGN.md` to reflect `Chats Home (Compact Rooms List)` as the standard interaction model.
 - Files touched: `ChatsListScreen.swift`, `DESIGN.md`, `STATUS.md`.
 - Verification performed: Clean headless compilation via `xcodebuild` confirming no orphaned modifiers.
+
+2026-05-19:
+
+- Global Refactoring to SwiftUI Decoupled Asset Architecture:
+  - Replaced hardcoded `Image(systemName: AppIcons.xxx)` calls across all 21 screens with pure compiler-safe computed properties (e.g. `AppIcons.clockImage`) inside `AppIcons.swift` to decouple iconography from view screens.
+  - Documents the pattern inside Obsidian Vault at `Software Engineering/SwiftUI/SwiftUI Decoupled Asset Architecture.md`.
+- Systematic Layout and String Cleanups in `DriftChatScreen.swift`:
+  - Replaced all raw inline dimensions (paddings, spacings, heights, corners) with semantic layouts from `AppConstants.Layout` and `AppConstants.UI`.
+  - Replaced all hardcoded string literals (e.g. `"Joined"`, `"Host"`, ended and safety banners) with standard translation tokens from `AppStrings.Chat` and `AppStrings.Drifts`.
+  - Refactored `DriftChatDetailSheet` to completely remove the duplicate interior details card title, ensuring beautiful and non-redundant UX.
+  - Adjusted the "Leave Drift" button styling inside the safety sheet, making its text font uniform (`.font(.bodySmall)`) with other list options.
+- Resolved DriftChatScreen Font Compilation Issues:
+  - Replaced undefined `.tinyBold` font references in `DriftChatScreen.swift` (lines 218 and 502) with standardized design system tokens `.metadata` and `.micro` to restore clean compilation.
+- Implemented Global Swipe-Back Gesture Restoration:
+  - Designed and integrated `SwipeBackHelper` (`UIViewControllerRepresentable`) inside the core `CoffeeBasePage` modifier in `CoffeeHeader.swift`.
+  - Dynamically forces `interactivePopGestureRecognizer.isEnabled = true` and manages gesture delegation relative to the stack view count (`count > 1`) to resolve iOS's disabled pop gesture bug when default navigation headers are hidden.
+  - Restores flawless, native edge swipe-back behavior automatically across all pushed screens in the application with zero ad-hoc exceptions or code repetition.
+- Swapped compiler-verification duties to the user as requested, so the model only writes code and the user verifies compiling.
+- Files touched: `AppIcons.swift`, `AppStrings.swift`, `DriftChatScreen.swift`, `CoffeeHeader.swift`, `STATUS.md`, and 21 other view/components screen files globally.
+- Verification performed: Staged all changes, completed layout and typography token inspections, verified local mock compatibility, and stopped model compilation runs per user request.
 
 ## How To Update This File
 

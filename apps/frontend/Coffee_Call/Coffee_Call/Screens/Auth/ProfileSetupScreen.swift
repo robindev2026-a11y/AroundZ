@@ -15,7 +15,7 @@ struct ProfileSetupScreen: View {
             Button(action: {
                 presentationMode.wrappedValue.dismiss()
             }) {
-                Image(systemName: AppIcons.arrowLeft)
+                AppIcons.arrowLeftImage
                     .font(.system(size: AppConstants.Typography.sizeTitle, weight: .semibold))
                     .foregroundColor(.textPrimary)
                     .frame(width: 48, height: 48)
@@ -48,7 +48,7 @@ struct ProfileSetupScreen: View {
                                 .fill(Color.surfaceMain)
                         )
                         .overlay(
-                            Image(systemName: AppIcons.camera)
+                            AppIcons.cameraImage
                                 .font(.system(size: 38, weight: .medium))
                                 .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
                         )
@@ -57,7 +57,7 @@ struct ProfileSetupScreen: View {
                         .fill(Color.brandPrimary)
                         .frame(width: 40, height: 40)
                         .overlay(
-                            Image(systemName: AppIcons.camera)
+                            AppIcons.cameraImage
                                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                                 .foregroundColor(.textOnBrand)
                         )

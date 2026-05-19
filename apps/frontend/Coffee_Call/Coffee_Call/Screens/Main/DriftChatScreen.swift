@@ -11,7 +11,7 @@ struct DriftChatScreen: View {
             // 1. Custom Sub-Banner Context Row
             subBanner
                 .padding(.horizontal, AppConstants.Layout.standardPadding)
-                .padding(.bottom, 10)
+                .padding(.bottom, AppConstants.Layout.elementSpacing)
                 .background(Color.backgroundMain)
             
             // MARK: - Message List
@@ -90,68 +90,55 @@ struct DriftChatScreen: View {
     
     // Custom Sub-Header Banner Context Chips
     private var subBanner: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: AppConstants.Layout.subElementSpacing) {
             // Time Chip
-            HStack(spacing: 6) {
-                Image(systemName: AppIcons.clock)
-                    .font(.system(size: 11))
+            HStack(spacing: AppConstants.Layout.miniPadding + 2) {
+                AppIcons.clockImage
+                    .font(.captionText)
                     .foregroundColor(.brandPrimary)
                 Text(viewModel.drift.time.replacingOccurrences(of: " • ", with: " "))
                     .font(.captionText)
                     .foregroundColor(.textPrimary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Color.surfaceSecondary.opacity(0.4))
-            .cornerRadius(12)
+            .padding(.horizontal, AppConstants.Layout.subElementSpacing + 2)
+            .padding(.vertical, AppConstants.Layout.subElementSpacing - 2)
+            .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal))
+            .cornerRadius(AppConstants.UI.cornerRadiusSmall)
             
             // Participants Chip
-            HStack(spacing: 6) {
-                Image(systemName: AppIcons.participants)
-                    .font(.system(size: 11))
+            HStack(spacing: AppConstants.Layout.miniPadding + 2) {
+                AppIcons.participantsImage
+                    .font(.captionText)
                     .foregroundColor(.textSecondary)
-                Text("\(viewModel.drift.peopleGoing) people")
+                Text("\(viewModel.drift.peopleGoing) \(AppStrings.Chat.participantsLabel)")
                     .font(.captionText)
                     .foregroundColor(.textPrimary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Color.surfaceSecondary.opacity(0.4))
-            .cornerRadius(12)
+            .padding(.horizontal, AppConstants.Layout.subElementSpacing + 2)
+            .padding(.vertical, AppConstants.Layout.subElementSpacing - 2)
+            .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal))
+            .cornerRadius(AppConstants.UI.cornerRadiusSmall)
             
             // Joined Badge
-            Text("Joined")
-                .font(.system(size: 10, weight: .bold))
+            Text(AppStrings.Chat.joined)
+                .font(.micro)
                 .foregroundColor(.brandPurple)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.brandPurple.opacity(0.12))
-                .cornerRadius(12)
-            
-            Spacer()
-            
-            // View Drift Link
-            Button(action: { showInfoSheet = true }) {
-                HStack(spacing: 2) {
-                    Text(AppStrings.Chat.viewDrift)
-                    Image(systemName: AppIcons.chevronRight)
-                        .font(.system(size: 8, weight: .bold))
-                }
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(.brandPrimary)
-            }
+                .padding(.horizontal, AppConstants.Layout.subElementSpacing + 2)
+                .padding(.vertical, AppConstants.Layout.subElementSpacing - 2)
+                .background(Color.brandPurple.opacity(AppConstants.UI.opacityLight))
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.horizontal, AppConstants.Layout.elementSpacing)
+        .padding(.vertical, AppConstants.Layout.subElementSpacing)
         .background(Color.white.opacity(0.6))
-        .cornerRadius(18)
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium - 2)
     }
     
     private var endedBanner: some View {
         HStack {
-            Image(systemName: AppIcons.bell)
+            AppIcons.bellImage
                 .foregroundColor(.brandPurple)
-            Text("This Drift has ended. You can still view messages but can't send new ones.")
+            Text(AppStrings.Chat.endedRoomBanner)
                 .font(.captionText)
                 .foregroundColor(.textSecondary)
             Spacer()
@@ -161,21 +148,21 @@ struct DriftChatScreen: View {
     }
     
     private var safetyBanner: some View {
-        HStack(spacing: 8) {
-            Image(systemName: AppIcons.verified)
-                .font(.system(size: 14))
+        HStack(spacing: AppConstants.Layout.subElementSpacing) {
+            AppIcons.verifiedImage
+                .font(.captionText)
                 .foregroundColor(.brandPurple)
             Text(AppStrings.Chat.safetyBannerText)
                 .font(.metadata)
                 .foregroundColor(.textSecondary)
             Spacer()
-            Image(systemName: AppIcons.ellipsis)
-                .font(.system(size: 14))
+            AppIcons.ellipsisImage
+                .font(.captionText)
                 .foregroundColor(.textSecondary)
         }
         .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .padding(.vertical, 12)
-        .padding(.bottom, 8)
+        .padding(.vertical, AppConstants.Layout.elementSpacing)
+        .padding(.bottom, AppConstants.Layout.subElementSpacing)
         .background(Color.surfaceMain)
     }
 }
@@ -190,7 +177,7 @@ struct MessageBubbleShape: Shape {
             byRoundingCorners: isSelf ? 
                 [.topLeft, .topRight, .bottomLeft] : 
                 [.topLeft, .topRight, .bottomRight],
-            cornerRadii: CGSize(width: 16, height: 16)
+            cornerRadii: CGSize(width: AppConstants.UI.cornerRadiusMedium - 4, height: AppConstants.UI.cornerRadiusMedium - 4)
         )
         return Path(path.cgPath)
     }
@@ -201,47 +188,47 @@ struct ChatBubble: View {
     let message: ChatMessage
     
     var body: some View {
-        HStack(alignment: .bottom, spacing: 8) {
+        HStack(alignment: .bottom, spacing: AppConstants.Layout.subElementSpacing) {
             if !message.isSelf {
                 // Avatar
                 Text(message.senderInitials)
                     .font(.micro)
                     .foregroundColor(.brandPrimary)
-                    .frame(width: 32, height: 32)
-                    .background(Circle().fill(Color.brandPrimary.opacity(0.1)))
+                    .frame(width: AppConstants.Layout.subElementSpacing * 4, height: AppConstants.Layout.subElementSpacing * 4)
+                    .background(Circle().fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight)))
             } else {
                 Spacer()
             }
             
-            VStack(alignment: message.isSelf ? .trailing : .leading, spacing: 4) {
+            VStack(alignment: message.isSelf ? .trailing : .leading, spacing: AppConstants.Layout.miniPadding) {
                 if !message.isSelf {
                     Text(message.senderName)
                         .font(.captionText)
                         .foregroundColor(.textSecondary)
-                        .padding(.leading, 4)
+                        .padding(.leading, AppConstants.Layout.miniPadding)
                 }
                 
-                HStack(alignment: .bottom, spacing: 6) {
+                HStack(alignment: .bottom, spacing: AppConstants.Layout.subElementSpacing - 2) {
                     if message.isSelf {
-                        HStack(spacing: 4) {
+                        HStack(spacing: AppConstants.Layout.miniPadding) {
                             Text(message.timestamp, style: .time)
                                 .font(.metadata)
                                 .foregroundColor(.textSecondary)
                             Text("✓✓")
-                                .font(.system(size: 10, weight: .bold))
+                                .font(.metadata)
                                 .foregroundColor(.brandPrimary)
                         }
-                        .padding(.bottom, 2)
+                        .padding(.bottom, AppConstants.Layout.miniPadding / 2)
                     }
                     
                     Text(message.content)
                         .font(.bodyStandard)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
+                        .padding(.vertical, AppConstants.Layout.elementSpacing)
                         .foregroundColor(.textPrimary)
                         .background(
                             MessageBubbleShape(isSelf: message.isSelf)
-                                .fill(message.isSelf ? Color.brandPrimary.opacity(0.12) : Color.white)
+                                .fill(message.isSelf ? Color.brandPrimary.opacity(AppConstants.UI.opacityLight) : Color.white)
                         )
                         .overlay(
                             MessageBubbleShape(isSelf: message.isSelf)
@@ -252,7 +239,7 @@ struct ChatBubble: View {
                         Text(message.timestamp, style: .time)
                             .font(.metadata)
                             .foregroundColor(.textSecondary)
-                            .padding(.bottom, 2)
+                            .padding(.bottom, AppConstants.Layout.miniPadding / 2)
                     }
                 }
             }
@@ -271,10 +258,10 @@ struct SystemMessageRow: View {
     let message: SystemMessage
     
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: AppConstants.Layout.subElementSpacing) {
             if let icon = message.icon {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .font(.captionText)
             }
             Text(message.content)
                 .font(.captionText)
@@ -283,8 +270,8 @@ struct SystemMessageRow: View {
                 .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.2))
         }
         .foregroundColor(.textSecondary)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
+        .padding(.vertical, AppConstants.Layout.subElementSpacing)
         .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
         .clipShape(Capsule())
     }
@@ -296,32 +283,32 @@ struct ChatComposer: View {
     let onSend: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: AppConstants.Layout.elementSpacing) {
             Button(action: {}) {
-                Image(systemName: AppIcons.paperclip)
+                AppIcons.paperclipImage
                     .font(.system(size: 18))
                     .foregroundColor(.textSecondary)
             }
             
             TextField(AppStrings.Chat.composerPlaceholder, text: $text)
                 .font(.bodyStandard)
-                .padding(.horizontal, 16)
-                .frame(height: 48)
+                .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
+                .frame(height: AppConstants.Layout.createDriftButtonHeight - 8)
                 .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
-                .cornerRadius(24)
+                .cornerRadius(AppConstants.UI.cornerRadiusLarge)
             
             Button(action: onSend) {
-                Image(systemName: AppIcons.paperplaneFill)
+                AppIcons.paperplaneFillImage
                     .font(.system(size: 16))
                     .foregroundColor(.white)
-                    .frame(width: 48, height: 48)
+                    .frame(width: AppConstants.Layout.createDriftButtonHeight - 8, height: AppConstants.Layout.createDriftButtonHeight - 8)
                     .background(Color.brandPrimary)
                     .clipShape(Circle())
             }
             .disabled(text.trimmingCharacters(in: .whitespaces).isEmpty)
         }
         .padding(.horizontal, AppConstants.Layout.elementSpacing)
-        .padding(.vertical, 12)
+        .padding(.vertical, AppConstants.Layout.elementSpacing)
     }
 }
 
@@ -342,47 +329,42 @@ struct DriftChatDetailSheet: View {
             // Header
             HStack {
                 Text(AppStrings.Chat.aboutDrift)
-                    .font(.heading2)
+                    .font(.heading2).fontWeight(.bold)
                     .foregroundColor(.textPrimary)
                 
                 Spacer()
                 
                 Button(action: { dismiss() }) {
-                    Image(systemName: AppIcons.close)
-                        .font(.system(size: 14, weight: .bold))
+                    AppIcons.closeImage
+                        .font(.captionText)
                         .foregroundColor(.textSecondary)
-                        .frame(width: 32, height: 32)
-                        .background(Color.surfaceSecondary.opacity(0.4))
+                        .frame(width: AppConstants.Layout.subElementSpacing * 4, height: AppConstants.Layout.subElementSpacing * 4)
+                        .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal))
                         .clipShape(Circle())
                 }
             }
             .padding(.horizontal, AppConstants.Layout.standardPadding)
-            .padding(.top, 24)
+            .padding(.top, AppConstants.Layout.sectionSpacing)
             .padding(.bottom, AppConstants.Layout.elementSpacing)
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: AppConstants.Layout.standardPadding) {
                     
                     // Card 1: Drift Details Card (Mockup style Image 4)
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text(AppStrings.Chat.driftDetails)
-                            .font(.bodyBold)
-                            .foregroundColor(.textPrimary)
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            // Row 1: Purpose
-                            HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: AppConstants.Layout.standardPadding - 4) {
+                        // Row 1: Purpose
+                            HStack(spacing: AppConstants.Layout.elementSpacing) {
                                 ZStack {
                                     Circle()
-                                        .fill(drift.category.color.opacity(0.12))
-                                        .frame(width: 36, height: 36)
+                                        .fill(drift.category.color.opacity(AppConstants.UI.opacityLight))
+                                        .frame(width: AppConstants.Layout.subElementSpacing * 4.5, height: AppConstants.Layout.subElementSpacing * 4.5)
                                     Image(systemName: drift.category.icon)
-                                        .font(.system(size: 16))
+                                        .font(.bodyStandard)
                                         .foregroundColor(drift.category.color)
                                 }
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Purpose")
+                                VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding / 2) {
+                                    Text(AppStrings.Drifts.Detail.detailsHeader)
                                         .font(.captionText)
                                         .foregroundColor(.textSecondary)
                                     Text(drift.title)
@@ -392,18 +374,18 @@ struct DriftChatDetailSheet: View {
                             }
                             
                             // Row 2: Time
-                            HStack(spacing: 12) {
+                            HStack(spacing: AppConstants.Layout.elementSpacing) {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.brandPrimary.opacity(0.12))
-                                        .frame(width: 36, height: 36)
-                                    Image(systemName: AppIcons.clock)
-                                        .font(.system(size: 16))
+                                        .fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                                        .frame(width: AppConstants.Layout.subElementSpacing * 4.5, height: AppConstants.Layout.subElementSpacing * 4.5)
+                                    AppIcons.clockImage
+                                        .font(.bodyStandard)
                                         .foregroundColor(.brandPrimary)
                                 }
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Time")
+                                VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding / 2) {
+                                    Text(AppStrings.Drifts.Detail.timeLabel)
                                         .font(.captionText)
                                         .foregroundColor(.textSecondary)
                                     Text(drift.time)
@@ -413,18 +395,18 @@ struct DriftChatDetailSheet: View {
                             }
                             
                             // Row 3: Location
-                            HStack(spacing: 12) {
+                            HStack(spacing: AppConstants.Layout.elementSpacing) {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.brandPrimary.opacity(0.12))
-                                        .frame(width: 36, height: 36)
-                                    Image(systemName: AppIcons.location)
-                                        .font(.system(size: 16))
+                                        .fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                                        .frame(width: AppConstants.Layout.subElementSpacing * 4.5, height: AppConstants.Layout.subElementSpacing * 4.5)
+                                    AppIcons.locationImage
+                                        .font(.bodyStandard)
                                         .foregroundColor(.brandPrimary)
                                 }
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Location")
+                                VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding / 2) {
+                                    Text(AppStrings.Drifts.Detail.meetingPointLabel)
                                         .font(.captionText)
                                         .foregroundColor(.textSecondary)
                                     Text(AppStrings.Chat.locationUnlocked)
@@ -434,18 +416,18 @@ struct DriftChatDetailSheet: View {
                             }
                             
                             // Row 4: Host note
-                            HStack(spacing: 12) {
+                            HStack(spacing: AppConstants.Layout.elementSpacing) {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.brandPrimary.opacity(0.12))
-                                        .frame(width: 36, height: 36)
-                                    Image(systemName: "bubble.left")
-                                        .font(.system(size: 16))
+                                        .fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                                        .frame(width: AppConstants.Layout.subElementSpacing * 4.5, height: AppConstants.Layout.subElementSpacing * 4.5)
+                                    AppIcons.navChatsImage
+                                        .font(.bodyStandard)
                                         .foregroundColor(.brandPrimary)
                                 }
                                 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Host note")
+                                VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding / 2) {
+                                    Text(AppStrings.Drifts.Detail.notesLabel)
                                         .font(.captionText)
                                         .foregroundColor(.textSecondary)
                                     Text(drift.notes ?? "Meet near the entrance, quick hello.")
@@ -453,21 +435,20 @@ struct DriftChatDetailSheet: View {
                                         .foregroundColor(.textPrimary)
                                 }
                             }
-                        }
                         
                         Divider()
                         
-                        HStack(spacing: 12) {
+                        HStack(spacing: AppConstants.Layout.elementSpacing) {
                             Button(action: { dismiss() }) {
                                 Text(AppStrings.Chat.viewDrift)
                                     .font(.bodySmall)
                                     .foregroundColor(.brandPrimary)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 44)
+                                    .frame(height: AppConstants.Layout.minTouchTarget)
                                     .background(Color.white)
-                                    .cornerRadius(22)
+                                    .cornerRadius(AppConstants.Layout.minTouchTarget / 2)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 22)
+                                        RoundedRectangle(cornerRadius: AppConstants.Layout.minTouchTarget / 2)
                                             .stroke(Color.brandPrimary, lineWidth: 1)
                                     )
                             }
@@ -477,62 +458,62 @@ struct DriftChatDetailSheet: View {
                                     isMuted.toggle()
                                 }
                             }) {
-                                HStack(spacing: 6) {
+                                HStack(spacing: AppConstants.Layout.miniPadding + 2) {
                                     Image(systemName: isMuted ? "bell.slash.fill" : AppIcons.bell)
                                     Text(AppStrings.Chat.muteRoom)
                                 }
                                 .font(.bodySmall)
                                 .foregroundColor(.textSecondary)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 44)
+                                .frame(height: AppConstants.Layout.minTouchTarget)
                                 .background(Color.white)
-                                .cornerRadius(22)
+                                .cornerRadius(AppConstants.Layout.minTouchTarget / 2)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 22)
+                                    RoundedRectangle(cornerRadius: AppConstants.Layout.minTouchTarget / 2)
                                         .stroke(Color.appBorder, lineWidth: 1)
                                 )
                             }
                         }
                     }
-                    .padding(20)
+                    .padding(AppConstants.Layout.standardPadding)
                     .background(Color.surfaceMain)
-                    .cornerRadius(24)
+                    .cornerRadius(AppConstants.UI.cornerRadiusLarge)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 24)
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
                             .stroke(Color.appBorder, lineWidth: 1)
                     )
                     
                     // Card 2: Participants Card (Mockup style Image 4)
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         HStack {
-                            Text("Participants (5)")
+                            Text("\(AppStrings.Chat.participantsTitle) (\(participants.count))")
                                 .font(.bodyBold)
                                 .foregroundColor(.textPrimary)
                             
                             Spacer()
                             
-                            Text("Host")
-                                .font(.system(size: 10, weight: .bold))
+                            Text(AppStrings.Chat.hosted)
+                                .font(.micro)
                                 .foregroundColor(.brandPrimary)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.brandPrimary.opacity(0.12))
-                                .cornerRadius(6)
+                                .padding(.horizontal, AppConstants.Layout.subElementSpacing)
+                                .padding(.vertical, AppConstants.Layout.miniPadding)
+                                .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                                .cornerRadius(AppConstants.UI.cornerRadiusTiny)
                         }
                         
-                        VStack(spacing: 14) {
+                        VStack(spacing: AppConstants.Layout.elementSpacing + 2) {
                             ForEach(participants) { p in
-                                HStack(spacing: 12) {
+                                HStack(spacing: AppConstants.Layout.elementSpacing) {
                                     ZStack {
                                         Circle()
-                                            .fill(p.color.opacity(0.12))
-                                            .frame(width: 36, height: 36)
+                                            .fill(p.color.opacity(AppConstants.UI.opacityLight))
+                                            .frame(width: AppConstants.Layout.subElementSpacing * 4.5, height: AppConstants.Layout.subElementSpacing * 4.5)
                                         Text(p.initials)
                                             .font(.micro)
                                             .foregroundColor(p.color)
                                     }
                                     
-                                    Text(p.isHost ? "\(p.name) (Host)" : p.name)
+                                    Text(p.isHost ? "\(p.name) (\(AppStrings.Chat.hosted))" : p.name)
                                         .font(.bodySmall)
                                         .foregroundColor(.textPrimary)
                                     
@@ -540,10 +521,10 @@ struct DriftChatDetailSheet: View {
                                     
                                     if !p.isMe && !p.isHost {
                                         Button(action: {}) {
-                                            Image(systemName: "bubble.left")
-                                                .font(.system(size: 14))
+                                            AppIcons.navChatsImage
+                                                .font(.bodyStandard)
                                                 .foregroundColor(.textSecondary)
-                                                .frame(width: 32, height: 32)
+                                                .frame(width: AppConstants.Layout.subElementSpacing * 4, height: AppConstants.Layout.subElementSpacing * 4)
                                                 .background(Color.white)
                                                 .clipShape(Circle())
                                                 .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
@@ -556,27 +537,27 @@ struct DriftChatDetailSheet: View {
                             }
                         }
                         
-                        HStack(spacing: 6) {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 10))
+                        HStack(spacing: AppConstants.Layout.miniPadding + 2) {
+                            AppIcons.lockImage
+                                .font(.captionText)
                                 .foregroundColor(.textSecondary)
                             Text(AppStrings.Chat.contextMessageWarning)
                                 .font(.metadata)
                                 .foregroundColor(.textSecondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 8)
+                        .padding(.top, AppConstants.Layout.subElementSpacing)
                     }
-                    .padding(20)
+                    .padding(AppConstants.Layout.standardPadding)
                     .background(Color.surfaceMain)
-                    .cornerRadius(24)
+                    .cornerRadius(AppConstants.UI.cornerRadiusLarge)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 24)
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
                             .stroke(Color.appBorder, lineWidth: 1)
                     )
                     
                     // Card 3: Safety & Controls Card (Mockup style Image 4)
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         Text(AppStrings.Chat.safetyControls)
                             .font(.bodyBold)
                             .foregroundColor(.textPrimary)
@@ -585,17 +566,17 @@ struct DriftChatDetailSheet: View {
                             // Report Drift
                             Button(action: {}) {
                                 HStack {
-                                    Image(systemName: AppIcons.report)
+                                    AppIcons.reportImage
                                         .foregroundColor(.statusError)
                                     Text(AppStrings.Chat.reportDrift)
                                         .font(.bodySmall)
                                         .foregroundColor(.statusError)
                                     Spacer()
-                                    Image(systemName: AppIcons.chevronRight)
-                                        .font(.system(size: 12, weight: .bold))
+                                    AppIcons.chevronRightImage
+                                        .font(.captionText)
                                         .foregroundColor(.statusError)
                                 }
-                                .padding(.vertical, 14)
+                                .padding(.vertical, AppConstants.Layout.elementSpacing + 2)
                             }
                             
                             Divider()
@@ -606,17 +587,17 @@ struct DriftChatDetailSheet: View {
                                 showBlockAlert = true
                             }) {
                                 HStack {
-                                    Image(systemName: AppIcons.block)
+                                    AppIcons.blockImage
                                         .foregroundColor(.statusError)
                                     Text(AppStrings.Chat.blockUser)
                                         .font(.bodySmall)
                                         .foregroundColor(.statusError)
                                     Spacer()
-                                    Image(systemName: AppIcons.chevronRight)
-                                        .font(.system(size: 12, weight: .bold))
+                                    AppIcons.chevronRightImage
+                                        .font(.captionText)
                                         .foregroundColor(.statusError)
                                 }
-                                .padding(.vertical, 14)
+                                .padding(.vertical, AppConstants.Layout.elementSpacing + 2)
                             }
                             
                             Divider()
@@ -624,25 +605,25 @@ struct DriftChatDetailSheet: View {
                             // Leave Drift
                             Button(action: {}) {
                                 HStack {
-                                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    AppIcons.logoutImage
                                         .foregroundColor(.statusError)
                                     Text(AppStrings.Chat.leaveDrift)
-                                        .font(.bodyBold)
+                                        .font(.bodySmall)
                                         .foregroundColor(.statusError)
                                     Spacer()
-                                    Image(systemName: AppIcons.chevronRight)
-                                        .font(.system(size: 12, weight: .bold))
+                                    AppIcons.chevronRightImage
+                                        .font(.captionText)
                                         .foregroundColor(.statusError)
                                 }
-                                .padding(.vertical, 14)
+                                .padding(.vertical, AppConstants.Layout.elementSpacing + 2)
                             }
                         }
                     }
-                    .padding(20)
+                    .padding(AppConstants.Layout.standardPadding)
                     .background(Color.surfaceMain)
-                    .cornerRadius(24)
+                    .cornerRadius(AppConstants.UI.cornerRadiusLarge)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 24)
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
                             .stroke(Color.appBorder, lineWidth: 1)
                     )
                     

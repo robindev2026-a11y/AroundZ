@@ -151,7 +151,7 @@ struct ActivityCardView: View {
     private var metaRow: some View {
         HStack(spacing: 20) {
             HStack(spacing: 6) {
-                Image(systemName: AppIcons.mappin)
+                AppIcons.mappinImage
                     .foregroundColor(.brandPrimary)
                     .font(.system(size: AppConstants.Typography.sizeCaption, weight: .semibold))
                 Text(String(format: "%.1f km away", drift.distance))
@@ -160,7 +160,7 @@ struct ActivityCardView: View {
             .foregroundColor(.white.opacity(0.9))
 
             HStack(spacing: 6) {
-                Image(systemName: AppIcons.clock)
+                AppIcons.clockImage
                     .foregroundColor(.brandPurple)
                     .font(.system(size: AppConstants.Typography.sizeCaption, weight: .semibold))
                 Text(drift.time)
@@ -178,7 +178,7 @@ struct ActivityCardView: View {
                 HStack(spacing: 6) {
                     Text(AppStrings.Discovery.joinMomentBtn)
                         .font(.system(size: AppConstants.Typography.sizeBody, weight: .black, design: .default))
-                    Image(systemName: AppIcons.arrowUpRight)
+                    AppIcons.arrowUpRightImage
                         .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
                 }
                 .foregroundColor(.white)
@@ -192,7 +192,7 @@ struct ActivityCardView: View {
 
             // Save/Heart button
             Button(action: onSave) {
-                Image(systemName: AppIcons.heart)
+                AppIcons.heartImage
                     .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .medium))
                     .foregroundColor(.white)
                     .frame(width: 64, height: 64)

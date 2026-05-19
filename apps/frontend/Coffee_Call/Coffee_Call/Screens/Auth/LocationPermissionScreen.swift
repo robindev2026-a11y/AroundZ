@@ -9,7 +9,7 @@ struct LocationPermissionScreen: View {
                 .fill(Color.textOnBrand)
                 .frame(width: 80, height: 80)
                 .overlay(
-                    Image(systemName: AppIcons.location)
+                    AppIcons.locationImage
                         .foregroundColor(.brandPrimary)
                         .font(.system(size: 32))
                 )

@@ -99,7 +99,7 @@ struct DiscoveryScreen: View {
                                     
                                     Spacer()
                                     
-                                    Image(systemName: AppIcons.chevronRight)
+                                    AppIcons.chevronRightImage
                                         .font(.bodySmall)
                                         .foregroundColor(.brandPrimary.opacity(0.4))
                                 }
@@ -222,7 +222,7 @@ extension DiscoveryScreen {
                             .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 6)
                             .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
                         
-                        Image(systemName: AppIcons.refresh)
+                        AppIcons.refreshImage
                             .font(.system(size: AppConstants.Typography.sizeTitle - 6, weight: .bold))
                             .foregroundColor(.brandPrimary)
                             .rotationEffect(.degrees(viewModel.isScanning ? 360 : 0))

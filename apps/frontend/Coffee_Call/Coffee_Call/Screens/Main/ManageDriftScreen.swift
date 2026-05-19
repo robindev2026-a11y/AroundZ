@@ -90,14 +90,14 @@ struct ManageDriftScreen: View {
                     }
                     
                     HStack(spacing: 6) {
-                        Image(systemName: AppIcons.calendar)
+                        AppIcons.calendarImage
                         Text("\(viewModel.drift.date), \(viewModel.drift.time) – \(viewModel.drift.endTime)")
                     }
                     .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                     .foregroundColor(.textSecondary)
                     
                     HStack(spacing: 6) {
-                        Image(systemName: AppIcons.mappin)
+                        AppIcons.mappinImage
                         Text(viewModel.drift.location)
                     }
                     .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
@@ -105,7 +105,7 @@ struct ManageDriftScreen: View {
                     
                     HStack(spacing: 12) {
                         HStack(spacing: 4) {
-                            Image(systemName: AppIcons.participants)
+                            AppIcons.participantsImage
                             Text(AppStrings.Manage.capacity(count: viewModel.drift.capacity))
                         }
                         Text("•")
@@ -118,7 +118,7 @@ struct ManageDriftScreen: View {
             
             if !viewModel.drift.pendingRequests.isEmpty {
                 HStack {
-                    Image(systemName: AppIcons.bellFill)
+                    AppIcons.bellFillImage
                         .foregroundColor(.brandPurple)
                     Text(AppStrings.Manage.requestsPending(count: viewModel.drift.pendingRequests.count))
                         .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
@@ -131,7 +131,7 @@ struct ManageDriftScreen: View {
             }
             
             HStack(spacing: 8) {
-                Image(systemName: AppIcons.lock)
+                AppIcons.lockImage
                     .font(.system(size: AppConstants.Typography.sizeTiny))
                 Text(AppStrings.Drifts.Detail.coordinationNote)
                     .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
@@ -261,7 +261,7 @@ struct ManageDriftScreen: View {
                     Circle()
                         .fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                         .frame(width: 48, height: 48)
-                    Image(systemName: AppIcons.navChatsFill)
+                    AppIcons.navChatsFillImage
                         .foregroundColor(.brandPrimary)
                 }
                 
@@ -276,7 +276,7 @@ struct ManageDriftScreen: View {
                 
                 Spacer()
                 
-                Image(systemName: AppIcons.chevronRight)
+                AppIcons.chevronRightImage
                     .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                     .foregroundColor(.textSecondary)
             }
@@ -295,7 +295,7 @@ struct ManageDriftScreen: View {
                 Circle()
                     .fill(Color.brandPurple.opacity(AppConstants.UI.opacityLight))
                     .frame(width: 32, height: 32)
-                Image(systemName: AppIcons.verified)
+                AppIcons.verifiedImage
                     .font(.system(size: AppConstants.Typography.sizeTiny))
                     .foregroundColor(.brandPurple)
             }
@@ -312,7 +312,7 @@ struct ManageDriftScreen: View {
             
             Spacer()
             
-            Image(systemName: AppIcons.chevronRight)
+            AppIcons.chevronRightImage
                 .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                 .foregroundColor(.brandPurple.opacity(AppConstants.UI.opacityNormal))
         }
@@ -359,7 +359,7 @@ struct JoinRequestRow: View {
             
             HStack(spacing: AppConstants.Layout.subElementSpacing) {
                 Button(action: onAccept) {
-                    Image(systemName: AppIcons.checkmark)
+                    AppIcons.checkmarkImage
                         .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                         .foregroundColor(.brandPrimary)
                         .frame(width: 36, height: 36)
@@ -368,7 +368,7 @@ struct JoinRequestRow: View {
                 }
                 
                 Button(action: onReject) {
-                    Image(systemName: AppIcons.close)
+                    AppIcons.closeImage
                         .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                         .foregroundColor(.statusError)
                         .frame(width: 36, height: 36)

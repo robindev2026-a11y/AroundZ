@@ -34,7 +34,7 @@ struct EditProfileScreen: View {
                                         Circle()
                                             .fill(Color.brandPrimary)
                                             .frame(width: 32, height: 32)
-                                        Image(systemName: AppIcons.camera)
+                                        AppIcons.cameraImage
                                             .font(.system(size: 14, weight: .bold))
                                             .foregroundColor(.white)
                                     }

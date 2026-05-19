@@ -22,7 +22,7 @@ struct OTPVerificationScreen: View {
                     presentationMode.wrappedValue.dismiss()
                 }
             }) {
-                Image(systemName: AppIcons.arrowLeft)
+                AppIcons.arrowLeftImage
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.textPrimary)
                     .frame(width: 48, height: 48)

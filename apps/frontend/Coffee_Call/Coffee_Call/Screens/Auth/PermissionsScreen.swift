@@ -25,7 +25,7 @@ struct PermissionsScreen: View {
                         .fill(Color.brandPrimary.opacity(0.1))
                         .frame(width: 48, height: 48)
                         .overlay(
-                            Image(systemName: AppIcons.location)
+                            AppIcons.locationImage
                                 .font(.system(size: 22, weight: .semibold))
                                 .foregroundColor(.brandPrimary)
                         )
@@ -52,7 +52,7 @@ struct PermissionsScreen: View {
                 }) {
                     HStack(spacing: 6) {
                         if locationRequested {
-                            Image(systemName: AppIcons.checkmark)
+                            AppIcons.checkmarkImage
                         }
                         Text(locationRequested ? AppStrings.Auth.locationGranted : AppStrings.Auth.locationCTA)
                     }
@@ -83,7 +83,7 @@ struct PermissionsScreen: View {
                         .fill(Color.brandSecondary.opacity(0.1))
                         .frame(width: 48, height: 48)
                         .overlay(
-                            Image(systemName: AppIcons.bell)
+                            AppIcons.bellImage
                                 .font(.system(size: 22, weight: .semibold))
                                 .foregroundColor(.brandSecondary)
                         )
@@ -110,7 +110,7 @@ struct PermissionsScreen: View {
                 }) {
                     HStack(spacing: 6) {
                         if notificationsRequested {
-                            Image(systemName: AppIcons.checkmark)
+                            AppIcons.checkmarkImage
                         }
                         Text(notificationsRequested ? AppStrings.Auth.notificationsEnabled : AppStrings.Auth.notificationsCTA)
                     }
@@ -140,7 +140,7 @@ struct PermissionsScreen: View {
                 Button(action: { navigateToReady = true }) {
                     HStack(spacing: 8) {
                         Text("All Set! Let's Go")
-                        Image(systemName: AppIcons.arrowRight)
+                        AppIcons.arrowRightImage
                             .font(.system(size: 16, weight: .bold))
                     }
                     .font(.system(size: 17, weight: .black, design: .default))
@@ -156,7 +156,7 @@ struct PermissionsScreen: View {
             
             HStack(spacing: 6) {
                 Spacer()
-                Image(systemName: AppIcons.privacyShield)
+                AppIcons.privacyShieldImage
                     .font(.system(size: 12))
                 Text(AppStrings.Auth.privacyNote)
                     .font(.system(size: 10, weight: .bold))

@@ -11,7 +11,7 @@ struct CreateDriftButton: View {
                     .fill(Color.white.opacity(0.15))
                     .frame(width: 32, height: 32)
                     .overlay(
-                        Image(systemName: AppIcons.plus)
+                        AppIcons.plusImage
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white)
                     )
@@ -28,7 +28,7 @@ struct CreateDriftButton: View {
                 
                 Spacer()
                 
-                Image(systemName: AppIcons.arrowRight)
+                AppIcons.arrowRightImage
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.white.opacity(0.6))
             }

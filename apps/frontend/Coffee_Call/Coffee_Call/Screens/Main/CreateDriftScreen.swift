@@ -65,7 +65,7 @@ struct CreateDriftScreen: View {
                             dismiss()
                         }
                     } label: {
-                        Image(systemName: AppIcons.close)
+                        AppIcons.closeImage
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(.textSecondary)
                             .padding(7)
@@ -150,7 +150,7 @@ struct CreateDriftScreen: View {
             HStack {
                 ZStack {
                     Circle().fill(Color.brandPrimary.opacity(0.1)).frame(width: 28, height: 28)
-                    Image(systemName: AppIcons.mappin).foregroundColor(.brandPrimary).font(.system(size: 12))
+                    AppIcons.mappinImage.foregroundColor(.brandPrimary).font(.system(size: 12))
                 }
                 
                 VStack(alignment: .leading, spacing: 2) {
@@ -256,7 +256,7 @@ struct CreateDriftScreen: View {
                     Text(AppStrings.Create.title)
                         .font(.buttonText)
                     Spacer()
-                    Image(systemName: AppIcons.chevronRight)
+                    AppIcons.chevronRightImage
                         .font(.bodyBold)
                 }
                 .padding(.horizontal, 20)
@@ -312,7 +312,7 @@ struct CreateDriftScreen: View {
                     Circle()
                         .fill(Color.brandPrimary.opacity(0.1))
                         .frame(width: 80, height: 80)
-                    Image(systemName: AppIcons.checkmark)
+                    AppIcons.checkmarkImage
                         .font(.system(size: 32, weight: .black))
                         .foregroundColor(.brandPrimary)
                 }
@@ -332,7 +332,7 @@ struct CreateDriftScreen: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color.brandPrimary.opacity(0.08))
                                     .frame(width: 40, height: 40)
-                                Image(systemName: AppIcons.calendar)
+                                AppIcons.calendarImage
                                     .font(.system(size: 18))
                                     .foregroundColor(.brandPrimary)
                             }
@@ -366,7 +366,7 @@ struct CreateDriftScreen: View {
                         Text(AppStrings.Create.manageDrift)
                             .font(.buttonText)
                         Spacer()
-                        Image(systemName: AppIcons.chevronRight)
+                        AppIcons.chevronRightImage
                             .font(.bodyBold)
                     }
                     .padding(.horizontal, 20)

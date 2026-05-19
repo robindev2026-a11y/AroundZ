@@ -16,7 +16,7 @@ struct DriftContextCard: View {
                     .fill(Color.brandPrimary.opacity(0.12))
                     .frame(width: 44, height: 44)
                 
-                Image(systemName: AppIcons.participants)
+                AppIcons.participantsImage
                     .foregroundColor(.brandPrimary)
                     .font(.system(size: 18, weight: .semibold))
             }
@@ -42,7 +42,7 @@ struct DriftContextCard: View {
                     Text(actionLabel)
                         .font(.system(size: 11, weight: .black))
                     
-                    Image(systemName: AppIcons.chevronRight)
+                    AppIcons.chevronRightImage
                         .font(.system(size: 10, weight: .black))
                 }
                 .foregroundColor(.brandPrimary)

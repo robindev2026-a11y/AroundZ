@@ -34,11 +34,11 @@ struct CoffeeBasePage<Header: View, Content: View>: View {
             } else {
                 content
                     .padding(.top, topPadding)
-                    .ignoresSafeArea(edges: .top)
             }
 
             header
         }
+        .background(SwipeBackHelper())
         .toolbar(.hidden, for: .navigationBar)
     }
 }
@@ -278,7 +278,7 @@ struct CoffeeBackButton: View {
 
     var body: some View {
         Button(action: { dismiss() }) {
-            Image(systemName: AppIcons.back)
+            AppIcons.backImage
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.textPrimary)
                 .frame(width: 44, height: 44)
@@ -308,7 +308,7 @@ struct NotificationIconButton: View {
                             .stroke(Color.appBorder.opacity(0.3), lineWidth: 1)
                     )
 
-                Image(systemName: AppIcons.bell)
+                AppIcons.bellImage
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.textPrimary)
 
@@ -541,9 +541,16 @@ extension View {
         @ViewBuilder rightView: @escaping () -> RightView = { EmptyView() }
     ) -> some View {
         let resolvedTopPadding: CGFloat = topPadding ?? {
-            switch style {
-            case .main: return 156
-            case .sub: return (categoryIcon != nil) ? 110 : 96
+            if scrollable {
+                switch style {
+                case .main: return 156
+                case .sub: return (categoryIcon != nil) ? 110 : 96
+                }
+            } else {
+                switch style {
+                case .main: return 92  // Header bottom is at SafeArea + 84. Add 8pt element spacing.
+                case .sub: return 72   // SubHeader bottom is at SafeArea + 64. Add 8pt element spacing.
+                }
             }
         }()
         
@@ -586,6 +593,37 @@ extension View {
         }
     }
 
+}
+
+// MARK: - Navigation Swipe-Back Helper
+
+struct SwipeBackHelper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        let controller = UIViewController()
+        DispatchQueue.main.async {
+            if let nav = controller.navigationController {
+                context.coordinator.navigationController = nav
+                nav.interactivePopGestureRecognizer?.isEnabled = true
+                nav.interactivePopGestureRecognizer?.delegate = context.coordinator
+            }
+        }
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        weak var navigationController: UINavigationController?
+
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard let nav = navigationController else { return false }
+            return nav.viewControllers.count > 1
+        }
+    }
 }
 
 // MARK: - Preview

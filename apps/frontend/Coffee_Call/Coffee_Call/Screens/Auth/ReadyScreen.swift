@@ -14,13 +14,13 @@ struct ReadyScreen: View {
                     .fill(Color.brandPrimary)
                     .frame(width: 96, height: 96)
                     .overlay(
-                        Image(systemName: AppIcons.checkmark)
+                        AppIcons.checkmarkImage
                             .font(.system(size: 40, weight: .bold))
                             .foregroundColor(.textOnBrand)
                     )
                     .shadow(color: Color.brandPrimary.opacity(0.28), radius: 20, x: 0, y: 10)
                 
-                Image(systemName: AppIcons.sparkles)
+                AppIcons.sparklesImage
                     .font(.system(size: 24))
                     .foregroundColor(Color.brandSecondary.opacity(0.8))
                     .offset(x: 16, y: -16)
@@ -46,7 +46,7 @@ struct ReadyScreen: View {
                     .fill(Color.brandPrimary.opacity(0.12))
                     .frame(width: 48, height: 48)
                     .overlay(
-                        Image(systemName: AppIcons.coffee)
+                        AppIcons.coffeeImage
                             .font(.system(size: 20))
                             .foregroundColor(.brandPrimary)
                     )

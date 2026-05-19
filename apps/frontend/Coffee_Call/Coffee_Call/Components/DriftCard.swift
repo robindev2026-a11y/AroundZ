@@ -61,7 +61,7 @@ struct DriftCard: View {
             // Hook / Offer
             if let hook = drift.hook {
                 HStack(spacing: 8) {
-                    Image(systemName: AppIcons.gift)
+                    AppIcons.giftImage
                         .font(.system(size: AppConstants.Typography.sizeHeadline))
                         .foregroundColor(.brandSecondary)
                     
@@ -73,7 +73,7 @@ struct DriftCard: View {
                     Spacer()
                     
                     if drift.category == .coffee {
-                        Image(systemName: AppIcons.coffeeFill)
+                        AppIcons.coffeeFillImage
                             .font(.system(size: AppConstants.Typography.sizeHeadline + 2))
                             .foregroundColor(.brandSecondary.opacity(0.4))
                     }

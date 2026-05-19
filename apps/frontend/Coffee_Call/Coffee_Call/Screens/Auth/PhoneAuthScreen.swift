@@ -41,7 +41,7 @@ struct PhoneAuthScreen: View {
     private var phoneEntryView: some View {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                Image(systemName: AppIcons.arrowLeft)
+                AppIcons.arrowLeftImage
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.textPrimary)
                     .frame(width: 48, height: 48)
@@ -82,7 +82,7 @@ struct PhoneAuthScreen: View {
                             Text(selectedCountry.dialCode)
                                 .font(.system(size: 16, weight: .bold, design: .default))
                                 .foregroundColor(.textPrimary)
-                            Image(systemName: AppIcons.chevronDown)
+                            AppIcons.chevronDownImage
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.textSecondary)
                         }
@@ -229,7 +229,7 @@ struct CountryPickerView: View {
                         }
                         Spacer()
                         if selected.dialCode == country.dialCode && selected.name == country.name {
-                            Image(systemName: AppIcons.checkmark)
+                            AppIcons.checkmarkImage
                                 .foregroundColor(.brandPrimary)
                                 .fontWeight(.semibold)
                         }

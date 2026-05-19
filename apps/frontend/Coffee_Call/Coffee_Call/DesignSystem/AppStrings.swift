@@ -274,6 +274,8 @@ enum AppStrings {
         static let composerPlaceholder = "Message"
         static let startingSoon = "Starting soon"
         static let newActivity = "New activity"
+        static let endedRoomBanner = "This Drift has ended. You can still view messages but can't send new ones."
+        static let youLabel = "You"
     }
 
     enum Profile {

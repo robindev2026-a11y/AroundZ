@@ -101,7 +101,7 @@ struct FloatingTabBar: View {
                         .frame(width: 38, height: 38)
                         .shadow(color: Color.brandPrimary.opacity(0.2), radius: 5, x: 0, y: 3)
                     
-                    Image(systemName: AppIcons.plus)
+                    AppIcons.plusImage
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
                 }

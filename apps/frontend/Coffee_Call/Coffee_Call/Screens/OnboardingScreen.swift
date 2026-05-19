@@ -269,7 +269,7 @@ struct Slide2View: View {
                 Circle()
                     .fill(Color.white)
                     .frame(width: 48, height: 48)
-                    .overlay(Image(systemName: AppIcons.bolt).foregroundColor(.brandPrimary).font(.system(size: 24)))
+                    .overlay(AppIcons.boltImage.foregroundColor(.brandPrimary).font(.system(size: 24)))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 
@@ -328,7 +328,7 @@ struct Slide3View: View {
                 Circle()
                     .fill(Color.white)
                     .frame(width: 64, height: 64)
-                    .overlay(Image(systemName: AppIcons.shield).foregroundColor(.brandPrimary).font(.system(size: 32)))
+                    .overlay(AppIcons.shieldImage.foregroundColor(.brandPrimary).font(.system(size: 32)))
                     .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     .padding(.bottom, 8)
                 

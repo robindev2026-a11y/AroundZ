@@ -102,7 +102,7 @@ struct RadarView: View {
                             .overlay(Circle().stroke(Color.brandPrimary.opacity(0.2), lineWidth: 1))
                             .scaleEffect(1.0 - (progress * 0.2))
                         
-                        Image(systemName: AppIcons.person)
+                        AppIcons.personImage
                             .foregroundColor(.brandPrimary)
                             .font(.system(size: 28))
                     }

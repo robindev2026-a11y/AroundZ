@@ -108,7 +108,7 @@ struct ProfileScreen: View {
                         )
                         .frame(width: 72, height: 72)
                     
-                    Image(systemName: AppIcons.person)
+                    AppIcons.personImage
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.brandPrimaryDark)
                 }
@@ -123,7 +123,7 @@ struct ProfileScreen: View {
                         .foregroundColor(.textPrimary)
                     
                     HStack(spacing: 4) {
-                        Image(systemName: AppIcons.mappin)
+                        AppIcons.mappinImage
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.textSecondary)
                         
@@ -134,7 +134,7 @@ struct ProfileScreen: View {
                     
                     // Small Mint Phone Verification Pill (Hides phone number)
                     HStack(spacing: 4) {
-                        Image(systemName: AppIcons.checkCircleFill)
+                        AppIcons.checkCircleFillImage
                             .font(.system(size: 9, weight: .black))
                             .foregroundColor(.brandPrimary)
                         
@@ -183,7 +183,7 @@ struct ProfileScreen: View {
                 Button(action: { showingEditProfile = true }) {
                     HStack(spacing: 4) {
                         Text(AppStrings.Profile.editProfile)
-                        Image(systemName: AppIcons.edit)
+                        AppIcons.editImage
                     }
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.brandPrimary)
@@ -228,7 +228,7 @@ struct ProfileScreen: View {
             
             // Privacy Caption
             HStack(spacing: 6) {
-                Image(systemName: AppIcons.lock)
+                AppIcons.lockImage
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.textSecondary)
                 
@@ -505,7 +505,7 @@ struct ProfileScreen: View {
             Divider().background(Color.appBorder.opacity(0.6))
             
             HStack {
-                Image(systemName: AppIcons.calendar)
+                AppIcons.calendarImage
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.textSecondary)
                 
@@ -543,7 +543,7 @@ struct SettingsSheetView: View {
                                     .fill(Color.brandPrimary.opacity(0.12))
                                     .frame(width: 80, height: 80)
                                 
-                                Image(systemName: AppIcons.coffeeFill)
+                                AppIcons.coffeeFillImage
                                     .font(.system(size: 36, weight: .bold))
                                     .foregroundColor(.brandPrimary)
                             }
@@ -656,7 +656,7 @@ struct InterestsSheetView: View {
                                         Spacer()
                                         
                                         if viewModel.interests.contains(category) {
-                                            Image(systemName: AppIcons.checkCircleFill)
+                                            AppIcons.checkCircleFillImage
                                                 .font(.system(size: 20, weight: .bold))
                                                 .foregroundColor(.brandPrimary)
                                         } else {
@@ -873,7 +873,7 @@ struct LocationSheetView: View {
                             .fill(Color.brandPrimary.opacity(0.12))
                             .frame(width: 100, height: 100)
                         
-                        Image(systemName: AppIcons.mappin)
+                        AppIcons.mappinImage
                             .font(.system(size: 48, weight: .bold))
                             .foregroundColor(.brandPrimary)
                     }
@@ -900,7 +900,7 @@ struct LocationSheetView: View {
                                 ProgressView()
                                     .tint(.white)
                             } else {
-                                Image(systemName: AppIcons.location)
+                                AppIcons.locationImage
                             }
                             
                             Text(isUpdating ? AppStrings.Profile.updatingLoc : AppStrings.Profile.updateLoc)
@@ -1097,7 +1097,7 @@ struct StatsDetailSheetView: View {
                     // Stat Card with beautiful description
                     VStack(alignment: .leading, spacing: 14) {
                         HStack(spacing: 8) {
-                            Image(systemName: AppIcons.shieldVerified)
+                            AppIcons.shieldVerifiedImage
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.brandPrimary)
                             

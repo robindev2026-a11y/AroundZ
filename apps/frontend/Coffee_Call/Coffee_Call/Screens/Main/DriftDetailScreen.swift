@@ -195,12 +195,12 @@ struct DriftDetailScreen: View {
                             .fill(Color.appBorder)
                             .frame(width: 48, height: 48)
                             .overlay(
-                                Image(systemName: AppIcons.person)
+                                AppIcons.personImage
                                     .foregroundColor(.white)
                             )
                         
                         if viewModel.drift.host.isVerified {
-                            Image(systemName: AppIcons.verified)
+                            AppIcons.verifiedImage
                                 .font(.system(size: 14))
                                 .foregroundColor(.brandPrimary)
                                 .background(Circle().fill(Color.white))
@@ -219,7 +219,7 @@ struct DriftDetailScreen: View {
                     
                     Spacer()
                     
-                    Image(systemName: AppIcons.chevronRight)
+                    AppIcons.chevronRightImage
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.textSecondary)
                 }
@@ -248,7 +248,7 @@ struct DriftDetailScreen: View {
                             Circle()
                                 .fill(Color.brandPrimary.opacity(0.1))
                                 .frame(width: 44, height: 44)
-                            Image(systemName: AppIcons.lock)
+                            AppIcons.lockImage
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.brandPrimary)
                         }
@@ -265,7 +265,7 @@ struct DriftDetailScreen: View {
                     
                     Spacer()
                     
-                    Image(systemName: AppIcons.chevronRight)
+                    AppIcons.chevronRightImage
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.textSecondary.opacity(0.3))
                 } else {
@@ -361,7 +361,7 @@ struct DriftDetailScreen: View {
                 Spacer()
                 
                 if hasChevron {
-                    Image(systemName: AppIcons.chevronRight)
+                    AppIcons.chevronRightImage
                         .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                         .foregroundColor(.textSecondary)
                         .padding(.top, AppConstants.Layout.elementSpacing)
@@ -379,7 +379,7 @@ struct DriftDetailScreen: View {
     private var safetyBanner: some View {
         VStack(spacing: AppConstants.Layout.elementSpacing) {
             HStack {
-                Image(systemName: AppIcons.shield)
+                AppIcons.shieldImage
                     .font(.system(size: AppConstants.Typography.sizeHeadline))
                     .foregroundColor(.brandPurple)
                 
@@ -394,7 +394,7 @@ struct DriftDetailScreen: View {
                 
                 Spacer()
                 
-                Image(systemName: AppIcons.chevronRight)
+                AppIcons.chevronRightImage
                     .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                     .foregroundColor(.brandPurple)
             }
@@ -403,7 +403,7 @@ struct DriftDetailScreen: View {
             .cornerRadius(AppConstants.UI.cornerRadiusSmall + 4)
             
             HStack(spacing: 8) {
-                Image(systemName: AppIcons.lock)
+                AppIcons.lockImage
                     .font(.system(size: AppConstants.Typography.sizeTiny + 1))
                 Text(AppStrings.Drifts.Detail.coordinationNote)
                     .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .medium))
@@ -465,7 +465,7 @@ struct DriftDetailScreen: View {
             
             Spacer()
             
-            Image(systemName: AppIcons.chevronRight)
+            AppIcons.chevronRightImage
                 .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                 .foregroundColor(.white.opacity(0.6))
         }
