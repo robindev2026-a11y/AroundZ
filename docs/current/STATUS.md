@@ -8,6 +8,12 @@ This file is the current progress ledger. Update it after meaningful work.
 ## Current Focus
 
 Align the live app and all AI guidance around a single active source of truth. The immediate UI focus is the updated Around screen.
+Temporary launch-path focus: auth-only flow is back as the root entry, while the main app shell remains out of the launch path for now.
+
+## Future Plan Notes
+
+- Add a simple internal web admin panel after MVP for moderation, user review, and safety operations.
+- Keep the admin panel separate from the consumer iOS app and gate it with admin-only auth claims.
 
 ## UX Status
 
@@ -263,7 +269,15 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Marked the implemented follow-up items as done in `REVIEW_CHECKLIST.md` while leaving `ISSUE-028` and `ISSUE-030` open for later.
 - Files touched: `CreateDriftButton.swift`, `CreatedDriftStore.swift`, `DriftsViewModel.swift`, `MainTabView.swift`, `AppStrings.swift`, `Coffee_Call.xcodeproj/project.pbxproj`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
 - Verification performed: Ran `xcodebuild` with signing disabled far enough to confirm the app target compiles through Swift source generation; the remaining failure is the environment simulator runtime / asset catalog tooling issue, not a Create-sheet source error.
-- Remaining gaps: `ISSUE-028` and `ISSUE-030` remain intentionally deferred per user direction.
+- Remaining gaps: This was superseded by the later Create fix that closed `ISSUE-028` and `ISSUE-030`.
+
+2026-05-19:
+
+- Closed the remaining Create follow-up items by keeping the header fixed above the scroll view and folding the activity grid to six items with an inline `View more` / `View less` expansion control.
+- Updated `REVIEW_CHECKLIST.md` so `ISSUE-028` and `ISSUE-030` are marked done with the clarified fixed-header and folded-grid definitions.
+- Files touched: `CreateDriftButton.swift`, `AppConstants.swift`, `AppStrings.swift`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
+- Verification performed: Reviewed the updated sheet structure and tracker entries for the intended fixed-header and folded-grid behavior.
+- Remaining gaps: None for the user-reported Create sheet items.
 
 2026-05-19:
 

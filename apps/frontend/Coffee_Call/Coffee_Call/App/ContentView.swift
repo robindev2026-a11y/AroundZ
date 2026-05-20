@@ -4,8 +4,10 @@ struct ContentView: View {
     @StateObject private var auth = AuthViewModel()
 
     var body: some View {
-        MainTabView()
-            .environmentObject(auth)
+        NavigationStack {
+            OnboardingScreen()
+                .environmentObject(auth)
+        }
     }
 }
 
@@ -14,4 +16,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-

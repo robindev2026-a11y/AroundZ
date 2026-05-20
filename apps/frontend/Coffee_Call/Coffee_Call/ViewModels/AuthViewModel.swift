@@ -6,7 +6,7 @@ import Foundation
 class AuthViewModel: ObservableObject {
 
     // MARK: - Published State
-    @Published var isAuthenticated: Bool = true
+    @Published var isAuthenticated: Bool = false
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
 
@@ -94,4 +94,3 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
     }
 }
-
