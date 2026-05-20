@@ -31,6 +31,9 @@ struct ChatsListScreen: View {
                 DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
             }
         }
+        .onAppear {
+            NavigationManager.shared.resetTabBarVisibility()
+        }
     }
     
     // MARK: - Status Filter Row
@@ -204,6 +207,8 @@ struct CompactChatRow: View {
 
 
 
-#Preview {
-    ChatsListScreen()
+struct ChatsListScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        ChatsListScreen()
+    }
 }

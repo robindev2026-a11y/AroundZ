@@ -103,6 +103,8 @@ struct EditProfileScreen: View {
                     .foregroundColor(.brandPrimary)
                 }
             })
+            .withDoneButton()
+            .dismissKeyboardOnTap()
         }
     }
 }

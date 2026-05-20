@@ -254,7 +254,7 @@ struct CoffeeSubHeader<Trailing: View>: View {
 
                 trailing
             }
-            .padding(.horizontal, AppConstants.Layout.standardPadding)
+            .padding(.horizontal, 10)
             .frame(height: 56)
             .background(.ultraThinMaterial)
             .clipShape(
@@ -628,21 +628,20 @@ struct SwipeBackHelper: UIViewControllerRepresentable {
 
 // MARK: - Preview
 
-#Preview {
-    VStack {
-        Text("Discover content here")
-    }
-    .asCoffeePage(
-        .sub,
-        title: AppStrings.Discovery.title,
-        subtitle: "People nearby are Open to plans",
-        categoryIcon: "d",
-        categoryColor: .red,
-        rightView: {
-       
-//                CoffeeHeaderButton(icon: AppIcons.search) {}
-                CoffeeHeaderButton(icon: AppIcons.filter) {}
+struct CoffeeHeader_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            Text(AppStrings.Discovery.contextTitle)
         }
-    )
+        .asCoffeePage(
+            .sub,
+            title: AppStrings.Discovery.title,
+            subtitle: AppStrings.Discovery.subtitleDefault,
+            categoryIcon: AppIcons.coffee,
+            categoryColor: .brandPrimary,
+            rightView: {
+                CoffeeHeaderButton(icon: AppIcons.filter) {}
+            }
+        )
+    }
 }
-

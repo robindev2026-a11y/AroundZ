@@ -103,4 +103,46 @@ extension View {
         // if #available(iOS 17, *) { self.contentTransition(.numericText()) } else { self }
         self
     }
+
+    // -------------------------------------------------------------------------
+    // MARK: iOS 15+ — Submit Label
+    // -------------------------------------------------------------------------
+    /// Sets the label for the keyboard's submission button (e.g., .done, .search).
+    @ViewBuilder
+    func coffeeSubmitLabel(_ label: SubmitLabel) -> some View {
+        self.submitLabel(label)
+    }
+
+    // -------------------------------------------------------------------------
+    // MARK: Keyboard Helpers
+    // -------------------------------------------------------------------------
+
+    /// Dismisses the keyboard by resigning first responder status.
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    /// Adds a 'Done' button to the keyboard toolbar to dismiss it.
+    func withDoneButton() -> some View {
+        self.toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button(AppStrings.Common.done) {
+                    hideKeyboard()
+                }
+                .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
+                .foregroundColor(.brandPrimary)
+            }
+        }
+    }
+    
+    /// Adds a tap gesture to the background to dismiss the keyboard.
+    /// Best used on the root container of a screen.
+    func dismissKeyboardOnTap() -> some View {
+        self.simultaneousGesture(
+            TapGesture().onEnded {
+                hideKeyboard()
+            }
+        )
+    }
 }

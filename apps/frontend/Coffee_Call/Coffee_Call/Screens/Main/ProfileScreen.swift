@@ -96,6 +96,9 @@ struct ProfileScreen: View {
                 Text(AppStrings.Profile.signOutConfirmation)
             }
         }
+        .onAppear {
+            NavigationManager.shared.resetTabBarVisibility()
+        }
     }
     
     // MARK: - Identity Card
@@ -1289,7 +1292,9 @@ struct StatsDetailSheetView: View {
     }
 }
 
-#Preview {
-    ProfileScreen()
-        .environmentObject(AuthViewModel())
+struct ProfileScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        ProfileScreen()
+            .environmentObject(AuthViewModel())
+    }
 }

@@ -19,6 +19,20 @@ extension Font {
     
     // Actions (Outfit Custom Font - scales natively relative to system buttons)
     static let buttonText = Font.custom("Outfit-Black", size: AppConstants.Typography.sizeHeadline, relativeTo: .headline)
+    
+    // Outfit Specific Semantic Generators (scales natively relative to specified systems)
+    static func outfitRegular(size: CGFloat, relativeTo style: TextStyle = .body) -> Font {
+        Font.custom("Outfit-Regular", size: size, relativeTo: style)
+    }
+    static func outfitMedium(size: CGFloat, relativeTo style: TextStyle = .body) -> Font {
+        Font.custom("Outfit-Medium", size: size, relativeTo: style)
+    }
+    static func outfitBold(size: CGFloat, relativeTo style: TextStyle = .body) -> Font {
+        Font.custom("Outfit-Bold", size: size, relativeTo: style)
+    }
+    static func outfitBlack(size: CGFloat, relativeTo style: TextStyle = .body) -> Font {
+        Font.custom("Outfit-Black", size: size, relativeTo: style)
+    }
 }
 
 

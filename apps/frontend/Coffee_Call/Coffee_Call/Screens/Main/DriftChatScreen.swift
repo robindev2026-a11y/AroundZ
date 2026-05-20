@@ -6,6 +6,25 @@ struct DriftChatScreen: View {
     @Environment(\.dismiss) var dismiss
     @State private var showInfoSheet = false
     @State private var tabBarVisibilitySource = UUID().uuidString
+    @State private var keyboardHeight: CGFloat = 0
+    
+    // Attachment States
+    @State private var showAttachmentDialog = false
+    @State private var showImagePicker = false
+    @State private var pickerSourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var selectedAttachmentImage: UIImage? = nil
+    @FocusState private var isComposerFocused: Bool
+    
+    private var bottomSafeArea: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows
+            .first?.safeAreaInsets.bottom ?? 0
+    }
+    
+    private var bottomPadding: CGFloat {
+        keyboardHeight > 0 ? 8 : (bottomSafeArea > 0 ? bottomSafeArea : 8)
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -26,12 +45,20 @@ struct DriftChatScreen: View {
                         
                         // Chat Messages
                         ForEach(viewModel.messages) { msg in
-                            ChatBubble(message: msg)
-                                .id(msg.id)
+                            ChatBubble(message: msg, onDelete: {
+                                withAnimation {
+                                    viewModel.deleteMessage(msg)
+                                }
+                            })
+                            .id(msg.id)
                         }
                     }
                     .padding(.vertical, AppConstants.Layout.standardPadding)
                     .padding(.horizontal, AppConstants.Layout.elementSpacing)
+                }
+                .scrollDismissesKeyboard(.interactively)
+                .onTapGesture {
+                    isComposerFocused = false
                 }
                 .onChange(of: viewModel.messages.count) { _ in
                     if let last = viewModel.messages.last {
@@ -48,7 +75,15 @@ struct DriftChatScreen: View {
                 if viewModel.drift.status == .ended {
                     endedBanner
                 } else {
-                    ChatComposer(text: $viewModel.messageText, onSend: viewModel.sendMessage)
+                    ChatComposer(
+                        text: $viewModel.messageText,
+                        isFocused: $isComposerFocused,
+                        onSend: viewModel.sendMessage,
+                        onAttach: {
+                            isComposerFocused = false
+                            showAttachmentDialog = true
+                        }
+                    )
                 }
                 
                 safetyBanner
@@ -68,11 +103,59 @@ struct DriftChatScreen: View {
                     .presentationDragIndicator(.visible)
             }
         }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(selectedImage: $selectedAttachmentImage, sourceType: pickerSourceType)
+        }
+        .confirmationDialog("Share attachment", isPresented: $showAttachmentDialog, titleVisibility: .hidden) {
+            Button("Take Photo") {
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    pickerSourceType = .camera
+                } else {
+                    pickerSourceType = .photoLibrary
+                }
+                showImagePicker = true
+            }
+            Button("Choose Photo") {
+                pickerSourceType = .photoLibrary
+                showImagePicker = true
+            }
+            Button("Share Current Location") {
+                viewModel.sendLocationMessage(locationName: "Indiranagar, Bengaluru")
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .onChange(of: selectedAttachmentImage) { newImage in
+            if let newImage {
+                viewModel.sendImageMessage(image: newImage)
+                selectedAttachmentImage = nil
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button(action: {
+                    isComposerFocused = false
+                    hideKeyboard()
+                }) {
+                    Image(systemName: "keyboard.chevron.compact.down")
+                        .foregroundColor(.brandPrimary)
+                }
+            }
+        }
         .onAppear {
             navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
         }
         .onDisappear {
             navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+            guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+                return
+            }
+            keyboardHeight = keyboardFrame.height
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardHeight = 0
         }
         .asCoffeePage(
             .sub,
@@ -87,6 +170,7 @@ struct DriftChatScreen: View {
                 }
             }
         )
+        .dismissKeyboardOnTap()
     }
     
     // Custom Sub-Header Banner Context Chips
@@ -163,7 +247,7 @@ struct DriftChatScreen: View {
         }
         .padding(.horizontal, AppConstants.Layout.standardPadding)
         .padding(.vertical, AppConstants.Layout.elementSpacing)
-        .padding(.bottom, AppConstants.Layout.subElementSpacing)
+        .padding(.bottom, bottomPadding)
         .background(Color.surfaceMain)
     }
 }
@@ -187,6 +271,7 @@ struct MessageBubbleShape: Shape {
 // MARK: - Chat Bubble
 struct ChatBubble: View {
     let message: ChatMessage
+    let onDelete: () -> Void
     
     var body: some View {
         HStack(alignment: .bottom, spacing: AppConstants.Layout.subElementSpacing) {
@@ -222,11 +307,31 @@ struct ChatBubble: View {
                         .padding(.bottom, AppConstants.Layout.miniPadding / 2)
                     }
                     
-                    Text(message.content)
-                        .font(.bodyStandard)
+                    if message.type == .image, let uiImage = message.attachmentImage {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(maxWidth: 220, maxHeight: 180)
+                            .clipShape(MessageBubbleShape(isSelf: message.isSelf))
+                            .overlay(
+                                MessageBubbleShape(isSelf: message.isSelf)
+                                    .stroke(Color.appBorder, lineWidth: 1)
+                            )
+                    } else if message.type == .location {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "mappin.and.ellipse")
+                                    .foregroundColor(.brandPrimary)
+                                Text("Current Location")
+                                    .font(.bodyBold)
+                                    .foregroundColor(.textPrimary)
+                            }
+                            Text(message.content)
+                                .font(.captionText)
+                                .foregroundColor(.textSecondary)
+                        }
                         .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
                         .padding(.vertical, AppConstants.Layout.elementSpacing)
-                        .foregroundColor(.textPrimary)
                         .background(
                             MessageBubbleShape(isSelf: message.isSelf)
                                 .fill(message.isSelf ? Color.brandPrimary.opacity(AppConstants.UI.opacityLight) : Color.white)
@@ -235,6 +340,21 @@ struct ChatBubble: View {
                             MessageBubbleShape(isSelf: message.isSelf)
                                 .stroke(Color.appBorder, lineWidth: message.isSelf ? 0 : 1)
                         )
+                    } else {
+                        Text(message.content)
+                            .font(.bodyStandard)
+                            .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
+                            .padding(.vertical, AppConstants.Layout.elementSpacing)
+                            .foregroundColor(.textPrimary)
+                            .background(
+                                MessageBubbleShape(isSelf: message.isSelf)
+                                    .fill(message.isSelf ? Color.brandPrimary.opacity(AppConstants.UI.opacityLight) : Color.white)
+                            )
+                            .overlay(
+                                MessageBubbleShape(isSelf: message.isSelf)
+                                    .stroke(Color.appBorder, lineWidth: message.isSelf ? 0 : 1)
+                            )
+                    }
                     
                     if !message.isSelf {
                         Text(message.timestamp, style: .time)
@@ -249,6 +369,11 @@ struct ChatBubble: View {
                 // Outgoing visual balance spacing
             } else {
                 Spacer()
+            }
+        }
+        .contextMenu {
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete Message", systemImage: "trash")
             }
         }
     }
@@ -281,23 +406,37 @@ struct SystemMessageRow: View {
 // MARK: - Chat Composer
 struct ChatComposer: View {
     @Binding var text: String
+    var isFocused: FocusState<Bool>.Binding
     let onSend: () -> Void
+    let onAttach: () -> Void
     
     var body: some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
+            Button(action: onAttach) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.brandPrimary)
+                    .frame(width: AppConstants.Layout.createDriftButtonHeight - 8, height: AppConstants.Layout.createDriftButtonHeight - 8)
+                    .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
+                    .clipShape(Circle())
+            }
+            
             TextField(
                 "",
                 text: $text,
                 prompt: Text(AppStrings.Chat.composerPlaceholder)
                     .foregroundColor(.textSecondary)
             )
-                .font(.bodyStandard)
-                .foregroundColor(.textPrimary)
-                .tint(.brandPrimary)
-                .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
-                .padding(.vertical, AppConstants.Layout.elementSpacing)
-                .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
-                .cornerRadius(AppConstants.UI.cornerRadiusLarge)
+            .focused(isFocused)
+            .submitLabel(.send)
+            .onSubmit(onSend)
+            .font(.bodyStandard)
+            .foregroundColor(.textPrimary)
+            .tint(.brandPrimary)
+            .padding(.horizontal, AppConstants.Layout.standardPadding - 4)
+            .padding(.vertical, AppConstants.Layout.elementSpacing)
+            .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacitySubtle))
+            .cornerRadius(AppConstants.UI.cornerRadiusLarge)
             
             Button(action: onSend) {
                 AppIcons.paperplaneFillImage
@@ -673,6 +812,44 @@ struct DriftChatScreen_Previews: PreviewProvider {
         
         return NavigationStack {
             DriftChatScreen(viewModel: DriftChatViewModel(drift: mockDrift))
+        }
+    }
+}
+
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var selectedImage: UIImage?
+    var sourceType: UIImagePickerController.SourceType
+    @Environment(\.dismiss) var dismiss
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = sourceType
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: ImagePicker
+
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.selectedImage = image
+            }
+            parent.dismiss()
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.dismiss()
         }
     }
 }

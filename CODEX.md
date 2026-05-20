@@ -48,7 +48,7 @@ For the active Around screen:
 - Drift-first context card.
 - Two-row interests grid.
 - Floating glass bottom nav.
-- Center Create opens the Create Drift sheet.
+- Center Create remains reserved for future Create design work.
 - `See nearby Drifts` opens the Drifts listing.
 
 If active docs conflict, stop and report the conflict before coding.

@@ -163,6 +163,8 @@ struct OTPVerificationScreen: View {
         .padding(.horizontal, 32)
         .background(Color.backgroundMain.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
+        .withDoneButton()
+        .dismissKeyboardOnTap()
     }
 }
 

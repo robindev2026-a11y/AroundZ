@@ -212,7 +212,7 @@ Target iPhone planning size: 393 x 852pt.
 - Tabs: Around, Drifts, Create, Chats, You.
 - Around is active in mint on this screen.
 - Center Create is a mint circular plus action.
-- Create presents Create Drift as a sheet, not as a normal tab page.
+- Create remains reserved for a future sheet design and should not be treated as implemented.
 - Content must have enough bottom inset so the grid does not hide behind the bar.
 
 ## Drifts Screen: Active Listing Screen
@@ -349,7 +349,7 @@ Nearby empty state:
 
 - Title: `No Drifts nearby yet`.
 - Body: `Start one and nearby people can join.`
-- Primary action: `Create Drift`, presented as the Create Drift sheet.
+- Primary action: `Create` is reserved for future sheet UX.
 - Keep this compact and inside the Drifts screen. The center bottom nav Create action remains the main global create affordance.
 
 My Drifts empty state:
@@ -364,7 +364,7 @@ My Drifts empty state:
 - Tabs: Around, Drifts, Create, Chats, You.
 - Drifts is active in mint on this screen.
 - Center Create remains a mint circular plus action.
-- Create presents Create Drift as a sheet.
+- Create is a pending sheet UX design item.
 - List content must include enough bottom inset so the last card can scroll above the nav.
 
 ### Interaction Rules
@@ -383,6 +383,76 @@ My Drifts empty state:
 - Avoid map-first browsing in MVP.
 - Avoid dense enterprise table layouts.
 - Avoid oversized marketing-style hero blocks.
+
+## Create Drift Sheet: Active Compose Sheet
+
+Create Drift is a modal bottom sheet launched from the center `Create` tab bar action.
+
+### Intent
+
+The sheet should feel fast, peaceful, warm, social, safe, and activity-first. It must help a user post a spontaneous nearby plan in under 20 seconds without exposing exact location, people browsing, chat, or direct-message behavior.
+
+### Entry Point
+
+- Bottom nav center `Create` opens this sheet.
+- The sheet is dismissed only after explicit confirmation if there are unsaved changes.
+
+### Screen Structure
+
+Target iPhone planning size: 393 x 852pt.
+
+1. Bottom sheet handle.
+2. Header with title, subtitle, and close action.
+3. Activity type grid.
+4. Plan title input.
+5. Time chip row.
+6. Two-column row with approximate location and capacity.
+7. Join mode selector.
+8. Optional details collapsible section.
+9. Privacy helper text.
+10. Sticky CTA footer.
+
+### Design Rules
+
+- Use warm background and ivory sheet surface.
+- Use rounded tactile cards and chips with soft border treatment.
+- Use mint as the selected state for primary choices.
+- Use lavender and peach only as restrained accents.
+- Use Outfit for section titles, selected chips, and CTA text.
+- Use SF Pro/system for helper text, placeholders, metadata, and input text.
+- Use app colors from the CoffeeCall token system only.
+- Show approximate location only.
+- Never show exact coordinates or a public people list.
+
+### Content Contract
+
+- Default activity: `Coffee`.
+- Activity grid includes:
+  - Coffee, Walk, Food, Movie, Study
+  - Fitness, Games, Music, Sports, Drinks
+  - Custom
+- Time chips:
+  - Now, In 30 mins, Tonight, Tomorrow, Custom
+- Capacity chips:
+  - 1, 3, 5, 8+
+- Join mode:
+  - Anyone can join
+  - Approve requests
+- Optional details:
+  - Hook
+  - Vibe
+  - Notes
+- Primary CTA:
+  - `Post Drift`
+
+### Interaction Rules
+
+- Activity, time, capacity, and join mode are single-selection controls.
+- Optional details are collapsed by default and expand smoothly.
+- CTA remains disabled until required fields are valid.
+- CTA shows a loading state while creating.
+- On success, show a brief confirmation state and dismiss or route to the new Drift.
+- If the user tries to dismiss with unsaved changes, ask for discard confirmation first.
 
 ## Chats: Active Chat Screens
 
@@ -589,7 +659,7 @@ No profile deep links, no follower actions.
 ## Other Screen Direction
 
 - Drifts: follow the active Drifts screen spec above. Pre-join shows approximate location; post-join unlocks exact coordination.
-- Create Drift: sheet presentation with purpose, location, time, optional hook, permission and dirty-form states.
+- Create: pending design work only; no implementation contract yet.
 - Drift Detail: summary, host context, participant privacy, safety banner, and sticky join/request/joined state.
 - Chats: async Drift-tied coordination only.
 - You: lightweight profile, active involvement, privacy/settings. No social profile depth.

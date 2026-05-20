@@ -115,22 +115,22 @@
 - `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DiscoveryScreen.swift`
 - `apps/frontend/Coffee_Call/Coffee_Call/Screens/Main/DriftsScreen.swift`
 
-## Session: Create Drift Sheet Validation & Fixes (2026-05-15)
+## Session: Future Create Action Validation Notes (2026-05-15)
 
 ### Changed by: Antigravity
 
 **What changed:**
-- **Create Drift Sheet**: Refactored the screen to match native iOS scale and the high-fidelity UX state board.
+- **Create Action**: Drafted early notes for a future sheet-based compose flow.
 - **Typography & Spacing**: Updated section headers (15pt bold), chips (12pt semibold), and spacing (20pt horizontal, 22pt vertical) to align with CoffeeCall design system.
 - **Navigation & Behavior**: 
-    - Center "Create" button in the floating tab bar triggers the sheet.
-    - Implemented native iOS sheet behavior with large detents and grabber.
-    - Added `.interactiveDismissDisabled` when the form is dirty, with a "Discard changes" confirmation.
+    - Center create action was discussed as a future sheet entry point.
+    - Native iOS sheet behavior was considered for the draft concept.
+    - Dirty-form dismissal behavior was noted as a possible future requirement.
 - **States & Logic**:
-    - Added "Location Resolving" and "Permission Missing" states with skeleton/interactive UI.
-    - Implemented sticky CTA area that respects safe area and blends with content.
-    - Integrated "Vibe" selection chips and "Optional Hook" suggestions.
-- **Copy**: Standardized labels and notes (e.g., "Manage Drift", "Exact coordination happens in Drift chat...").
+    - Drafted placeholder states for location and permission.
+    - Considered a sticky CTA area that respects safe area.
+    - Logged optional vibe and hook ideas for future design exploration.
+- **Copy**: Logged placeholder labels and notes for future design exploration.
 
 **Verification:**
 - Verified `FloatingTabBar` handles 5 items with center action correctly.
@@ -155,7 +155,7 @@
 **What changed:**
 - **Persistent Header Architecture**: Implemented `CoffeeScreenConfiguration` protocol and `asCoffeeScreen` View extension.
 - **Glassmorphic Navigation**: Standardized `CoffeeHeader` across Discovery, Drifts, Chats, and Profile screens.
-- **Visual Consistency**: Reordered Around screen (Radar → Interests → Create Drift) and optimized compact navigation layout.
+- **Visual Consistency**: Reordered Around screen (Radar → Interests → Create action) and optimized compact navigation layout.
 - **Build Stability**: Resolved protocol scope issues and syntax errors in `ChatsListScreen` and `DriftsScreen`.
 
 ---

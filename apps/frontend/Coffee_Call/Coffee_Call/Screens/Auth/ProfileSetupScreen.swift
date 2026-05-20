@@ -165,6 +165,8 @@ struct ProfileSetupScreen: View {
         .navigationDestination(isPresented: $navigateToPermissions) {
             PermissionsScreen()
         }
+        .withDoneButton()
+        .dismissKeyboardOnTap()
     }
 }
 

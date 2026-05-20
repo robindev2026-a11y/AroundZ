@@ -94,7 +94,7 @@ As a user, I want to see people and activities happening around me, so I can fin
 - [ ] Notification opens Around view in app
 - [ ] Around view shows vertical interest cards with nearby counts (e.g., "3 nearby")
 - [ ] User can tap an interest to see specific Drifts or people
-- [ ] Primary CTA "Create Drift" is clearly visible
+- [ ] Primary create CTA is clearly visible
 - [ ] Around view does not expose people for random direct messaging
 
 **Priority:** High
@@ -269,7 +269,7 @@ See `/Design/screens.md`, `/Design/design-tokens.md`, and `/Design/component-spe
 1. **Signup** — Phone number input + OTP verification + profile photo upload + name input
 2. **Profile** — User's profile view (photo, name, stats) + edit capability
 3. **Post Creation** — 3-field form (Purpose, Location, Time) with location picker + submit
-4. **Around** — Radar-based spatial discovery of nearby people and interests with "Create Drift" primary action
+4. **Around** — Radar-based spatial discovery of nearby people and interests with a centered create action
 5. **Acceptance Confirmation** — Modal dialog showing activity details + poster info + confirm/cancel
 6. **Messages** — Message thread view with chronological message list + message input + send button
 7. **Poster Dashboard** — List of all acceptances for poster's posts with acceptor info + accept time

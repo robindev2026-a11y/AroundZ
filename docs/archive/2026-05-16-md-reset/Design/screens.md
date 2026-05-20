@@ -48,7 +48,7 @@ Current direction:
 - "You" avatar at center; surrounding avatars/initials show ambient presence only.
 - **Rule**: No people-browsing. Radar is for ambient presence, not for unsolicited contact.
 - **Interests Section**: Horizontal list of vertical cards showing icon, title, and nearby count.
-- **Primary CTA**: Large capsule-shaped "Create Drift" button.
+- **Primary CTA**: Large capsule-shaped create button.
 - Navigation: Around | Drifts | Chats | You.
 
 ---

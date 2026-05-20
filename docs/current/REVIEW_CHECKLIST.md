@@ -163,14 +163,14 @@ Primary files:
   - Status: Done
   - Owner: Agent
 
-- [ ] ISSUE-028
+- [x] ISSUE-028
   - Screen: Create
   - Priority: P1
   - Type: UI, Layout
-  - Summary: The close button should stay as a fixed-size header action and the sheet should not depend on vertical scrolling.
-  - Expected: Keep the close icon visually anchored in the header with a consistent touch target and fit the compose flow into the sheet without making the body scrollable.
-  - Status: Open
-  - Owner: Unassigned
+  - Summary: The close button should stay fixed in the sheet header so it does not scroll away with the body.
+  - Expected: Keep the close icon visually anchored in the header with a consistent touch target.
+  - Status: Done
+  - Owner: Agent
 
 - [x] ISSUE-029
   - Screen: Create
@@ -181,14 +181,14 @@ Primary files:
   - Status: Done
   - Owner: Unassigned
 
-- [ ] ISSUE-030
+- [x] ISSUE-030
   - Screen: Create
   - Priority: P1
   - Type: UI, Layout
   - Summary: Activity choices should use a `LazyVGrid` that shows up to six items first, then folds remaining items behind a `View more` control.
   - Expected: The grid should breathe evenly across screen sizes, show the first row or six items by default, and expand gracefully when the user taps `View more`.
-  - Status: Open
-  - Owner: Unassigned
+  - Status: Done
+  - Owner: Agent
 
 - [x] ISSUE-031
   - Screen: Create

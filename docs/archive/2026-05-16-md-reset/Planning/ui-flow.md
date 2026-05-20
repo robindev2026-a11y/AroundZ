@@ -34,7 +34,7 @@ This document serves as the master checklist and flow structure for the CoffeeCa
 ### Around (Discovery)
 *   **Radar**: 0.3mi, 0.6mi, 0.8mi rings. Ambient presence only.
 *   **Interests**: Lead to Drifts filtered by category.
-*   **Primary CTA**: Create Drift.
+*   **Primary CTA**: Create action.
 
 ### Drifts
 *   **Discover Tab**: Publicly available drifts nearby.

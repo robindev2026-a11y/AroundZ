@@ -14,6 +14,7 @@ class DriftDetailViewModel: ObservableObject {
     @Published var joinStatus: JoinStatus = .notJoined
     @Published var participants: [ParticipantDetail] = []
     @Published var savedDrifts: [Drift] = []
+    @Published var showingRequestSentConfirmation = false
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -125,15 +126,10 @@ class DriftDetailViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func joinDrift() {
-        withAnimation(.spring()) {
-            self.joinStatus = .joined
-        }
-    }
-    
     func requestToJoin() {
         withAnimation(.spring()) {
             self.joinStatus = .requested
+            self.showingRequestSentConfirmation = true
         }
     }
     

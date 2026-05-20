@@ -9,8 +9,42 @@ struct ChatMessage: Identifiable, Hashable {
     let content: String
     let timestamp: Date
     let isSelf: Bool
-    var status: MessageStatus = .sent
-    let type: MessageType = .text
+    var status: MessageStatus
+    let type: MessageType
+    let attachmentImage: UIImage?
+    let attachmentLocation: String?
+    
+    init(
+        senderId: String,
+        senderName: String,
+        senderInitials: String,
+        content: String,
+        timestamp: Date,
+        isSelf: Bool,
+        status: MessageStatus = .sent,
+        type: MessageType = .text,
+        attachmentImage: UIImage? = nil,
+        attachmentLocation: String? = nil
+    ) {
+        self.senderId = senderId
+        self.senderName = senderName
+        self.senderInitials = senderInitials
+        self.content = content
+        self.timestamp = timestamp
+        self.isSelf = isSelf
+        self.status = status
+        self.type = type
+        self.attachmentImage = attachmentImage
+        self.attachmentLocation = attachmentLocation
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 enum MessageStatus: Hashable {
@@ -18,7 +52,7 @@ enum MessageStatus: Hashable {
 }
 
 enum MessageType: Hashable {
-    case text, system
+    case text, system, image, location
 }
 
 struct SystemMessage: Identifiable, Hashable {

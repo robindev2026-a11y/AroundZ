@@ -72,6 +72,6 @@ The first post-login screen is Around. It must use the updated Social Refresh UX
 - Drift-first context card.
 - Two-row interests grid.
 - Floating glass bottom navigation.
-- Center Create action opens the Create Drift sheet.
+- Center Create remains reserved for the future Create sheet design.
 
 The active screen spec is in `docs/current/DESIGN.md`.

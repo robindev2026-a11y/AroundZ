@@ -8,7 +8,7 @@ This file describes current component direction only. Older blue/coral component
 
 ## Primary Button
 
-Use for main actions such as "Let's Go", "Next", "Create Drift", and "Send".
+Use for main actions such as "Let's Go", "Next", "Create", and "Send".
 
 Visual:
 - Height: 52-64pt depending on screen context.
@@ -18,10 +18,10 @@ Visual:
 - Text: white / `.textOnBrand`.
 - Font: 16pt, heavy/bold default system.
 
-**Create Drift Variant**:
+**Create Variant**:
 - Large capsule button (height 72-80pt).
 - Leading circular icon (white circle with mint plus).
-- Stacked title ("Create Drift") and subtitle ("Share what you're up for").
+- Stacked title ("Create") and subtitle ("Share what you're up for").
 - Trailing SF Symbol chevron.
 
 Rules:

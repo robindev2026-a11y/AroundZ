@@ -13,6 +13,7 @@ struct DiscoveryScreen: View {
     }
     
     @State private var selectedPerson: RadarPerson? = nil
+    @State private var showNotificationDropdown = false
     
     // Bottom Sheet
     @State private var sheetOffset: CGFloat = AppConstants.Layout.sheetCollapsedOffset
@@ -157,6 +158,85 @@ struct DiscoveryScreen: View {
                     }
                 }
                 .zIndex(15)
+                
+                // MARK: Notification Dropdown overlay
+                if showNotificationDropdown {
+                    Color.black.opacity(0.15)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                showNotificationDropdown = false
+                            }
+                        }
+                        .zIndex(24)
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Notifications")
+                                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
+                                .foregroundColor(.textPrimary)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    showNotificationDropdown = false
+                                }
+                            }) {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(.textSecondary)
+                                    .padding(6)
+                                    .background(Circle().fill(Color.surfaceSecondary))
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                        
+                        Divider()
+                            .padding(.horizontal, 16)
+                        
+                        VStack(spacing: 0) {
+                            NotificationRow(
+                                icon: "checkmark.circle.fill",
+                                iconColor: .brandPrimary,
+                                text: "Mira accepted your request to join 'Evening Run' 🏃‍♂️",
+                                time: "2m ago"
+                            )
+                            Divider().padding(.horizontal, 16)
+                            NotificationRow(
+                                icon: "bolt.fill",
+                                iconColor: .brandSecondary,
+                                text: "Rahul created a new Coffee Drift nearby ☕️",
+                                time: "15m ago"
+                            )
+                            Divider().padding(.horizontal, 16)
+                            NotificationRow(
+                                icon: "message.fill",
+                                iconColor: .brandPurple,
+                                text: "Aditi sent a message in 'Study Group' 📚",
+                                time: "1h ago"
+                            )
+                        }
+                        .padding(.bottom, 8)
+                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
+                            .fill(Color.surfaceMain)
+                            .shadow(color: .black.opacity(0.15), radius: 20, x: 0, y: 10)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge)
+                            .stroke(Color.appBorder.opacity(0.5), lineWidth: 1)
+                    )
+                    .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    .padding(.top, 110)
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .move(edge: .top)),
+                        removal: .opacity
+                    ))
+                    .zIndex(25)
+                }
             }
         }
         .asCoffeePage(
@@ -167,7 +247,9 @@ struct DiscoveryScreen: View {
             scrollable: false,
             rightView: {
                 NotificationIconButton(count: 3) {
-                    // Tap notification
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        showNotificationDropdown.toggle()
+                    }
                 }
             }
         )
@@ -261,6 +343,43 @@ extension DiscoveryScreen {
     }
 }
 
-#Preview {
-    DiscoveryScreen(selectedTab: .constant(0))
+struct DiscoveryScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        DiscoveryScreen(selectedTab: .constant(0))
+    }
+}
+
+struct NotificationRow: View {
+    let icon: String
+    let iconColor: Color
+    let text: String
+    let time: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundColor(iconColor)
+                .frame(width: 32, height: 32)
+                .background(iconColor.opacity(0.1))
+                .clipShape(Circle())
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(text)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.textPrimary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                
+                Text(time)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.textSecondary)
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
 }

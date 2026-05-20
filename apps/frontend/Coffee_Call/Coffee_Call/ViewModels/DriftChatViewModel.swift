@@ -58,10 +58,45 @@ class DriftChatViewModel: ObservableObject {
             content: trimmedMessage,
             timestamp: Date(),
             isSelf: true,
-            status: .sent
+            status: .sent,
+            type: .text
         )
         
         messages.append(newMessage)
         messageText = ""
+    }
+    
+    func sendImageMessage(image: UIImage) {
+        let newMessage = ChatMessage(
+            senderId: "self",
+            senderName: "You",
+            senderInitials: "ME",
+            content: "Sent an image",
+            timestamp: Date(),
+            isSelf: true,
+            status: .sent,
+            type: .image,
+            attachmentImage: image
+        )
+        messages.append(newMessage)
+    }
+    
+    func sendLocationMessage(locationName: String) {
+        let newMessage = ChatMessage(
+            senderId: "self",
+            senderName: "You",
+            senderInitials: "ME",
+            content: locationName,
+            timestamp: Date(),
+            isSelf: true,
+            status: .sent,
+            type: .location,
+            attachmentLocation: locationName
+        )
+        messages.append(newMessage)
+    }
+    
+    func deleteMessage(_ message: ChatMessage) {
+        messages.removeAll(where: { $0.id == message.id })
     }
 }

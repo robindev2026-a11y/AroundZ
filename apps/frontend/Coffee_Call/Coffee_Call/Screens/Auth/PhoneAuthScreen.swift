@@ -155,6 +155,8 @@ struct PhoneAuthScreen: View {
         .sheet(isPresented: $showCountryPicker) {
             CountryPickerView(selected: $selectedCountry)
         }
+        .withDoneButton()
+        .dismissKeyboardOnTap()
     }
 
     private var phoneFieldBackground: some View {

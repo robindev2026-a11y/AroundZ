@@ -34,7 +34,7 @@ Before coding a UI change:
 - Around must not expose people for unsolicited contact.
 - Drifts are the unit of action.
 - `See nearby Drifts` routes to the Drifts listing.
-- Center Create presents the Create Drift sheet.
+- Center Create remains reserved for future Create design work.
 - Chat only appears after joining or hosting a Drift.
 
 ## Design Guardrails

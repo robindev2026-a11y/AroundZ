@@ -3,22 +3,25 @@ import SwiftUI
 class NavigationManager: ObservableObject {
     @Published private var tabBarHiddenSources: Set<String> = []
     @Published var activeInterestFilter: String? = nil
+    @Published var isTabBarHidden: Bool = false
     
     static let shared = NavigationManager()
     
-    var isTabBarHidden: Bool {
-        !tabBarHiddenSources.isEmpty
-    }
-    
     func setTabBarHidden(_ isHidden: Bool, source: String) {
-        if isHidden {
-            tabBarHiddenSources.insert(source)
-        } else {
-            tabBarHiddenSources.remove(source)
+        DispatchQueue.main.async {
+            if isHidden {
+                self.tabBarHiddenSources.insert(source)
+            } else {
+                self.tabBarHiddenSources.remove(source)
+            }
+            self.isTabBarHidden = !self.tabBarHiddenSources.isEmpty
         }
     }
     
     func resetTabBarVisibility() {
-        tabBarHiddenSources.removeAll()
+        DispatchQueue.main.async {
+            self.tabBarHiddenSources.removeAll()
+            self.isTabBarHidden = false
+        }
     }
 }

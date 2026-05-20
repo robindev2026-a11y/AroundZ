@@ -23,6 +23,10 @@ struct DriftsScreen: View {
                             TextField("Search Drifts...", text: $viewModel.searchQuery)
                                 .font(.bodyStandard)
                                 .foregroundColor(.textPrimary)
+                                .coffeeSubmitLabel(.search)
+                                .onSubmit {
+                                    hideKeyboard()
+                                }
                             
                             if !viewModel.searchQuery.isEmpty {
                                 Button(action: { viewModel.searchQuery = "" }) {
@@ -35,6 +39,7 @@ struct DriftsScreen: View {
                         .padding(.vertical, 10)
                         .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
                         .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
                         
                         Button("Cancel") {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -46,6 +51,7 @@ struct DriftsScreen: View {
                         .foregroundColor(.brandPrimary)
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    .padding(.top, 12) // Moved down slightly for better selectability
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
@@ -57,10 +63,6 @@ struct DriftsScreen: View {
                     
                     TimeStateTabs(selectedState: $viewModel.selectedTimeState)
                 }
-                
-                // 3. Category Chips Row (ISSUE-008 / DESIGN.md)
-                categoryChipsRow
-                    .padding(.bottom, 4)
                 
                 // 4. Main List / Scrollable Container
                 ScrollView(showsIndicators: false) {
@@ -84,23 +86,13 @@ struct DriftsScreen: View {
                         if viewModel.filteredDrifts.isEmpty {
                             emptyStateView
                         } else {
-                            // Section: Open now
-                            driftSection(
-                                title: AppStrings.Drifts.openNow,
-                                drifts: remainingDrifts.filter { $0.status == .open }
-                            )
-                            
-                            // Section: Starting soon
-                            driftSection(
-                                title: AppStrings.Drifts.startingSoon,
-                                drifts: remainingDrifts.filter { $0.status == .startingSoon }
-                            )
-                            
-                            // Section: Later today
-                            driftSection(
-                                title: AppStrings.Drifts.laterToday,
-                                drifts: remainingDrifts.filter { $0.status == .tonight }
-                            )
+                            ForEach(remainingDrifts) { drift in
+                                NavigationLink(value: drift) {
+                                    DriftCard(drift: drift, isFeatured: false, onJoin: {})
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, AppConstants.Layout.standardPadding)
+                            }
                         }
                     }
                     .padding(.top, 8)
@@ -124,8 +116,19 @@ struct DriftsScreen: View {
                             }
                         }
                         // Filter Refinement Button (ISSUE-006)
-                        CoffeeHeaderButton(icon: AppIcons.filter) {
-                            showingFilterPanel = true
+                        ZStack(alignment: .topTrailing) {
+                            CoffeeHeaderButton(icon: AppIcons.filter) {
+                                showingFilterPanel = true
+                            }
+                            
+                            if viewModel.activeFilterCount > 0 {
+                                Text("\(viewModel.activeFilterCount)")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 16, height: 16)
+                                    .background(Circle().fill(Color.brandPrimary))
+                                    .offset(x: 4, y: -4)
+                            }
                         }
                     }
                 }
@@ -138,13 +141,21 @@ struct DriftsScreen: View {
                 }
             }
             .sheet(isPresented: $showingFilterPanel) {
-                DriftsFilterSheet(viewModel: viewModel)
-                    .presentationDetents([.fraction(0.85)])
-                    .presentationDragIndicator(.visible)
+                if #available(iOS 16.4, *) {
+                    DriftsFilterSheet(viewModel: viewModel)
+                        .presentationDetents([.fraction(0.68)])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackground(.ultraThinMaterial)
+                } else {
+                    DriftsFilterSheet(viewModel: viewModel)
+                        .presentationDetents([.fraction(0.68)])
+                        .presentationDragIndicator(.visible)
+                }
             }
             .onAppear {
                 NavigationManager.shared.resetTabBarVisibility()
             }
+            .dismissKeyboardOnTap()
         }
     }
     
@@ -317,21 +328,6 @@ struct DriftsFilterSheet: View {
     @ObservedObject var viewModel: DriftsViewModel
     @Environment(\.dismiss) private var dismiss
     
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
-    
-    private let filterCategories = [
-        FilterCategoryItem(name: "Coffee", iconName: AppIcons.coffee, category: .coffee),
-        FilterCategoryItem(name: "Walks", iconName: AppIcons.walk, category: .walk),
-        FilterCategoryItem(name: "Movies", iconName: AppIcons.movie, category: .movie),
-        FilterCategoryItem(name: "Dinner", iconName: AppIcons.food, category: .food),
-        FilterCategoryItem(name: "Music", iconName: "music.note", category: .music),
-        FilterCategoryItem(name: "Books", iconName: "book", category: .study)
-    ]
-    
     var body: some View {
         VStack(spacing: 0) {
             // Top Pull-Handle Line
@@ -346,7 +342,7 @@ struct DriftsFilterSheet: View {
                     // Header Title
                     HStack {
                         Text("Filter Drifts")
-                            .font(.heading2)
+                            .font(.outfitBlack(size: 24, relativeTo: .title2))
                             .foregroundColor(.textPrimary)
                         Spacer()
                     }
@@ -355,61 +351,17 @@ struct DriftsFilterSheet: View {
                     // 1. Distance Radius Section
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         Text("1. Distance")
-                            .font(.bodySmall)
+                            .font(.outfitBold(size: 16, relativeTo: .headline))
                             .foregroundColor(.textPrimary)
                         
                         TactileSlider(value: $viewModel.selectedDistanceRadius, range: 1.0...10.0, step: 0.5)
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
                     
-                    // 2. Activity Types Section
+                    // 2. Time Picker Section
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-                        Text("2. Activity Types")
-                            .font(.bodySmall)
-                            .foregroundColor(.textPrimary)
-                        
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(filterCategories) { item in
-                                let isSelected = viewModel.selectedCategories.contains(item.name)
-                                Button(action: {
-                                    if isSelected {
-                                        viewModel.selectedCategories.remove(item.name)
-                                    } else {
-                                        viewModel.selectedCategories.insert(item.name)
-                                    }
-                                }) {
-                                    VStack(spacing: AppConstants.Layout.subElementSpacing) {
-                                        Image(systemName: item.iconName)
-                                            .font(.system(size: 28, weight: .light))
-                                            .foregroundColor(isSelected ? .brandPrimary : .textPrimary)
-                                            .frame(height: 36)
-                                        
-                                        Text(item.name)
-                                            .font(.captionText)
-                                            .foregroundColor(isSelected ? .brandPrimary : .textPrimary)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
-                                            .fill(isSelected ? Color.brandPrimary.opacity(0.12) : Color.surfaceMain)
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
-                                            .stroke(isSelected ? Color.brandPrimary.opacity(0.3) : Color.appBorder, lineWidth: 1)
-                                    )
-                                }
-                                .buttonStyle(.plain)
-                                .pressScale(0.96)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    
-                    // 3. Time Picker Section
-                    VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-                        Text("3. Time")
-                            .font(.bodySmall)
+                        Text("2. Time")
+                            .font(.outfitBold(size: 16, relativeTo: .headline))
                             .foregroundColor(.textPrimary)
                         
                         HStack(spacing: 8) {
@@ -423,6 +375,7 @@ struct DriftsFilterSheet: View {
                                     case "This Weekend": return Color.brandPurple
                                     default: return Color.brandPrimary
                                     }
+                                    
                                 }()
                                 
                                 Button(action: {
@@ -431,18 +384,64 @@ struct DriftsFilterSheet: View {
                                     }
                                 }) {
                                     Text(timeframe)
-                                        .font(.captionText)
+                                        .font(.outfitBold(size: 13, relativeTo: .subheadline))
                                         .foregroundColor(isSelected ? tintColor : .textSecondary)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 10)
                                         .background(
                                             Capsule()
-                                                .fill(isSelected ? tintColor.opacity(0.12) : Color.surfaceMain)
+                                                .fill(isSelected ? tintColor.opacity(0.12) : Color.surfaceMain.opacity(0.3))
+                                                .background(Capsule().fill(.ultraThinMaterial))
                                         )
                                         .overlay(
                                             Capsule()
-                                                .stroke(isSelected ? tintColor.opacity(0.3) : Color.appBorder, lineWidth: 1)
+                                                .stroke(isSelected ? tintColor.opacity(0.3) : Color.appBorder.opacity(0.5), lineWidth: 1)
                                         )
+                                }
+                                .buttonStyle(.plain)
+                                .pressScale(0.96)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, AppConstants.Layout.standardPadding)
+                    
+                    // 3. Activity Types Section
+                    VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
+                        Text("3. Activity Types")
+                            .font(.outfitBold(size: 16, relativeTo: .headline))
+                            .foregroundColor(.textPrimary)
+                        
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                            ForEach(DriftCategory.allCases, id: \.self) { category in
+                                let isSelected = viewModel.selectedCategory == category
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                        if isSelected {
+                                            viewModel.selectedCategory = nil
+                                        } else {
+                                            viewModel.selectedCategory = category
+                                        }
+                                    }
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: category.icon)
+                                            .font(.system(size: 11, weight: .bold))
+                                        Text(category.rawValue.capitalized)
+                                            .font(.outfitMedium(size: 12, relativeTo: .caption))
+                                            .lineLimit(1)
+                                    }
+                                    .foregroundColor(isSelected ? .brandPrimary : .textSecondary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        Capsule()
+                                            .fill(isSelected ? Color.brandPrimary.opacity(0.12) : Color.surfaceMain.opacity(0.3))
+                                            .background(Capsule().fill(.ultraThinMaterial))
+                                    )
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(isSelected ? Color.brandPrimary.opacity(0.3) : Color.appBorder.opacity(0.5), lineWidth: 1)
+                                    )
                                 }
                                 .buttonStyle(.plain)
                                 .pressScale(0.96)
@@ -457,12 +456,13 @@ struct DriftsFilterSheet: View {
                             dismiss()
                         }) {
                             Text("Apply Filters")
-                                .font(.buttonText)
+                                .font(.outfitBlack(size: 16, relativeTo: .headline))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
                                 .background(Color.brandPrimary)
                                 .cornerRadius(AppConstants.UI.cornerRadiusLarge)
+                                .shadow(color: Color.brandPrimary.opacity(0.2), radius: 8, x: 0, y: 4)
                         }
                         .pressScale(0.96)
                         
@@ -475,7 +475,7 @@ struct DriftsFilterSheet: View {
                                 viewModel.selectedTimeState = .all
                             }
                         }
-                        .font(.buttonText)
+                        .font(.outfitBold(size: 14, relativeTo: .subheadline))
                         .foregroundColor(.brandPrimary)
                         .padding(.vertical, 8)
                     }
@@ -485,7 +485,7 @@ struct DriftsFilterSheet: View {
                 .padding(.bottom, 32)
             }
         }
-        .background(Color.surfaceMain)
+        .background(Color.surfaceMain.opacity(0.45))
     }
 }
 
@@ -508,14 +508,15 @@ struct TactileSlider: View {
                 ZStack(alignment: .leading) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.brandPrimary.opacity(0.12))
+                            .fill(Color.brandPrimary.opacity(0.08))
+                            .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 1)
+                                    .stroke(Color.brandPrimary.opacity(0.2), lineWidth: 0.8)
                             )
                         
                         Text("\(Int(value)) km radius")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.outfitBold(size: 11, relativeTo: .caption))
                             .foregroundColor(.brandPrimary)
                     }
                     .frame(width: bubbleWidth, height: 26)
@@ -529,11 +530,11 @@ struct TactileSlider: View {
             
             HStack {
                 Text("\(Int(range.lowerBound)) km")
-                    .font(.captionText)
+                    .font(.outfitMedium(size: 11, relativeTo: .caption))
                     .foregroundColor(.textSecondary)
                 Spacer()
                 Text("\(Int(range.upperBound)) km")
-                    .font(.captionText)
+                    .font(.outfitMedium(size: 11, relativeTo: .caption))
                     .foregroundColor(.textSecondary)
             }
         }
@@ -548,6 +549,8 @@ struct FilterCategoryItem: Identifiable {
     let category: DriftCategory
 }
 
-#Preview {
-    DriftsScreen()
+struct DriftsScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        DriftsScreen()
+    }
 }
