@@ -68,6 +68,7 @@ struct MainTabView: View {
                 })
                     .presentationDetents([.fraction(0.96)])
                     .presentationCornerRadius(AppConstants.Layout.createSheetRadius)
+                    .presentationBackground(.clear)
                     .presentationDragIndicator(.hidden)
             } else {
                 CreateDriftSheet(onCreateSucceeded: {

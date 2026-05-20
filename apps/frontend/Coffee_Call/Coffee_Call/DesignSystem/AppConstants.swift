@@ -58,6 +58,14 @@ enum AppConstants {
         static let headerHeight: CGFloat = 82
         static let headerRadius: CGFloat = Grid.step30
         static let tooltipRadius: CGFloat = Grid.step12
+
+        // Map Preview
+        static let mapPreviewHeight: CGFloat = 180
+        static let mapGridStep: CGFloat = 40
+        static let mapGridOffset: CGFloat = 20
+        static let mapGridOffsetSmall: CGFloat = 10
+        static let mapRadiusSize: CGFloat = 100
+        static let mapTextOffset: CGFloat = 74
         
         // Presentation sheets
         static let sheetCollapsedOffset: CGFloat = 420
@@ -68,9 +76,36 @@ enum AppConstants {
         static let sheetHandleHeight: CGFloat = 5
         static let sheetHandleTopPadding: CGFloat = Grid.step8
         static let sheetHandleBottomPadding: CGFloat = Grid.step16
-        
+        static let createSheetRadius: CGFloat = 32
+        static let createSheetFooterHeight: CGFloat = 112
+        static let createSheetFooterSpacing: CGFloat = Grid.step16
+        static let createSheetCardMinHeight: CGFloat = 54
+        static let createSheetChipHeight: CGFloat = 44
+        static let createSheetIconWellSize: CGFloat = 48
+        static let createSheetLocationCardHeight: CGFloat = 132
+        static let createSheetTimeChipWidth: CGFloat = 92
+        static let createSheetCapacityChipWidth: CGFloat = 56
+        static let createSheetJoinModeHeight: CGFloat = 72
+        static let createSheetOptionalCollapsedHeight: CGFloat = 84
+
+        static let confirmationSheetHeight: CGFloat = 380
+
         // Avatar asset scales
-        static let avatarSizeLarge: CGFloat = 62
+        static let avatarSizeSmall: CGFloat = 38
+        static let avatarSizeMedium: CGFloat = 44
+        static let avatarSizeLarge: CGFloat = 48
+        static let avatarSizeXLarge: CGFloat = 62 // Replaced old avatarSizeLarge
+        static let avatarSizeXXLarge: CGFloat = 72
+        static let avatarSizeXXXLarge: CGFloat = 80
+
+        static let cardThumbnailWidth: CGFloat = 80
+        static let cardThumbnailHeight: CGFloat = 60
+        static let cardGalleryWidth: CGFloat = 120
+        static let cardGalleryHeight: CGFloat = 80
+        static let cardGalleryContainerWidth: CGFloat = 136
+
+        static let cornerRadiusTiny: CGFloat = Grid.step4
+        static let mappinSize: CGFloat = 44
         
         // Action margins
         static let buttonPaddingHorizontal: CGFloat = Grid.step16
@@ -85,6 +120,10 @@ enum AppConstants {
         static let sizeCaption: CGFloat = 12 // Caption
         static let sizeTiny: CGFloat = 10 // Detail Tags
         static let sizeMicro: CGFloat = 9 // Micro tags
+    }
+
+    enum Create {
+        static let activityGridCollapsedCount: Int = 6
     }
     
     enum Animation {

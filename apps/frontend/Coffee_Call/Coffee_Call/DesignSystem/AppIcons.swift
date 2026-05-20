@@ -48,9 +48,15 @@ enum AppIcons {
     static let walk = "figure.walk"
     static let movie = "film"
     static let food = "fork.knife"
+    static let study = "book"
     static let chatGroup = "bubble.left.and.bubble.right.fill"
     static let fitness = "bolt.fill"
     static let games = "gamecontroller.fill"
+    static let music = "music.note"
+    static let sports = "sportscourt"
+    static let drinks = "wineglass"
+    static let custom = "sparkles"
+    static let moon = "moon.fill"
     
     // MARK: - Spatial & Info
     static let calendar = "calendar"
@@ -128,6 +134,7 @@ enum AppIcons {
     static var walkImage: Image { Image(systemName: walk) }
     static var movieImage: Image { Image(systemName: movie) }
     static var foodImage: Image { Image(systemName: food) }
+    static var studyImage: Image { Image(systemName: study) }
     
     static var clockImage: Image { Image(systemName: clock) }
     static var clockFillImage: Image { Image(systemName: clockFill) }
@@ -154,6 +161,11 @@ enum AppIcons {
     static var chatGroupImage: Image { Image(systemName: chatGroup) }
     static var fitnessImage: Image { Image(systemName: fitness) }
     static var gamesImage: Image { Image(systemName: games) }
+    static var musicImage: Image { Image(systemName: music) }
+    static var sportsImage: Image { Image(systemName: sports) }
+    static var drinksImage: Image { Image(systemName: drinks) }
+    static var customImage: Image { Image(systemName: custom) }
+    static var moonImage: Image { Image(systemName: moon) }
     static var distanceImage: Image { Image(systemName: distance) }
     static var shieldImage: Image { Image(systemName: shield) }
     static var shieldVerifiedImage: Image { Image(systemName: shieldVerified) }

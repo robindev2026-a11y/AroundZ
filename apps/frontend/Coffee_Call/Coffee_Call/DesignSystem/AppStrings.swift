@@ -220,6 +220,8 @@ enum AppStrings {
         static let customActivityPlaceholder = "What activity is it?"
         static let requiredMarker = "*"
         static let hostRole = "Hosting this Drift"
+        static let openToAll = "Open to all"
+        static let openToAllSubtitle = "All nearby people can join"
 
         static let titlePlaceholder = "e.g. Evening walk at Cubbon Park"
         static let titleCounterFormat = "%d/60"
@@ -239,6 +241,8 @@ enum AppStrings {
         static let notesTitle = "Notes"
         static let notesTitleShort = "Notes"
         static let notesPlaceholder = "Additional info..."
+        static let hookTooltipTitle = "What’s a hook?"
+        static let hookTooltipMessage = "A short line that makes people want to join. Example: Coffee on me if you bring a good story."
         static let joinModeOpen = "Anyone can join"
         static let joinModeApproval = "Approve requests"
         static let joinModeOpenSubtitle = "Open to everyone"
@@ -256,6 +260,8 @@ enum AppStrings {
         static let created = "Drift created!"
         static let createdSubtitle = "Your plan is live and people can join."
         static let redirectNote = "We'll take you to manage your Drift."
+        static let viewMoreActivities = "View more"
+        static let viewLessActivities = "View less"
         
         static let discardTitle = "Discard changes?"
         static let discardMessage = "You have unsaved changes. If you go back now, they will be lost."
