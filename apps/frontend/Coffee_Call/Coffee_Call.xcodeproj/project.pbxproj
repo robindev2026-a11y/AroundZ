@@ -61,7 +61,6 @@
 		33CA3A4B2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CA3A4A2FB33A42008EF23C /* Coffee_CallUITestsLaunchTests.swift */; };
 		423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */; };
 		43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860AAD253DC8B95B03AF333 /* MainTabView.swift */; };
-		54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */; };
 		64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79EEFE313C630B04AED288E /* AuthViewModel.swift */; };
 		78E7D14988238765F3DD1D7C /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1DF7DD85DAFAEF4D0D1EA7F /* Activity.swift */; };
 		7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AD42B952A8F1B46A03476D /* PermissionsScreen.swift */; };
@@ -108,7 +107,6 @@
 /* Begin PBXFileReference section */
 		1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTPVerificationScreen.swift; sourceTree = "<group>"; };
 		11C75F18AD0A56F05577934A /* PillBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PillBadge.swift; sourceTree = "<group>"; };
-		1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationPermissionScreen.swift; sourceTree = "<group>"; };
 		3302E3F02FB475DD0077EAC8 /* Coffee_CallApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coffee_CallApp.swift; sourceTree = "<group>"; };
 		3302E3F12FB475DD0077EAC8 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3302E3F22FB475DD0077EAC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -346,7 +344,6 @@
 			isa = PBXGroup;
 			children = (
 				8B5A8CE72FBDEBAF003090FE /* CountryPickerView.swift */,
-				1DF0CBB40A53995BA3A33E35 /* LocationPermissionScreen.swift */,
 				B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */,
 				8F0F95581A8747A90A8E7218 /* PhoneAuthScreen.swift */,
 				1024BEB9D05E895A2D4C6B90 /* OTPVerificationScreen.swift */,
@@ -622,7 +619,6 @@
 				EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */,
 				3374CEDE2FB725060020F28D /* CreateDriftScreen.swift in Sources */,
 				3374CEBF2FB6E7A50020F28D /* RadarView.swift in Sources */,
-				54E9DE9FA12B1DC1E2D303FF /* LocationPermissionScreen.swift in Sources */,
 				3374CEAD2FB6DFF50020F28D /* DiscoveryViewModel.swift in Sources */,
 				116BE050DAD99D601B181CC5 /* ProfileSetupScreen.swift in Sources */,
 				3374CEB62FB6E0950020F28D /* AppConstants.swift in Sources */,
