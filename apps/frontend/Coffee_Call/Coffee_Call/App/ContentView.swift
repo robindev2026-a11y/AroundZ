@@ -4,8 +4,14 @@ struct ContentView: View {
     @StateObject private var auth = AuthViewModel()
 
     var body: some View {
-        NavigationStack {
-            OnboardingScreen()
+        Group {
+            if auth.isAuthenticated {
+                MainTabView()
+            } else {
+                NavigationStack {
+                    OnboardingScreen()
+                }
+            }
         }
         .environmentObject(auth)
     }

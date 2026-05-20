@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import Combine
 
 class ProfileViewModel: ObservableObject {
@@ -17,6 +18,7 @@ class ProfileViewModel: ObservableObject {
     @Published var initials: String = AppConstants.MockData.userInitials {
         didSet { UserDefaults.standard.set(initials, forKey: "profile_initials") }
     }
+    @Published var profileImage: UIImage? = nil
     
     @Published var location: String = "Bengaluru, India" {
         didSet { UserDefaults.standard.set(location, forKey: "profile_location") }
@@ -106,6 +108,9 @@ class ProfileViewModel: ObservableObject {
         if let savedInterests = UserDefaults.standard.stringArray(forKey: "profile_interests") {
             self.interests = savedInterests.compactMap { DriftCategory(rawValue: $0) }
         }
+
+        // Load profile photo from disk
+        self.profileImage = ProfileImageHelper.loadProfileImage()
     }
     
     func loadMockHistory() {
@@ -132,10 +137,14 @@ class ProfileViewModel: ObservableObject {
     }
     
     // MARK: - Save Profile (CRUD: Update)
-    func updateProfile(name: String, bio: String) {
+    func updateProfile(name: String, bio: String, image: UIImage? = nil) {
         self.name = name
         self.bio = bio
         self.initials = computeInitials(name: name)
+        if let image = image {
+            ProfileImageHelper.saveProfileImage(image)
+            self.profileImage = image
+        }
     }
     
     // MARK: - Sign Out & Reset (CRUD: Delete/Reset)
@@ -148,6 +157,8 @@ class ProfileViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "profile_availability_weekends")
         UserDefaults.standard.removeObject(forKey: "profile_availability_daytime")
         UserDefaults.standard.removeObject(forKey: "profile_interests")
+        ProfileImageHelper.clearProfileImage()
+        self.profileImage = nil
         
         self.name = AppConstants.MockData.userName
         self.bio = AppConstants.MockData.userBio

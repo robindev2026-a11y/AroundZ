@@ -93,9 +93,4 @@ To prevent repository clutter while maintaining deep architectural, styling, and
 * **Your Action**: Before making any UI, typography, or architectural changes, read the markdown notes inside this Obsidian vault (specifically under `Software Engineering/SwiftUI/` and `Software Engineering/Apple HIG/`).
 * **Your Contribution**: Whenever you discover a new reusable pattern, design principle, or coding standard during development, **always write or update a corresponding markdown note inside the Obsidian vault** with proper categories and frontmatter tags (e.g., `#swiftui`, `#architecture`).
 
-## Verification
-
-- For UI work, provide screenshot/build verification when practical.
-- For doc work, run markdown inventory and stale-guidance searches.
-- If a task cannot be verified, state the gap clearly.
 

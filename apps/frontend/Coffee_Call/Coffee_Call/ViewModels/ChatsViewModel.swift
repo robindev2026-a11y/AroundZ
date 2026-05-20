@@ -32,8 +32,13 @@ class ChatsViewModel: ObservableObject {
     
     private let chatService: ChatServiceProtocol
     
-    init(chatService: ChatServiceProtocol = MockChatService()) {
-        self.chatService = chatService
+    init(chatService: ChatServiceProtocol? = nil) {
+        if let chatService = chatService {
+            self.chatService = chatService
+        } else {
+            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            self.chatService = isFirebaseEnabled ? FirebaseChatService() : MockChatService()
+        }
         loadChats()
     }
     

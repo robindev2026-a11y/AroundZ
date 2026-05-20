@@ -105,21 +105,30 @@ struct ProfileScreen: View {
     private var identityCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .center, spacing: 16) {
-                // Circular Avatar (72x72) with premium brand gradient
+                // Circular Avatar (72x72) — profile photo or initials fallback
                 ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.brandPrimary.opacity(0.25), Color.brandPrimary.opacity(0.05)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                    if let profileImage = viewModel.profileImage {
+                        Image(uiImage: profileImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 72, height: 72)
+                            .clipShape(Circle())
+                    } else {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.brandPrimary.opacity(0.25), Color.brandPrimary.opacity(0.05)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
-                        .frame(width: 72, height: 72)
-                    
-                    AppIcons.personImage
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.brandPrimaryDark)
+                            .frame(width: 72, height: 72)
+                            .overlay(
+                                AppIcons.personImage
+                                    .font(.system(size: 32, weight: .bold))
+                                    .foregroundColor(.brandPrimaryDark)
+                            )
+                    }
                 }
                 .overlay(
                     Circle()

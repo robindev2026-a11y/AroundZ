@@ -47,8 +47,13 @@ class DiscoveryViewModel: ObservableObject {
     let contextBody = AppStrings.Discovery.driftsFormingSub
     let contextCTA = AppStrings.Discovery.seeNearbyDrifts
 
-    init(service: DiscoveryServiceProtocol = MockDiscoveryService()) {
-        self.service = service
+    init(service: DiscoveryServiceProtocol? = nil) {
+        if let service = service {
+            self.service = service
+        } else {
+            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            self.service = isFirebaseEnabled ? FirebaseDiscoveryService() : MockDiscoveryService()
+        }
         loadData()
     }
     

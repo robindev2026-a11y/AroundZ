@@ -95,8 +95,13 @@ class DriftsViewModel: ObservableObject {
         }
     }
     
-    init(driftsService: DriftsServiceProtocol = MockDriftsService()) {
-        self.driftsService = driftsService
+    init(driftsService: DriftsServiceProtocol? = nil) {
+        if let driftsService = driftsService {
+            self.driftsService = driftsService
+        } else {
+            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+        }
         
         // Setup Search Debouncer (ISSUE-007)
         $searchQuery

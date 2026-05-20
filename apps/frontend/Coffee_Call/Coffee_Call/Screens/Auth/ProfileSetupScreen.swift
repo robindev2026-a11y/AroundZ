@@ -6,12 +6,18 @@ struct ProfileSetupScreen: View {
     @State private var navigateToPermissions = false
     @Environment(\.presentationMode) var presentationMode
 
+    // Photo picker state
+    @State private var pickedImage: UIImage? = nil
+    @State private var photoPickerSource: PhotoPickerSource? = nil
+    @State private var showSourceChoiceSheet = false
+
     var isReady: Bool {
         !firstName.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            // Back button
             Button(action: {
                 presentationMode.wrappedValue.dismiss()
             }) {
@@ -34,43 +40,56 @@ struct ProfileSetupScreen: View {
                 .foregroundColor(.textPrimary)
                 .padding(.bottom, 36)
 
+            // MARK: - Avatar
             VStack(spacing: AppConstants.Layout.standardPadding) {
                 ZStack(alignment: .bottomTrailing) {
-                    RoundedRectangle(cornerRadius: 48, style: .continuous)
-                        .fill(Color.surfaceSecondary)
-                        .frame(width: 140, height: 140)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 48, style: .continuous)
-                                .strokeBorder(Color.appBorder, style: StrokeStyle(lineWidth: 2, dash: [7]))
-                        )
-                        .background(
-                            RoundedRectangle(cornerRadius: 48, style: .continuous)
-                                .fill(Color.surfaceMain)
-                        )
-                        .overlay(
-                            AppIcons.cameraImage
-                                .font(.system(size: 38, weight: .medium))
-                                .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
-                        )
+                    // Avatar preview / placeholder
+                    Group {
+                        if let pickedImage {
+                            Image(uiImage: pickedImage)
+                                .resizable()
+                                .scaledToFill()
+                        } else {
+                            Color.surfaceSecondary
+                                .overlay(
+                                    AppIcons.cameraImage
+                                        .font(.system(size: 38, weight: .medium))
+                                        .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
+                                )
+                        }
+                    }
+                    .frame(width: 140, height: 140)
+                    .clipShape(RoundedRectangle(cornerRadius: 48, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 48, style: .continuous)
+                            .strokeBorder(
+                                pickedImage == nil ? Color.appBorder : Color.brandPrimary.opacity(0.4),
+                                style: StrokeStyle(lineWidth: 2, dash: pickedImage == nil ? [7] : [])
+                            )
+                    )
 
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                        .fill(Color.brandPrimary)
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            AppIcons.cameraImage
-                                .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
-                                .foregroundColor(.textOnBrand)
-                        )
-                        .offset(x: 2, y: 2)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                                .stroke(Color.surfaceMain, lineWidth: 4)
-                        )
-                        .shadow(color: Color.brandPrimary.opacity(0.24), radius: 12, x: 0, y: 6)
+                    // Camera badge
+                    Button(action: { showSourceChoiceSheet = true }) {
+                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
+                            .fill(Color.brandPrimary)
+                            .frame(width: 40, height: 40)
+                            .overlay(
+                                AppIcons.cameraImage
+                                    .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
+                                    .foregroundColor(.textOnBrand)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
+                                    .stroke(Color.surfaceMain, lineWidth: 4)
+                            )
+                            .shadow(color: Color.brandPrimary.opacity(0.24), radius: 12, x: 0, y: 6)
+                    }
+                    .offset(x: 2, y: 2)
                 }
 
+                // Source choice buttons
                 HStack(spacing: AppConstants.Layout.elementSpacing) {
-                    Button(action: {}) {
+                    Button(action: { photoPickerSource = .camera }) {
                         Text(AppStrings.Auth.takePhoto)
                             .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                             .foregroundColor(.brandPrimary)
@@ -79,8 +98,8 @@ struct ProfileSetupScreen: View {
                             .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
-                    
-                    Button(action: {}) {
+
+                    Button(action: { photoPickerSource = .library }) {
                         Text(AppStrings.Auth.chooseLibrary)
                             .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                             .foregroundColor(.brandPrimary)
@@ -94,7 +113,7 @@ struct ProfileSetupScreen: View {
             .frame(maxWidth: .infinity)
             .padding(.bottom, 40)
 
-            // Name Input Section
+            // MARK: - Name Input
             VStack(alignment: .leading, spacing: 8) {
                 Text(AppStrings.Auth.displayNameLabel)
                     .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .black, design: .default))
@@ -131,8 +150,9 @@ struct ProfileSetupScreen: View {
 
             Spacer()
 
+            // MARK: - CTA
             Button(action: {
-                auth.saveProfile(name: firstName) { success in
+                auth.saveProfile(name: firstName, image: pickedImage) { success in
                     if success {
                         navigateToPermissions = true
                     }
@@ -167,6 +187,9 @@ struct ProfileSetupScreen: View {
         }
         .withDoneButton()
         .dismissKeyboardOnTap()
+        .photoPicker(source: $photoPickerSource) { image in
+            pickedImage = image
+        }
     }
 }
 

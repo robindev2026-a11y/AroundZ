@@ -1,9 +1,34 @@
 import SwiftUI
 
 struct PermissionsScreen: View {
-    @State private var locationRequested = false
-    @State private var notificationsRequested = false
+    @StateObject private var permissions = PermissionsManager()
     @State private var navigateToReady = false
+    
+    private var locationDetermined: Bool {
+        permissions.locationStatus != .notDetermined
+    }
+    
+    private var locationGranted: Bool {
+        permissions.locationStatus == .authorizedWhenInUse || permissions.locationStatus == .authorizedAlways
+    }
+    
+    private var locationDenied: Bool {
+        permissions.locationStatus == .denied || permissions.locationStatus == .restricted
+    }
+    
+    private var notificationsDetermined: Bool {
+        permissions.notificationStatus != .notDetermined
+    }
+    
+    private var notificationsGranted: Bool {
+        permissions.notificationStatus == .authorized ||
+        permissions.notificationStatus == .provisional ||
+        permissions.notificationStatus == .ephemeral
+    }
+    
+    private var notificationsDenied: Bool {
+        permissions.notificationStatus == .denied
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -43,27 +68,25 @@ struct PermissionsScreen: View {
                 }
                 
                 Button(action: {
-                    locationRequested = true
-                    if notificationsRequested {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            navigateToReady = true
-                        }
-                    }
+                    permissions.requestLocationPermission()
                 }) {
                     HStack(spacing: 6) {
-                        if locationRequested {
+                        if locationGranted {
                             AppIcons.checkmarkImage
+                        } else if locationDenied {
+                            AppIcons.infoCircleImage
                         }
-                        Text(locationRequested ? AppStrings.Auth.locationGranted : AppStrings.Auth.locationCTA)
+                        
+                        Text(locationText)
                     }
                     .font(.system(size: 14, weight: .bold, design: .default))
-                    .foregroundColor(locationRequested ? .statusSuccess : .textOnBrand)
+                    .foregroundColor(locationForegroundColor)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .background(locationRequested ? Color.statusSuccess.opacity(0.1) : Color.brandPrimary)
+                    .background(locationBackgroundColor)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
-                .disabled(locationRequested)
+                .disabled(locationGranted)
             }
             .padding(20)
             .background(
@@ -101,27 +124,25 @@ struct PermissionsScreen: View {
                 }
                 
                 Button(action: {
-                    notificationsRequested = true
-                    if locationRequested {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            navigateToReady = true
-                        }
-                    }
+                    permissions.requestNotificationPermission()
                 }) {
                     HStack(spacing: 6) {
-                        if notificationsRequested {
+                        if notificationsGranted {
                             AppIcons.checkmarkImage
+                        } else if notificationsDenied {
+                            AppIcons.infoCircleImage
                         }
-                        Text(notificationsRequested ? AppStrings.Auth.notificationsEnabled : AppStrings.Auth.notificationsCTA)
+                        
+                        Text(notificationsText)
                     }
                     .font(.system(size: 14, weight: .bold, design: .default))
-                    .foregroundColor(notificationsRequested ? .statusSuccess : .textOnBrand)
+                    .foregroundColor(notificationsForegroundColor)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .background(notificationsRequested ? Color.statusSuccess.opacity(0.1) : Color.brandPrimary)
+                    .background(notificationsBackgroundColor)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
-                .disabled(notificationsRequested)
+                .disabled(notificationsGranted)
             }
             .padding(20)
             .background(
@@ -136,7 +157,7 @@ struct PermissionsScreen: View {
             
             Spacer()
             
-            if locationRequested && notificationsRequested {
+            if locationDetermined && notificationsDetermined {
                 Button(action: { navigateToReady = true }) {
                     HStack(spacing: 8) {
                         Text("All Set! Let's Go")
@@ -172,6 +193,84 @@ struct PermissionsScreen: View {
         .navigationDestination(isPresented: $navigateToReady) {
             ReadyScreen()
         }
+        .onChange(of: locationDetermined) { newValue in
+            if newValue && notificationsDetermined {
+                triggerAutoNavigation()
+            }
+        }
+        .onChange(of: notificationsDetermined) { newValue in
+            if newValue && locationDetermined {
+                triggerAutoNavigation()
+            }
+        }
+    }
+    
+    private func triggerAutoNavigation() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            navigateToReady = true
+        }
+    }
+    
+    // MARK: - UI Configuration Helpers
+    
+    private var locationText: String {
+        if locationGranted {
+            return AppStrings.Auth.locationGranted
+        } else if locationDenied {
+            return "Location Denied (Enable in Settings)"
+        } else {
+            return AppStrings.Auth.locationCTA
+        }
+    }
+    
+    private var locationForegroundColor: Color {
+        if locationGranted {
+            return .statusSuccess
+        } else if locationDenied {
+            return .brandSecondary
+        } else {
+            return .textOnBrand
+        }
+    }
+    
+    private var locationBackgroundColor: Color {
+        if locationGranted {
+            return Color.statusSuccess.opacity(0.1)
+        } else if locationDenied {
+            return Color.brandSecondary.opacity(0.1)
+        } else {
+            return Color.brandPrimary
+        }
+    }
+    
+    private var notificationsText: String {
+        if notificationsGranted {
+            return AppStrings.Auth.notificationsEnabled
+        } else if notificationsDenied {
+            return "Notifications Denied (Enable in Settings)"
+        } else {
+            return AppStrings.Auth.notificationsCTA
+        }
+    }
+    
+    private var notificationsForegroundColor: Color {
+        if notificationsGranted {
+            return .statusSuccess
+        } else if notificationsDenied {
+            return .brandSecondary
+        } else {
+            return .textOnBrand
+        }
+    }
+    
+    private var notificationsBackgroundColor: Color {
+        if notificationsGranted {
+            return Color.statusSuccess.opacity(0.1)
+        } else if notificationsDenied {
+            return Color.brandSecondary.opacity(0.1)
+        } else {
+            return Color.brandPrimary
+        }
     }
 }
 
@@ -180,3 +279,4 @@ struct PermissionsScreen_Previews: PreviewProvider {
         PermissionsScreen()
     }
 }
+

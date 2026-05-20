@@ -1,14 +1,14 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 
 This file is the current progress ledger. Update it after meaningful work.
 
 ## Current Focus
 
 Align the live app and all AI guidance around a single active source of truth. The immediate UI focus is the updated Around screen.
-Temporary launch-path focus: auth-only flow is back as the root entry, while the main app shell remains out of the launch path for now.
+Connected the onboarding authentication flow to the main application flow, making the app flow end-to-end.
 
 ## Future Plan Notes
 
@@ -103,6 +103,11 @@ Temporary launch-path focus: auth-only flow is back as the root entry, while the
   - Refactored `AuthViewModel.swift`'s initializer and auth methods to support a safe offline mock preview mode when `FirebaseApp.app()` is not configured, completely preventing runtime crashes or FrontBoard transaction timeouts.
 - Files touched: `RadarView.swift`, `AuthViewModel.swift`, `STATUS.md`.
 - Verification performed: Successfully removed Metal rendering blocks, added bulletproof Firebase configuration checks, and verified compilation clean.
+- Connected the onboarding authentication flow to the main application flow:
+  - Modified `ContentView.swift` to conditionally display `MainTabView()` when `auth.isAuthenticated` is true, and `OnboardingScreen()` (wrapped in `NavigationStack`) when false.
+  - Ensures a seamless end-to-end user experience, automatically navigating to the main tab view upon completing onboarding, and returning the user to the onboarding screen upon logging out.
+- Files touched: `ContentView.swift`, `STATUS.md`.
+- Verification performed: Successfully compiled the app targeting iOS Simulator with xcodebuild and verified it has no compilation errors.
 
 - Remaining gaps: None.
 
