@@ -6,13 +6,14 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             OnboardingScreen()
-                .environmentObject(auth)
         }
+        .environmentObject(auth)
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(AuthViewModel())
     }
 }

@@ -47,6 +47,7 @@ enum AppStrings {
         static let phonePlaceholder = "(555) 000-0000"
         static let phoneCTA = "Send Code"
         static let sending = "Sending..."
+        static let smsHelper = "Standard SMS rates may apply. You'll receive a 6-digit code to verify your phone."
         static let searchCountry = "Search country"
         static let selectCountry = "Select Country"
         
@@ -85,6 +86,24 @@ enum AppStrings {
         static let otpCTA = "Verify"
         static let sentTo = "Enter the 6-digit code sent to"
         static let resendCode = "Resend code"
+    }
+
+    enum Country {
+        static let us = "United States"
+        static let uk = "United Kingdom"
+        static let india = "India"
+        static let canada = "Canada"
+        static let australia = "Australia"
+        static let germany = "Germany"
+        static let france = "France"
+        static let singapore = "Singapore"
+        static let uae = "UAE"
+        static let japan = "Japan"
+        static let brazil = "Brazil"
+        static let mexico = "Mexico"
+        static let southAfrica = "South Africa"
+        static let nigeria = "Nigeria"
+        static let philippines = "Philippines"
     }
     
     enum Error {

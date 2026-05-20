@@ -125,6 +125,50 @@ enum AppConstants {
     enum Create {
         static let activityGridCollapsedCount: Int = 6
     }
+
+    enum Auth {
+        static let screenHorizontalPadding: CGFloat = 32
+        static let topSpacing: CGFloat = 40
+        static let sectionSpacing: CGFloat = 12
+        static let titleBottomSpacing: CGFloat = 48
+        static let helperTopSpacing: CGFloat = 24
+        static let fieldHeight: CGFloat = 64
+        static let backButtonSize: CGFloat = 48
+        static let backButtonCornerRadius: CGFloat = 24
+        static let fieldCornerRadius: CGFloat = 16
+        static let countryFieldWidth: CGFloat = 110
+        static let countryFieldSpacing: CGFloat = 14
+        static let countryFlagSize: CGFloat = 20
+        static let countryCodeFontSize: CGFloat = 16
+        static let countryChevronSize: CGFloat = 12
+        static let phoneFontSize: CGFloat = 20
+        static let smsHelperFontSize: CGFloat = 14
+        static let phoneButtonFontSize: CGFloat = 18
+        static let authButtonBottomSpacing: CGFloat = 12
+        static let minPhoneDigits: Int = 8
+        static let maxPhoneDigits: Int = 15
+        static let titleLineSpacing: CGFloat = 4
+        static let helperLineSpacing: CGFloat = 3
+        static let labelKerning: CGFloat = 1.8
+        static let countryItemSpacing: CGFloat = 16
+        static let countryItemFlagSize: CGFloat = 28
+        static let countryItemCornerRadius: CGFloat = 16
+        static let countryItemVerticalPadding: CGFloat = 4
+        static let backButtonShadowRadius: CGFloat = 12
+        static let backButtonShadowY: CGFloat = 4
+        static let fieldShadowRadius: CGFloat = 12
+        static let fieldShadowY: CGFloat = 4
+        static let loadingScale: CGFloat = 0.9
+        static let phoneButtonShadowRadius: CGFloat = 18
+        static let phoneButtonShadowY: CGFloat = 8
+        static let countryHeight: CGFloat = 64
+        static let countryFieldShadowRadius: CGFloat = 12
+        static let countryFieldShadowY: CGFloat = 4
+        static let borderWidth: CGFloat = 1
+        static let disabledButtonOpacity: CGFloat = 0.24
+        static let brandShadowOpacity: CGFloat = 0.22
+        static let secondaryTextOpacity: CGFloat = 0.82
+    }
     
     enum Animation {
         static let entranceStagger: Double = 0.1

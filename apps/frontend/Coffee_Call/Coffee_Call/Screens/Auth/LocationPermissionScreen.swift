@@ -31,11 +31,11 @@ struct LocationPermissionScreen: View {
             
             VStack(spacing: 16) {
                 PrimaryButton(title: AppStrings.Auth.locationSimpleCTA) {
-                    print("Requesting Location Permissions")
+                    print(AppStrings.Auth.locationCTA)
                 }
                 
                 Button(action: {
-                    print("Skipping Location")
+                    print(AppStrings.Auth.locationSkip)
                 }) {
                     Text(AppStrings.Auth.locationSkip)
                         .font(.buttonText)
