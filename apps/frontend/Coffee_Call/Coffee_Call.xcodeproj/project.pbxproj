@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -44,6 +44,7 @@
 		3374CEE62FB732DB0020F28D /* RadarPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEE52FB732DB0020F28D /* RadarPerson.swift */; };
 		3374CEE72FB732DB0020F28D /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEE82FB732DB0020F28D /* BookmarkManager.swift */; };
 		3374CEE92FB732DB0020F28D /* DriftsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEEA2FB732DB0020F28D /* DriftsService.swift */; };
+		3374CEF12FB732DB0020F28D /* PermissionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3374CEF02FB732DB0020F28D /* PermissionsManager.swift */; };
 		3387CF312FB495D40084895E /* BetaBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3387CF302FB495D20084895E /* BetaBadge.swift */; };
 		338E3B192FB435F40048FC32 /* AppIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B162FB435F40048FC32 /* AppIcons.swift */; };
 		338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E3B172FB435F40048FC32 /* AppImages.swift */; };
@@ -72,9 +73,20 @@
 		8B5A8CE82FBDEBAF003090FE /* CountryPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5A8CE72FBDEBAF003090FE /* CountryPickerView.swift */; };
 		8BAB29A62FBD9005004556D9 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A52FBD9005004556D9 /* FirebaseAuth */; };
 		8BAB29A82FBD9005004556D9 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A72FBD9005004556D9 /* FirebaseCore */; };
+		8BAB29AA2FBD9005004556D9 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A92FBD9005004556D9 /* FirebaseFirestore */; };
+		8BAB29AC2FBD9005004556D9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29AB2FBD9005004556D9 /* FirebaseStorage */; };
+		CC004FB1000000000000010 /* PhotoPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC004FA1000000000000010 /* PhotoPickerModifier.swift */; };
+		7FD5933B0BB94049AB1334F8 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE175DA70B2E44199029821D /* CameraPicker.swift */; };
+		989CAEEA46054462AE6DCE98 /* LibraryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9F58E3ADF34D35BC277CD5 /* LibraryPicker.swift */; };
+		258380F2F4DB489F9FD83FA5 /* PhotoPickerPermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAFB3940E734175A054BA5C /* PhotoPickerPermissionService.swift */; };
+		CEF26EBF49C34AA89F1FA90C /* ProfileImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04B3901F064B1893505DB3 /* ProfileImageHelper.swift */; };
+		CC001FB1000000000000001 /* FirebaseDriftsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA1000000000000001 /* FirebaseDriftsService.swift */; };
+		CC001FB2000000000000002 /* FirebaseDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */; };
+		CC001FB3000000000000003 /* FirebaseChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA3000000000000003 /* FirebaseChatService.swift */; };
 		8BE4A1B52FB860B40064EE09 /* DriftContextCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */; };
 		8BE4A1B72FB8ACF50064EE09 /* RadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */; };
 		8BE4A1B92FB8B1620064EE09 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B82FB8B1620064EE09 /* AppColors.swift */; };
+		CC004FA1000000000000010 /* PhotoPickerModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPickerModifier.swift; sourceTree = "<group>"; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
 		8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C75F18AD0A56F05577934A /* PillBadge.swift */; };
 		9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFABF6FCFF8585103471820C /* Color+Extensions.swift */; };
@@ -141,6 +153,10 @@
 		3374CEE52FB732DB0020F28D /* RadarPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RadarPerson.swift; path = Models/RadarPerson.swift; sourceTree = "<group>"; };
 		3374CEE82FB732DB0020F28D /* BookmarkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		3374CEEA2FB732DB0020F28D /* DriftsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DriftsService.swift; sourceTree = "<group>"; };
+		CC001FA1000000000000001 /* FirebaseDriftsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseDriftsService.swift; sourceTree = "<group>"; };
+		CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseDiscoveryService.swift; sourceTree = "<group>"; };
+		CC001FA3000000000000003 /* FirebaseChatService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseChatService.swift; sourceTree = "<group>"; };
+		3374CEF02FB732DB0020F28D /* PermissionsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PermissionsManager.swift; sourceTree = "<group>"; };
 		3387CF302FB495D20084895E /* BetaBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BetaBadge.swift; sourceTree = "<group>"; };
 		338E3B162FB435F40048FC32 /* AppIcons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		338E3B172FB435F40048FC32 /* AppImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
@@ -185,11 +201,11 @@
 		F3D02189DC5247BDA9CFD1A8 /* Outfit-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file.ttf; name = "Outfit-Black.ttf"; path = "Fonts/Outfit-Black.ttf"; sourceTree = "<group>"; };
 		F79EEFE313C630B04AED288E /* AuthViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		FFABF6FCFF8585103471820C /* Color+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		AE175DA70B2E44199029821D /* CameraPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
+		CE9F58E3ADF34D35BC277CD5 /* LibraryPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryPicker.swift; sourceTree = "<group>"; };
+		ADAFB3940E734175A054BA5C /* PhotoPickerPermissionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPickerPermissionService.swift; sourceTree = "<group>"; };
+		AF04B3901F064B1893505DB3 /* ProfileImageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		8BE4A1B32FB837270064EE09 /* New Folder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "New Folder"; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		33CA3A212FB33A3F008EF23C /* Frameworks */ = {
@@ -198,6 +214,8 @@
 			files = (
 				8BAB29A82FBD9005004556D9 /* FirebaseCore in Frameworks */,
 				8BAB29A62FBD9005004556D9 /* FirebaseAuth in Frameworks */,
+				8BAB29AA2FBD9005004556D9 /* FirebaseFirestore in Frameworks */,
+				8BAB29AC2FBD9005004556D9 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +240,9 @@
 			isa = PBXGroup;
 			children = (
 				8B0E67F52FB9CDFD0052E3AA /* Navigation */,
+				AE175DA70B2E44199029821D /* CameraPicker.swift */,
+				CE9F58E3ADF34D35BC277CD5 /* LibraryPicker.swift */,
+				CC004FA1000000000000010 /* PhotoPickerModifier.swift */,
 				8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */,
 				8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */,
 				3374CEBD2FB6E7A50020F28D /* CreateDriftButton.swift */,
@@ -263,6 +284,11 @@
 			isa = PBXGroup;
 			children = (
 				3374CEEA2FB732DB0020F28D /* DriftsService.swift */,
+				CC001FA1000000000000001 /* FirebaseDriftsService.swift */,
+				CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */,
+				CC001FA3000000000000003 /* FirebaseChatService.swift */,
+				ADAFB3940E734175A054BA5C /* PhotoPickerPermissionService.swift */,
+				AF04B3901F064B1893505DB3 /* ProfileImageHelper.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -296,7 +322,6 @@
 				33CA3A2B2FB33A41008EF23C /* Assets.xcassets */,
 				33CA3A322FB33A41008EF23C /* Coffee_Call.xcdatamodeld */,
 				33CA3A2D2FB33A41008EF23C /* Preview Content */,
-				8BE4A1B32FB837270064EE09 /* New Folder */,
 				D5039854887953B93268D7A0 /* Coffee_Call.xcdatamodeld */,
 				854F67326A3D7D34D2066BA2 /* Screens */,
 				147D07BDA2FF4DF23D1993AE /* Components */,
@@ -385,6 +410,7 @@
 			isa = PBXGroup;
 			children = (
 				3374CEE82FB732DB0020F28D /* BookmarkManager.swift */,
+				3374CEF02FB732DB0020F28D /* PermissionsManager.swift */,
 				33192FB02FB7838E00FBBEDE /* NavigationManager.swift */,
 				D0A1B2C3D4E5F60718293A4B /* CreatedDriftStore.swift */,
 				3374CEDF2FB725670020F28D /* CreateDriftViewModel.swift */,
@@ -456,13 +482,12 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				8BE4A1B32FB837270064EE09 /* New Folder */,
-			);
 			name = Coffee_Call;
 			packageProductDependencies = (
 				8BAB29A52FBD9005004556D9 /* FirebaseAuth */,
 				8BAB29A72FBD9005004556D9 /* FirebaseCore */,
+				8BAB29A92FBD9005004556D9 /* FirebaseFirestore */,
+				8BAB29AB2FBD9005004556D9 /* FirebaseStorage */,
 			);
 			productName = Coffee_Call;
 			productReference = 33CA3A242FB33A3F008EF23C /* Coffee_Call.app */;
@@ -587,6 +612,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3374CEE72FB732DB0020F28D /* BookmarkManager.swift in Sources */,
+				3374CEF12FB732DB0020F28D /* PermissionsManager.swift in Sources */,
 				3374CEE92FB732DB0020F28D /* DriftsService.swift in Sources */,
 				23BCC639374942C9BC39CC46 /* CoffeeBottomSheet.swift in Sources */,
 				3374CEC82FB6F86A0020F28D /* ManageDriftScreen.swift in Sources */,
@@ -647,11 +673,18 @@
 				3374CED02FB6FDD90020F28D /* ChatsListScreen.swift in Sources */,
 				A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */,
 				3302E3F52FB475DD0077EAC8 /* ContentView.swift in Sources */,
-				8BE4A1B72FB8ACF50064EE09 /* RadarView.swift in Sources */,
 				43AFA9F88821B7BD1F0D8960 /* MainTabView.swift in Sources */,
 				3302E3F42FB475DD0077EAC8 /* Coffee_CallApp.swift in Sources */,
 				3374CEC42FB6E7A50020F28D /* DriftModeSwitch.swift in Sources */,
 				78E7D14988238765F3DD1D7C /* Activity.swift in Sources */,
+				CC001FB1000000000000001 /* FirebaseDriftsService.swift in Sources */,
+				CC001FB2000000000000002 /* FirebaseDiscoveryService.swift in Sources */,
+				CC001FB3000000000000003 /* FirebaseChatService.swift in Sources */,
+				CC004FB1000000000000010 /* PhotoPickerModifier.swift in Sources */,
+				7FD5933B0BB94049AB1334F8 /* CameraPicker.swift in Sources */,
+				989CAEEA46054462AE6DCE98 /* LibraryPicker.swift in Sources */,
+				258380F2F4DB489F9FD83FA5 /* PhotoPickerPermissionService.swift in Sources */,
+				CEF26EBF49C34AA89F1FA90C /* ProfileImageHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -994,6 +1027,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8BAB29A42FBD9005004556D9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		8BAB29A92FBD9005004556D9 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8BAB29A42FBD9005004556D9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		8BAB29AB2FBD9005004556D9 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8BAB29A42FBD9005004556D9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct ChatMessage: Identifiable, Hashable {
-    let id = UUID()
+    let id: UUID
     let senderId: String
     let senderName: String
     let senderInitials: String
@@ -15,6 +15,7 @@ struct ChatMessage: Identifiable, Hashable {
     let attachmentLocation: String?
     
     init(
+        id: UUID = UUID(),
         senderId: String,
         senderName: String,
         senderInitials: String,
@@ -26,6 +27,7 @@ struct ChatMessage: Identifiable, Hashable {
         attachmentImage: UIImage? = nil,
         attachmentLocation: String? = nil
     ) {
+        self.id = id
         self.senderId = senderId
         self.senderName = senderName
         self.senderInitials = senderInitials

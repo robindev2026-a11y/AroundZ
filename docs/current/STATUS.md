@@ -78,6 +78,13 @@ Temporary launch-path focus: auth-only flow is back as the root entry, while the
 - Registered Outfit fonts in `Info.plist` and successfully programmatically linked them in `project.pbxproj` to automate build packaging.
 - Refactored `Font+Extensions.swift` to use custom Outfit fonts for headers/buttons, and dynamically scalable SF Pro system fonts for body/metadata text.
 - Updated typography standards and scales in `docs/current/DESIGN.md`.
+
+2026-05-20:
+
+- Fixed missing iOS build inputs by wiring photo picker and profile image helper files into `Coffee_Call.xcodeproj`.
+- Updated Firestore calls to match the current Firebase iOS SDK APIs (`whereField(...isGreaterThanOrEqualTo:)`, `getDocument`).
+- Fixed chat thread compilation by making `ChatMessage` accept an explicit `id` and aligning `DriftChatViewModel` with the shared `MessageType`.
+- Verification: `xcodebuild -project apps/frontend/Coffee_Call/Coffee_Call.xcodeproj -scheme Coffee_Call -configuration Debug -destination 'generic/platform=iOS Simulator' -quiet build` (succeeds; warnings remain).
 - Files touched: `Info.plist`, `Font+Extensions.swift`, `DESIGN.md`, `STATUS.md`, `project.pbxproj`.
 - Verification performed: Performed compilation check, verified all resources download and build phases compile.
 - Refactored `AppConstants.swift` to align layout parameters with strict 8pt grid system rules (`sectionSpacing = 24`, `subElementSpacing = 8`, `tooltipRadius = 12`, `sheetHandleTopPadding = 8`, `sheetHandleBottomPadding = 16`, `buttonPaddingVertical = 8`).
