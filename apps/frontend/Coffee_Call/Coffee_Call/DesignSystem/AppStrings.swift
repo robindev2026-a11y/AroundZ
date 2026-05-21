@@ -195,6 +195,10 @@ enum AppStrings {
             static let safetySubtitle = "Meet in public places. No personal contact shared."
             static let coordinationNote = "Exact coordination happens in the Drift chat after joining."
             
+            static func inviteText(title: String, date: String, time: String, location: String) -> String {
+                "Hey! Join me for '\(title)' on \(date) at \(time) at \(location). Let's catch up! Download \(AppStrings.appTitle) to join."
+            }
+            
             enum Location {
                 static let approxTitle = "Approximate Area"
                 static let unlockedSubtitle = "Unlocked after joining"
