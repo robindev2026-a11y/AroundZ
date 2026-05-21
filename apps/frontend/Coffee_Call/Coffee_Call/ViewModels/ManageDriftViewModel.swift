@@ -96,6 +96,7 @@ class ManageDriftViewModel: ObservableObject {
     }
     
     func shareDrift() {
-        // Share sheet
+        let inviteText = "Hey! Join me for '\(drift.title)' on \(drift.date) at \(drift.time) at \(drift.location). Let's catch up! Download CoffeeCall to join."
+        UIApplication.shareText(inviteText)
     }
 }

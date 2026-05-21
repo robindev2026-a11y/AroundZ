@@ -428,6 +428,7 @@ struct CreateDriftSheet: View {
                         dateTimeSection
                         locationCapacitySection
                         joinModeSection
+                        VibeMenuRow(selectedVibe: $viewModel.selectedVibe)
                         optionalDetailsSection
                         privacySection
                     }
@@ -782,8 +783,6 @@ struct CreateDriftSheet: View {
                         focusField: .hook,
                         focusedField: $focusedField
                     )
-
-                    VibeMenuRow(selectedVibe: $viewModel.selectedVibe)
 
                     NotesFieldRow(
                         title: AppStrings.Create.notesTitle,

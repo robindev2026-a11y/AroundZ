@@ -59,7 +59,7 @@ struct DriftCard: View {
             }
             
             // Hook / Offer
-            if let hook = drift.hook {
+            if let hook = drift.hook, !hook.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 HStack(spacing: 8) {
                     AppIcons.giftImage
                         .font(.system(size: AppConstants.Typography.sizeHeadline))
@@ -88,8 +88,8 @@ struct DriftCard: View {
             HStack(spacing: 0) {
                 // Participants (Reduced size)
                 HStack(spacing: -8) {
-                    ForEach(0..<min(drift.participantInitials.count, 3), id: \.self) { index in
-                        Text(drift.participantInitials[index])
+                    ForEach(Array(drift.participantInitials.prefix(3).enumerated()), id: \.offset) { index, initial in
+                        Text(initial)
                             .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
                             .foregroundColor(.white)
                             .frame(width: 28, height: 28)

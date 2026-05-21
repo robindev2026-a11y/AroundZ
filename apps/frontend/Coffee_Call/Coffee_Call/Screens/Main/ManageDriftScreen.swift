@@ -218,8 +218,8 @@ struct ManageDriftScreen: View {
             }
             
             HStack(spacing: -10) {
-                ForEach(0..<min(viewModel.drift.participantInitials.count, 5), id: \.self) { index in
-                    Text(viewModel.drift.participantInitials[index])
+                ForEach(Array(viewModel.drift.participantInitials.prefix(5).enumerated()), id: \.offset) { index, initial in
+                    Text(initial)
                         .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
                         .foregroundColor(.white)
                         .frame(width: 40, height: 40)
@@ -256,7 +256,7 @@ struct ManageDriftScreen: View {
     
     // MARK: - Open Chat Button
     private var openChatButton: some View {
-        NavigationLink(destination: DriftChatScreen(viewModel: DriftChatViewModel(drift: viewModel.drift))) {
+        NavigationLink(destination: LazyView(DriftChatScreen(viewModel: DriftChatViewModel(drift: viewModel.drift)))) {
             HStack(spacing: AppConstants.Layout.elementSpacing) {
                 ZStack {
                     Circle()

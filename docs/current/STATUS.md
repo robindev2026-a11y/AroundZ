@@ -113,6 +113,16 @@ Connected the onboarding authentication flow to the main application flow, makin
 
 2026-05-21:
 
+- Implemented Drift Edit, Share, Vibe compose field relocation, conditional hook container, and Lazy Navigation crash fix:
+  - **Relocated Vibe selector**: Moved the vibe selection menu row out of the optional details section to the main scroll view body of the creation sheet in `CreateDriftButton.swift`, placing it directly below `joinModeSection` and above `optionalDetailsSection` so it is always visible and required per the approved spec.
+  - **Implemented lazy navigation wrapper to prevent eager evaluation crashes**: Created a `LazyView` helper inside `Navigation+Extensions.swift` that wraps destination views using `@autoclosure` to defer view and ViewModel initialization. Integrated `LazyView` on all eager navigation links in `DriftDetailScreen.swift` and `ManageDriftScreen.swift` (including `ManageDriftScreen` and `DriftChatScreen` transitions) to prevent SwiftUI state desyncs/crashes when the parent screen dynamically redraws.
+  - **Added native share sheets**: Added a native `shareText(_:)` helper to `UIApplication` in `Navigation+Extensions.swift` utilizing `UIActivityViewController` with iPad popover compatibility. Integrated share action flows inside `DriftDetailViewModel.swift` and `ManageDriftViewModel.swift` to format dynamic invitation text and trigger the share sheets.
+  - **Hided empty hook badges**: Updated `DriftCard.swift` to evaluate hook strings for whitespaces/emptiness, completely hiding the gift icon and badge if no hook is added.
+  - **Fixed index range loops**: Converted raw integer range loops (`ForEach(0..<count)`) inside `DriftCard.swift`, `DriftDetailScreen.swift`, and `ManageDriftScreen.swift` to enumerated loops (`ForEach(Array(elements.enumerated()), id: \.offset)`) to eliminate dynamic out-of-bounds array crashes.
+- Files touched: `CreateDriftButton.swift`, `DriftCard.swift`, `Navigation+Extensions.swift`, `DriftDetailScreen.swift`, `ManageDriftScreen.swift`, `DriftDetailViewModel.swift`, `ManageDriftViewModel.swift`, `STATUS.md`.
+- Verification performed: Verified code and view architectures meet SwiftUI composability principles and apple HIG guidelines. The user validates all builds manually per non-negotiable instruction.
+- Remaining gaps: None.
+
 - Completed full mock data decoupling phase 2:
   - Modified `Drift.swift` (Host initializer checks if Firebase is enabled at runtime and defaults trust metrics/lists to empty/zero).
   - Modified `ProfileViewModel.swift` and `AuthViewModel.swift` to check if cached local name is `"Arjun R."` under Firebase, and if so clear all mock keys to prevent credentials leak.

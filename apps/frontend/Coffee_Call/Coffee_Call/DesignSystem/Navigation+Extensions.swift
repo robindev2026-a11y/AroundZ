@@ -16,3 +16,42 @@ extension UINavigationController: UIGestureRecognizerDelegate {
         return viewControllers.count > 1
     }
 }
+
+// MARK: - Native Share Sheet Helper
+extension UIApplication {
+    static func shareText(_ text: String) {
+        guard let windowScene = shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene ?? shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+            return
+        }
+        
+        var topVC = rootVC
+        while let presented = topVC.presentedViewController {
+            topVC = presented
+        }
+        
+        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = topVC.view
+            popover.sourceRect = CGRect(x: topVC.view.bounds.midX, y: topVC.view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        
+        topVC.present(activityVC, animated: true)
+    }
+}
+
+// MARK: - Lazy Navigation Wrapper
+struct LazyView<Content: View>: View {
+    private let build: () -> Content
+    
+    init(_ build: @autoclosure @escaping () -> Content) {
+        self.build = build
+    }
+    
+    var body: Content {
+        build()
+    }
+}
+

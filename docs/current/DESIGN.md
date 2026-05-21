@@ -438,9 +438,9 @@ Target iPhone planning size: 393 x 852pt.
 - Join mode:
   - Anyone can join
   - Approve requests
+- Vibe (Required, always visible below Join Mode)
 - Optional details:
   - Hook
-  - Vibe
   - Notes
 - Primary CTA:
   - `Post Drift`

@@ -360,7 +360,8 @@ class DriftDetailViewModel: ObservableObject {
     }
     
     func shareDrift() {
-        print("Sharing drift...")
+        let inviteText = "Hey! Join me for '\(drift.title)' on \(drift.date) at \(drift.time) at \(drift.location). Let's catch up! Download CoffeeCall to join."
+        UIApplication.shareText(inviteText)
     }
     
     func setReminder() {

@@ -313,8 +313,8 @@ struct DriftDetailScreen: View {
                     // MARK: - Open State
                     HStack(spacing: AppConstants.Layout.elementSpacing) {
                         HStack(spacing: -(AppConstants.Layout.elementSpacing)) {
-                            ForEach(0..<min(viewModel.drift.participantInitials.count, 3), id: \.self) { index in
-                                Text(viewModel.drift.participantInitials[index])
+                            ForEach(Array(viewModel.drift.participantInitials.prefix(3).enumerated()), id: \.offset) { index, initial in
+                                Text(initial)
                                     .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
                                     .foregroundColor(.white)
                                     .frame(width: AppConstants.Layout.mapGridStep, height: AppConstants.Layout.mapGridStep)
@@ -467,8 +467,13 @@ struct DriftDetailScreen: View {
             Divider().opacity(0.1)
             
             HStack {
-                if viewModel.joinStatus == .joined {
-                    NavigationLink(destination: DriftChatScreen(viewModel: DriftChatViewModel(drift: viewModel.drift))) {
+                if viewModel.drift.isMine {
+                    NavigationLink(destination: LazyView(ManageDriftScreen(viewModel: ManageDriftViewModel(drift: viewModel.drift)))) {
+                        manageButtonContent
+                    }
+                    .buttonStyle(.plain)
+                } else if viewModel.joinStatus == .joined {
+                    NavigationLink(destination: LazyView(DriftChatScreen(viewModel: DriftChatViewModel(drift: viewModel.drift)))) {
                         ctaButtonContent
                     }
                     .buttonStyle(.plain)
@@ -490,6 +495,40 @@ struct DriftDetailScreen: View {
                 .fill(.ultraThinMaterial)
                 .ignoresSafeArea(edges: .bottom)
         )
+    }
+    
+    private var manageButtonContent: some View {
+        HStack(spacing: AppConstants.Layout.elementSpacing) {
+            Circle()
+                .fill(Color.white.opacity(AppConstants.UI.opacityLight))
+                .frame(width: AppConstants.Layout.avatarSizeLarge, height: AppConstants.Layout.avatarSizeLarge)
+                .overlay(
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
+                        .foregroundColor(.white)
+                )
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(AppStrings.Manage.title)
+                    .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
+                Text("Manage your drift & guest requests")
+                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
+                    .opacity(0.9)
+            }
+            .foregroundColor(.white)
+            
+            Spacer()
+            
+            AppIcons.chevronRightImage
+                .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
+                .foregroundColor(.white.opacity(0.6))
+        }
+        .padding(.horizontal, AppConstants.Layout.buttonPaddingHorizontal)
+        .frame(maxWidth: .infinity)
+        .frame(height: 80)
+        .background(Color.brandPurple)
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+        .shadow(color: Color.brandPurple.opacity(AppConstants.UI.opacityMuted), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
     }
     
     private var ctaButtonContent: some View {
@@ -704,8 +743,8 @@ struct HostContextCardSheet: View {
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: AppConstants.Layout.elementSpacing) {
-                                ForEach(0..<host.pastDrifts.count, id: \.self) { index in
-                                    pastCompletedCard(title: host.pastDrifts[index], index: index)
+                                ForEach(Array(host.pastDrifts.enumerated()), id: \.offset) { index, pastDrift in
+                                    pastCompletedCard(title: pastDrift, index: index)
                                 }
                             }
                             .padding(.vertical, 2)
