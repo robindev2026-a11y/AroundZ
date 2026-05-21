@@ -117,13 +117,13 @@ struct Host: Identifiable, Hashable, Codable {
         role: String,
         imageUrl: String?,
         isVerified: Bool,
-        hostedCount: Int = 4,
-        joinedCount: Int = 12,
-        completedCount: Int = 16,
-        verified: Bool = true,
+        hostedCount: Int? = nil,
+        joinedCount: Int? = nil,
+        completedCount: Int? = nil,
+        verified: Bool? = nil,
         otherActiveDrifts: [Drift] = [],
-        pastDrifts: [String] = ["Walk in Indiranagar", "Coffee chat"],
-        interests: [String] = ["Walks", "Coffee", "Movies"],
+        pastDrifts: [String]? = nil,
+        interests: [String]? = nil,
         firestoreUID: String = ""
     ) {
         self.id = id
@@ -131,13 +131,16 @@ struct Host: Identifiable, Hashable, Codable {
         self.role = role
         self.imageUrl = imageUrl
         self.isVerified = isVerified
-        self.hostedCount = hostedCount
-        self.joinedCount = joinedCount
-        self.completedCount = completedCount
-        self.verified = verified
+        
+        let isFirebase = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        
+        self.hostedCount = hostedCount ?? (isFirebase ? 0 : 4)
+        self.joinedCount = joinedCount ?? (isFirebase ? 0 : 12)
+        self.completedCount = completedCount ?? (isFirebase ? 0 : 16)
+        self.verified = verified ?? (isFirebase ? false : true)
         self.otherActiveDrifts = otherActiveDrifts
-        self.pastDrifts = pastDrifts
-        self.interests = interests
+        self.pastDrifts = pastDrifts ?? (isFirebase ? [] : ["Walk in Indiranagar", "Coffee chat"])
+        self.interests = interests ?? (isFirebase ? [] : ["Walks", "Coffee", "Movies"])
         self.firestoreUID = firestoreUID
     }
     

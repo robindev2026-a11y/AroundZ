@@ -40,6 +40,19 @@ class AuthViewModel: ObservableObject {
                 self.isAuthenticated = true
                 UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
             }
+
+            // Clear mock profile keys if present under Firebase mode
+            if UserDefaults.standard.string(forKey: "profile_name") == AppConstants.MockData.userName {
+                UserDefaults.standard.removeObject(forKey: "profile_name")
+                UserDefaults.standard.removeObject(forKey: "profile_bio")
+                UserDefaults.standard.removeObject(forKey: "profile_initials")
+                UserDefaults.standard.removeObject(forKey: "profile_location")
+                UserDefaults.standard.removeObject(forKey: "profile_availability_weekday_evenings")
+                UserDefaults.standard.removeObject(forKey: "profile_availability_weekends")
+                UserDefaults.standard.removeObject(forKey: "profile_availability_daytime")
+                UserDefaults.standard.removeObject(forKey: "profile_interests")
+                ProfileImageHelper.clearProfileImage()
+            }
         } else {
             // Offline / preview mock mode — fall back to local flag only.
             if UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
@@ -204,6 +217,11 @@ class AuthViewModel: ObservableObject {
             ProfileImageHelper.saveProfileImage(image)
         }
 
+        // Cache name and initials locally in UserDefaults immediately
+        let computedInitials = self.computeInitials(name: name)
+        UserDefaults.standard.set(name, forKey: "profile_name")
+        UserDefaults.standard.set(computedInitials, forKey: "profile_initials")
+
         if isFirebaseEnabled {
             guard let currentUid = Auth.auth().currentUser?.uid else {
                 isLoading = false
@@ -256,6 +274,15 @@ class AuthViewModel: ObservableObject {
         // Reset so ContentView routes to PhoneAuthScreen, not OnboardingScreen.
         // hasLaunchedBefore stays true — the slides are shown exactly once per install.
         isFirstLaunch = false
+    }
+
+    private func computeInitials(name: String) -> String {
+        let parts = name.components(separatedBy: " ").filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        guard let firstLetter = parts.first?.first else { return "U" }
+        if parts.count > 1, let lastLetter = parts.last?.first {
+            return "\(firstLetter)\(lastLetter)".uppercased()
+        }
+        return String(firstLetter).uppercased()
     }
 
     func clearError() {

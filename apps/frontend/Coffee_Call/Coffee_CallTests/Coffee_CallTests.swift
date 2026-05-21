@@ -386,4 +386,22 @@ final class Coffee_CallTests: XCTestCase {
         BookmarkManager.shared.loadBookmarks()
         XCTAssertEqual(BookmarkManager.shared.savedDrifts.count, 0)
     }
+
+    func testFirebaseChatServiceDeploysNoMocks() throws {
+        let service = FirebaseChatService()
+        let isFirebase = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        
+        let chats = service.getChats()
+        let threadContext = service.loadThread(for: makeDrift())
+        
+        if isFirebase {
+            XCTAssertTrue(chats.isEmpty)
+            XCTAssertTrue(threadContext.messages.isEmpty)
+            XCTAssertTrue(threadContext.systemMessages.isEmpty)
+            XCTAssertTrue(threadContext.participants.isEmpty)
+        } else {
+            XCTAssertFalse(chats.isEmpty)
+            XCTAssertFalse(threadContext.messages.isEmpty)
+        }
+    }
 }

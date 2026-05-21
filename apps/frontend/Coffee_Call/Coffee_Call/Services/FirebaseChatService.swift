@@ -129,13 +129,15 @@ class FirebaseChatService: ChatServiceProtocol, DriftChatThreadServiceProtocol {
         guard isFirebaseEnabled else {
             return MockChatService().getChats()
         }
-        return cachedChats.isEmpty ? MockChatService().getChats() : cachedChats
+        return cachedChats
     }
     
     // Conforming to DriftChatThreadServiceProtocol
     func loadThread(for drift: Drift) -> DriftChatThreadContext {
         // Real-time messages are handled dynamically via real-time listeners inside the view model.
-        // We load static mocks as a placeholder/starting state.
-        return MockDriftChatThreadService().loadThread(for: drift)
+        guard isFirebaseEnabled else {
+            return MockDriftChatThreadService().loadThread(for: drift)
+        }
+        return DriftChatThreadContext(systemMessages: [], messages: [], participants: [])
     }
 }

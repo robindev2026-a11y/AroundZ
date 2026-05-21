@@ -113,6 +113,25 @@ Connected the onboarding authentication flow to the main application flow, makin
 
 2026-05-21:
 
+- Completed full mock data decoupling phase 2:
+  - Modified `Drift.swift` (Host initializer checks if Firebase is enabled at runtime and defaults trust metrics/lists to empty/zero).
+  - Modified `ProfileViewModel.swift` and `AuthViewModel.swift` to check if cached local name is `"Arjun R."` under Firebase, and if so clear all mock keys to prevent credentials leak.
+  - Modified `AuthViewModel.saveProfile()` to compute initials and cache the onboarding user profile immediately to prevent visual race conditions.
+  - Modified `DiscoveryScreen.swift` to set notification badge count to `0` and disable/hide the hardcoded dropdown overlay if Firebase is active.
+- Files touched: `Drift.swift`, `ProfileViewModel.swift`, `AuthViewModel.swift`, `DiscoveryScreen.swift`, `STATUS.md`.
+- Verification performed: Checked code changes against composing patterns and HIG requirements. User validates all builds manually.
+- Remaining gaps: None.
+
+- Decoupled mock data fallbacks in chats, radar/discovery, profile, and drift creation under Firebase mode:
+  - Modified `FirebaseDiscoveryService.swift` to return category elements with counts initialized to `0` and direct empty radar results under Firebase instead of mock fallbacks.
+  - Modified `ProfileViewModel.swift` to initialize profile variables (`name`, `bio`, `initials`, `location`) and statistics to empty values, querying Firestore for history and counts only.
+  - Modified `FirebaseChatService.swift` to prevent fallback to `MockChatService` in `getChats()` and return an empty `DriftChatThreadContext` in `loadThread(for:)` when Firebase is active.
+  - Modified `CreateDriftButton.swift` to dynamically pull the creator's name, initials, and UID from UserDefaults and FirebaseAuth during drift creation, constructing host metadata with empty arrays and zeroed trust stats.
+  - Updated unit tests inside `Coffee_CallTests.swift` to verify Firebase-active chat service decoupling properties.
+- Files touched: `FirebaseDiscoveryService.swift`, `ProfileViewModel.swift`, `FirebaseChatService.swift`, `CreateDriftButton.swift`, `Coffee_CallTests.swift`, `STATUS.md`.
+- Verification performed: Verified layout logic and service implementations. The user validates all builds manually per rules.
+- Remaining gaps: None.
+
 - Integrated full Firestore CRUD operations and offline mock fallbacks:
   - Updated `Drift.swift` and `JoinRequest` to support mutable statuses, participant counts, and participant user ID mappings.
   - Expanded `DriftsServiceProtocol` and updated `MockDriftsService` to provide stateful, static in-memory CRUD operations for previews.

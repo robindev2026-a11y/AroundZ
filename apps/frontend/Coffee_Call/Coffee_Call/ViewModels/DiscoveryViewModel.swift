@@ -4,9 +4,12 @@ import Combine
 protocol DiscoveryServiceProtocol {
     func fetchInterestCategories() -> [InterestCategory]
     func fetchRadarPeople() -> [RadarPerson]
+    var onUpdate: (() -> Void)? { get set }
 }
 
 class MockDiscoveryService: DiscoveryServiceProtocol {
+    var onUpdate: (() -> Void)? = nil
+    
     func fetchInterestCategories() -> [InterestCategory] {
         [
             InterestCategory(id: "Coffee", label: AppStrings.Discovery.Categories.coffee, icon: AppIcons.coffee, count: 3, color: .brandPrimary),
@@ -36,7 +39,7 @@ class DiscoveryViewModel: ObservableObject {
     @Published var radarPeople: [RadarPerson] = []
     @Published var isScanning: Bool = false
     
-    private let service: DiscoveryServiceProtocol
+    private var service: DiscoveryServiceProtocol
     
     // Header Strings (Using AppStrings)
     let title = AppStrings.Discovery.title
@@ -53,6 +56,11 @@ class DiscoveryViewModel: ObservableObject {
         } else {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
             self.service = isFirebaseEnabled ? FirebaseDiscoveryService() : MockDiscoveryService()
+        }
+        self.service.onUpdate = { [weak self] in
+            DispatchQueue.main.async {
+                self?.loadData()
+            }
         }
         loadData()
     }

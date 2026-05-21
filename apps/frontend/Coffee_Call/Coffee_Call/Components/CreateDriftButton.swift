@@ -1,5 +1,7 @@
 import SwiftUI
 import Combine
+import FirebaseCore
+import FirebaseAuth
 
 final class CreateDriftViewModel: ObservableObject {
     enum ActivityType: String, CaseIterable, Identifiable {
@@ -296,11 +298,26 @@ final class CreateDriftViewModel: ObservableObject {
     func buildDrift() -> Drift {
         let capacityValue = isOpenToAllCapacity ? 50 : selectedCapacityCount
         let vibeTags = selectedVibe.map { [$0.title] } ?? []
+        
+        let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        
+        let creatorName = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_name") ?? "") : AppConstants.MockData.userName
+        let creatorInitials = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_initials") ?? "") : AppConstants.MockData.userInitials
+        let creatorUid = isFirebaseEnabled ? (Auth.auth().currentUser?.uid ?? "") : ""
+        
         let host = Host(
-            name: AppConstants.MockData.userName,
+            name: creatorName,
             role: AppStrings.Create.hostRole,
             imageUrl: nil,
-            isVerified: true
+            isVerified: true,
+            hostedCount: isFirebaseEnabled ? 0 : 4,
+            joinedCount: isFirebaseEnabled ? 0 : 12,
+            completedCount: isFirebaseEnabled ? 0 : 16,
+            verified: true,
+            otherActiveDrifts: [],
+            pastDrifts: isFirebaseEnabled ? [] : ["Walk in Indiranagar", "Coffee chat"],
+            interests: isFirebaseEnabled ? [] : ["Walks", "Coffee", "Movies"],
+            firestoreUID: creatorUid
         )
 
         return Drift(
@@ -322,7 +339,7 @@ final class CreateDriftViewModel: ObservableObject {
             vibeTags: vibeTags,
             whatToBring: [],
             notes: cleanedText(notesText),
-            participantInitials: [AppConstants.MockData.userInitials],
+            participantInitials: [creatorInitials],
             imageUrl: nil,
             isMine: true
         )

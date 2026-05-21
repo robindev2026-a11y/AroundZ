@@ -12,19 +12,19 @@ class ProfileViewModel: ObservableObject {
     @Published var showingSettingsSheet = false
     
     // MARK: - Persisted Fields with didSet Observers (CRUD: Update)
-    @Published var name: String = AppConstants.MockData.userName {
+    @Published var name: String = "" {
         didSet {
             UserDefaults.standard.set(name, forKey: "profile_name")
             if isLoaded { syncProfileToFirebase() }
         }
     }
-    @Published var bio: String = AppConstants.MockData.userBio {
+    @Published var bio: String = "" {
         didSet {
             UserDefaults.standard.set(bio, forKey: "profile_bio")
             if isLoaded { syncProfileToFirebase() }
         }
     }
-    @Published var initials: String = AppConstants.MockData.userInitials {
+    @Published var initials: String = "U" {
         didSet {
             UserDefaults.standard.set(initials, forKey: "profile_initials")
             if isLoaded { syncProfileToFirebase() }
@@ -32,7 +32,7 @@ class ProfileViewModel: ObservableObject {
     }
     @Published var profileImage: UIImage? = nil
     
-    @Published var location: String = "Bengaluru, India" {
+    @Published var location: String = "" {
         didSet {
             UserDefaults.standard.set(location, forKey: "profile_location")
             if isLoaded { syncProfileToFirebase() }
@@ -67,11 +67,11 @@ class ProfileViewModel: ObservableObject {
     }
     
     // Stats & History
-    @Published var driftsJoined: Int = 24
-    @Published var driftsHosted: Int = 8
-    @Published var noShowsCount: Int = 4
+    @Published var driftsJoined: Int = 0
+    @Published var driftsHosted: Int = 0
+    @Published var noShowsCount: Int = 0
     @Published var score: String = "Coming soon"
-    @Published var pastDriftsCount: Int = 16
+    @Published var pastDriftsCount: Int = 0
     @Published var historyDrifts: [Drift] = []
     @Published var selectedHistoryTab: Int = 0
     @Published var savedDrifts: [Drift] = []
@@ -98,7 +98,15 @@ class ProfileViewModel: ObservableObject {
     // MARK: - Initializer (CRUD: Read)
     init() {
         loadPersistedData()
-        loadMockHistory()
+        if !isFirebaseEnabled {
+            loadMockHistory()
+            driftsJoined = 24
+            driftsHosted = 8
+            noShowsCount = 4
+            pastDriftsCount = 16
+        } else {
+            loadRealHistory()
+        }
         setupBookmarkSubscription()
         self.isLoaded = true
     }
@@ -111,19 +119,41 @@ class ProfileViewModel: ObservableObject {
     }
     
     func loadPersistedData() {
+        let isFirebase = isFirebaseEnabled
+        
+        if isFirebase {
+            if UserDefaults.standard.string(forKey: "profile_name") == AppConstants.MockData.userName {
+                UserDefaults.standard.removeObject(forKey: "profile_name")
+                UserDefaults.standard.removeObject(forKey: "profile_bio")
+                UserDefaults.standard.removeObject(forKey: "profile_initials")
+                UserDefaults.standard.removeObject(forKey: "profile_location")
+                UserDefaults.standard.removeObject(forKey: "profile_availability_weekday_evenings")
+                UserDefaults.standard.removeObject(forKey: "profile_availability_weekends")
+                UserDefaults.standard.removeObject(forKey: "profile_availability_daytime")
+                UserDefaults.standard.removeObject(forKey: "profile_interests")
+                ProfileImageHelper.clearProfileImage()
+            }
+        }
+        
         if let savedName = UserDefaults.standard.string(forKey: "profile_name") {
             self.name = savedName
+        } else {
+            self.name = isFirebase ? "" : AppConstants.MockData.userName
         }
         if let savedBio = UserDefaults.standard.string(forKey: "profile_bio") {
             self.bio = savedBio
+        } else {
+            self.bio = isFirebase ? "" : AppConstants.MockData.userBio
         }
         if let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") {
             self.initials = savedInitials
         } else {
-            self.initials = computeInitials(name: self.name)
+            self.initials = isFirebase ? "U" : AppConstants.MockData.userInitials
         }
         if let savedLocation = UserDefaults.standard.string(forKey: "profile_location") {
             self.location = savedLocation
+        } else {
+            self.location = isFirebase ? "" : "Bengaluru, India"
         }
         
         if UserDefaults.standard.object(forKey: "profile_availability_weekday_evenings") != nil {
@@ -138,6 +168,8 @@ class ProfileViewModel: ObservableObject {
         
         if let savedInterests = UserDefaults.standard.stringArray(forKey: "profile_interests") {
             self.interests = savedInterests.compactMap { DriftCategory(rawValue: $0) }
+        } else {
+            self.interests = isFirebase ? [] : [.coffee, .walk, .food, .movie, .study]
         }
 
         // Load profile photo from disk
@@ -183,6 +215,11 @@ class ProfileViewModel: ObservableObject {
                     if let name = data["name"] as? String {
                         self.name = name
                         UserDefaults.standard.set(name, forKey: "profile_name")
+                        if data["initials"] == nil {
+                            let computed = self.computeInitials(name: name)
+                            self.initials = computed
+                            UserDefaults.standard.set(computed, forKey: "profile_initials")
+                        }
                     }
                     if let bio = data["bio"] as? String {
                         self.bio = bio
@@ -242,6 +279,161 @@ class ProfileViewModel: ObservableObject {
         ]
     }
     
+    func loadRealHistory() {
+        guard isFirebaseEnabled, let uid = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        
+        // 1. Query hosted drifts: posts where creatorId == uid
+        db.collection("posts")
+            .whereField("creatorId", isEqualTo: uid)
+            .addSnapshotListener { [weak self] querySnapshot, error in
+                guard let self = self, let documents = querySnapshot?.documents else { return }
+                DispatchQueue.main.async {
+                    self.driftsHosted = documents.count
+                    self.updatePastDriftsCount()
+                }
+            }
+            
+        // 2. Query all message threads where participants contains uid
+        db.collection("messageThreads")
+            .whereField("participants", arrayContains: uid)
+            .addSnapshotListener { [weak self] querySnapshot, error in
+                guard let self = self, let documents = querySnapshot?.documents else { return }
+                
+                let threadIds = documents.map { $0.documentID }
+                if threadIds.isEmpty {
+                    DispatchQueue.main.async {
+                        self.historyDrifts = []
+                        self.driftsJoined = 0
+                        self.updatePastDriftsCount()
+                    }
+                    return
+                }
+                
+                let group = DispatchGroup()
+                var fetchedDrifts: [Drift] = []
+                
+                for threadId in threadIds {
+                    group.enter()
+                    db.collection("posts").document(threadId).getDocument { document, error in
+                        defer { group.leave() }
+                        if let document = document, document.exists, let drift = self.parseDrift(document) {
+                            fetchedDrifts.append(drift)
+                        }
+                    }
+                }
+                
+                group.notify(queue: .main) {
+                    self.historyDrifts = fetchedDrifts.sorted(by: { $0.date > $1.date })
+                    self.driftsJoined = fetchedDrifts.filter { !$0.isMine }.count
+                    self.updatePastDriftsCount()
+                }
+            }
+    }
+    
+    private func updatePastDriftsCount() {
+        self.pastDriftsCount = self.driftsHosted + self.driftsJoined
+    }
+    
+    private func parseDrift(_ doc: DocumentSnapshot) -> Drift? {
+        guard let data = doc.data() else { return nil }
+        
+        let id = UUID.fromString(doc.documentID)
+        let title = data["title"] as? String ?? ""
+        let description = data["description"] as? String ?? ""
+        let location = data["location"] as? String ?? ""
+        let meetingPoint = data["meetingPoint"] as? String ?? ""
+        let time = data["time"] as? String ?? ""
+        let endTime = data["endTime"] as? String ?? ""
+        let date = data["date"] as? String ?? ""
+        let distance = data["distance"] as? Double ?? 1.2
+        
+        let statusStr = data["status"] as? String ?? "OPEN"
+        let status: DriftStatus
+        switch statusStr.uppercased() {
+        case "OPEN": status = .open
+        case "STARTING SOON": status = .startingSoon
+        case "TONIGHT": status = .tonight
+        case "ENDED": status = .ended
+        default: status = .open
+        }
+        
+        let categoryStr = data["category"] as? String ?? "coffee"
+        let category = DriftCategory(rawValue: categoryStr.lowercased()) ?? .coffee
+        let hook = data["hook"] as? String
+        
+        let creatorId = data["creatorId"] as? String ?? ""
+        let hostName = data["creatorName"] as? String ?? "Host"
+        
+        let host = Host(
+            id: UUID.fromString(creatorId),
+            name: hostName,
+            role: "Host",
+            imageUrl: data["creatorImageUrl"] as? String,
+            isVerified: data["creatorVerified"] as? Bool ?? false,
+            firestoreUID: creatorId
+        )
+        
+        let peopleGoing = data["participantCount"] as? Int ?? 1
+        let capacity = data["capacity"] as? Int ?? 5
+        let spotsLeft = data["spotsLeft"] as? Int ?? (capacity - peopleGoing)
+        
+        let vibeTags = data["vibeTags"] as? [String] ?? []
+        let whatToBring = data["whatToBring"] as? [String] ?? []
+        let participantInitials = data["participantInitials"] as? [String] ?? []
+        let imageUrl = data["imageUrl"] as? String
+        let pendingRequestsData = data["pendingRequests"] as? [[String: Any]] ?? []
+        let pendingRequests = pendingRequestsData.compactMap { reqDict -> JoinRequest? in
+            guard let idStr = reqDict["id"] as? String,
+                  let id = UUID(uuidString: idStr),
+                  let userName = reqDict["userName"] as? String,
+                  let userInitials = reqDict["userInitials"] as? String,
+                  let userRole = reqDict["userRole"] as? String,
+                  let message = reqDict["message"] as? String,
+                  let timestamp = reqDict["timestamp"] as? String else {
+                return nil
+            }
+            let userId = reqDict["userId"] as? String ?? ""
+            return JoinRequest(
+                id: id,
+                userId: userId,
+                userName: userName,
+                userInitials: userInitials,
+                userRole: userRole,
+                message: message,
+                timestamp: timestamp
+            )
+        }
+        
+        let currentUid = Auth.auth().currentUser?.uid
+        let isMine = (creatorId == currentUid)
+        
+        return Drift(
+            id: id,
+            title: title,
+            description: description,
+            location: location,
+            meetingPoint: meetingPoint,
+            time: time,
+            endTime: endTime,
+            date: date,
+            distance: distance,
+            status: status,
+            category: category,
+            hook: hook,
+            host: host,
+            peopleGoing: peopleGoing,
+            spotsLeft: spotsLeft,
+            capacity: capacity,
+            vibeTags: vibeTags,
+            whatToBring: whatToBring,
+            participantInitials: participantInitials,
+            imageUrl: imageUrl,
+            pendingRequests: pendingRequests,
+            isMine: isMine
+        )
+    }
+    
     // MARK: - Save Profile (CRUD: Update)
     func updateProfile(name: String, bio: String, image: UIImage? = nil) {
         self.name = name
@@ -278,11 +470,21 @@ class ProfileViewModel: ObservableObject {
             self.bio = ""
             self.initials = ""
             self.location = ""
+            self.driftsJoined = 0
+            self.driftsHosted = 0
+            self.noShowsCount = 0
+            self.pastDriftsCount = 0
+            self.historyDrifts = []
         } else {
             self.name = AppConstants.MockData.userName
             self.bio = AppConstants.MockData.userBio
             self.initials = AppConstants.MockData.userInitials
             self.location = "Bengaluru, India"
+            self.driftsJoined = 24
+            self.driftsHosted = 8
+            self.noShowsCount = 4
+            self.pastDriftsCount = 16
+            loadMockHistory()
         }
         self.availabilityWeekdayEvenings = true
         self.availabilityWeekends = true

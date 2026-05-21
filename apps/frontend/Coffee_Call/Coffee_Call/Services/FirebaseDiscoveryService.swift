@@ -12,6 +12,8 @@ class FirebaseDiscoveryService: DiscoveryServiceProtocol {
     private var cachedPeople: [RadarPerson] = []
     private var cachedCategories: [InterestCategory] = []
     
+    var onUpdate: (() -> Void)?
+    
     init() {
         if isFirebaseEnabled {
             setupListeners()
@@ -72,15 +74,19 @@ class FirebaseDiscoveryService: DiscoveryServiceProtocol {
                 
                 // Update interest category counts based on active nearby users
                 self.cachedCategories = [
-                    InterestCategory(id: "Coffee", label: AppStrings.Discovery.Categories.coffee, icon: AppIcons.coffee, count: interestCounts["Coffee"] ?? 1, color: .brandPrimary),
-                    InterestCategory(id: "Walks",  label: AppStrings.Discovery.Categories.walks,  icon: AppIcons.walk,   count: interestCounts["Walks"] ?? 2, color: .brandPrimary),
-                    InterestCategory(id: "Movies", label: AppStrings.Discovery.Categories.movies, icon: AppIcons.movie,  count: interestCounts["Movies"] ?? 1, color: .brandPurple),
-                    InterestCategory(id: "Food",   label: AppStrings.Discovery.Categories.food,   icon: AppIcons.food,   count: interestCounts["Food"] ?? 3, color: .brandSecondary),
-                    InterestCategory(id: "Music",  label: AppStrings.Discovery.Categories.music,  icon: "music.note",    count: interestCounts["Music"] ?? 1, color: .brandSecondary),
-                    InterestCategory(id: "Gaming", label: AppStrings.Discovery.Categories.gaming, icon: AppIcons.games,   count: interestCounts["Gaming"] ?? 1, color: .brandSecondary),
-                    InterestCategory(id: "Books",  label: "Books",                                icon: "book",          count: interestCounts["Books"] ?? 1, color: .brandPrimary),
-                    InterestCategory(id: "Workout",label: "Workout",                               icon: "dumbbell.fill", count: interestCounts["Workout"] ?? 2, color: .brandPurple)
+                    InterestCategory(id: "Coffee", label: AppStrings.Discovery.Categories.coffee, icon: AppIcons.coffee, count: interestCounts["Coffee"] ?? 0, color: .brandPrimary),
+                    InterestCategory(id: "Walks",  label: AppStrings.Discovery.Categories.walks,  icon: AppIcons.walk,   count: interestCounts["Walks"] ?? 0, color: .brandPrimary),
+                    InterestCategory(id: "Movies", label: AppStrings.Discovery.Categories.movies, icon: AppIcons.movie,  count: interestCounts["Movies"] ?? 0, color: .brandPurple),
+                    InterestCategory(id: "Food",   label: AppStrings.Discovery.Categories.food,   icon: AppIcons.food,   count: interestCounts["Food"] ?? 0, color: .brandSecondary),
+                    InterestCategory(id: "Music",  label: AppStrings.Discovery.Categories.music,  icon: "music.note",    count: interestCounts["Music"] ?? 0, color: .brandSecondary),
+                    InterestCategory(id: "Gaming", label: AppStrings.Discovery.Categories.gaming, icon: AppIcons.games,   count: interestCounts["Gaming"] ?? 0, color: .brandSecondary),
+                    InterestCategory(id: "Books",  label: "Books",                                icon: "book",          count: interestCounts["Books"] ?? 0, color: .brandPrimary),
+                    InterestCategory(id: "Workout",label: "Workout",                               icon: "dumbbell.fill", count: interestCounts["Workout"] ?? 0, color: .brandPurple)
                 ]
+                
+                DispatchQueue.main.async {
+                    self.onUpdate?()
+                }
             }
     }
     
@@ -88,14 +94,23 @@ class FirebaseDiscoveryService: DiscoveryServiceProtocol {
         guard isFirebaseEnabled else {
             return MockDiscoveryService().fetchInterestCategories()
         }
-        return cachedCategories.isEmpty ? MockDiscoveryService().fetchInterestCategories() : cachedCategories
+        return cachedCategories.isEmpty ? [
+            InterestCategory(id: "Coffee", label: AppStrings.Discovery.Categories.coffee, icon: AppIcons.coffee, count: 0, color: .brandPrimary),
+            InterestCategory(id: "Walks",  label: AppStrings.Discovery.Categories.walks,  icon: AppIcons.walk,   count: 0, color: .brandPrimary),
+            InterestCategory(id: "Movies", label: AppStrings.Discovery.Categories.movies, icon: AppIcons.movie,  count: 0, color: .brandPurple),
+            InterestCategory(id: "Food",   label: AppStrings.Discovery.Categories.food,   icon: AppIcons.food,   count: 0, color: .brandSecondary),
+            InterestCategory(id: "Music",  label: AppStrings.Discovery.Categories.music,  icon: "music.note",    count: 0, color: .brandSecondary),
+            InterestCategory(id: "Gaming", label: AppStrings.Discovery.Categories.gaming, icon: AppIcons.games,   count: 0, color: .brandSecondary),
+            InterestCategory(id: "Books",  label: "Books",                                icon: "book",          count: 0, color: .brandPrimary),
+            InterestCategory(id: "Workout",label: "Workout",                               icon: "dumbbell.fill", count: 0, color: .brandPurple)
+        ] : cachedCategories
     }
     
     func fetchRadarPeople() -> [RadarPerson] {
         guard isFirebaseEnabled else {
             return MockDiscoveryService().fetchRadarPeople()
         }
-        return cachedPeople.isEmpty ? MockDiscoveryService().fetchRadarPeople() : cachedPeople
+        return cachedPeople
     }
     
     private func colorForInterests(_ interests: [String]) -> Color {

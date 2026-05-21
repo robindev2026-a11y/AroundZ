@@ -19,6 +19,10 @@ struct DiscoveryScreen: View {
     @State private var sheetOffset: CGFloat = AppConstants.Layout.sheetCollapsedOffset
     @State private var dragOffset: CGFloat = 0
     
+    private var isFirebaseEnabled: Bool {
+        Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+    }
+    
     // 4 x 2 Grid per DESIGN.md
     private let columns = [
         GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing),
@@ -160,7 +164,7 @@ struct DiscoveryScreen: View {
                 .zIndex(15)
                 
                 // MARK: Notification Dropdown overlay
-                if showNotificationDropdown {
+                if showNotificationDropdown && !isFirebaseEnabled {
                     Color.black.opacity(0.15)
                         .ignoresSafeArea()
                         .onTapGesture {
@@ -246,9 +250,11 @@ struct DiscoveryScreen: View {
             topPadding: 0,
             scrollable: false,
             rightView: {
-                NotificationIconButton(count: 3) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        showNotificationDropdown.toggle()
+                NotificationIconButton(count: isFirebaseEnabled ? 0 : 3) {
+                    if !isFirebaseEnabled {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            showNotificationDropdown.toggle()
+                        }
                     }
                 }
             }
