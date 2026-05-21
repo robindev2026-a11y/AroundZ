@@ -92,6 +92,7 @@
 		CC001FB2000000000000002 /* FirebaseDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */; };
 		CC001FB3000000000000003 /* FirebaseChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA3000000000000003 /* FirebaseChatService.swift */; };
 		CC004FB1000000000000010 /* PhotoPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC004FA1000000000000010 /* PhotoPickerModifier.swift */; };
+		CC005FB1000000000000001 /* Navigation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC005FA1000000000000001 /* Navigation+Extensions.swift */; };
 		CEF26EBF49C34AA89F1FA90C /* ProfileImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04B3901F064B1893505DB3 /* ProfileImageHelper.swift */; };
 		D0A1B2C3D4E5F60718293A4C /* CreatedDriftStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A1B2C3D4E5F60718293A4B /* CreatedDriftStore.swift */; };
 		EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */; };
@@ -199,6 +200,7 @@
 		CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseDiscoveryService.swift; sourceTree = "<group>"; };
 		CC001FA3000000000000003 /* FirebaseChatService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseChatService.swift; sourceTree = "<group>"; };
 		CC004FA1000000000000010 /* PhotoPickerModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPickerModifier.swift; sourceTree = "<group>"; };
+		CC005FA1000000000000001 /* Navigation+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Navigation+Extensions.swift"; sourceTree = "<group>"; };
 		CE9F58E3ADF34D35BC277CD5 /* LibraryPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryPicker.swift; sourceTree = "<group>"; };
 		D0A1B2C3D4E5F60718293A4B /* CreatedDriftStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreatedDriftStore.swift; sourceTree = "<group>"; };
 		D1DF7DD85DAFAEF4D0D1EA7F /* Activity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Activity.swift; path = Models/Activity.swift; sourceTree = "<group>"; };
@@ -464,6 +466,7 @@
 				338E3B182FB435F40048FC32 /* AppStrings.swift */,
 				FFABF6FCFF8585103471820C /* Color+Extensions.swift */,
 				6E4792D78269808A78FA6024 /* Font+Extensions.swift */,
+				CC005FA1000000000000001 /* Navigation+Extensions.swift */,
 				338E3B292FB46EA50048FC32 /* View+Availability.swift */,
 			);
 			path = DesignSystem;
@@ -684,6 +687,7 @@
 				CC001FB2000000000000002 /* FirebaseDiscoveryService.swift in Sources */,
 				CC001FB3000000000000003 /* FirebaseChatService.swift in Sources */,
 				CC004FB1000000000000010 /* PhotoPickerModifier.swift in Sources */,
+				CC005FB1000000000000001 /* Navigation+Extensions.swift in Sources */,
 				7FD5933B0BB94049AB1334F8 /* CameraPicker.swift in Sources */,
 				989CAEEA46054462AE6DCE98 /* LibraryPicker.swift in Sources */,
 				258380F2F4DB489F9FD83FA5 /* PhotoPickerPermissionService.swift in Sources */,
