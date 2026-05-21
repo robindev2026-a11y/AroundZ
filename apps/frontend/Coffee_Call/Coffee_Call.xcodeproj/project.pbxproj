@@ -97,7 +97,8 @@
 		D0A1B2C3D4E5F60718293A4C /* CreatedDriftStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A1B2C3D4E5F60718293A4B /* CreatedDriftStore.swift */; };
 		EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB36B9E57D3A90DD56A454 /* PrimaryButton.swift */; };
 		F28713BD12F9457387A8875A /* Outfit-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A23B1871D38640D2AEA59E1C /* Outfit-Regular.ttf */; };
-/* End PBXBuildFile section */
+		AA000001000000000000AA02 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AA01 /* GoogleService-Info.plist */; };
+		/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		33CA3A3B2FB33A42008EF23C /* PBXContainerItemProxy */ = {
@@ -205,7 +206,8 @@
 		CE9F58E3ADF34D35BC277CD5 /* LibraryPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryPicker.swift; sourceTree = "<group>"; };
 		ADAFB3940E734175A054BA5C /* PhotoPickerPermissionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPickerPermissionService.swift; sourceTree = "<group>"; };
 		AF04B3901F064B1893505DB3 /* ProfileImageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageHelper.swift; sourceTree = "<group>"; };
-/* End PBXFileReference section */
+		AA000001000000000000AA01 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		33CA3A212FB33A3F008EF23C /* Frameworks */ = {
@@ -276,6 +278,7 @@
 				3302E3F12FB475DD0077EAC8 /* ContentView.swift */,
 				3302E3F22FB475DD0077EAC8 /* Info.plist */,
 				3302E3F32FB475DD0077EAC8 /* Persistence.swift */,
+				AA000001000000000000AA01 /* GoogleService-Info.plist */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -587,6 +590,7 @@
 				3374CEE42FB731DB0020F28D /* App in Resources */,
 				33CA3A2F2FB33A41008EF23C /* Preview Assets.xcassets in Resources */,
 				33CA3A2C2FB33A41008EF23C /* Assets.xcassets in Resources */,
+				AA000001000000000000AA02 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
