@@ -3,13 +3,26 @@ import Combine
 
 protocol DriftsServiceProtocol {
     func fetchDrifts() -> AnyPublisher<[Drift], Error>
+    func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error>
+    func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error>
+    func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error>
+    func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error>
+    func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error>
 }
 
 class MockDriftsService: DriftsServiceProtocol {
-    func fetchDrifts() -> AnyPublisher<[Drift], Error> {
+    static var mockDrifts: [Drift] = []
+    
+    init() {
+        if MockDriftsService.mockDrifts.isEmpty {
+            initializeMockDrifts()
+        }
+    }
+    
+    private func initializeMockDrifts() {
         let mockHost = Host(name: "Arjun", role: "Hosting this Drift", imageUrl: "host_arjun", isVerified: true)
         
-        let drifts = [
+        MockDriftsService.mockDrifts = [
             Drift(
                 title: "Coffee Drift",
                 description: "Spontaneous coffee meetup at a nice local cafe. Open to anyone who wants to chat and meet new people in the area.",
@@ -100,8 +113,69 @@ class MockDriftsService: DriftsServiceProtocol {
                 imageUrl: "drift_dinner"
             )
         ]
-        
-        return Just(drifts)
+    }
+    
+    func fetchDrifts() -> AnyPublisher<[Drift], Error> {
+        return Just(MockDriftsService.mockDrifts)
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+    
+    func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
+        MockDriftsService.mockDrifts.insert(drift, at: 0)
+        CreatedDriftStore.shared.add(drift)
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+    
+    func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
+            var updatedDrift = MockDriftsService.mockDrifts[index]
+            updatedDrift.pendingRequests.append(request)
+            MockDriftsService.mockDrifts[index] = updatedDrift
+        }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+    
+    func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
+            var updatedDrift = MockDriftsService.mockDrifts[index]
+            updatedDrift.pendingRequests.removeAll { $0.id == request.id }
+            if !updatedDrift.participantInitials.contains(request.userInitials) {
+                updatedDrift.participantInitials.append(request.userInitials)
+            }
+            updatedDrift.peopleGoing += 1
+            if let spots = updatedDrift.spotsLeft {
+                updatedDrift.spotsLeft = max(spots - 1, 0)
+            }
+            MockDriftsService.mockDrifts[index] = updatedDrift
+        }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+    
+    func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error> {
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
+            var updatedDrift = MockDriftsService.mockDrifts[index]
+            updatedDrift.pendingRequests.removeAll { $0.id == requestId }
+            MockDriftsService.mockDrifts[index] = updatedDrift
+        }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+    
+    func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error> {
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
+            var updatedDrift = MockDriftsService.mockDrifts[index]
+            updatedDrift.status = status
+            MockDriftsService.mockDrifts[index] = updatedDrift
+        }
+        return Just(())
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
     }

@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 final class CreateDriftViewModel: ObservableObject {
     enum ActivityType: String, CaseIterable, Identifiable {
@@ -208,8 +209,16 @@ final class CreateDriftViewModel: ObservableObject {
 
     let maxTitleCount = 60
     private let initialScheduledDate: Date
+    private let driftsService: DriftsServiceProtocol
+    private var cancellables = Set<AnyCancellable>()
 
-    init() {
+    init(driftsService: DriftsServiceProtocol? = nil) {
+        if let driftsService = driftsService {
+            self.driftsService = driftsService
+        } else {
+            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+        }
         let now = Date()
         initialScheduledDate = now
         _scheduledDate = Published(initialValue: now)
@@ -269,11 +278,19 @@ final class CreateDriftViewModel: ObservableObject {
         guard canPost else { return }
         isCreating = true
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self else { return }
-            self.isCreating = false
-            completion(self.buildDrift())
-        }
+        let drift = buildDrift()
+        driftsService.createDrift(drift)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completionResult in
+                guard let self = self else { return }
+                self.isCreating = false
+                if case .failure(let error) = completionResult {
+                    print("Error creating drift: \(error)")
+                }
+            }, receiveValue: {
+                completion(drift)
+            })
+            .store(in: &cancellables)
     }
 
     func buildDrift() -> Drift {

@@ -1,7 +1,7 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-20
+Last updated: 2026-05-21
 
 This file is the current progress ledger. Update it after meaningful work.
 
@@ -109,6 +109,36 @@ Connected the onboarding authentication flow to the main application flow, makin
 - Files touched: `ContentView.swift`, `STATUS.md`.
 - Verification performed: Successfully compiled the app targeting iOS Simulator with xcodebuild and verified it has no compilation errors.
 
+- Remaining gaps: None.
+
+2026-05-21:
+
+- Integrated full Firestore CRUD operations and offline mock fallbacks:
+  - Updated `Drift.swift` and `JoinRequest` to support mutable statuses, participant counts, and participant user ID mappings.
+  - Expanded `DriftsServiceProtocol` and updated `MockDriftsService` to provide stateful, static in-memory CRUD operations for previews.
+  - Implemented `FirebaseDriftsService` CRUD operations in Firestore (create, request to join, accept, reject, status update) utilizing Firestore transactions and array mappings.
+  - Hooked up `CreateDriftViewModel`, `DriftDetailViewModel`, and `ManageDriftViewModel` to utilize the new decoupled service protocols.
+  - Enhanced `ProfileViewModel` to sync profile fields (name, bio, location, availability, interests) to the Firestore `users` collection in real time, fetch documents on launch, and handle Firebase sign-out resets cleanly without infinite write loops.
+- Files touched: `Drift.swift`, `DriftsService.swift`, `FirebaseDriftsService.swift`, `CreateDriftButton.swift`, `DriftDetailViewModel.swift`, `ManageDriftViewModel.swift`, `ProfileViewModel.swift`, `STATUS.md`.
+- Verification performed: Successfully compiled the entire workspace targeting iOS Simulator using `xcodebuild` with zero compilation errors.
+- Remaining gaps: None.
+
+- Fixed auth session persistence desync bug in `AuthViewModel.swift`:
+  - Removed the dual-flag dependency (`hasCompletedOnboarding` AND `currentUser`) in Firebase mode.
+  - `Auth.auth().currentUser != nil` is now the sole source of truth for `isAuthenticated` on init.
+  - Auto-heals the `hasCompletedOnboarding` flag on reinstall (UserDefaults wiped but Firebase token survives).
+  - Offline/mock mode path unchanged.
+- Files touched: `AuthViewModel.swift`, `STATUS.md`.
+- Remaining gaps: None.
+
+- Fixed sign-out routing: returning users now land on `PhoneAuthScreen` directly instead of re-running all 5 onboarding slides:
+  - Added `isFirstLaunch: Bool` flag to `AuthViewModel`, set only on the very first ever app open (tracked via `hasLaunchedBefore` in UserDefaults).
+  - Updated `ContentView` to show `OnboardingScreen` only when `isFirstLaunch` is true, `PhoneAuthScreen` otherwise.
+- Fixed existing-user OTP loop: returning users no longer get pushed to `ProfileSetupScreen` after OTP:
+  - Added `isNewUser: Bool` flag to `AuthViewModel`.
+  - `verifyOTP` now performs a Firestore `getDocument` on `users/{uid}` after sign-in. If a `name` field exists → calls `completeOnboarding()` immediately (straight to main app). If not → sets `isNewUser = true` so the caller navigates to `ProfileSetupScreen`.
+  - `OTPVerificationScreen` only pushes to `ProfileSetupScreen` when `auth.isNewUser` is true.
+- Files touched: `AuthViewModel.swift`, `ContentView.swift`, `OTPVerificationScreen.swift`, `STATUS.md`.
 - Remaining gaps: None.
 
 2026-05-18:

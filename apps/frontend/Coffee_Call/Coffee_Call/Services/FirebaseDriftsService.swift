@@ -77,6 +77,28 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                     let whatToBring = data["whatToBring"] as? [String] ?? []
                     let participantInitials = data["participantInitials"] as? [String] ?? []
                     let imageUrl = data["imageUrl"] as? String
+                    let pendingRequestsData = data["pendingRequests"] as? [[String: Any]] ?? []
+                    let pendingRequests = pendingRequestsData.compactMap { reqDict -> JoinRequest? in
+                        guard let idStr = reqDict["id"] as? String,
+                              let id = UUID(uuidString: idStr),
+                              let userName = reqDict["userName"] as? String,
+                              let userInitials = reqDict["userInitials"] as? String,
+                              let userRole = reqDict["userRole"] as? String,
+                              let message = reqDict["message"] as? String,
+                              let timestamp = reqDict["timestamp"] as? String else {
+                            return nil
+                        }
+                        let userId = reqDict["userId"] as? String ?? ""
+                        return JoinRequest(
+                            id: id,
+                            userId: userId,
+                            userName: userName,
+                            userInitials: userInitials,
+                            userRole: userRole,
+                            message: message,
+                            timestamp: timestamp
+                        )
+                    }
                     
                     let isMine = (creatorId == currentUid)
                     
@@ -101,6 +123,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         whatToBring: whatToBring,
                         participantInitials: participantInitials,
                         imageUrl: imageUrl,
+                        pendingRequests: pendingRequests,
                         isMine: isMine
                     )
                 }
@@ -109,6 +132,252 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             }
             
         return subject.eraseToAnyPublisher()
+    }
+    
+    func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().createDrift(drift)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postId = drift.id.uuidString
+        let currentUid = Auth.auth().currentUser?.uid ?? ""
+        
+        let postData: [String: Any] = [
+            "title": drift.title,
+            "description": drift.description,
+            "location": drift.location,
+            "meetingPoint": drift.meetingPoint,
+            "time": drift.time,
+            "endTime": drift.endTime,
+            "date": drift.date,
+            "distance": drift.distance,
+            "status": drift.status.rawValue,
+            "category": drift.category.rawValue,
+            "hook": drift.hook ?? "",
+            "creatorId": currentUid,
+            "creatorName": drift.host.name,
+            "creatorImageUrl": drift.host.imageUrl ?? "",
+            "creatorVerified": drift.host.isVerified,
+            "participantCount": 1,
+            "capacity": drift.capacity,
+            "spotsLeft": max(drift.capacity - 1, 0),
+            "vibeTags": drift.vibeTags,
+            "whatToBring": drift.whatToBring,
+            "participantInitials": drift.participantInitials,
+            "imageUrl": drift.imageUrl ?? "",
+            "createdAt": FieldValue.serverTimestamp()
+        ]
+        
+        let batch = db.batch()
+        let postRef = db.collection("posts").document(postId)
+        let threadRef = db.collection("messageThreads").document(postId)
+        
+        batch.setData(postData, forDocument: postRef)
+        batch.setData([
+            "participants": [currentUid],
+            "lastMessage": [
+                "text": "Drift created! Welcome to the chat room.",
+                "timestamp": FieldValue.serverTimestamp(),
+                "senderId": "system",
+                "senderName": "System"
+            ]
+        ], forDocument: threadRef)
+        
+        batch.commit { error in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
+        return subject.eraseToAnyPublisher()
+    }
+    
+    func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().requestToJoin(driftId: driftId, request: request)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postId = driftId.uuidString
+        let postRef = db.collection("posts").document(postId)
+        
+        postRef.updateData([
+            "pendingRequests": FieldValue.arrayUnion([request.dictionary])
+        ]) { error in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
+        return subject.eraseToAnyPublisher()
+    }
+    
+    func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().acceptJoinRequest(driftId: driftId, request: request)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postId = driftId.uuidString
+        
+        let postRef = db.collection("posts").document(postId)
+        let threadRef = db.collection("messageThreads").document(postId)
+        
+        db.runTransaction({ (transaction, errorPointer) -> Any? in
+            let postDocument: DocumentSnapshot
+            do {
+                try postDocument = transaction.getDocument(postRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+            
+            guard let postData = postDocument.data() else {
+                let error = NSError(domain: "FirebaseDriftsService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Post document not found"])
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            let pendingRequestsData = postData["pendingRequests"] as? [[String: Any]] ?? []
+            let updatedPendingRequests = pendingRequestsData.filter { dict in
+                if let idStr = dict["id"] as? String {
+                    return idStr != request.id.uuidString
+                }
+                return true
+            }
+            
+            var participantInitials = postData["participantInitials"] as? [String] ?? []
+            if !participantInitials.contains(request.userInitials) {
+                participantInitials.append(request.userInitials)
+            }
+            
+            let participantCount = postData["participantCount"] as? Int ?? 1
+            let capacity = postData["capacity"] as? Int ?? 5
+            let newParticipantCount = participantCount + 1
+            let newSpotsLeft = max(capacity - newParticipantCount, 0)
+            
+            transaction.updateData([
+                "pendingRequests": updatedPendingRequests,
+                "participantInitials": participantInitials,
+                "participantCount": newParticipantCount,
+                "spotsLeft": newSpotsLeft
+            ], forDocument: postRef)
+            
+            if !request.userId.isEmpty {
+                transaction.updateData([
+                    "participants": FieldValue.arrayUnion([request.userId])
+                ], forDocument: threadRef)
+            }
+            
+            return nil
+        }) { (object, error) in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
+        return subject.eraseToAnyPublisher()
+    }
+    
+    func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().rejectJoinRequest(driftId: driftId, requestId: requestId)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postId = driftId.uuidString
+        let postRef = db.collection("posts").document(postId)
+        
+        db.runTransaction({ (transaction, errorPointer) -> Any? in
+            let postDocument: DocumentSnapshot
+            do {
+                try postDocument = transaction.getDocument(postRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+            
+            guard let postData = postDocument.data() else {
+                let error = NSError(domain: "FirebaseDriftsService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Post document not found"])
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            let pendingRequestsData = postData["pendingRequests"] as? [[String: Any]] ?? []
+            let updatedPendingRequests = pendingRequestsData.filter { dict in
+                if let idStr = dict["id"] as? String {
+                    return idStr != requestId.uuidString
+                }
+                return true
+            }
+            
+            transaction.updateData([
+                "pendingRequests": updatedPendingRequests
+            ], forDocument: postRef)
+            
+            return nil
+        }) { (object, error) in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
+        return subject.eraseToAnyPublisher()
+    }
+    
+    func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().updateDriftStatus(driftId: driftId, status: status)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postId = driftId.uuidString
+        let postRef = db.collection("posts").document(postId)
+        
+        postRef.updateData([
+            "status": status.rawValue
+        ]) { error in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
+        return subject.eraseToAnyPublisher()
+    }
+}
+
+extension JoinRequest {
+    var dictionary: [String: Any] {
+        return [
+            "id": id.uuidString,
+            "userId": userId,
+            "userName": userName,
+            "userInitials": userInitials,
+            "userRole": userRole,
+            "message": message,
+            "timestamp": timestamp
+        ]
     }
 }
 

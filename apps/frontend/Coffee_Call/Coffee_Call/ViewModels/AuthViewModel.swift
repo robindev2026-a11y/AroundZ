@@ -10,6 +10,12 @@ class AuthViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
+    /// true  → brand new user, caller should navigate to ProfileSetupScreen
+    /// false → returning user, completeOnboarding() was already called
+    @Published var isNewUser: Bool = false
+    /// true only on the very first ever app launch on this device.
+    /// After that it stays false even across sign-outs.
+    @Published var isFirstLaunch: Bool = false
 
     private var verificationID: String? = nil
     private let verificationIDKey = "authVerificationID"
@@ -21,21 +27,26 @@ class AuthViewModel: ObservableObject {
     // MARK: - Init
     init() {
         if isFirebaseEnabled {
-            // Restore verification ID if present
+            // Restore any in-progress verification ID
             self.verificationID = UserDefaults.standard.string(forKey: verificationIDKey)
-            
-            // Check if user is already authenticated
+
+            // Firebase is the single source of truth for session state.
             if Auth.auth().currentUser != nil {
-                // If they completed onboarding earlier
-                if UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
-                    self.isAuthenticated = true
-                }
+                self.isAuthenticated = true
+                UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
             }
         } else {
-            // Mock auth state restore
+            // Offline / preview mock mode — fall back to local flag only.
             if UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
                 self.isAuthenticated = true
             }
+        }
+
+        // First launch = app has never been opened on this device.
+        // We track this separately so sign-out users skip the marketing slides.
+        if !UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
+            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+            self.isFirstLaunch = true
         }
     }
 
@@ -106,15 +117,38 @@ class AuthViewModel: ObservableObject {
                     }
                     self.verificationID = nil
                     UserDefaults.standard.removeObject(forKey: self.verificationIDKey)
-                    completion(true)
+
+                    // Check Firestore to decide if this is a new or returning user.
+                    // Returning users already have a 'name' field — skip profile setup.
+                    guard let uid = Auth.auth().currentUser?.uid else {
+                        self.isNewUser = true
+                        completion(true)
+                        return
+                    }
+                    let db = Firestore.firestore()
+                    db.collection("users").document(uid).getDocument { snapshot, _ in
+                        DispatchQueue.main.async {
+                            let hasProfile = (snapshot?.data()?["name"] as? String)?.isEmpty == false
+                            if hasProfile {
+                                // Existing user — go straight to the main app.
+                                self.isNewUser = false
+                                self.completeOnboarding()
+                            } else {
+                                // New user — caller navigates to ProfileSetupScreen.
+                                self.isNewUser = true
+                            }
+                            completion(true)
+                        }
+                    }
                 }
             }
         } else {
-            // Safe offline preview fallback mock flow
+            // Offline / preview mock mode — treat as new user so profile setup is reachable.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.isLoading = false
                 self.verificationID = nil
                 UserDefaults.standard.removeObject(forKey: self.verificationIDKey)
+                self.isNewUser = true
                 completion(true)
             }
         }

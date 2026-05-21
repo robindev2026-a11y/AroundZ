@@ -1,6 +1,9 @@
 import SwiftUI
 import UIKit
 import Combine
+import FirebaseCore
+import FirebaseAuth
+import FirebaseFirestore
 
 class ProfileViewModel: ObservableObject {
     var title: String { AppStrings.Profile.title }
@@ -10,34 +13,56 @@ class ProfileViewModel: ObservableObject {
     
     // MARK: - Persisted Fields with didSet Observers (CRUD: Update)
     @Published var name: String = AppConstants.MockData.userName {
-        didSet { UserDefaults.standard.set(name, forKey: "profile_name") }
+        didSet {
+            UserDefaults.standard.set(name, forKey: "profile_name")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     @Published var bio: String = AppConstants.MockData.userBio {
-        didSet { UserDefaults.standard.set(bio, forKey: "profile_bio") }
+        didSet {
+            UserDefaults.standard.set(bio, forKey: "profile_bio")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     @Published var initials: String = AppConstants.MockData.userInitials {
-        didSet { UserDefaults.standard.set(initials, forKey: "profile_initials") }
+        didSet {
+            UserDefaults.standard.set(initials, forKey: "profile_initials")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     @Published var profileImage: UIImage? = nil
     
     @Published var location: String = "Bengaluru, India" {
-        didSet { UserDefaults.standard.set(location, forKey: "profile_location") }
+        didSet {
+            UserDefaults.standard.set(location, forKey: "profile_location")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     
     @Published var availabilityWeekdayEvenings: Bool = true {
-        didSet { UserDefaults.standard.set(availabilityWeekdayEvenings, forKey: "profile_availability_weekday_evenings") }
+        didSet {
+            UserDefaults.standard.set(availabilityWeekdayEvenings, forKey: "profile_availability_weekday_evenings")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     @Published var availabilityWeekends: Bool = true {
-        didSet { UserDefaults.standard.set(availabilityWeekends, forKey: "profile_availability_weekends") }
+        didSet {
+            UserDefaults.standard.set(availabilityWeekends, forKey: "profile_availability_weekends")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     @Published var availabilityDaytime: Bool = false {
-        didSet { UserDefaults.standard.set(availabilityDaytime, forKey: "profile_availability_daytime") }
+        didSet {
+            UserDefaults.standard.set(availabilityDaytime, forKey: "profile_availability_daytime")
+            if isLoaded { syncProfileToFirebase() }
+        }
     }
     
     @Published var interests: [DriftCategory] = [.coffee, .walk, .food, .movie, .study] {
         didSet {
             let rawValues = interests.map { $0.rawValue }
             UserDefaults.standard.set(rawValues, forKey: "profile_interests")
+            if isLoaded { syncProfileToFirebase() }
         }
     }
     
@@ -52,6 +77,11 @@ class ProfileViewModel: ObservableObject {
     @Published var savedDrifts: [Drift] = []
     
     private var cancellables = Set<AnyCancellable>()
+    private var isLoaded = false
+    
+    private var isFirebaseEnabled: Bool {
+        return Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+    }
     
     // Preferences Summaries
     var notificationsSummary: String { "Push, In-app" }
@@ -70,6 +100,7 @@ class ProfileViewModel: ObservableObject {
         loadPersistedData()
         loadMockHistory()
         setupBookmarkSubscription()
+        self.isLoaded = true
     }
     
     private func setupBookmarkSubscription() {
@@ -111,6 +142,81 @@ class ProfileViewModel: ObservableObject {
 
         // Load profile photo from disk
         self.profileImage = ProfileImageHelper.loadProfileImage()
+
+        // Sync from Firebase if authenticated
+        fetchProfileFromFirebase()
+    }
+
+    // MARK: - Firebase Sync
+    func syncProfileToFirebase() {
+        guard isFirebaseEnabled, let uid = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        let data: [String: Any] = [
+            "uid": uid,
+            "name": name,
+            "bio": bio,
+            "initials": initials,
+            "location": location,
+            "availabilityWeekdayEvenings": availabilityWeekdayEvenings,
+            "availabilityWeekends": availabilityWeekends,
+            "availabilityDaytime": availabilityDaytime,
+            "interests": interests.map { $0.rawValue },
+            "updatedAt": FieldValue.serverTimestamp()
+        ]
+        db.collection("users").document(uid).setData(data, merge: true) { error in
+            if let error = error {
+                print("Error syncing profile to Firebase: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func fetchProfileFromFirebase() {
+        guard isFirebaseEnabled, let uid = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).getDocument { [weak self] document, error in
+            guard let self = self else { return }
+            if let document = document, document.exists, let data = document.data() {
+                DispatchQueue.main.async {
+                    let wasLoaded = self.isLoaded
+                    self.isLoaded = false
+                    
+                    if let name = data["name"] as? String {
+                        self.name = name
+                        UserDefaults.standard.set(name, forKey: "profile_name")
+                    }
+                    if let bio = data["bio"] as? String {
+                        self.bio = bio
+                        UserDefaults.standard.set(bio, forKey: "profile_bio")
+                    }
+                    if let initials = data["initials"] as? String {
+                        self.initials = initials
+                        UserDefaults.standard.set(initials, forKey: "profile_initials")
+                    }
+                    if let location = data["location"] as? String {
+                        self.location = location
+                        UserDefaults.standard.set(location, forKey: "profile_location")
+                    }
+                    if let availabilityWeekdayEvenings = data["availabilityWeekdayEvenings"] as? Bool {
+                        self.availabilityWeekdayEvenings = availabilityWeekdayEvenings
+                        UserDefaults.standard.set(availabilityWeekdayEvenings, forKey: "profile_availability_weekday_evenings")
+                    }
+                    if let availabilityWeekends = data["availabilityWeekends"] as? Bool {
+                        self.availabilityWeekends = availabilityWeekends
+                        UserDefaults.standard.set(availabilityWeekends, forKey: "profile_availability_weekends")
+                    }
+                    if let availabilityDaytime = data["availabilityDaytime"] as? Bool {
+                        self.availabilityDaytime = availabilityDaytime
+                        UserDefaults.standard.set(availabilityDaytime, forKey: "profile_availability_daytime")
+                    }
+                    if let interestsRaw = data["interests"] as? [String] {
+                        self.interests = interestsRaw.compactMap { DriftCategory(rawValue: $0) }
+                        UserDefaults.standard.set(interestsRaw, forKey: "profile_interests")
+                    }
+                    
+                    self.isLoaded = wasLoaded
+                }
+            }
+        }
     }
     
     func loadMockHistory() {
@@ -149,6 +255,13 @@ class ProfileViewModel: ObservableObject {
     
     // MARK: - Sign Out & Reset (CRUD: Delete/Reset)
     func signOut() {
+        let wasLoaded = self.isLoaded
+        self.isLoaded = false
+        
+        if isFirebaseEnabled {
+            try? Auth.auth().signOut()
+        }
+        
         UserDefaults.standard.removeObject(forKey: "profile_name")
         UserDefaults.standard.removeObject(forKey: "profile_bio")
         UserDefaults.standard.removeObject(forKey: "profile_initials")
@@ -168,6 +281,8 @@ class ProfileViewModel: ObservableObject {
         self.availabilityWeekends = true
         self.availabilityDaytime = false
         self.interests = [.coffee, .walk, .food, .movie, .study]
+        
+        self.isLoaded = wasLoaded
     }
     
     // Helper to extract clean dynamic initials

@@ -132,7 +132,13 @@ struct OTPVerificationScreen: View {
 
             Button(action: {
                 auth.verifyOTP(code: otpCode) { success in
-                    if success { navigateToProfile = true }
+                    if success && auth.isNewUser {
+                        // New user: go through profile setup flow.
+                        navigateToProfile = true
+                    }
+                    // Returning user: completeOnboarding() was already called
+                    // inside AuthViewModel; isAuthenticated flips and ContentView
+                    // switches to MainTabView automatically.
                 }
             }) {
                 HStack(spacing: 12) {

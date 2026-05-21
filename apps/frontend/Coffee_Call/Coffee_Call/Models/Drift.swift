@@ -11,12 +11,12 @@ struct Drift: Identifiable, Hashable, Codable {
     let endTime: String
     let date: String
     let distance: Double // km
-    let status: DriftStatus
+    var status: DriftStatus
     let category: DriftCategory
     let hook: String?
     var host: Host
-    let peopleGoing: Int
-    let spotsLeft: Int?
+    var peopleGoing: Int
+    var spotsLeft: Int?
     let capacity: Int
     let vibeTags: [String]
     let whatToBring: [String]
@@ -205,11 +205,30 @@ enum DriftCategory: String, Hashable, CaseIterable, Codable {
 
 struct JoinRequest: Identifiable, Hashable, Codable {
     var id: UUID = UUID()
+    let userId: String
     let userName: String
     let userInitials: String
     let userRole: String
     let message: String
     let timestamp: String
+
+    init(
+        id: UUID = UUID(),
+        userId: String = "",
+        userName: String,
+        userInitials: String,
+        userRole: String,
+        message: String,
+        timestamp: String
+    ) {
+        self.id = id
+        self.userId = userId
+        self.userName = userName
+        self.userInitials = userInitials
+        self.userRole = userRole
+        self.message = message
+        self.timestamp = timestamp
+    }
 }
 
 struct ParticipantInfo: Identifiable, Hashable {

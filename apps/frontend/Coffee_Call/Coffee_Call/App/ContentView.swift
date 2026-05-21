@@ -7,9 +7,15 @@ struct ContentView: View {
         Group {
             if auth.isAuthenticated {
                 MainTabView()
-            } else {
+            } else if auth.isFirstLaunch {
+                // Very first time on this device — show the full onboarding slides.
                 NavigationStack {
                     OnboardingScreen()
+                }
+            } else {
+                // Returning user who signed out — go straight to phone login.
+                NavigationStack {
+                    PhoneAuthScreen()
                 }
             }
         }

@@ -68,6 +68,7 @@ Before UI implementation, search active docs for conflicts and state the active 
 - Do not commit unless the user asks.
 - Use semantic SwiftUI design tokens and local helpers where practical.
 - For meaningful work, update `docs/current/STATUS.md`.
+- **Never run `xcodebuild`, launch a simulator, or attempt any build/validation step.** The user validates all builds themselves. Do not add build, verify, or screenshot tasks to any task list or plan.
 
 ### SwiftUI Composable Design Principles
 

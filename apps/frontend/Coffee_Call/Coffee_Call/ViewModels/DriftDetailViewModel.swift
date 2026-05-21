@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import FirebaseAuth
 
 struct ParticipantDetail: Identifiable, Hashable {
     let id = UUID()
@@ -30,7 +31,15 @@ class DriftDetailViewModel: ObservableObject {
         joinStatus == .joined
     }
     
-    init(drift: Drift, initialJoinStatus: JoinStatus? = nil) {
+    private let driftsService: DriftsServiceProtocol
+    
+    init(drift: Drift, initialJoinStatus: JoinStatus? = nil, driftsService: DriftsServiceProtocol? = nil) {
+        if let driftsService = driftsService {
+            self.driftsService = driftsService
+        } else {
+            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+        }
         // Build rich mock details for the host to display in the Host Context Card
         let hostName = drift.host.name
         let mockOtherActive = [
@@ -127,10 +136,38 @@ class DriftDetailViewModel: ObservableObject {
     }
     
     func requestToJoin() {
-        withAnimation(.spring()) {
-            self.joinStatus = .requested
-            self.showingRequestSentConfirmation = true
-        }
+        let currentUid = Auth.auth().currentUser?.uid ?? ""
+        let currentUserName = AppConstants.MockData.userName
+        let currentUserInitials = AppConstants.MockData.userInitials
+        let currentUserRole = "Member"
+        
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        let timestamp = formatter.string(from: Date())
+        
+        let joinRequest = JoinRequest(
+            userId: currentUid,
+            userName: currentUserName,
+            userInitials: currentUserInitials,
+            userRole: currentUserRole,
+            message: "Hey, I'd love to join your drift!",
+            timestamp: timestamp
+        )
+        
+        driftsService.requestToJoin(driftId: drift.id, request: joinRequest)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completionResult in
+                if case .failure(let error) = completionResult {
+                    print("Error requesting to join: \(error)")
+                }
+            }, receiveValue: { [weak self] in
+                guard let self = self else { return }
+                withAnimation(.spring()) {
+                    self.joinStatus = .requested
+                    self.showingRequestSentConfirmation = true
+                }
+            })
+            .store(in: &cancellables)
     }
     
     var isBookmarked: Bool {
