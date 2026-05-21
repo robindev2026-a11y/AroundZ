@@ -118,21 +118,35 @@ class AuthViewModel: ObservableObject {
                     self.verificationID = nil
                     UserDefaults.standard.removeObject(forKey: self.verificationIDKey)
 
-                    // Check Firestore to decide if this is a new or returning user.
-                    // Returning users already have a 'name' field — skip profile setup.
+                    // Primary signal: Firebase tells us directly if this is a new account.
+                    // This is authoritative and does not depend on Firestore or network.
+                    let isNewFirebaseUser = authResult?.additionalUserInfo?.isNewUser ?? true
+
                     guard let uid = Auth.auth().currentUser?.uid else {
                         self.isNewUser = true
                         completion(true)
                         return
                     }
+
+                    if !isNewFirebaseUser {
+                        // Returning Firebase user — skip profile setup entirely.
+                        // Secondary Firestore check: if the profile write failed during
+                        // first registration, still let them in; ProfileViewModel will
+                        // re-fetch and they can update from the Profile tab.
+                        self.isNewUser = false
+                        self.completeOnboarding()
+                        completion(true)
+                        return
+                    }
+
+                    // New Firebase user — check Firestore in case they already have a
+                    // profile document (e.g. account recreated with same number).
                     let db = Firestore.firestore()
                     db.collection("users").document(uid).getDocument { snapshot, error in
                         DispatchQueue.main.async {
                             if let error = error {
-                                // Network or permissions error — treat as new user
-                                // so they can set up a profile. They won't lose data;
-                                // ProfileViewModel will re-fetch from Firestore on launch.
                                 print("[Auth] Firestore profile check failed: \(error.localizedDescription)")
+                                // Can't confirm profile exists — show setup screen.
                                 self.isNewUser = true
                                 completion(true)
                                 return
@@ -140,11 +154,9 @@ class AuthViewModel: ObservableObject {
                             let name = (snapshot?.data()?["name"] as? String ?? "").trimmingCharacters(in: .whitespaces)
                             let hasProfile = snapshot?.exists == true && !name.isEmpty
                             if hasProfile {
-                                // Existing user — skip profile setup, go straight to app.
                                 self.isNewUser = false
                                 self.completeOnboarding()
                             } else {
-                                // New user — caller navigates to ProfileSetupScreen.
                                 self.isNewUser = true
                             }
                             completion(true)
