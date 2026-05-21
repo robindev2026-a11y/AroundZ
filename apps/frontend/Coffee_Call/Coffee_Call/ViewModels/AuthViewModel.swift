@@ -68,11 +68,24 @@ class AuthViewModel: ObservableObject {
         }
 
         if isFirebaseEnabled {
-            PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: nil) { [weak self] verificationID, error in
+            // On Simulator, APNs is unavailable so Firebase falls back to reCAPTCHA.
+            // Passing the root view controller as uiDelegate lets Firebase present
+            // the reCAPTCHA web sheet. On a real device this is never invoked —
+            // the silent APNs push flow handles verification instead.
+            // Test phone numbers (+917012655068 / 666666) bypass reCAPTCHA entirely.
+            let uiDelegate = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .flatMap { $0.windows }
+                .first { $0.isKeyWindow }?
+                .rootViewController as? UIViewController
+
+            PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: uiDelegate) { [weak self] verificationID, error in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     self.isLoading = false
                     if let error = error {
+                        let nsError = error as NSError
+                        print("[Auth] sendOTP failed — domain: \(nsError.domain) code: \(nsError.code) msg: \(nsError.localizedDescription)")
                         self.errorMessage = error.localizedDescription
                         completion(false)
                         return
