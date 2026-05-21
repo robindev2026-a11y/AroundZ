@@ -152,7 +152,8 @@ Target iPhone planning size: 393 x 852pt.
 - Use the shared Floating Glass Top Header.
 - Title: `Around`.
 - Subtitle: `Plans forming nearby`.
-- Right action: circular notification button, 56 x 56pt, with badge `3`.
+- Right actions: circular Online/Offline presence toggle plus circular notification button.
+- Presence toggle: icon-only button; Online uses mint active treatment, Offline uses muted/private treatment. It must not expose extra public profile details.
 
 ### Radar
 
@@ -162,6 +163,7 @@ Target iPhone planning size: 393 x 852pt.
 - Center bubble: 72 x 72pt, icon and label `You`.
 - Nearby anonymous bubbles: 46 x 46pt with initials such as `LM`, `DK`, `MR`, `NP`, `AL`.
 - Bubbles may be backed by nearby user presence, but they are presented as ambient activity signals rather than profile cards.
+- Users who set presence Offline must not appear in other users' radar snapshots.
 - Tapping a radar element must not open a profile or direct message. Instead, it presents a small floating interest card anchored near the bottom of the radar showing only the anonymous active interests (e.g., "Coffee & Walks").
 
 ### Refresh Control

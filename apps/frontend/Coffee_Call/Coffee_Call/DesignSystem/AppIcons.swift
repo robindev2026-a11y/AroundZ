@@ -36,6 +36,8 @@ enum AppIcons {
     static let bookmarkFill = "bookmark.fill"
     static let bell = "bell"
     static let bellFill = "bell.fill"
+    static let radarVisible = "antenna.radiowaves.left.and.right"
+    static let radarHidden = "eye.slash.fill"
     static let sparkles = "sparkles"
     static let gift = "gift.fill"
     static let helpTip = "lightbulb"
@@ -128,6 +130,8 @@ enum AppIcons {
     static var bookmarkFillImage: Image { Image(systemName: bookmarkFill) }
     static var bellImage: Image { Image(systemName: bell) }
     static var bellFillImage: Image { Image(systemName: bellFill) }
+    static var radarVisibleImage: Image { Image(systemName: radarVisible) }
+    static var radarHiddenImage: Image { Image(systemName: radarHidden) }
     
     static var coffeeImage: Image { Image(systemName: coffee) }
     static var coffeeFillImage: Image { Image(systemName: coffeeFill) }

@@ -39,6 +39,7 @@ users
   lastLocation
   lastLocationGeoHash
   lastLocationUpdate
+  isRadarVisible
   createdAt
 
 posts
@@ -80,7 +81,8 @@ The product may call user-facing posts "Drifts"; storage can keep the existing c
 - Around shows ambient signals and category counts.
 - Around radar may use nearby user presence as an anonymous ambient signal.
 - Around radar presence uses explicit one-time snapshots cached in the UI, not a continuous live user listener.
-- Current-user location refreshes are one-shot and should be throttled to a one-hour interval, with manual radar refresh allowed to force a fresh location request.
+- Current-user location refreshes are one-shot and should be throttled to a one-hour interval, with manual radar refresh allowed to force a fresh location request only while Online.
+- Current-user radar visibility is controlled by `users/{uid}.isRadarVisible`; Offline users must be filtered out of radar snapshots and should not upload new presence locations.
 - Drifts listing shows concrete nearby meetups.
 - Radar initials are not public profiles and must not provide direct contact entry points.
 

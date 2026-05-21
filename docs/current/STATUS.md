@@ -47,11 +47,14 @@ Connected the onboarding authentication flow to the main application flow, makin
 
 ## 2026-05-21 Updates
 
+- Added an Around header Online/Offline presence toggle backed by local persistence and `users/{uid}.isRadarVisible`.
+- Updated Offline behavior so location uploads are skipped and Firebase radar snapshots filter out users whose radar presence is disabled (handled client-side to prevent Firestore query failures from missing composite indexes and support default visibility for existing users).
+- Added `ISSUE-038` to `docs/current/REVIEW_CHECKLIST.md` and marked it done.
 - Replaced the Firebase Around radar `users` live listener with an explicit one-time `getDocuments` snapshot, capped to recent presence signals and cached in `DiscoveryViewModel`.
-- Added one-hour throttling for normal current-user location uploads in `PermissionsManager`, while allowing the radar refresh button to force a fresh location request.
+- Added one-hour throttling for normal current-user location uploads in `PermissionsManager`, while allowing the radar refresh button to force a fresh location request only while Online.
 - Wired Around `.onAppear` to fetch a radar snapshot and the refresh button to force location plus radar refresh while preserving the scan animation.
 - Marked `ISSUE-037` done in `docs/current/REVIEW_CHECKLIST.md`.
-- Files touched: `FirebaseDiscoveryService.swift`, `DiscoveryViewModel.swift`, `PermissionsManager.swift`, `DiscoveryScreen.swift`, `ARCHITECTURE.md`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
+- Files touched: `CoffeeHeader.swift`, `AppIcons.swift`, `AppStrings.swift`, `FirebaseDiscoveryService.swift`, `DiscoveryViewModel.swift`, `PermissionsManager.swift`, `DiscoveryScreen.swift`, `CONTEXT.md`, `DESIGN.md`, `PLAN.md`, `ARCHITECTURE.md`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
 - Verification performed: Static code review only. Per repository rules, no `xcodebuild`, simulator launch, or build validation was run.
 
 ## Documentation Reset Log

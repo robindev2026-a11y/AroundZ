@@ -106,6 +106,15 @@ Primary files:
   - Status: Done
   - Owner: Agent
 
+- [x] ISSUE-038
+  - Screen: Around / Discovery
+  - Priority: P1
+  - Type: Privacy, UX, Firebase
+  - Summary: Around needs a user-controlled Online/Offline presence toggle in the navigation header.
+  - Expected: Online users can upload throttled presence location and appear in radar snapshots; Offline users write `isRadarVisible = false`, stop location uploads, persist the preference locally, and are excluded from other users' radar snapshots.
+  - Status: Done
+  - Owner: Agent
+
 ### 2. Drifts / Listing
 
 Spec anchors:

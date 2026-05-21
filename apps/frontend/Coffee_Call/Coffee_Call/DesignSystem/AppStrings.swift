@@ -126,6 +126,10 @@ enum AppStrings {
         static let title = "Around"
         static let subtitleDefault = "People nearby are open to plans"
         static let subtitleRefreshing = "Refreshing nearby activity..."
+        static let presenceGoOffline = "Go offline"
+        static let presenceGoOnline = "Go online"
+        static let presenceOnlineHint = "You are visible on nearby radar."
+        static let presenceOfflineHint = "You are hidden from nearby radar."
         
         static let contextTitle = "People around you are open to plans."
         static let contextSubtitle = "Join a Drift or create your own."

@@ -1,28 +1,29 @@
 import SwiftUI
 
 struct DiscoveryScreen: View {
-    
+
     // MARK: - State
-    
+
     @StateObject private var viewModel: DiscoveryViewModel
+    @ObservedObject private var permissions = PermissionsManager.shared
     @Binding var selectedTab: Int
-    
+
     init(viewModel: DiscoveryViewModel = DiscoveryViewModel(), selectedTab: Binding<Int>) {
         _viewModel = StateObject(wrappedValue: viewModel)
         _selectedTab = selectedTab
     }
-    
+
     @State private var selectedPerson: RadarPerson? = nil
     @State private var showNotificationDropdown = false
-    
+
     // Bottom Sheet
     @State private var sheetOffset: CGFloat = AppConstants.Layout.sheetCollapsedOffset
     @State private var dragOffset: CGFloat = 0
-    
+
     private var isFirebaseEnabled: Bool {
         Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
     }
-    
+
     // 4 x 2 Grid per DESIGN.md
     private let columns = [
         GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing),
@@ -30,33 +31,33 @@ struct DiscoveryScreen: View {
         GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing),
         GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing)
     ]
-    
+
     // MARK: - Derived Animation Values
-    
+
     private var currentSheetOffset: CGFloat {
         max(AppConstants.Layout.sheetExpandedOffset, min(AppConstants.Layout.sheetCollapsedOffset, sheetOffset + dragOffset))
     }
-    
+
     private var progress: CGFloat {
         let total = AppConstants.Layout.sheetCollapsedOffset - AppConstants.Layout.sheetExpandedOffset
         let moved = AppConstants.Layout.sheetCollapsedOffset - currentSheetOffset
         return max(0, min(1, moved / total))
     }
-    
+
     private var radarScale: CGFloat {
         1.0 - (progress * 0.08)
     }
-    
+
     private var radarOpacity: CGFloat {
         1.0 - (progress * 0.65)
     }
-    
+
     private var radarBlur: CGFloat {
         progress * AppConstants.Layout.radarBlurFactor
     }
-    
+
     // MARK: - Body
-    
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -67,7 +68,7 @@ struct DiscoveryScreen: View {
                     .onTapGesture {
                         withAnimation(.spring()) { selectedPerson = nil }
                     }
-                
+
                 // MARK: Radar World
                 radarLayer
                     .scaleEffect(radarScale)
@@ -75,13 +76,13 @@ struct DiscoveryScreen: View {
                     .blur(radius: radarBlur)
                     .animation(.easeInOut(duration: 0.25), value: progress)
                     .zIndex(1)
-                
+
                 // MARK: Refresh Button
                 refreshButton
                     .opacity(progress < 0.55 ? 1 : 0)
                     .animation(.easeInOut(duration: 0.2), value: progress)
                     .zIndex(20)
-                
+
                 // MARK: Bottom Sheet
                 CoffeeBottomSheet(sheetOffset: $sheetOffset, dragOffset: $dragOffset, geo: geo) {
                     ScrollView(showsIndicators: false) {
@@ -96,19 +97,19 @@ struct DiscoveryScreen: View {
                                         size: AppConstants.Layout.sheetHandleWidth, // 44pt
                                         iconSize: 18
                                     )
-                                    
+
                                     VStack(alignment: .leading, spacing: 0) {
                                         Text(AppStrings.Discovery.driftsForming)
                                             .font(.captionText)
                                             .foregroundColor(.textPrimary)
-                                        
+
                                         Text(AppStrings.Discovery.driftsFormingSub)
                                             .font(.metadata)
                                             .foregroundColor(.textSecondary)
                                     }
-                                    
+
                                     Spacer()
-                                    
+
                                     AppIcons.chevronRightImage
                                         .font(.bodySmall)
                                         .foregroundColor(.brandPrimary.opacity(0.4))
@@ -126,19 +127,19 @@ struct DiscoveryScreen: View {
                             .onTapGesture {
                                 withAnimation { selectedPerson = nil }
                             }
-                            
+
                             // Interests
                             VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                                 Text(AppStrings.Discovery.interestsNearby)
                                     .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .black))
                                     .foregroundColor(.textPrimary)
-                                
+
                                 LazyVGrid(columns: columns, spacing: AppConstants.Layout.elementSpacing + 2) {
                                     ForEach(viewModel.interestCategories) { category in
                                         Button(action: {
                                             // Set active interest filter on global navigation singleton
                                             NavigationManager.shared.activeInterestFilter = category.id
-                                            
+
                                             // Route user to Drifts listing tab (index 1)
                                             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                                                 selectedTab = 1
@@ -155,14 +156,14 @@ struct DiscoveryScreen: View {
                                     }
                                 }
                             }
-                            
+
                             Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100)
                         }
                         .padding(.horizontal, AppConstants.Layout.standardPadding)
                     }
                 }
                 .zIndex(15)
-                
+
                 // MARK: Notification Dropdown overlay
                 if showNotificationDropdown && !isFirebaseEnabled {
                     Color.black.opacity(0.15)
@@ -173,15 +174,15 @@ struct DiscoveryScreen: View {
                             }
                         }
                         .zIndex(24)
-                    
+
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("Notifications")
                                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                                 .foregroundColor(.textPrimary)
-                            
+
                             Spacer()
-                            
+
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                     showNotificationDropdown = false
@@ -196,10 +197,10 @@ struct DiscoveryScreen: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
-                        
+
                         Divider()
                             .padding(.horizontal, 16)
-                        
+
                         VStack(spacing: 0) {
                             NotificationRow(
                                 icon: "checkmark.circle.fill",
@@ -250,10 +251,16 @@ struct DiscoveryScreen: View {
             topPadding: 0,
             scrollable: false,
             rightView: {
-                NotificationIconButton(count: isFirebaseEnabled ? 0 : 3) {
-                    if !isFirebaseEnabled {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            showNotificationDropdown.toggle()
+                HStack(spacing: 8) {
+                    PresenceToggleButton(isOnline: permissions.isRadarVisible) {
+                        permissions.toggleRadarVisibility()
+                    }
+
+                    NotificationIconButton(count: isFirebaseEnabled ? 0 : 3) {
+                        if !isFirebaseEnabled {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                showNotificationDropdown.toggle()
+                            }
                         }
                     }
                 }
@@ -261,7 +268,8 @@ struct DiscoveryScreen: View {
         )
         .onAppear {
             NavigationManager.shared.resetTabBarVisibility()
-            PermissionsManager.shared.requestLocation()
+            permissions.syncRadarVisibilityPreference()
+            permissions.requestLocation()
             viewModel.refreshRadarSnapshot()
         }
     }
@@ -270,14 +278,14 @@ struct DiscoveryScreen: View {
 // MARK: - Radar Layer
 
 extension DiscoveryScreen {
-    
+
     private var radarLayer: some View {
         VStack(spacing: 0) {
-            
+
             // This spacer pushes the radar center to the middle of the available gap
             Spacer()
                 .frame(height: (AppConstants.Layout.headerHeight + AppConstants.Layout.sheetCollapsedOffset) / 2 - 140)
-            
+
             RadarView(
                 persons: viewModel.radarPeople,
                 isScanning: viewModel.isScanning,
@@ -294,7 +302,7 @@ extension DiscoveryScreen {
                 }
             )
             .frame(height: 380)
-            
+
             Spacer()
         }
         .frame(maxWidth: .infinity)
@@ -308,30 +316,32 @@ extension DiscoveryScreen {
 // MARK: - Refresh Button
 
 extension DiscoveryScreen {
-    
+
     private var refreshButton: some View {
-        
+
         VStack {
-            
+
             Spacer()
-            
+
             HStack {
-                
+
                 Spacer()
-                
+
                 Button(action: {
-                    PermissionsManager.shared.requestLocation(force: true)
+                    if permissions.isRadarVisible {
+                        permissions.requestLocation(force: true)
+                    }
                     viewModel.refreshNearby()
                 }) {
-                    
+
                     ZStack {
-                        
+
                         Circle()
                             .fill(.ultraThinMaterial)
                             .frame(width: AppConstants.Layout.refreshButtonSize, height: AppConstants.Layout.refreshButtonSize)
                             .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 6)
                             .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 1))
-                        
+
                         AppIcons.refreshImage
                             .font(.system(size: AppConstants.Typography.sizeTitle - 6, weight: .bold))
                             .foregroundColor(.brandPrimary)
@@ -363,7 +373,7 @@ struct NotificationRow: View {
     let iconColor: Color
     let text: String
     let time: String
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
@@ -372,19 +382,19 @@ struct NotificationRow: View {
                 .frame(width: 32, height: 32)
                 .background(iconColor.opacity(0.1))
                 .clipShape(Circle())
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(text)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
-                
+
                 Text(time)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
-            
+
             Spacer()
         }
         .padding(.horizontal, 16)

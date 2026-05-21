@@ -327,6 +327,41 @@ struct NotificationIconButton: View {
     }
 }
 
+struct PresenceToggleButton: View {
+    let isOnline: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(Color.surfaceMain)
+                    .frame(width: 48, height: 48)
+                    .overlay(
+                        Circle()
+                            .stroke(
+                                isOnline ? Color.brandPrimary.opacity(0.35) : Color.appBorder.opacity(0.35),
+                                lineWidth: 1
+                            )
+                    )
+
+                if isOnline {
+                    AppIcons.radarVisibleImage
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.brandPrimary)
+                } else {
+                    AppIcons.radarHiddenImage
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.textSecondary)
+                }
+            }
+        }
+        .accessibilityLabel(isOnline ? AppStrings.Discovery.presenceGoOffline : AppStrings.Discovery.presenceGoOnline)
+        .accessibilityHint(isOnline ? AppStrings.Discovery.presenceOnlineHint : AppStrings.Discovery.presenceOfflineHint)
+        .pressScale(0.9)
+    }
+}
+
 struct HeaderIconButton: View {
     let icon: String
     var color: Color = .brandPrimary

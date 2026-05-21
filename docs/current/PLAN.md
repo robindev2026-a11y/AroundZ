@@ -23,6 +23,7 @@ Ship a focused iOS MVP that supports:
 ## Product Rules
 
 - Around is ambient discovery, not a people directory; anonymous nearby user presence may power the radar as long as it does not create profile browsing or cold outreach.
+- Users can toggle radar presence Online/Offline from Around; Offline means hidden from other radar snapshots and no location uploads for presence.
 - Interest should lead to seeing or creating Drifts.
 - Chat only exists inside a joined or hosted Drift.
 - Exact coordination is unlocked only after joining or acceptance.

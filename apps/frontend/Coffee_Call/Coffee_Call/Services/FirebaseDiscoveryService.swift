@@ -63,6 +63,9 @@ class FirebaseDiscoveryService: DiscoveryServiceProtocol {
             if userId == currentUid { continue }
 
             let data = doc.data()
+            let isVisible = data["isRadarVisible"] as? Bool ?? true
+            if !isVisible { continue }
+
             let name = data["name"] as? String ?? "Someone"
             let initials = initials(from: name)
             let interestTags = data["interestTags"] as? [String] ?? []

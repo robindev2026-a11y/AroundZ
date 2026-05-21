@@ -11,13 +11,18 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
 
     @Published var locationStatus: CLAuthorizationStatus = .notDetermined
     @Published var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @Published var isRadarVisible: Bool
 
     private let locationManager = CLLocationManager()
     private let locationRefreshInterval: TimeInterval = 60 * 60
     private let lastLocationRefreshKey = "CoffeeCall.lastLocationRefreshAt"
+    private let radarVisibilityKey = "CoffeeCall.isRadarVisible"
     private var isLocationRequestInFlight = false
+    private var hasSyncedRadarVisibilityPreference = false
+    private var isRadarVisibilitySyncInFlight = false
 
     override init() {
+        self.isRadarVisible = UserDefaults.standard.object(forKey: radarVisibilityKey) as? Bool ?? true
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
@@ -44,6 +49,10 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
     }
 
     func requestLocation(force: Bool = false) {
+        guard isRadarVisible else {
+            print("PermissionsManager: Skipping location request because radar presence is offline")
+            return
+        }
         let status = locationManager.authorizationStatus
         if status == .authorizedWhenInUse || status == .authorizedAlways {
             guard force || shouldRequestLocation() else {
@@ -54,6 +63,27 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
             isLocationRequestInFlight = true
             locationManager.requestLocation()
         }
+    }
+
+    func toggleRadarVisibility() {
+        setRadarVisibility(!isRadarVisible)
+    }
+
+    func setRadarVisibility(_ isVisible: Bool) {
+        guard isRadarVisible != isVisible else { return }
+        isRadarVisible = isVisible
+        UserDefaults.standard.set(isVisible, forKey: radarVisibilityKey)
+        hasSyncedRadarVisibilityPreference = false
+        syncRadarVisibility(isVisible)
+
+        if isVisible {
+            requestLocation(force: true)
+        }
+    }
+
+    func syncRadarVisibilityPreference() {
+        guard !hasSyncedRadarVisibilityPreference, !isRadarVisibilitySyncInFlight else { return }
+        syncRadarVisibility(isRadarVisible)
     }
 
     func requestNotificationPermission() {
@@ -86,6 +116,32 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
         return Date().timeIntervalSince(lastRefresh) >= locationRefreshInterval
     }
 
+    @discardableResult
+    private func syncRadarVisibility(_ isVisible: Bool) -> Bool {
+        let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        guard isFirebaseEnabled, let uid = Auth.auth().currentUser?.uid else { return false }
+
+        isRadarVisibilitySyncInFlight = true
+        Firestore.firestore().collection("users").document(uid).setData(
+            [
+                "isRadarVisible": isVisible,
+                "radarVisibilityUpdatedAt": FieldValue.serverTimestamp()
+            ],
+            merge: true
+        ) { error in
+            DispatchQueue.main.async {
+                self.isRadarVisibilitySyncInFlight = false
+                if let error = error {
+                    self.hasSyncedRadarVisibilityPreference = false
+                    print("PermissionsManager: Error updating radar visibility: \(error.localizedDescription)")
+                } else {
+                    self.hasSyncedRadarVisibilityPreference = true
+                }
+            }
+        }
+        return true
+    }
+
     // MARK: - CLLocationManagerDelegate
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         DispatchQueue.main.async {
@@ -105,6 +161,13 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
         let lng = location.coordinate.longitude
         print("PermissionsManager: Location updated to \(lat), \(lng)")
 
+        guard isRadarVisible else {
+            isLocationRequestInFlight = false
+            syncRadarVisibility(false)
+            print("PermissionsManager: Discarded location update because radar presence is offline")
+            return
+        }
+
         let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
         if isFirebaseEnabled, let uid = Auth.auth().currentUser?.uid {
             let db = Firestore.firestore()
@@ -113,7 +176,8 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
             let data: [String: Any] = [
                 "lastLocation": GeoPoint(latitude: lat, longitude: lng),
                 "lastLocationGeoHash": geoHash,
-                "lastLocationUpdate": FieldValue.serverTimestamp()
+                "lastLocationUpdate": FieldValue.serverTimestamp(),
+                "isRadarVisible": true
             ]
 
             db.collection("users").document(uid).setData(data, merge: true) { error in
