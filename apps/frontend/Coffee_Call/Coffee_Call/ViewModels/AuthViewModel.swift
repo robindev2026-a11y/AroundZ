@@ -126,11 +126,21 @@ class AuthViewModel: ObservableObject {
                         return
                     }
                     let db = Firestore.firestore()
-                    db.collection("users").document(uid).getDocument { snapshot, _ in
+                    db.collection("users").document(uid).getDocument { snapshot, error in
                         DispatchQueue.main.async {
-                            let hasProfile = (snapshot?.data()?["name"] as? String)?.isEmpty == false
+                            if let error = error {
+                                // Network or permissions error — treat as new user
+                                // so they can set up a profile. They won't lose data;
+                                // ProfileViewModel will re-fetch from Firestore on launch.
+                                print("[Auth] Firestore profile check failed: \(error.localizedDescription)")
+                                self.isNewUser = true
+                                completion(true)
+                                return
+                            }
+                            let name = (snapshot?.data()?["name"] as? String ?? "").trimmingCharacters(in: .whitespaces)
+                            let hasProfile = snapshot?.exists == true && !name.isEmpty
                             if hasProfile {
-                                // Existing user — go straight to the main app.
+                                // Existing user — skip profile setup, go straight to app.
                                 self.isNewUser = false
                                 self.completeOnboarding()
                             } else {
@@ -213,6 +223,9 @@ class AuthViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: verificationIDKey)
         verificationID = nil
         isAuthenticated = false
+        // Reset so ContentView routes to PhoneAuthScreen, not OnboardingScreen.
+        // hasLaunchedBefore stays true — the slides are shown exactly once per install.
+        isFirstLaunch = false
     }
 
     func clearError() {
