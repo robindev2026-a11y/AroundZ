@@ -56,6 +56,13 @@ Connected the onboarding authentication flow to the main application flow, makin
 - Marked `ISSUE-037` done in `docs/current/REVIEW_CHECKLIST.md`.
 - Files touched: `CoffeeHeader.swift`, `AppIcons.swift`, `AppStrings.swift`, `FirebaseDiscoveryService.swift`, `DiscoveryViewModel.swift`, `PermissionsManager.swift`, `DiscoveryScreen.swift`, `CONTEXT.md`, `DESIGN.md`, `PLAN.md`, `ARCHITECTURE.md`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
 - Verification performed: Static code review only. Per repository rules, no `xcodebuild`, simulator launch, or build validation was run.
+- Implemented Dynamic GPS Geolocation Radius filtering for Drifts list and creation:
+  - **Injected Host coordinates in Drift creation**: Modified [CreateDriftButton.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/Components/CreateDriftButton.swift) to retrieve host coordinates from `PermissionsManager.shared.currentLocation` and tag created Drifts with active `latitude` and `longitude` fields.
+  - **Dynamic distance updates in Drifts view**: Modified [DriftsViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Coffee_Call/ViewModels/DriftsViewModel.swift) to import `CoreLocation`, observe `PermissionsManager.shared.$currentLocation` publisher, and dynamically recalculate distance in `mergeDrifts()` when location updates are received.
+  - Files touched: `CreateDriftButton.swift`, `DriftsViewModel.swift`, `task.md`, `STATUS.md`.
+  - Verification performed: Static code review only. Per repository rules, no `xcodebuild`, simulator launch, or build validation was run.
+  - Remaining gaps: None.
+
 
 ## Documentation Reset Log
 

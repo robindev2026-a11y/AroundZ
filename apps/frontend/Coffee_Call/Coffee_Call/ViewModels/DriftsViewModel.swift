@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import CoreLocation
 
 class DriftsViewModel: ObservableObject {
     var title: String { AppStrings.Drifts.title }
@@ -135,6 +136,13 @@ class DriftsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
             
+        PermissionsManager.shared.$currentLocation
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.mergeDrifts()
+            }
+            .store(in: &cancellables)
+            
         loadDrifts()
     }
     
@@ -150,8 +158,14 @@ class DriftsViewModel: ObservableObject {
 
     private func mergeDrifts() {
         var merged: [Drift] = []
-        for drift in baseDrifts + createdDriftStore.createdDrifts {
+        let userLoc = PermissionsManager.shared.currentLocation
+        for var drift in baseDrifts + createdDriftStore.createdDrifts {
             if !merged.contains(where: { $0.id == drift.id }) {
+                if let lat = drift.latitude, let lng = drift.longitude, let userLocation = userLoc {
+                    let userCLLoc = CLLocation(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+                    let driftCLLoc = CLLocation(latitude: lat, longitude: lng)
+                    drift.distance = userCLLoc.distance(from: driftCLLoc) / 1000.0
+                }
                 merged.append(drift)
             }
         }

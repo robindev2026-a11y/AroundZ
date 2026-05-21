@@ -10,7 +10,7 @@ struct Drift: Identifiable, Hashable, Codable {
     let time: String
     let endTime: String
     let date: String
-    let distance: Double // km
+    var distance: Double // km
     var status: DriftStatus
     let category: DriftCategory
     let hook: String?
@@ -28,6 +28,8 @@ struct Drift: Identifiable, Hashable, Codable {
     var lastMessage: String? = nil
     var lastMessageTime: String? = nil
     var unreadCount: Int = 0
+    let latitude: Double?
+    let longitude: Double?
     
     init(
         id: UUID = UUID(),
@@ -55,7 +57,9 @@ struct Drift: Identifiable, Hashable, Codable {
         isMine: Bool = false,
         lastMessage: String? = nil,
         lastMessageTime: String? = nil,
-        unreadCount: Int = 0
+        unreadCount: Int = 0,
+        latitude: Double? = nil,
+        longitude: Double? = nil
     ) {
         self.id = id
         self.title = title
@@ -82,6 +86,8 @@ struct Drift: Identifiable, Hashable, Codable {
         self.lastMessage = lastMessage
         self.lastMessageTime = lastMessageTime
         self.unreadCount = unreadCount
+        self.latitude = latitude
+        self.longitude = longitude
     }
     
     // Hashable conformance (synthesized)

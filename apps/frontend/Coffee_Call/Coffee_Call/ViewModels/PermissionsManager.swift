@@ -12,6 +12,7 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
     @Published var locationStatus: CLAuthorizationStatus = .notDetermined
     @Published var notificationStatus: UNAuthorizationStatus = .notDetermined
     @Published var isRadarVisible: Bool
+    @Published var currentLocation: CLLocation? = nil
 
     private let locationManager = CLLocationManager()
     private let locationRefreshInterval: TimeInterval = 60 * 60
@@ -160,6 +161,10 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
         let lat = location.coordinate.latitude
         let lng = location.coordinate.longitude
         print("PermissionsManager: Location updated to \(lat), \(lng)")
+
+        DispatchQueue.main.async {
+            self.currentLocation = location
+        }
 
         guard isRadarVisible else {
             isLocationRequestInFlight = false

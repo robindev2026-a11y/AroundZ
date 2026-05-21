@@ -3,6 +3,7 @@ import Combine
 import FirebaseCore
 import FirebaseAuth
 import FirebaseFirestore
+import CoreLocation
 
 class FirebaseDriftsService: DriftsServiceProtocol {
     private var isFirebaseEnabled: Bool {
@@ -42,7 +43,17 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                     let time = data["time"] as? String ?? ""
                     let endTime = data["endTime"] as? String ?? ""
                     let date = data["date"] as? String ?? ""
-                    let distance = data["distance"] as? Double ?? 1.2
+                    
+                    let latitude = data["latitude"] as? Double
+                    let longitude = data["longitude"] as? Double
+                    
+                    var distance = data["distance"] as? Double ?? 1.2
+                    if let lat = latitude, let lng = longitude,
+                       let userLoc = PermissionsManager.shared.currentLocation {
+                        let userCLLoc = CLLocation(latitude: userLoc.coordinate.latitude, longitude: userLoc.coordinate.longitude)
+                        let driftCLLoc = CLLocation(latitude: lat, longitude: lng)
+                        distance = userCLLoc.distance(from: driftCLLoc) / 1000.0
+                    }
                     
                     let statusStr = data["status"] as? String ?? "OPEN"
                     let status: DriftStatus
@@ -125,7 +136,9 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         participantInitials: participantInitials,
                         imageUrl: imageUrl,
                         pendingRequests: pendingRequests,
-                        isMine: isMine
+                        isMine: isMine,
+                        latitude: latitude,
+                        longitude: longitude
                     )
                 }
                 
@@ -145,7 +158,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         let postId = drift.id.uuidString
         let currentUid = Auth.auth().currentUser?.uid ?? ""
         
-        let postData: [String: Any] = [
+        var postData: [String: Any] = [
             "title": drift.title,
             "description": drift.description,
             "location": drift.location,
@@ -170,6 +183,13 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             "imageUrl": drift.imageUrl ?? "",
             "createdAt": FieldValue.serverTimestamp()
         ]
+        
+        if let lat = drift.latitude {
+            postData["latitude"] = lat
+        }
+        if let lng = drift.longitude {
+            postData["longitude"] = lng
+        }
         
         let batch = db.batch()
         let postRef = db.collection("posts").document(postId)

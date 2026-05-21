@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import CoreLocation
 
 protocol DiscoveryServiceProtocol {
     func fetchInterestCategories() -> [InterestCategory]
@@ -45,6 +46,7 @@ class DiscoveryViewModel: ObservableObject {
 
     private var service: DiscoveryServiceProtocol
     private var isRefreshingSnapshot: Bool = false
+    private var cancellables = Set<AnyCancellable>()
 
     // Header Strings (Using AppStrings)
     let title = AppStrings.Discovery.title
@@ -63,6 +65,16 @@ class DiscoveryViewModel: ObservableObject {
             self.service = isFirebaseEnabled ? FirebaseDiscoveryService() : MockDiscoveryService()
         }
         loadData()
+        
+        // Observe current location to trigger radar refresh when it is resolved/updated
+        PermissionsManager.shared.$currentLocation
+            .compactMap { $0 }
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                print("DiscoveryViewModel: User location updated, refreshing radar snapshot...")
+                self?.refreshRadarSnapshot()
+            }
+            .store(in: &cancellables)
     }
 
     func loadData() {

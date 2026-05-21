@@ -2,6 +2,7 @@ import SwiftUI
 import Combine
 import FirebaseCore
 import FirebaseAuth
+import CoreLocation
 
 final class CreateDriftViewModel: ObservableObject {
     enum ActivityType: String, CaseIterable, Identifiable {
@@ -341,7 +342,9 @@ final class CreateDriftViewModel: ObservableObject {
             notes: cleanedText(notesText),
             participantInitials: [creatorInitials],
             imageUrl: nil,
-            isMine: true
+            isMine: true,
+            latitude: PermissionsManager.shared.currentLocation?.coordinate.latitude,
+            longitude: PermissionsManager.shared.currentLocation?.coordinate.longitude
         )
     }
 

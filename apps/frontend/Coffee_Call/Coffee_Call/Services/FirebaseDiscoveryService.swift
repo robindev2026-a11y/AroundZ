@@ -3,6 +3,7 @@ import SwiftUI
 import FirebaseCore
 import FirebaseAuth
 import FirebaseFirestore
+import CoreLocation
 
 class FirebaseDiscoveryService: DiscoveryServiceProtocol {
     private let radarSnapshotLimit = 40
@@ -57,6 +58,8 @@ class FirebaseDiscoveryService: DiscoveryServiceProtocol {
         let currentUid = Auth.auth().currentUser?.uid
         var newPeople: [RadarPerson] = []
         var interestCounts: [String: Int] = [:]
+        
+        let userLocation = PermissionsManager.shared.currentLocation
 
         for doc in documents {
             let userId = doc.documentID
@@ -75,8 +78,25 @@ class FirebaseDiscoveryService: DiscoveryServiceProtocol {
             }
 
             let fallbackPosition = fallbackRadarPosition(for: userId)
-            let distance = data["distance"] as? Double ?? fallbackPosition.distance
+            var distance = data["distance"] as? Double ?? fallbackPosition.distance
             let angle = data["angle"] as? Double ?? fallbackPosition.angle
+
+            if let userLoc = userLocation,
+               let otherLocGeo = data["lastLocation"] as? GeoPoint {
+                let userCLLoc = CLLocation(latitude: userLoc.coordinate.latitude, longitude: userLoc.coordinate.longitude)
+                let otherCLLoc = CLLocation(latitude: otherLocGeo.latitude, longitude: otherLocGeo.longitude)
+                let actualDistanceKm = userCLLoc.distance(from: otherCLLoc) / 1000.0
+
+                if actualDistanceKm > 10.0 {
+                    continue
+                }
+
+                // Map 0..10 km to a normalized radar circle radius (0.2..0.95)
+                distance = 0.2 + (actualDistanceKm / 10.0) * 0.75
+            } else if userLocation != nil {
+                // If user location is available but other user doesn't have a location, exclude them
+                continue
+            }
 
             newPeople.append(
                 RadarPerson(
