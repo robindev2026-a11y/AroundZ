@@ -4,6 +4,11 @@ import FirebaseCore
 import FirebaseAuth
 import FirebaseFirestore
 
+// UIViewController already implements present(_:animated:completion:) and
+// dismiss(animated:completion:) — the two methods AuthUIDelegate requires.
+// This conformance lets us pass the root VC directly to verifyPhoneNumber.
+extension UIViewController: AuthUIDelegate {}
+
 class AuthViewModel: ObservableObject {
 
     // MARK: - Published State
@@ -77,7 +82,7 @@ class AuthViewModel: ObservableObject {
                 .compactMap { $0 as? UIWindowScene }
                 .flatMap { $0.windows }
                 .first { $0.isKeyWindow }?
-                .rootViewController as? UIViewController
+                .rootViewController
 
             PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: uiDelegate) { [weak self] verificationID, error in
                 guard let self = self else { return }
