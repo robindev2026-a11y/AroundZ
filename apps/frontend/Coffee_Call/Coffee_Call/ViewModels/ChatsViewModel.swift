@@ -4,6 +4,9 @@ import Combine
 // MARK: - Chat Service Dependency Injection
 protocol ChatServiceProtocol {
     func getChats() -> [Drift]
+    /// Called by the service whenever Firestore data changes.
+    /// The ViewModel sets this closure to refresh its published state.
+    var onUpdate: (([Drift]) -> Void)? { get set }
 }
 
 enum ChatFilter: String, CaseIterable, Identifiable {
@@ -27,11 +30,11 @@ enum ChatFilter: String, CaseIterable, Identifiable {
 class ChatsViewModel: ObservableObject {
     var title: String { AppStrings.Chat.title }
     var subtitle: String? { AppStrings.Chat.subtitle }
-    
+
     @Published var allChats: [Drift] = []
-    
-    private let chatService: ChatServiceProtocol
-    
+
+    private var chatService: ChatServiceProtocol
+
     init(chatService: ChatServiceProtocol? = nil) {
         if let chatService = chatService {
             self.chatService = chatService
@@ -39,10 +42,16 @@ class ChatsViewModel: ObservableObject {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
             self.chatService = isFirebaseEnabled ? FirebaseChatService() : MockChatService()
         }
+        // Subscribe to live Firestore updates so UI refreshes when data arrives.
+        self.chatService.onUpdate = { [weak self] updated in
+            DispatchQueue.main.async { self?.allChats = updated }
+        }
         loadChats()
     }
-    
+
     func loadChats() {
+        // getChats() returns cached/mock data immediately as a placeholder.
+        // Real data arrives later via onUpdate when the Firestore listener fires.
         self.allChats = chatService.getChats()
     }
     
@@ -62,6 +71,8 @@ class ChatsViewModel: ObservableObject {
 
 // MARK: - High Fidelity Mock Chat Service
 class MockChatService: ChatServiceProtocol {
+    // onUpdate is never fired for mock — data is static and returned synchronously.
+    var onUpdate: (([Drift]) -> Void)? = nil
     func getChats() -> [Drift] {
         let hostArjun = Host(name: "Arjun R.", role: "Host", imageUrl: nil, isVerified: true)
         let hostMira = Host(name: "Mira", role: "Host", imageUrl: nil, isVerified: true)

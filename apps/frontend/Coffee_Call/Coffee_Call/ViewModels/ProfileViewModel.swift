@@ -271,10 +271,19 @@ class ProfileViewModel: ObservableObject {
         ProfileImageHelper.clearProfileImage()
         self.profileImage = nil
 
-        self.name = AppConstants.MockData.userName
-        self.bio = AppConstants.MockData.userBio
-        self.initials = AppConstants.MockData.userInitials
-        self.location = "Bengaluru, India"
+        // When Firebase is enabled, reset to blank so real data loads on next login.
+        // In offline/preview mode, restore mock persona so screens remain previewable.
+        if isFirebaseEnabled {
+            self.name = ""
+            self.bio = ""
+            self.initials = ""
+            self.location = ""
+        } else {
+            self.name = AppConstants.MockData.userName
+            self.bio = AppConstants.MockData.userBio
+            self.initials = AppConstants.MockData.userInitials
+            self.location = "Bengaluru, India"
+        }
         self.availabilityWeekdayEvenings = true
         self.availabilityWeekends = true
         self.availabilityDaytime = false

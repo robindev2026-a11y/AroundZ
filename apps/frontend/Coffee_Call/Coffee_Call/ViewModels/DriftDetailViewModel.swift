@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import FirebaseAuth
+import FirebaseFirestore
 
 struct ParticipantDetail: Identifiable, Hashable {
     let id = UUID()
@@ -102,16 +103,21 @@ class DriftDetailViewModel: ObservableObject {
             interests: ["Walks", "Coffee", "Movies"]
         )
         
-        var updatedDrift = drift
-        updatedDrift.host = richHost
         self.drift = updatedDrift
-        
-        self.participants = [
-            ParticipantDetail(name: "Liam", initials: "LJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 2:14 PM"),
-            ParticipantDetail(name: "Maya", initials: "MM", interests: ["Coffee", "Walks", "Music"], joinTimeDescription: "Joined today 1:45 PM"),
-            ParticipantDetail(name: "Sarah", initials: "SJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 12:30 PM"),
-            ParticipantDetail(name: "Dev", initials: "DG", interests: ["Music", "Coffee", "Walks"], joinTimeDescription: "Joined today 11:15 AM")
-        ]
+
+        // Participants: fetch live from Firestore when Firebase is enabled.
+        // Fall back to mock people in offline/preview mode.
+        if isFirebaseEnabled {
+            self.participants = [] // will be populated by fetchParticipants()
+            fetchParticipants()
+        } else {
+            self.participants = [
+                ParticipantDetail(name: "Liam", initials: "LJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 2:14 PM"),
+                ParticipantDetail(name: "Maya", initials: "MM", interests: ["Coffee", "Walks", "Music"], joinTimeDescription: "Joined today 1:45 PM"),
+                ParticipantDetail(name: "Sarah", initials: "SJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 12:30 PM"),
+                ParticipantDetail(name: "Dev", initials: "DG", interests: ["Music", "Coffee", "Walks"], joinTimeDescription: "Joined today 11:15 AM")
+            ]
+        }
         
         if let initialJoinStatus {
             self.joinStatus = initialJoinStatus
@@ -137,14 +143,19 @@ class DriftDetailViewModel: ObservableObject {
     
     func requestToJoin() {
         let currentUid = Auth.auth().currentUser?.uid ?? ""
-        let currentUserName = AppConstants.MockData.userName
-        let currentUserInitials = AppConstants.MockData.userInitials
+
+        // Use real profile data from UserDefaults (written by ProfileViewModel on save/fetch).
+        // Falls back to MockData only if UserDefaults has nothing (offline preview mode).
+        let currentUserName = UserDefaults.standard.string(forKey: "profile_name")
+            ?? AppConstants.MockData.userName
+        let currentUserInitials = UserDefaults.standard.string(forKey: "profile_initials")
+            ?? AppConstants.MockData.userInitials
         let currentUserRole = "Member"
-        
+
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         let timestamp = formatter.string(from: Date())
-        
+
         let joinRequest = JoinRequest(
             userId: currentUid,
             userName: currentUserName,
@@ -153,7 +164,7 @@ class DriftDetailViewModel: ObservableObject {
             message: "Hey, I'd love to join your drift!",
             timestamp: timestamp
         )
-        
+
         driftsService.requestToJoin(driftId: drift.id, request: joinRequest)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completionResult in
@@ -168,6 +179,59 @@ class DriftDetailViewModel: ObservableObject {
                 }
             })
             .store(in: &cancellables)
+    }
+
+    // MARK: - Firebase Participants Fetch
+    private var isFirebaseEnabled: Bool {
+        Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+    }
+
+    func fetchParticipants() {
+        guard isFirebaseEnabled else { return }
+        let db = Firestore.firestore()
+        let postId = drift.id.uuidString
+
+        db.collection("acceptances")
+            .whereField("postId", isEqualTo: postId)
+            .getDocuments { [weak self] snapshot, error in
+                guard let self = self, let docs = snapshot?.documents, error == nil else { return }
+
+                let group = DispatchGroup()
+                var fetched: [ParticipantDetail] = []
+
+                for doc in docs {
+                    let data = doc.data()
+                    guard let acceptorId = data["acceptorId"] as? String else { continue }
+
+                    group.enter()
+                    db.collection("users").document(acceptorId).getDocument { userSnap, _ in
+                        defer { group.leave() }
+                        let userData = userSnap?.data() ?? [:]
+                        let name = userData["name"] as? String ?? "Someone"
+                        let parts = name.components(separatedBy: " ")
+                        let initials = parts.compactMap { $0.first }.map { String($0) }.joined().uppercased()
+                        let interests = userData["interestTags"] as? [String] ?? []
+
+                        var joinTimeDesc = "Joined recently"
+                        if let ts = data["acceptedAt"] as? Timestamp {
+                            let fmt = DateFormatter()
+                            fmt.timeStyle = .short
+                            joinTimeDesc = "Joined \(fmt.string(from: ts.dateValue()))"
+                        }
+
+                        fetched.append(ParticipantDetail(
+                            name: name,
+                            initials: initials,
+                            interests: interests,
+                            joinTimeDescription: joinTimeDesc
+                        ))
+                    }
+                }
+
+                group.notify(queue: .main) { [weak self] in
+                    self?.participants = fetched
+                }
+            }
     }
     
     var isBookmarked: Bool {

@@ -8,9 +8,11 @@ class FirebaseChatService: ChatServiceProtocol, DriftChatThreadServiceProtocol {
     private var isFirebaseEnabled: Bool {
         return Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
     }
-    
+
     private var cachedChats: [Drift] = []
-    
+    /// Closure called on the main queue whenever Firestore delivers new chat data.
+    var onUpdate: (([Drift]) -> Void)?
+
     init() {
         if isFirebaseEnabled {
             setupChatsListener()
@@ -114,6 +116,8 @@ class FirebaseChatService: ChatServiceProtocol, DriftChatThreadServiceProtocol {
                 
                 dispatchGroup.notify(queue: .main) {
                     self.cachedChats = chats
+                    // Notify ChatsViewModel so the UI refreshes immediately.
+                    self.onUpdate?(chats)
                 }
             }
     }
