@@ -254,14 +254,12 @@ class ProfileViewModel: ObservableObject {
     }
     
     // MARK: - Sign Out & Reset (CRUD: Delete/Reset)
+    // Note: Firebase session sign-out is handled exclusively by AuthViewModel.signOut().
+    // This method only clears local profile state and UserDefaults.
     func signOut() {
         let wasLoaded = self.isLoaded
         self.isLoaded = false
-        
-        if isFirebaseEnabled {
-            try? Auth.auth().signOut()
-        }
-        
+
         UserDefaults.standard.removeObject(forKey: "profile_name")
         UserDefaults.standard.removeObject(forKey: "profile_bio")
         UserDefaults.standard.removeObject(forKey: "profile_initials")
@@ -272,7 +270,7 @@ class ProfileViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "profile_interests")
         ProfileImageHelper.clearProfileImage()
         self.profileImage = nil
-        
+
         self.name = AppConstants.MockData.userName
         self.bio = AppConstants.MockData.userBio
         self.initials = AppConstants.MockData.userInitials
@@ -281,7 +279,7 @@ class ProfileViewModel: ObservableObject {
         self.availabilityWeekends = true
         self.availabilityDaytime = false
         self.interests = [.coffee, .walk, .food, .movie, .study]
-        
+
         self.isLoaded = wasLoaded
     }
     
