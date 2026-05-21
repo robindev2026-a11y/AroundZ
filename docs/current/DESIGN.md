@@ -161,7 +161,7 @@ Target iPhone planning size: 393 x 852pt.
 - Three soft rings labeled `0.8 mi`, `0.6 mi`, and `0.3 mi`.
 - Center bubble: 72 x 72pt, icon and label `You`.
 - Nearby anonymous bubbles: 46 x 46pt with initials such as `LM`, `DK`, `MR`, `NP`, `AL`.
-- Bubbles are interactive activity signals.
+- Bubbles may be backed by nearby user presence, but they are presented as ambient activity signals rather than profile cards.
 - Tapping a radar element must not open a profile or direct message. Instead, it presents a small floating interest card anchored near the bottom of the radar showing only the anonymous active interests (e.g., "Coffee & Walks").
 
 ### Refresh Control

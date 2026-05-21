@@ -4,12 +4,16 @@ import Combine
 protocol DiscoveryServiceProtocol {
     func fetchInterestCategories() -> [InterestCategory]
     func fetchRadarPeople() -> [RadarPerson]
-    var onUpdate: (() -> Void)? { get set }
+    func refreshRadarSnapshot(completion: @escaping () -> Void)
+}
+
+extension DiscoveryServiceProtocol {
+    func refreshRadarSnapshot(completion: @escaping () -> Void) {
+        completion()
+    }
 }
 
 class MockDiscoveryService: DiscoveryServiceProtocol {
-    var onUpdate: (() -> Void)? = nil
-    
     func fetchInterestCategories() -> [InterestCategory] {
         [
             InterestCategory(id: "Coffee", label: AppStrings.Discovery.Categories.coffee, icon: AppIcons.coffee, count: 3, color: .brandPrimary),
@@ -22,7 +26,7 @@ class MockDiscoveryService: DiscoveryServiceProtocol {
             InterestCategory(id: "Workout",label: "Workout",                               icon: "dumbbell.fill", count: 4, color: .brandPurple)
         ]
     }
-    
+
     func fetchRadarPeople() -> [RadarPerson] {
         [
             RadarPerson(initials: "LM", name: "Liam M.", color: .brandPrimary, distance: 0.75, angle: 110, hasPresence: true, interests: ["Coffee", "Walks"]),
@@ -38,13 +42,14 @@ class DiscoveryViewModel: ObservableObject {
     @Published var interestCategories: [InterestCategory] = []
     @Published var radarPeople: [RadarPerson] = []
     @Published var isScanning: Bool = false
-    
+
     private var service: DiscoveryServiceProtocol
-    
+    private var isRefreshingSnapshot: Bool = false
+
     // Header Strings (Using AppStrings)
     let title = AppStrings.Discovery.title
     let subtitle = AppStrings.Discovery.subtitleDefault
-    
+
     // Context Card Strings (Using AppStrings)
     let contextTitle = AppStrings.Discovery.driftsForming
     let contextBody = AppStrings.Discovery.driftsFormingSub
@@ -57,22 +62,29 @@ class DiscoveryViewModel: ObservableObject {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
             self.service = isFirebaseEnabled ? FirebaseDiscoveryService() : MockDiscoveryService()
         }
-        self.service.onUpdate = { [weak self] in
-            DispatchQueue.main.async {
-                self?.loadData()
-            }
-        }
         loadData()
     }
-    
+
     func loadData() {
         self.interestCategories = service.fetchInterestCategories()
         self.radarPeople = service.fetchRadarPeople()
     }
-    
+
+    func refreshRadarSnapshot() {
+        guard !isRefreshingSnapshot else { return }
+        isRefreshingSnapshot = true
+        service.refreshRadarSnapshot { [weak self] in
+            DispatchQueue.main.async {
+                self?.loadData()
+                self?.isRefreshingSnapshot = false
+            }
+        }
+    }
+
     func refreshNearby() {
         guard !isScanning else { return }
         isScanning = true
+        refreshRadarSnapshot()
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             self?.isScanning = false
         }

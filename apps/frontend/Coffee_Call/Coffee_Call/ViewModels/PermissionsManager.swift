@@ -8,12 +8,15 @@ import FirebaseFirestore
 
 class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     static let shared = PermissionsManager()
-    
+
     @Published var locationStatus: CLAuthorizationStatus = .notDetermined
     @Published var notificationStatus: UNAuthorizationStatus = .notDetermined
-    
+
     private let locationManager = CLLocationManager()
-    
+    private let locationRefreshInterval: TimeInterval = 60 * 60
+    private let lastLocationRefreshKey = "CoffeeCall.lastLocationRefreshAt"
+    private var isLocationRequestInFlight = false
+
     override init() {
         super.init()
         locationManager.delegate = self
@@ -22,7 +25,7 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
         self.locationStatus = locationManager.authorizationStatus
         checkNotificationStatus()
     }
-    
+
     func checkNotificationStatus() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
@@ -30,7 +33,7 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
             }
         }
     }
-    
+
     func requestLocationPermission() {
         let status = locationManager.authorizationStatus
         if status == .notDetermined {
@@ -39,14 +42,20 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
             openSettings()
         }
     }
-    
-    func requestLocation() {
+
+    func requestLocation(force: Bool = false) {
         let status = locationManager.authorizationStatus
         if status == .authorizedWhenInUse || status == .authorizedAlways {
+            guard force || shouldRequestLocation() else {
+                print("PermissionsManager: Skipping location request because last refresh is still fresh")
+                return
+            }
+            guard !isLocationRequestInFlight else { return }
+            isLocationRequestInFlight = true
             locationManager.requestLocation()
         }
     }
-    
+
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
@@ -62,52 +71,68 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
             }
         }
     }
-    
+
     private func openSettings() {
         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else { return }
         if UIApplication.shared.canOpenURL(settingsUrl) {
             UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
         }
     }
-    
+
+    private func shouldRequestLocation() -> Bool {
+        guard let lastRefresh = UserDefaults.standard.object(forKey: lastLocationRefreshKey) as? Date else {
+            return true
+        }
+        return Date().timeIntervalSince(lastRefresh) >= locationRefreshInterval
+    }
+
     // MARK: - CLLocationManagerDelegate
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         DispatchQueue.main.async {
             self.locationStatus = manager.authorizationStatus
             if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
-                self.locationManager.requestLocation()
+                self.requestLocation(force: true)
             }
         }
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
+        guard let location = locations.last else {
+            isLocationRequestInFlight = false
+            return
+        }
         let lat = location.coordinate.latitude
         let lng = location.coordinate.longitude
         print("PermissionsManager: Location updated to \(lat), \(lng)")
-        
+
         let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
         if isFirebaseEnabled, let uid = Auth.auth().currentUser?.uid {
             let db = Firestore.firestore()
             let geoHash = GeohashHelper.encode(latitude: lat, longitude: lng)
-            
+
             let data: [String: Any] = [
                 "lastLocation": GeoPoint(latitude: lat, longitude: lng),
                 "lastLocationGeoHash": geoHash,
                 "lastLocationUpdate": FieldValue.serverTimestamp()
             ]
-            
+
             db.collection("users").document(uid).setData(data, merge: true) { error in
+                self.isLocationRequestInFlight = false
                 if let error = error {
                     print("PermissionsManager: Error updating location in Firestore: \(error.localizedDescription)")
                 } else {
+                    UserDefaults.standard.set(Date(), forKey: self.lastLocationRefreshKey)
                     print("PermissionsManager: Successfully updated location in Firestore for user \(uid)")
                 }
             }
+        } else {
+            UserDefaults.standard.set(Date(), forKey: lastLocationRefreshKey)
+            isLocationRequestInFlight = false
         }
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        isLocationRequestInFlight = false
         print("PermissionsManager: Location update failed: \(error.localizedDescription)")
     }
 }
@@ -115,7 +140,7 @@ class PermissionsManager: NSObject, ObservableObject, CLLocationManagerDelegate 
 // MARK: - Geohash Encoding Helper
 struct GeohashHelper {
     private static let base32 = Array("0123456789bcdefghjkmnpqrstuvwxyz")
-    
+
     static func encode(latitude: Double, longitude: Double, precision: Int = 9) -> String {
         var latRange = (-90.0, 90.0)
         var lonRange = (-180.0, 180.0)
@@ -123,7 +148,7 @@ struct GeohashHelper {
         var isEven = true
         var bit = 0
         var ch = 0
-        
+
         while geohash.count < precision {
             let mid: Double
             if isEven {
@@ -143,7 +168,7 @@ struct GeohashHelper {
                     latRange.1 = mid
                 }
             }
-            
+
             isEven.toggle()
             if bit < 4 {
                 bit += 1

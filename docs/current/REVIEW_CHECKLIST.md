@@ -97,6 +97,15 @@ Primary files:
   - Status: Done
   - Owner: Agent
 
+- [x] ISSUE-037
+  - Screen: Around / Discovery
+  - Priority: P1
+  - Type: Backend cost, Privacy, Battery
+  - Summary: Firebase mode keeps a live `users` collection listener for radar presence and requests location on every Around appearance.
+  - Expected: Radar should use explicit one-time snapshots cached in the UI, location writes should be throttled to a one-hour interval, and manual refresh should force both location and radar refresh without opening profile browsing or cold outreach.
+  - Status: Done
+  - Owner: Agent
+
 ### 2. Drifts / Listing
 
 Spec anchors:

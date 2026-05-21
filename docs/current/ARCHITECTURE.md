@@ -78,6 +78,9 @@ The product may call user-facing posts "Drifts"; storage can keep the existing c
 - Discovery radius is fixed at 10 km.
 - Location queries use geohashing-friendly data.
 - Around shows ambient signals and category counts.
+- Around radar may use nearby user presence as an anonymous ambient signal.
+- Around radar presence uses explicit one-time snapshots cached in the UI, not a continuous live user listener.
+- Current-user location refreshes are one-shot and should be throttled to a one-hour interval, with manual radar refresh allowed to force a fresh location request.
 - Drifts listing shows concrete nearby meetups.
 - Radar initials are not public profiles and must not provide direct contact entry points.
 

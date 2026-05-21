@@ -14,6 +14,8 @@ Connected the onboarding authentication flow to the main application flow, makin
 
 - Add a simple internal web admin panel after MVP for moderation, user review, and safety operations.
 - Keep the admin panel separate from the consumer iOS app and gate it with admin-only auth claims.
+- Clarified that Around radar may use anonymous nearby user presence as ambient signal, while Drifts remains the concrete discovery/action surface.
+- Updated Around radar Firebase behavior to use one-time presence snapshots and one-hour-throttled current-user location writes instead of live user listeners.
 
 ## UX Status
 
@@ -42,6 +44,15 @@ Connected the onboarding authentication flow to the main application flow, makin
 - The live Around implementation may be a partial match to the approved design.
 - The approved Around design requires the full two-row interests grid to remain visible above the floating bottom nav.
 - Archive files may contain outdated patterns; they are not active guidance.
+
+## 2026-05-21 Updates
+
+- Replaced the Firebase Around radar `users` live listener with an explicit one-time `getDocuments` snapshot, capped to recent presence signals and cached in `DiscoveryViewModel`.
+- Added one-hour throttling for normal current-user location uploads in `PermissionsManager`, while allowing the radar refresh button to force a fresh location request.
+- Wired Around `.onAppear` to fetch a radar snapshot and the refresh button to force location plus radar refresh while preserving the scan animation.
+- Marked `ISSUE-037` done in `docs/current/REVIEW_CHECKLIST.md`.
+- Files touched: `FirebaseDiscoveryService.swift`, `DiscoveryViewModel.swift`, `PermissionsManager.swift`, `DiscoveryScreen.swift`, `ARCHITECTURE.md`, `REVIEW_CHECKLIST.md`, `STATUS.md`.
+- Verification performed: Static code review only. Per repository rules, no `xcodebuild`, simulator launch, or build validation was run.
 
 ## Documentation Reset Log
 

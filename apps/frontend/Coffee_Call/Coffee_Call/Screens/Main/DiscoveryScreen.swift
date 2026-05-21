@@ -262,6 +262,7 @@ struct DiscoveryScreen: View {
         .onAppear {
             NavigationManager.shared.resetTabBarVisibility()
             PermissionsManager.shared.requestLocation()
+            viewModel.refreshRadarSnapshot()
         }
     }
 }
@@ -319,6 +320,7 @@ extension DiscoveryScreen {
                 Spacer()
                 
                 Button(action: {
+                    PermissionsManager.shared.requestLocation(force: true)
                     viewModel.refreshNearby()
                 }) {
                     

@@ -47,7 +47,7 @@ Historical markdown lives under `docs/archive/2026-05-16-md-reset/`. Archive fil
 - Activity first, person second.
 - The Drift is the unit of action.
 - No cold direct messages.
-- No person browsing from Around.
+- No person browsing from Around: the radar may show anonymous nearby user presence as ambient activity signal, but it must not expose profiles, direct contact, or a public people list.
 - No phone number exchange in MVP.
 - Async messaging only.
 - Posts stay active after acceptance so group meetups are possible.
