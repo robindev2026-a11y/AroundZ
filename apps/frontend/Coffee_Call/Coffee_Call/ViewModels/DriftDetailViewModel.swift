@@ -100,9 +100,12 @@ class DriftDetailViewModel: ObservableObject {
             verified: true,
             otherActiveDrifts: mockOtherActive,
             pastDrifts: ["Walk in Indiranagar", "Coffee chat"],
-            interests: ["Walks", "Coffee", "Movies"]
+            interests: ["Walks", "Coffee", "Movies"],
+            firestoreUID: drift.host.firestoreUID
         )
         
+        var updatedDrift = drift
+        updatedDrift.host = richHost
         self.drift = updatedDrift
 
         // Participants: fetch live from Firestore when Firebase is enabled.
@@ -110,6 +113,7 @@ class DriftDetailViewModel: ObservableObject {
         if isFirebaseEnabled {
             self.participants = [] // will be populated by fetchParticipants()
             fetchParticipants()
+            fetchHostOtherActiveDrifts()
         } else {
             self.participants = [
                 ParticipantDetail(name: "Liam", initials: "LJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 2:14 PM"),
@@ -230,6 +234,119 @@ class DriftDetailViewModel: ObservableObject {
 
                 group.notify(queue: .main) { [weak self] in
                     self?.participants = fetched
+                }
+            }
+    }
+    
+    func fetchHostOtherActiveDrifts() {
+        guard isFirebaseEnabled else { return }
+        let creatorId = drift.host.firestoreUID
+        guard !creatorId.isEmpty else { return }
+        
+        let db = Firestore.firestore()
+        db.collection("posts")
+            .whereField("creatorId", isEqualTo: creatorId)
+            .getDocuments { [weak self] snapshot, error in
+                guard let self = self, let docs = snapshot?.documents, error == nil else { return }
+                
+                let currentUid = Auth.auth().currentUser?.uid
+                let fetchedDrifts: [Drift] = docs.compactMap { doc -> Drift? in
+                    // Let's skip the current drift!
+                    if doc.documentID == self.drift.id.uuidString { return nil }
+                    
+                    let data = doc.data()
+                    let isActive = data["isActive"] as? Bool ?? true
+                    if !isActive { return nil }
+                    
+                    let id = UUID.fromString(doc.documentID)
+                    let title = data["title"] as? String ?? ""
+                    let description = data["description"] as? String ?? ""
+                    let location = data["location"] as? String ?? ""
+                    let meetingPoint = data["meetingPoint"] as? String ?? ""
+                    let time = data["time"] as? String ?? ""
+                    let endTime = data["endTime"] as? String ?? ""
+                    let date = data["date"] as? String ?? ""
+                    let distance = data["distance"] as? Double ?? 1.2
+                    
+                    let statusStr = data["status"] as? String ?? "OPEN"
+                    let status: DriftStatus
+                    switch statusStr.uppercased() {
+                    case "OPEN": status = .open
+                    case "STARTING SOON": status = .startingSoon
+                    case "TONIGHT": status = .tonight
+                    case "ENDED": status = .ended
+                    default: status = .open
+                    }
+                    
+                    let categoryStr = data["category"] as? String ?? "coffee"
+                    let category = DriftCategory(rawValue: categoryStr.lowercased()) ?? .coffee
+                    let hook = data["hook"] as? String
+                    
+                    let hostName = data["creatorName"] as? String ?? "Host"
+                    
+                    let host = Host(
+                        id: UUID.fromString(creatorId),
+                        name: hostName,
+                        role: "Host",
+                        imageUrl: data["creatorImageUrl"] as? String,
+                        isVerified: data["creatorVerified"] as? Bool ?? false,
+                        firestoreUID: creatorId
+                    )
+                    
+                    let peopleGoing = data["participantCount"] as? Int ?? 1
+                    let capacity = data["capacity"] as? Int ?? 5
+                    let spotsLeft = data["spotsLeft"] as? Int ?? (capacity - peopleGoing)
+                    
+                    let vibeTags = data["vibeTags"] as? [String] ?? []
+                    let whatToBring = data["whatToBring"] as? [String] ?? []
+                    let participantInitials = data["participantInitials"] as? [String] ?? []
+                    let imageUrl = data["imageUrl"] as? String
+                    
+                    let isMine = (creatorId == currentUid)
+                    
+                    return Drift(
+                        id: id,
+                        title: title,
+                        description: description,
+                        location: location,
+                        meetingPoint: meetingPoint,
+                        time: time,
+                        endTime: endTime,
+                        date: date,
+                        distance: distance,
+                        status: status,
+                        category: category,
+                        hook: hook,
+                        host: host,
+                        peopleGoing: peopleGoing,
+                        spotsLeft: spotsLeft,
+                        capacity: capacity,
+                        vibeTags: vibeTags,
+                        whatToBring: whatToBring,
+                        participantInitials: participantInitials,
+                        imageUrl: imageUrl,
+                        isMine: isMine
+                    )
+                }
+                
+                DispatchQueue.main.async {
+                    var updatedHost = self.drift.host
+                    let newHost = Host(
+                        id: updatedHost.id,
+                        name: updatedHost.name,
+                        role: updatedHost.role,
+                        imageUrl: updatedHost.imageUrl,
+                        isVerified: updatedHost.isVerified,
+                        hostedCount: updatedHost.hostedCount,
+                        joinedCount: updatedHost.joinedCount,
+                        completedCount: updatedHost.completedCount,
+                        verified: updatedHost.verified,
+                        otherActiveDrifts: fetchedDrifts,
+                        pastDrifts: updatedHost.pastDrifts,
+                        interests: updatedHost.interests,
+                        firestoreUID: updatedHost.firestoreUID
+                    )
+                    self.drift.host = newHost
                 }
             }
     }

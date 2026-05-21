@@ -66,7 +66,8 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         name: hostName,
                         role: "Host",
                         imageUrl: data["creatorImageUrl"] as? String,
-                        isVerified: data["creatorVerified"] as? Bool ?? false
+                        isVerified: data["creatorVerified"] as? Bool ?? false,
+                        firestoreUID: creatorId
                     )
                     
                     let peopleGoing = data["participantCount"] as? Int ?? 1

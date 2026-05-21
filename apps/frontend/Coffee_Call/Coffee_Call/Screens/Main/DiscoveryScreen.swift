@@ -255,6 +255,7 @@ struct DiscoveryScreen: View {
         )
         .onAppear {
             NavigationManager.shared.resetTabBarVisibility()
+            PermissionsManager.shared.requestLocation()
         }
     }
 }

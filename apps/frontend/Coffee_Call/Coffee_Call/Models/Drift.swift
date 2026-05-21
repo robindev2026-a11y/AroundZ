@@ -109,6 +109,7 @@ struct Host: Identifiable, Hashable, Codable {
     let otherActiveDrifts: [Drift]
     let pastDrifts: [String]
     let interests: [String]
+    let firestoreUID: String
     
     init(
         id: UUID = UUID(),
@@ -122,7 +123,8 @@ struct Host: Identifiable, Hashable, Codable {
         verified: Bool = true,
         otherActiveDrifts: [Drift] = [],
         pastDrifts: [String] = ["Walk in Indiranagar", "Coffee chat"],
-        interests: [String] = ["Walks", "Coffee", "Movies"]
+        interests: [String] = ["Walks", "Coffee", "Movies"],
+        firestoreUID: String = ""
     ) {
         self.id = id
         self.name = name
@@ -136,6 +138,7 @@ struct Host: Identifiable, Hashable, Codable {
         self.otherActiveDrifts = otherActiveDrifts
         self.pastDrifts = pastDrifts
         self.interests = interests
+        self.firestoreUID = firestoreUID
     }
     
     var initials: String {

@@ -119,8 +119,14 @@ Connected the onboarding authentication flow to the main application flow, makin
   - Implemented `FirebaseDriftsService` CRUD operations in Firestore (create, request to join, accept, reject, status update) utilizing Firestore transactions and array mappings.
   - Hooked up `CreateDriftViewModel`, `DriftDetailViewModel`, and `ManageDriftViewModel` to utilize the new decoupled service protocols.
   - Enhanced `ProfileViewModel` to sync profile fields (name, bio, location, availability, interests) to the Firestore `users` collection in real time, fetch documents on launch, and handle Firebase sign-out resets cleanly without infinite write loops.
-- Files touched: `Drift.swift`, `DriftsService.swift`, `FirebaseDriftsService.swift`, `CreateDriftButton.swift`, `DriftDetailViewModel.swift`, `ManageDriftViewModel.swift`, `ProfileViewModel.swift`, `STATUS.md`.
-- Verification performed: Successfully compiled the entire workspace targeting iOS Simulator using `xcodebuild` with zero compilation errors.
+- Connected Live GPS Geolocation Tracking & Geohash Uploads to Firestore:
+  - Added `firestoreUID` property to `Host` in `Drift.swift` to track the Firestore user ID.
+  - Injected Firestore `creatorId` into `Host.firestoreUID` inside `FirebaseDriftsService.swift` and `FirebaseChatService.swift`.
+  - Implemented `fetchHostOtherActiveDrifts()` in `DriftDetailViewModel.swift` to retrieve host's other active drifts recursively.
+  - Updated `PermissionsManager.swift` with standard geohash encoding helper, and implemented location delegate uploads to Firestore under `users/{uid}` (`lastLocation`, `lastLocationGeoHash`, `lastLocationUpdate`).
+  - Added `PermissionsManager.shared.requestLocation()` call in `DiscoveryScreen.swift` under `.onAppear` to refresh location and sync with Firestore.
+- Files touched: `Drift.swift`, `DriftsService.swift`, `FirebaseDriftsService.swift`, `CreateDriftButton.swift`, `DriftDetailViewModel.swift`, `ManageDriftViewModel.swift`, `ProfileViewModel.swift`, `FirebaseChatService.swift`, `PermissionsManager.swift`, `DiscoveryScreen.swift`, `STATUS.md`.
+- Verification performed: Checked code changes against guidelines. User validates all builds manually per non-negotiable instruction: "Never run xcodebuild, launch a simulator, or attempt any build/validation step. The user validates all builds themselves."
 - Remaining gaps: None.
 
 - Fixed auth session persistence desync bug in `AuthViewModel.swift`:

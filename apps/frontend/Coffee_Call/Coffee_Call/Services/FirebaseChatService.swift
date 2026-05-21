@@ -68,12 +68,14 @@ class FirebaseChatService: ChatServiceProtocol, DriftChatThreadServiceProtocol {
                         let categoryStr = data["category"] as? String ?? "coffee"
                         let category = DriftCategory(rawValue: categoryStr.lowercased()) ?? .coffee
                         
+                        let creatorId = data["creatorId"] as? String ?? ""
                         let host = Host(
-                            id: UUID.fromString(data["creatorId"] as? String ?? ""),
+                            id: UUID.fromString(creatorId),
                             name: data["creatorName"] as? String ?? "Host",
                             role: "Host",
                             imageUrl: data["creatorImageUrl"] as? String,
-                            isVerified: data["creatorVerified"] as? Bool ?? false
+                            isVerified: data["creatorVerified"] as? Bool ?? false,
+                            firestoreUID: creatorId
                         )
                         
                         let lastMessageData = threadData["lastMessage"] as? [String: Any]
