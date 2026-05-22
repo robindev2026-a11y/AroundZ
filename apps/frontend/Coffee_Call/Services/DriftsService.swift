@@ -8,6 +8,8 @@ protocol DriftsServiceProtocol {
     func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error>
     func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error>
     func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error>
+    func updateDrift(_ drift: Drift) -> AnyPublisher<Void, Error>
+    func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error>
 }
 
 class MockDriftsService: DriftsServiceProtocol {
@@ -175,6 +177,24 @@ class MockDriftsService: DriftsServiceProtocol {
             updatedDrift.status = status
             MockDriftsService.mockDrifts[index] = updatedDrift
         }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+    
+    // MARK: - New CRUD Methods
+    func updateDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
+        // In mock, simply replace the drift in the array if it exists
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == drift.id }) {
+            MockDriftsService.mockDrifts[index] = drift
+        }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+
+    func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error> {
+        MockDriftsService.mockDrifts.removeAll { $0.id == driftId }
         return Just(())
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()

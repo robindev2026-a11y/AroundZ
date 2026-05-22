@@ -76,12 +76,15 @@
 		8B1ECD5D2FC02FBE0060CEB9 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD592FC02FBE0060CEB9 /* LocationService.swift */; };
 		8B1ECD602FC033440060CEB9 /* NotificationPermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD5E2FC033440060CEB9 /* NotificationPermissionService.swift */; };
 		8B1ECD612FC033440060CEB9 /* RadarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD5F2FC033440060CEB9 /* RadarService.swift */; };
+		8B1ECD662FC048830060CEB9 /* EditDriftScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD652FC048830060CEB9 /* EditDriftScreen.swift */; };
+		8B1ECD682FC048C40060CEB9 /* ManageDriftScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD672FC048C40060CEB9 /* ManageDriftScreen.swift */; };
 		8B5A8CE62FBDEA2C003090FE /* CountryCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5A8CE52FBDEA2C003090FE /* CountryCode.swift */; };
 		8B5A8CE82FBDEBAF003090FE /* CountryPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5A8CE72FBDEBAF003090FE /* CountryPickerView.swift */; };
 		8BAB29A62FBD9005004556D9 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A52FBD9005004556D9 /* FirebaseAuth */; };
 		8BAB29A82FBD9005004556D9 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A72FBD9005004556D9 /* FirebaseCore */; };
 		8BAB29AA2FBD9005004556D9 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A92FBD9005004556D9 /* FirebaseFirestore */; };
 		8BAB29AC2FBD9005004556D9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29AB2FBD9005004556D9 /* FirebaseStorage */; };
+		8BD07EB72FC0688200E32A8D /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD07EB62FC0688200E32A8D /* NetworkManager.swift */; };
 		8BE4A1B52FB860B40064EE09 /* DriftContextCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */; };
 		8BE4A1B92FB8B1620064EE09 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE4A1B82FB8B1620064EE09 /* AppColors.swift */; };
 		8D735886447EF9E16224E603 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4792D78269808A78FA6024 /* Font+Extensions.swift */; };
@@ -190,8 +193,11 @@
 		8B1ECD5A2FC02FBE0060CEB9 /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
 		8B1ECD5E2FC033440060CEB9 /* NotificationPermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionService.swift; sourceTree = "<group>"; };
 		8B1ECD5F2FC033440060CEB9 /* RadarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarService.swift; sourceTree = "<group>"; };
+		8B1ECD652FC048830060CEB9 /* EditDriftScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDriftScreen.swift; sourceTree = "<group>"; };
+		8B1ECD672FC048C40060CEB9 /* ManageDriftScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDriftScreen.swift; sourceTree = "<group>"; };
 		8B5A8CE52FBDEA2C003090FE /* CountryCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryCode.swift; sourceTree = "<group>"; };
 		8B5A8CE72FBDEBAF003090FE /* CountryPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryPickerView.swift; sourceTree = "<group>"; };
+		8BD07EB62FC0688200E32A8D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		8BE4A1B42FB860B40064EE09 /* DriftContextCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftContextCard.swift; sourceTree = "<group>"; };
 		8BE4A1B62FB8ACF50064EE09 /* RadarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarView.swift; sourceTree = "<group>"; };
 		8BE4A1B82FB8B1620064EE09 /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
@@ -301,6 +307,7 @@
 		3374CEEB2FB732DB0020F28D /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8BD07EB62FC0688200E32A8D /* NetworkManager.swift */,
 				8B1ECD5E2FC033440060CEB9 /* NotificationPermissionService.swift */,
 				8B1ECD5F2FC033440060CEB9 /* RadarService.swift */,
 				3374CEEA2FB732DB0020F28D /* DriftsService.swift */,
@@ -380,6 +387,8 @@
 		6C7F7ABFC2D113FA3339DA3D /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				8B1ECD672FC048C40060CEB9 /* ManageDriftScreen.swift */,
+				8B1ECD652FC048830060CEB9 /* EditDriftScreen.swift */,
 				6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */,
 				B860AAD253DC8B95B03AF333 /* MainTabView.swift */,
 			);
@@ -641,6 +650,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3374CEE72FB732DB0020F28D /* BookmarkManager.swift in Sources */,
+				8B1ECD662FC048830060CEB9 /* EditDriftScreen.swift in Sources */,
 				3374CEF12FB732DB0020F28D /* PermissionsManager.swift in Sources */,
 				3374CEE92FB732DB0020F28D /* DriftsService.swift in Sources */,
 				23BCC639374942C9BC39CC46 /* CoffeeBottomSheet.swift in Sources */,
@@ -663,9 +673,11 @@
 				33192FB12FB7838E00FBBEDE /* NavigationManager.swift in Sources */,
 				9D8F6B1B9A26ABEE4E624A85 /* Color+Extensions.swift in Sources */,
 				3302E3F72FB475DD0077EAC8 /* Persistence.swift in Sources */,
+				8BD07EB72FC0688200E32A8D /* NetworkManager.swift in Sources */,
 				3374CEAE2FB6DFF50020F28D /* DriftsViewModel.swift in Sources */,
 				D0A1B2C3D4E5F60718293A4C /* CreatedDriftStore.swift in Sources */,
 				3374CEC02FB6E7A50020F28D /* InterestCard.swift in Sources */,
+				8B1ECD682FC048C40060CEB9 /* ManageDriftScreen.swift in Sources */,
 				338E3B1E2FB44DFF0048FC32 /* ActivityCardView.swift in Sources */,
 				3374CEE62FB732DB0020F28D /* RadarPerson.swift in Sources */,
 				8BE4A1B92FB8B1620064EE09 /* AppColors.swift in Sources */,

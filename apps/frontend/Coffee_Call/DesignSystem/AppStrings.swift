@@ -346,6 +346,8 @@ enum AppStrings {
         static let share = "Share"
         static let close = "Close"
         static let delete = "Delete"
+        static let deleteConfirmationTitle = "Delete Drift?"
+        static let deleteConfirmationMessage = "This will permanently remove the Drift and can't be undone."
         static let requests = "Requests"
         static let participants = "Participants"
         static let openChat = "Open Drift Chat"
@@ -360,6 +362,17 @@ enum AppStrings {
         static let whoIsComing = "Who's Coming"
         static let preciseLocationNote = "Precise meeting coordinate is unlocked"
         static let joinToSeeParticipants = "Join to see participants"
+
+        enum EditFields {
+            static let title = "Title"
+            static let description = "Description"
+            static let location = "Approximate location"
+            static let meetingPoint = "Meeting point"
+            static let date = "Date"
+            static let time = "Time"
+            static let endTime = "End time"
+            static let capacity = "Capacity"
+        }
         
         static func capacity(count: Int) -> String { "Open to \(count) people" }
         static func joinedCount(count: Int) -> String { "\(count) joined" }

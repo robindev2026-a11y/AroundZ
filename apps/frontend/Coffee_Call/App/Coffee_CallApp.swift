@@ -50,9 +50,11 @@ struct Coffee_CallApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     let persistenceController = PersistenceController.shared
 
+    @StateObject private var networkManager = NetworkManager.shared
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(networkManager)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

@@ -387,6 +387,71 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         
         return subject.eraseToAnyPublisher()
     }
+    
+    // MARK: - Update Drift (full fields)
+    func updateDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().updateDrift(drift)
+        }
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postRef = db.collection("posts").document(drift.id.uuidString)
+        var data: [String: Any] = [
+            "title": drift.title,
+            "description": drift.description,
+            "location": drift.location,
+            "meetingPoint": drift.meetingPoint,
+            "time": drift.time,
+            "endTime": drift.endTime,
+            "date": drift.date,
+            "distance": drift.distance,
+            "status": drift.status.rawValue,
+            "category": drift.category.rawValue,
+            "hook": drift.hook ?? "",
+            "capacity": drift.capacity,
+            "vibeTags": drift.vibeTags,
+            "whatToBring": drift.whatToBring,
+            "participantInitials": drift.participantInitials,
+            "imageUrl": drift.imageUrl ?? "",
+            "latitude": drift.latitude as Any,
+            "longitude": drift.longitude as Any
+        ]
+        // Remove nil entries for optional fields
+        data = data.filter { !($0.value is NSNull) }
+        postRef.setData(data, merge: true) { error in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        return subject.eraseToAnyPublisher()
+    }
+    
+    // MARK: - Delete Drift
+    func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().deleteDrift(driftId: driftId)
+        }
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postRef = db.collection("posts").document(driftId.uuidString)
+        let threadRef = db.collection("messageThreads").document(driftId.uuidString)
+        let batch = db.batch()
+        batch.deleteDocument(postRef)
+        batch.deleteDocument(threadRef)
+        batch.commit { error in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        return subject.eraseToAnyPublisher()
+    }
+
 }
 
 extension JoinRequest {

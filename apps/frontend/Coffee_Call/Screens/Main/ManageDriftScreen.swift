@@ -1,60 +1,87 @@
 import SwiftUI
 
 struct ManageDriftScreen: View {
+    @State private var showEdit = false
+    @State private var showDeleteAlert = false
     @StateObject var viewModel: ManageDriftViewModel
     @Environment(\.dismiss) var dismiss
     @StateObject private var navManager = NavigationManager.shared
     @State private var tabBarVisibilitySource = UUID().uuidString
     
     var body: some View {
-        VStack(spacing: AppConstants.Layout.standardPadding) {
-            // MARK: - Navigation Space & Title
-            HStack {
-                Text(AppStrings.Manage.title)
-                    .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
-                    .foregroundColor(.textPrimary)
-                Spacer()
-            }
-            .padding(.top, 20) // Tight spacing under the VStack header
-            
-            // MARK: - Overview Card
-            driftOverviewCard
-            
-            // MARK: - Host Actions
-            hostActionsRow
-            
-            // MARK: - Join Requests
-            if !viewModel.drift.pendingRequests.isEmpty {
-                joinRequestsSection
-            }
-            
-            // MARK: - Joined Participants
-            joinedParticipantsSection
-            
-            // MARK: - Primary Action
-            openChatButton
-            
-            // MARK: - Safety Reminder
-            safetyReminderBanner
-        }
-        .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .padding(.bottom, AppConstants.Layout.screenBottomSpacer + 40)
-        .asCoffeePage(
-            .sub,
-            title: "",
-            rightView: {
-                HStack(spacing: 8) {
-                    CoffeeHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
-                    CoffeeHeaderButton(icon: AppIcons.ellipsis) { }
+        ZStack {
+            VStack(spacing: AppConstants.Layout.standardPadding) {
+                // MARK: - Navigation Space & Title
+                HStack {
+                    Text(AppStrings.Manage.title)
+                        .font(.system(size: AppConstants.Typography.sizeDisplay, weight: .black))
+                        .foregroundColor(.textPrimary)
+                    Spacer()
                 }
+                .padding(.top, 20) // Tight spacing under the VStack header
+                
+                // MARK: - Overview Card
+                driftOverviewCard
+                
+                // MARK: - Host Actions
+                hostActionsRow
+                
+                // MARK: - Join Requests
+                if !viewModel.drift.pendingRequests.isEmpty {
+                    joinRequestsSection
+                }
+                
+                // MARK: - Joined Participants
+                joinedParticipantsSection
+                
+                // MARK: - Primary Action
+                openChatButton
+                
+                // MARK: - Safety Reminder
+                safetyReminderBanner
             }
-        )
-        .navigationBarHidden(true)
-        .onAppear {
-            navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
+            .padding(.horizontal, AppConstants.Layout.standardPadding)
+            .padding(.bottom, AppConstants.Layout.screenBottomSpacer + 40)
+            .asCoffeePage(
+                .sub,
+                title: "",
+                rightView: {
+                    HStack(spacing: 8) {
+                        CoffeeHeaderButton(icon: AppIcons.share) { viewModel.shareDrift() }
+                        CoffeeHeaderButton(icon: AppIcons.ellipsis) { }
+                    }
+                }
+            )
+            .navigationBarHidden(true)
+        .navigationDestination(isPresented: $showEdit) {
+            EditDriftScreen(viewModel: viewModel)
         }
-        .onDisappear {
-            navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
+            .onAppear {
+                navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
+                // Ensure edit button respects editability
+            }
+            .onDisappear {
+                navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
+            }
+            .alert(isPresented: $showDeleteAlert) {
+                Alert(
+                    title: Text(AppStrings.Manage.deleteConfirmationTitle),
+                    message: Text(AppStrings.Manage.deleteConfirmationMessage),
+                    primaryButton: .destructive(Text(AppStrings.Manage.delete)) {
+                        viewModel.deleteDrift()
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+            .alert(isPresented: $viewModel.showDeleteError) {
+                Alert(
+                    title: Text("Delete Error"),
+                    message: Text(viewModel.deleteErrorMessage),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
+            
+
         }
     }
     
@@ -150,10 +177,15 @@ struct ManageDriftScreen: View {
     // MARK: - Action Buttons
     private var hostActionsRow: some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
-            actionButton(icon: "pencil", label: AppStrings.Manage.edit, color: .textPrimary, action: viewModel.editDrift)
+            // Edit button triggers navigation
+            actionButton(icon: "pencil", label: AppStrings.Manage.edit, color: .textPrimary, action: { showEdit = true })
+                .disabled(!viewModel.canEdit)
+            // Share button
             actionButton(icon: AppIcons.share, label: AppStrings.Manage.share, color: .textPrimary, action: viewModel.shareDrift)
+            // Close button
             actionButton(icon: "pause.circle", label: AppStrings.Manage.close, color: .brandPurple, action: viewModel.closeDrift)
-            actionButton(icon: "trash", label: AppStrings.Manage.delete, color: .statusError, action: viewModel.deleteDrift)
+            // Delete button triggers alert
+            actionButton(icon: "trash", label: AppStrings.Manage.delete, color: .statusError, action: { showDeleteAlert = true })
         }
     }
     
@@ -174,6 +206,8 @@ struct ManageDriftScreen: View {
         }
     }
     
+
+
     // MARK: - Join Requests Section
     private var joinRequestsSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
