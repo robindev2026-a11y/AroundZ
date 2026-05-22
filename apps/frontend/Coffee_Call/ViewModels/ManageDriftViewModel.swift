@@ -123,24 +123,14 @@ class ManageDriftViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completionResult in
                 self?.isLoading = false
-                if case .failure(let error) = completionResult {
+                switch completionResult {
+                case .failure(let error):
                     print("Error deleting drift: \(error)")
                     self?.presentError("Failed to delete drift: \(error.localizedDescription)")
-                }
-            }, receiveValue: { })
-            .store(in: &cancellables)
-        
-        // For non-transactional delete calls, success arrives via completion (finished) and we set didDelete there.
-        // Some publishers send a value before finishing; handle that as success as well.
-        driftsService.deleteDrift(driftId: drift.id)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completionResult in
-                if case .finished = completionResult {
+                case .finished:
                     self?.didDelete = true
                 }
-            }, receiveValue: { [weak self] in
-                self?.didDelete = true
-            })
+            }, receiveValue: { })
             .store(in: &cancellables)
     }
 
