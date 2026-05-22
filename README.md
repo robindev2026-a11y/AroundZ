@@ -4,22 +4,17 @@ CoffeeCall is an activity-based meetup app for nearby spontaneous plans.
 
 ## Active Documentation
 
-Use only the active docs in `docs/current/`:
+Use only the active docs in `docs/`:
 
-- `docs/current/CONTEXT.md`
-- `docs/current/PLAN.md`
-- `docs/current/ARCHITECTURE.md`
-- `docs/current/DESIGN.md`
-- `docs/current/STATUS.md`
+- `docs/CONTEXT.md`
+- `docs/PLAN.md`
+- `docs/ARCHITECTURE.md`
+- `docs/DESIGN.md`
+- `docs/STATUS.md`
 
-Agent starter files:
+Agent working rules:
 
 - `AGENTS.md`
-- `CODEX.md`
-- `CLAUDE.md`
-- `ANTIGRAVITY.md`
-
-Historical markdown has been archived under `docs/archive/2026-05-16-md-reset/` and is not current guidance.
 
 ## Stack
 
@@ -31,8 +26,7 @@ Historical markdown has been archived under `docs/archive/2026-05-16-md-reset/` 
 ```text
 apps/frontend/      SwiftUI iOS app
 apps/backend/       Firebase backend
-docs/current/       Active project documentation
-docs/archive/       Historical documentation
+docs/               Active project documentation
 ```
 
 ## Working Rule

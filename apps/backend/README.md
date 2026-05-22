@@ -9,12 +9,10 @@ CoffeeCall uses Firebase for the MVP backend.
 
 Use:
 
-- `../../docs/current/CONTEXT.md`
-- `../../docs/current/PLAN.md`
-- `../../docs/current/ARCHITECTURE.md`
-- `../../docs/current/STATUS.md`
-
-Historical backend prompts and earlier planning notes are archived under `../../docs/archive/2026-05-16-md-reset/` and are not implementation guidance unless the user explicitly asks.
+- `../../docs/CONTEXT.md`
+- `../../docs/PLAN.md`
+- `../../docs/ARCHITECTURE.md`
+- `../../docs/STATUS.md`
 
 ## Backend Scope
 
@@ -26,4 +24,4 @@ Historical backend prompts and earlier planning notes are archived under `../../
 
 ## Working Rule
 
-Before backend changes, confirm behavior against `docs/current/ARCHITECTURE.md` and update `docs/current/STATUS.md` after meaningful work.
+Before backend changes, confirm behavior against `../../docs/ARCHITECTURE.md` and update `../../docs/STATUS.md` after meaningful work.

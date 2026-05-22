@@ -9,11 +9,11 @@ This file applies to every AI agent working in this repository.
 
 Read these active files before making changes:
 
-1. `docs/current/CONTEXT.md`
-2. `docs/current/STATUS.md`
-3. `docs/current/DESIGN.md` for UI/UX work
-4. `docs/current/PLAN.md` for product scope
-5. `docs/current/ARCHITECTURE.md` for system design
+1. `docs/CONTEXT.md`
+2. `docs/STATUS.md`
+3. `docs/DESIGN.md` for UI/UX work
+4. `docs/PLAN.md` for product scope
+5. `docs/ARCHITECTURE.md` for system design
 
 Archive files under `docs/archive/` are historical only. Do not use them as implementation truth unless the user explicitly asks to inspect history.
 
@@ -28,12 +28,12 @@ The product is not a dating app, people directory, coffee ordering app, or gener
 When instructions conflict:
 
 1. Latest user message.
-2. This file and the active tool-specific starter file.
-3. `docs/current/CONTEXT.md`.
-4. `docs/current/STATUS.md`.
-5. `docs/current/DESIGN.md`.
-6. `docs/current/PLAN.md`.
-7. `docs/current/ARCHITECTURE.md`.
+2. This file.
+3. `docs/CONTEXT.md`.
+4. `docs/STATUS.md`.
+5. `docs/DESIGN.md`.
+6. `docs/PLAN.md`.
+7. `docs/ARCHITECTURE.md`.
 8. Archive files only by explicit user request.
 
 Before UI implementation, search active docs for conflicts and state the active spec being followed.
@@ -53,7 +53,7 @@ Before UI implementation, search active docs for conflicts and state the active 
 
 ## Design Rules
 
-- Follow the Social Refresh system in `docs/current/DESIGN.md`.
+- Follow the Social Refresh system in `docs/DESIGN.md`.
 - Use mint `#53B8A6`, pressed mint `#3D8D7A`, lavender `#8E7DBE`, peach `#E88C6B`, warm background `#F6F1EB`, card surface `#FFFDF9`, text primary `#243447`, and text secondary `#5F6368`.
 - Use native iOS default typography.
 - Keep glassmorphic top and bottom navigation where specified.
@@ -67,7 +67,7 @@ Before UI implementation, search active docs for conflicts and state the active 
 - Do not reset, stash, discard, or revert user/agent changes unless explicitly requested.
 - Do not commit unless the user asks.
 - Use semantic SwiftUI design tokens and local helpers where practical.
-- For meaningful work, update `docs/current/STATUS.md`.
+- For meaningful work, update `docs/STATUS.md`.
 - **Never run `xcodebuild`, launch a simulator, or attempt any build/validation step.** The user validates all builds themselves. Do not add build, verify, or screenshot tasks to any task list or plan.
 
 ### SwiftUI Composable Design Principles

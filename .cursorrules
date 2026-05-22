@@ -9,10 +9,10 @@ You are an AI assistant helping with CoffeeCall, an activity-based meetup platfo
 - **Oversight:** Track progress, identify gaps
 
 ## Critical Files (Read First)
-1. `/Planning/spec.md` — Comprehensive specification
-2. `/Planning/architecture.md` — System design
-3. `/Planning/decisions.md` — Architecture Decision Records
-4. `/Design/design-tokens.md` — Design values
+1. `docs/PLAN.md` — Comprehensive product specification
+2. `docs/ARCHITECTURE.md` — System architecture design
+3. `docs/DESIGN.md` — Design system & screen specs
+4. `docs/CONTEXT.md` — Shared AI ground truth and context
 5. `Obsidian Vault` at `/Users/developer/Documents/Projects/ObsidianVault/` — Centralized learning, coding standards, and reusable styling memory (read and contribute new notes here!).
 
 ## Project Context
@@ -55,30 +55,29 @@ Activity-based meetup app: Post activity → nearby users notified → accept �
 ## Workflow
 
 ### Before Starting Work
-1. Read `/Planning/spec.md` (understand scope)
-2. Read `/Planning/architecture.md` (understand design)
-3. Check `/Planning/context.md` (last session summary)
-4. Review `/Planning/decisions.md` (rationale)
+1. Read `docs/PLAN.md` (understand scope)
+2. Read `docs/ARCHITECTURE.md` (understand architecture)
+3. Check `docs/STATUS.md` (active progress ledger)
+4. Check `docs/CONTEXT.md` (shared ground truth)
 
 ### During Development
-- Reference `/Design/design-tokens.md` for UI values
-- Check `/Design/screens.md` for screen specs
-- Verify against acceptance criteria in spec
+- Reference `docs/DESIGN.md` for UI/UX values and screen specs
+- Verify against criteria in `docs/REVIEW_CHECKLIST.md`
 
 ### End of Session
-- Update `/Planning/context.md` with:
+- Update `docs/STATUS.md` with:
   - What was accomplished
-  - Critical details (versions, configs)
-  - Next session focus
-  - Any blockers
+  - Files touched
+  - Verification performed
+  - Remaining gaps
 
 ## When Adding Features
 
-1. **Find in spec:** Feature must be in `/Planning/spec.md`
-2. **Check design:** Reference `/Design/design-tokens.md` + screens
-3. **Code path:** Use Ambiglytics (never code directly)
-4. **Test:** Write tests, verify acceptance criteria
-5. **Document:** Update context if decisions changed
+1. **Find in spec:** Feature must be in `docs/PLAN.md`
+2. **Check design:** Reference `docs/DESIGN.md`
+3. **Code path:** Implement cleanly (type-safe composable SwiftUI rules)
+4. **Test:** Verify against acceptance criteria
+5. **Document:** Update `docs/STATUS.md` after meaningful work
 
 ## Architecture Principles
 
@@ -122,10 +121,10 @@ See `/Design/design-tokens.md` for complete list.
 ## Debugging
 
 **If stuck, consult:**
-- Spec for requirements: `/Planning/spec.md`
-- Architecture for design: `/Planning/architecture.md`
-- Decisions for rationale: `/Planning/decisions.md`
-- Design tokens for UI: `/Design/design-tokens.md`
+- Plan: `docs/PLAN.md`
+- Architecture: `docs/ARCHITECTURE.md`
+- Design tokens & screen specs: `docs/DESIGN.md`
+- Shared context: `docs/CONTEXT.md`
 
 ## Performance Targets
 
@@ -145,10 +144,10 @@ See `/Design/accessibility.md` for full guide.
 
 ## Questions?
 
-**"What should this do?"** → `/Planning/spec.md`
-**"How does this work?"** → `/Planning/architecture.md`
-**"Why did we do X?"** → `/Planning/decisions.md`
-**"What's the next focus?"** → `/Planning/context.md`
+**"What should this do?"** → `docs/PLAN.md`
+**"How does this work?"** → `docs/ARCHITECTURE.md`
+**"What's the design contract?"** → `docs/DESIGN.md`
+**"What's the next focus?"** → `docs/STATUS.md`
 
 ---
 

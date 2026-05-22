@@ -12,7 +12,7 @@ xcuserdata/
 
 # Firebase credentials
 apps/frontend/Config/Firebase/GoogleService-Info.plist
-apps/frontend/Coffee_Call/Coffee_Call/App/GoogleService-Info.plist
+apps/frontend/Coffee_Call/App/GoogleService-Info.plist
 **/GoogleService-Info.plist
 **/serviceAccountKey.json
 **/service-account*.json
