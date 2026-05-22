@@ -113,6 +113,18 @@ class ProfileViewModel: ObservableObject {
         }
         setupBookmarkSubscription()
         // setupLocationObservation() removed – location handled by LocationService
+        // Subscribe to location updates and update profile location automatically
+        LocationService.shared.$currentLocation
+            .receive(on: RunLoop.main)
+            .compactMap { $0 }
+            .sink { [weak self] location in
+                self?.geocodeLocation(location) { success, address in
+                    if success, let address = address {
+                        self?.location = address
+                    }
+                }
+            }
+            .store(in: &cancellables)
         self.isLoaded = true
     }
     
