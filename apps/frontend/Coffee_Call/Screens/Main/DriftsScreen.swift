@@ -98,6 +98,9 @@ struct DriftsScreen: View {
                     .padding(.top, 8)
                     .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
                 }
+                .refreshable {
+                    viewModel.loadDrifts()
+                }
             }
             .asCoffeePage(
                 .main,
