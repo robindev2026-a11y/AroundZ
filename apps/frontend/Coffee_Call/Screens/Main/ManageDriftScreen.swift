@@ -4,6 +4,7 @@ struct ManageDriftScreen: View {
     @State private var showDeleteConfirmation = false
     @StateObject var viewModel: ManageDriftViewModel
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject private var driftStore: GlobalDriftStore
     @StateObject private var navManager = NavigationManager.shared
     @State private var tabBarVisibilitySource = UUID().uuidString
     
@@ -188,7 +189,7 @@ struct ManageDriftScreen: View {
                 titleVisibility: .visible
             ) {
                 Button(AppStrings.Manage.delete, role: .destructive) {
-                    viewModel.deleteDrift()
+                    viewModel.deleteDrift(store: driftStore)
                 }
                 Button(AppStrings.Common.cancel, role: .cancel) {}
             } message: {
@@ -460,5 +461,6 @@ struct ManageDriftScreen_Previews: PreviewProvider {
                 isMine: true
             )))
         }
+        .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
     }
 }

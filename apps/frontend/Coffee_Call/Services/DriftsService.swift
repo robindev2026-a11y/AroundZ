@@ -125,7 +125,6 @@ class MockDriftsService: DriftsServiceProtocol {
     
     func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
         MockDriftsService.mockDrifts.insert(drift, at: 0)
-        CreatedDriftStore.shared.add(drift)
         return Just(())
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()

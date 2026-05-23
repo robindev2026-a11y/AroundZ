@@ -51,10 +51,12 @@ struct Coffee_CallApp: App {
     let persistenceController = PersistenceController.shared
 
     @StateObject private var networkManager = NetworkManager.shared
+    @StateObject private var driftStore = GlobalDriftStore()
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(networkManager)
+                .environmentObject(driftStore)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

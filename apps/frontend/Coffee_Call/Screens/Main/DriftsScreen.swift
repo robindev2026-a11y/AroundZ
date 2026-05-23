@@ -3,9 +3,14 @@ import SwiftUI
 struct DriftsScreen: View {
     @StateObject private var viewModel: DriftsViewModel
     @State private var showingFilterPanel = false
+    @EnvironmentObject private var driftStore: GlobalDriftStore
     
     init(viewModel: DriftsViewModel = DriftsViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    private var filteredDrifts: [Drift] {
+        viewModel.filteredDrifts(from: driftStore.drifts)
     }
     
     var body: some View {
@@ -70,7 +75,7 @@ struct DriftsScreen: View {
                         
                         // Featured Section (Only in discover, default category, "All" time tab)
                         if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all && viewModel.selectedCategory == nil && viewModel.searchQuery.isEmpty {
-                            if let first = viewModel.filteredDrifts.first {
+                            if let first = filteredDrifts.first {
                                 NavigationLink(value: first) {
                                     DriftCard(drift: first, isFeatured: true, onJoin: {})
                                 }
@@ -80,10 +85,10 @@ struct DriftsScreen: View {
                         }
                         
                         let remainingDrifts = (viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all && viewModel.selectedCategory == nil && viewModel.searchQuery.isEmpty)
-                            ? Array(viewModel.filteredDrifts.dropFirst())
-                            : viewModel.filteredDrifts
+                            ? Array(filteredDrifts.dropFirst())
+                            : filteredDrifts
                         
-                        if viewModel.filteredDrifts.isEmpty {
+                        if filteredDrifts.isEmpty {
                             emptyStateView
                         } else {
                             ForEach(remainingDrifts, id: \.self) { drift in
@@ -99,7 +104,7 @@ struct DriftsScreen: View {
                     .padding(.bottom, AppConstants.Layout.screenBottomSpacer)
                 }
                 .refreshable {
-                    viewModel.loadDrifts()
+                    driftStore.fetchDrifts()
                 }
             }
             .asCoffeePage(
@@ -157,6 +162,7 @@ struct DriftsScreen: View {
             }
             .onAppear {
                 NavigationManager.shared.resetTabBarVisibility()
+                driftStore.start()
             }
             .dismissKeyboardOnTap()
         }
@@ -555,5 +561,6 @@ struct FilterCategoryItem: Identifiable {
 struct DriftsScreen_Previews: PreviewProvider {
     static var previews: some View {
         DriftsScreen()
+            .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
     }
 }

@@ -64,7 +64,6 @@ struct MainTabView: View {
                     driftsViewModel.searchQuery = ""
                     driftsViewModel.debouncedSearchQuery = ""
                     driftsViewModel.isSearchActive = false
-                    driftsViewModel.loadDrifts()
                 })
                     .presentationDetents([.fraction(0.96)])
                     .presentationCornerRadius(AppConstants.Layout.createSheetRadius)
@@ -82,7 +81,6 @@ struct MainTabView: View {
                     driftsViewModel.searchQuery = ""
                     driftsViewModel.debouncedSearchQuery = ""
                     driftsViewModel.isSearchActive = false
-                    driftsViewModel.loadDrifts()
                 })
                     .presentationDetents([.fraction(0.96)])
                     .presentationDragIndicator(.hidden)

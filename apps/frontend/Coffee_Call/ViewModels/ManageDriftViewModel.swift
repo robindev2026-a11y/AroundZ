@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 	
+@MainActor
 class ManageDriftViewModel: ObservableObject {
     @Published var drift: Drift
     @Published var isLoading = false
@@ -117,9 +118,12 @@ class ManageDriftViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func deleteDrift() {
+    @available(*, unavailable, message: "Use deleteDrift(store:) so the EnvironmentObject stays in sync.")
+    func deleteDrift() { }
+
+    func deleteDrift(store: GlobalDriftStore) {
         isLoading = true
-        driftsService.deleteDrift(driftId: drift.id)
+        store.deleteDrift(driftId: drift.id)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completionResult in
                 self?.isLoading = false
@@ -128,10 +132,7 @@ class ManageDriftViewModel: ObservableObject {
                     print("Error deleting drift: \(error)")
                     self?.presentError("Failed to delete drift: \(error.localizedDescription)")
                 case .finished:
-                    guard let self = self else { return }
-                    CreatedDriftStore.shared.remove(driftId: self.drift.id)
-                    NotificationCenter.default.post(name: NSNotification.Name("DriftDeleted"), object: nil, userInfo: ["driftId": self.drift.id])
-                    self.didDelete = true
+                    self?.didDelete = true
                 }
             }, receiveValue: { })
             .store(in: &cancellables)

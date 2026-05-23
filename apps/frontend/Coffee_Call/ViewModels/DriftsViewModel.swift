@@ -1,6 +1,5 @@
 import SwiftUI
 import Combine
-import CoreLocation
 
 class DriftsViewModel: ObservableObject {
     var title: String { AppStrings.Drifts.title }
@@ -8,7 +7,6 @@ class DriftsViewModel: ObservableObject {
         selectedMode == .discover ? AppStrings.Drifts.subtitle : "Your active plans"
     }
     
-    @Published var drifts: [Drift] = []
     @Published var selectedMode: DriftMode = .discover
     @Published var selectedTimeState: TimeState = .all
     @Published var selectedCategory: DriftCategory? = nil {
@@ -69,10 +67,7 @@ class DriftsViewModel: ObservableObject {
         return count
     }
     
-    private let driftsService: DriftsServiceProtocol
-    private let createdDriftStore = CreatedDriftStore.shared
     private var cancellables = Set<AnyCancellable>()
-    private var baseDrifts: [Drift] = []
     private var isSyncingFilters = false
     
     enum DriftMode: String, CaseIterable {
@@ -96,19 +91,14 @@ class DriftsViewModel: ObservableObject {
         }
     }
     
-    init(driftsService: DriftsServiceProtocol? = nil) {
-        if let driftsService = driftsService {
-            self.driftsService = driftsService
-        } else {
-            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
-        }
-        
+    init() {
         // Setup Search Debouncer (ISSUE-007)
         $searchQuery
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .removeDuplicates()
-            .assign(to: \.debouncedSearchQuery, on: self)
+            .sink { [weak self] query in
+                self?.debouncedSearchQuery = query
+            }
             .store(in: &cancellables)
         
         // Listen to dynamic handoff filters from DiscoveryScreen (ISSUE-008)
@@ -128,72 +118,9 @@ class DriftsViewModel: ObservableObject {
                 }
             }
             .store(in: &cancellables)
-
-        createdDriftStore.$createdDrifts
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.mergeDrifts()
-            }
-            .store(in: &cancellables)
-            
-        LocationService.shared.$currentLocation
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.mergeDrifts()
-            }
-            .store(in: &cancellables)
-            
-        NotificationCenter.default.publisher(for: NSNotification.Name("DriftDeleted"))
-            .receive(on: RunLoop.main)
-            .sink { [weak self] notification in
-                if let driftId = notification.userInfo?["driftId"] as? UUID {
-                    self?.baseDrifts.removeAll(where: { $0.id == driftId })
-                    self?.mergeDrifts()
-                }
-            }
-            .store(in: &cancellables)
-            
-        NotificationCenter.default.publisher(for: NSNotification.Name("DriftUpdated"))
-            .receive(on: RunLoop.main)
-            .sink { [weak self] notification in
-                if let updatedDrift = notification.userInfo?["drift"] as? Drift {
-                    if let index = self?.baseDrifts.firstIndex(where: { $0.id == updatedDrift.id }) {
-                        self?.baseDrifts[index] = updatedDrift
-                    }
-                    self?.mergeDrifts()
-                }
-            }
-            .store(in: &cancellables)
-            
-        loadDrifts()
     }
     
-    func loadDrifts() {
-        driftsService.fetchDrifts()
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] drifts in
-                self?.baseDrifts = drifts
-                self?.mergeDrifts()
-            })
-            .store(in: &cancellables)
-    }
-
-    private func mergeDrifts() {
-        var merged: [Drift] = []
-        let userLocation = LocationService.shared.currentLocationModel
-        for var drift in createdDriftStore.createdDrifts + baseDrifts {
-            if !merged.contains(where: { $0.id == drift.id }) {
-                if let lat = drift.latitude, let lng = drift.longitude, let userLoc = userLocation {
-                    let distance = haversineDistance(lat1: userLoc.latitude, lon1: userLoc.longitude, lat2: lat, lon2: lng)
-                    drift.distance = distance
-                }
-                merged.append(drift)
-            }
-        }
-        drifts = merged
-    }
-    
-    var filteredDrifts: [Drift] {
+    func filteredDrifts(from drifts: [Drift]) -> [Drift] {
         drifts.filter { drift in
             // 1. Filter by Mode (Discover vs Mine)
             if selectedMode == .mine && !drift.isMine { return false }

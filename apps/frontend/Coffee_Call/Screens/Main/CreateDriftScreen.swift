@@ -12,6 +12,7 @@ struct CreateDriftSheet: View {
     private let onCreateSucceeded: () -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @EnvironmentObject private var driftStore: GlobalDriftStore
     @FocusState private var focusedField: FocusField?
     @StateObject private var viewModel: CreateDriftViewModel
     @State private var showDiscardConfirmation = false
@@ -612,7 +613,7 @@ struct CreateDriftSheet: View {
 
         if mode == .create {
             viewModel.create { drift in
-                CreatedDriftStore.shared.add(drift)
+                driftStore.addOrUpdate(drift)
                 showSuccessState = true
                 onCreateSucceeded()
 
@@ -622,8 +623,7 @@ struct CreateDriftSheet: View {
             }
         } else if mode == .edit, let existing = existingDrift {
             viewModel.update(original: existing) { updated in
-                CreatedDriftStore.shared.add(updated)
-                NotificationCenter.default.post(name: NSNotification.Name("DriftUpdated"), object: nil, userInfo: ["drift": updated])
+                driftStore.addOrUpdate(updated)
                 onSave(updated)
                 dismiss()
             }
@@ -1172,5 +1172,6 @@ struct CreateDriftSheet_Previews: PreviewProvider {
     static var previews: some View {
         CreateDriftSheet()
             .presentationDetents([.large])
+            .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
     }
 }
