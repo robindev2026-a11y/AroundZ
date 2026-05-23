@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct ManageDriftScreen: View {
-    @State private var showEdit = false
-    @State private var showDeleteAlert = false
+    @State private var showDeleteConfirmation = false
     @StateObject var viewModel: ManageDriftViewModel
     @Environment(\.dismiss) var dismiss
     @StateObject private var navManager = NavigationManager.shared
@@ -53,9 +52,6 @@ struct ManageDriftScreen: View {
                 }
             )
             .navigationBarHidden(true)
-        .navigationDestination(isPresented: $showEdit) {
-            EditDriftScreen(viewModel: viewModel)
-        }
             .onAppear {
                 navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
                 // Ensure edit button respects editability
@@ -63,21 +59,16 @@ struct ManageDriftScreen: View {
             .onDisappear {
                 navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
             }
-            .alert(isPresented: $showDeleteAlert) {
-                Alert(
-                    title: Text(AppStrings.Manage.deleteConfirmationTitle),
-                    message: Text(AppStrings.Manage.deleteConfirmationMessage),
-                    primaryButton: .destructive(Text(AppStrings.Manage.delete)) {
-                        viewModel.deleteDrift()
-                    },
-                    secondaryButton: .cancel()
-                )
+            .onChange(of: viewModel.didDelete) { didDelete in
+                if didDelete {
+                    dismiss()
+                }
             }
-            .alert(isPresented: $viewModel.showDeleteError) {
+            .alert(isPresented: $viewModel.showErrorAlert) {
                 Alert(
-                    title: Text("Delete Error"),
-                    message: Text(viewModel.deleteErrorMessage),
-                    dismissButton: .default(Text("OK"))
+                    title: Text("Error"),
+                    message: Text(viewModel.errorAlertMessage),
+                    dismissButton: .default(Text(AppStrings.Common.ok))
                 )
             }
             
@@ -177,35 +168,58 @@ struct ManageDriftScreen: View {
     // MARK: - Action Buttons
     private var hostActionsRow: some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
-            // Edit button triggers navigation
-            actionButton(icon: "pencil", label: AppStrings.Manage.edit, color: .textPrimary, action: { showEdit = true })
-                .disabled(!viewModel.canEdit)
+            NavigationLink(destination: EditDriftScreen(viewModel: viewModel)) {
+                actionTile(icon: "pencil", label: AppStrings.Manage.edit, color: .textPrimary)
+            }
+            .buttonStyle(.plain)
+            .disabled(!viewModel.canEdit)
             // Share button
             actionButton(icon: AppIcons.share, label: AppStrings.Manage.share, color: .textPrimary, action: viewModel.shareDrift)
             // Close button
             actionButton(icon: "pause.circle", label: AppStrings.Manage.close, color: .brandPurple, action: viewModel.closeDrift)
+                .disabled(viewModel.isLoading || viewModel.drift.status == .ended)
             // Delete button triggers alert
-            actionButton(icon: "trash", label: AppStrings.Manage.delete, color: .statusError, action: { showDeleteAlert = true })
+            Button(action: { showDeleteConfirmation = true }) {
+                actionTile(icon: "trash", label: AppStrings.Manage.delete, color: .statusError)
+            }
+            .confirmationDialog(
+                AppStrings.Manage.deleteConfirmationTitle,
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(AppStrings.Manage.delete, role: .destructive) {
+                    viewModel.deleteDrift()
+                }
+                Button(AppStrings.Common.cancel, role: .cancel) {}
+            } message: {
+                Text(AppStrings.Manage.deleteConfirmationMessage)
+            }
+            .disabled(viewModel.isLoading)
         }
     }
     
+    private func actionTile(icon: String, label: String, color: Color) -> some View {
+        VStack(spacing: AppConstants.Layout.subElementSpacing) {
+            Image(systemName: icon)
+                .font(.system(size: AppConstants.Typography.sizeTitle))
+            Text(label)
+                .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
+        }
+        .foregroundColor(color)
+        .frame(maxWidth: .infinity)
+        .frame(height: 72)
+        .background(Color.surfaceMain)
+        .cornerRadius(AppConstants.UI.cornerRadiusSmall)
+        .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
+        .contentShape(Rectangle())
+    }
+
     private func actionButton(icon: String, label: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: AppConstants.Layout.subElementSpacing) {
-                Image(systemName: icon)
-                    .font(.system(size: AppConstants.Typography.sizeTitle))
-                Text(label)
-                    .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
-            }
-            .foregroundColor(color)
-            .frame(maxWidth: .infinity)
-            .frame(height: 72)
-            .background(Color.surfaceMain)
-            .cornerRadius(AppConstants.UI.cornerRadiusSmall)
-            .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
+            actionTile(icon: icon, label: label, color: color)
         }
     }
-    
+
 
 
     // MARK: - Join Requests Section

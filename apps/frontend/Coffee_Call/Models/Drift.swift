@@ -20,7 +20,7 @@ struct Drift: Identifiable, Hashable, Codable {
     let capacity: Int
     let vibeTags: [String]
     let whatToBring: [String]
-    let notes: String? = nil
+    let notes: String?
     var participantInitials: [String]
     let imageUrl: String?
     var pendingRequests: [JoinRequest] = []
@@ -79,6 +79,7 @@ struct Drift: Identifiable, Hashable, Codable {
         self.capacity = capacity
         self.vibeTags = vibeTags
         self.whatToBring = whatToBring
+        self.notes = notes
         self.participantInitials = participantInitials
         self.imageUrl = imageUrl
         self.pendingRequests = pendingRequests
@@ -250,4 +251,142 @@ struct ParticipantInfo: Identifiable, Hashable {
     let color: Color
     let isHost: Bool
     let isMe: Bool
+}
+
+// MARK: - Core Domain Enums
+public enum ActivityType: String, CaseIterable, Identifiable {
+    case coffee, walk, food, movie, study,
+         fitness, games, music, sports, drinks, custom
+    public var id: String { rawValue }
+}
+
+public enum TimeOption: String, CaseIterable, Identifiable {
+    case now, in30Mins, tonight, tomorrow, custom
+    public var id: String { rawValue }
+}
+
+public enum CapacityOption: String, CaseIterable, Identifiable {
+    case one, three, five, eightPlus
+    public var id: String { rawValue }
+    public var value: Int {
+        switch self {
+        case .one: return 1
+        case .three: return 3
+        case .five: return 5
+        case .eightPlus: return 8
+        }
+    }
+}
+
+public enum VibeOption: String, CaseIterable, Identifiable {
+    case casual, chill, friendly, focused, adventurous, social
+    public var id: String { rawValue }
+}
+
+public enum JoinMode: String, CaseIterable, Identifiable {
+    case open, approval
+    public var id: String { rawValue }
+}
+
+// MARK: - UI Extensions
+
+extension VibeOption {
+    var title: String {
+        switch self {
+        case .casual:       return AppStrings.Create.Vibe.casual
+        case .chill:        return AppStrings.Create.Vibe.chill
+        case .friendly:     return AppStrings.Create.Vibe.friendly
+        case .focused:      return AppStrings.Create.Vibe.focused
+        case .adventurous:  return AppStrings.Create.Vibe.adventurous
+        case .social:       return AppStrings.Create.Vibe.social
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .casual:       return "leaf"
+        case .chill:        return "snowflake"
+        case .friendly:     return "hand.wave"
+        case .focused:      return "target"
+        case .adventurous:  return "globe"
+        case .social:       return "person.2"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .casual, .chill:          return .brandSecondary
+        case .friendly, .social:       return .brandPrimary
+        case .focused, .adventurous:   return .brandPurple
+        }
+    }
+}
+
+extension ActivityType {
+    var title: String {
+        switch self {
+        case .coffee:      return AppStrings.Create.Activity.coffee
+        case .walk:        return AppStrings.Create.Activity.walk
+        case .food:        return AppStrings.Create.Activity.food
+        case .movie:       return AppStrings.Create.Activity.movie
+        case .study:       return AppStrings.Create.Activity.study
+        case .fitness:     return AppStrings.Create.Activity.fitness
+        case .games:       return AppStrings.Create.Activity.games
+        case .music:       return AppStrings.Create.Activity.music
+        case .sports:      return AppStrings.Create.Activity.sports
+        case .drinks:      return AppStrings.Create.Activity.drinks
+        case .custom:      return AppStrings.Create.Activity.custom
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .coffee:      return AppIcons.coffee
+        case .walk:        return AppIcons.walk
+        case .food:        return AppIcons.food
+        case .movie:       return AppIcons.movie
+        case .study:       return AppIcons.study
+        case .fitness:     return AppIcons.fitness
+        case .games:       return AppIcons.games
+        case .music:       return AppIcons.music
+        case .sports:      return AppIcons.sports
+        case .drinks:      return AppIcons.drinks
+        case .custom:      return AppIcons.custom
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .coffee, .walk, .fitness:
+            return .brandPrimary
+        case .food, .drinks:
+            return .brandSecondary
+        case .movie, .music, .games, .sports:
+            return .brandPurple
+        case .study, .custom:
+            return .textPrimary
+        }
+    }
+}
+
+extension TimeOption {
+    var title: String {
+        switch self {
+        case .now: return AppStrings.Create.Time.now
+        case .in30Mins: return AppStrings.Create.Time.in30Mins
+        case .tonight: return AppStrings.Create.Time.tonight
+        case .tomorrow: return AppStrings.Create.Time.tomorrow
+        case .custom: return AppStrings.Create.Time.custom
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .now: return AppIcons.bolt
+        case .in30Mins: return AppIcons.clock
+        case .tonight: return AppIcons.moon
+        case .tomorrow: return AppIcons.calendar
+        case .custom: return AppIcons.ellipsis
+        }
+    }
 }

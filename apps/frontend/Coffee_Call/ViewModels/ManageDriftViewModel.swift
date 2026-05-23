@@ -95,7 +95,7 @@ class ManageDriftViewModel: ObservableObject {
                 }
             }, receiveValue: { [weak self] in
                 guard let self else { return }
-                withAnimation { drift.status = .ended }
+                withAnimation { self.drift.status = .ended }
             })
             .store(in: &cancellables)
     }
@@ -112,7 +112,7 @@ class ManageDriftViewModel: ObservableObject {
                 }
             }, receiveValue: { [weak self] in
                 guard let self else { return }
-                withAnimation { drift = updated }
+                withAnimation { self.drift = updated }
             })
             .store(in: &cancellables)
     }

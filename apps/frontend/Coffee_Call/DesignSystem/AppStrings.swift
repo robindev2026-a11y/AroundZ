@@ -342,6 +342,9 @@ enum AppStrings {
 
     enum Manage {
         static let title = "Manage Drift"
+        static let editTitle = "Edit Drift"
+        static let editSubtitle = "Update your plan details"
+        static let savingAction = "Saving..."
         static let edit = "Edit"
         static let share = "Share"
         static let close = "Close"

@@ -20,8 +20,15 @@ extension UINavigationController: UIGestureRecognizerDelegate {
 // MARK: - Native Share Sheet Helper
 extension UIApplication {
     static func shareText(_ text: String) {
-        guard let windowScene = shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene ?? shared.connectedScenes.first as? UIWindowScene,
-              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+        guard let windowScene = (shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene)
+                ?? (shared.connectedScenes.first as? UIWindowScene) else {
+            return
+        }
+
+        let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController
+            ?? windowScene.windows.first?.rootViewController
+
+        guard let rootVC else {
             return
         }
         
@@ -54,4 +61,3 @@ struct LazyView<Content: View>: View {
         build()
     }
 }
-
