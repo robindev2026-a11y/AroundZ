@@ -83,6 +83,11 @@ struct CreateDriftSheet: View {
         } message: {
             Text(AppStrings.Create.discardMessage)
         }
+        .alert("Error", isPresented: $viewModel.showErrorAlert) {
+            Button(AppStrings.Common.ok, role: .cancel) { }
+        } message: {
+            Text(viewModel.errorAlertMessage)
+        }
     }
 
     private var glassBackdrop: some View {

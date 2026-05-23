@@ -32,6 +32,8 @@ final class CreateDriftViewModel: ObservableObject {
     @Published var optionalDetailsExpanded: Bool = false
     @Published var isActivityGridExpanded: Bool = false
     @Published var isCreating: Bool = false
+    @Published var showErrorAlert = false
+    @Published var errorAlertMessage = ""
 
     let maxTitleCount = 60
     private let initialScheduledDate: Date
@@ -149,6 +151,8 @@ final class CreateDriftViewModel: ObservableObject {
                 self.isCreating = false
                 if case .failure(let error) = completionResult {
                     print("Error creating drift: \(error)")
+                    self.errorAlertMessage = "Failed to create drift: \(error.localizedDescription)"
+                    self.showErrorAlert = true
                 }
             }, receiveValue: {
                 completion(drift)
@@ -168,6 +172,8 @@ final class CreateDriftViewModel: ObservableObject {
                 self.isCreating = false
                 if case .failure(let error) = completionResult {
                     print("Error updating drift: \(error)")
+                    self.errorAlertMessage = "Failed to update drift: \(error.localizedDescription)"
+                    self.showErrorAlert = true
                 }
             }, receiveValue: {
                 completion(updated)
