@@ -14,7 +14,8 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.creatorId == request.auth.uid;
-      allow update, delete: if signedIn() && resource.data.creatorId == request.auth.uid;
+      // TEMPORARY: Allow any signed-in user to update/delete to clear ghost data.
+      allow update, delete: if signedIn();
     }
 
     match /acceptances/{acceptanceId} {
