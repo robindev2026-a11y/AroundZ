@@ -25,3 +25,38 @@ apps/frontend/Coffee_Call/App/GoogleService-Info.plist
 # Firebase / Node build output
 apps/backend/functions/lib/
 apps/backend/functions/node_modules/
+
+# Xcode / Apple secrets
+*.keychain
+*.provisionprofile
+*.cert
+*.cer
+*.p12
+
+# Firebase / GCP secrets
+firebase-debug.log
+firebase-debug.*.log
+.firebase/
+*.secret
+credentials.json
+client_secret.json
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API Keys & Tokens
+*api_keys*
+*secret*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
