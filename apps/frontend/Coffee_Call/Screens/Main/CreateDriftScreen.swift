@@ -623,6 +623,7 @@ struct CreateDriftSheet: View {
         } else if mode == .edit, let existing = existingDrift {
             viewModel.update(original: existing) { updated in
                 CreatedDriftStore.shared.add(updated)
+                NotificationCenter.default.post(name: NSNotification.Name("DriftUpdated"), object: nil, userInfo: ["drift": updated])
                 onSave(updated)
                 dismiss()
             }

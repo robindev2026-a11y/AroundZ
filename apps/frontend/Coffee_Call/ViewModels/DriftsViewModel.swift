@@ -153,6 +153,18 @@ class DriftsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
             
+        NotificationCenter.default.publisher(for: NSNotification.Name("DriftUpdated"))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] notification in
+                if let updatedDrift = notification.userInfo?["drift"] as? Drift {
+                    if let index = self?.baseDrifts.firstIndex(where: { $0.id == updatedDrift.id }) {
+                        self?.baseDrifts[index] = updatedDrift
+                    }
+                    self?.mergeDrifts()
+                }
+            }
+            .store(in: &cancellables)
+            
         loadDrifts()
     }
     
