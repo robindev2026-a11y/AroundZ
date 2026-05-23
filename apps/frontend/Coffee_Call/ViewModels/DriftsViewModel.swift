@@ -159,7 +159,7 @@ class DriftsViewModel: ObservableObject {
     private func mergeDrifts() {
         var merged: [Drift] = []
         let userLocation = LocationService.shared.currentLocationModel
-        for var drift in baseDrifts + createdDriftStore.createdDrifts {
+        for var drift in createdDriftStore.createdDrifts + baseDrifts {
             if !merged.contains(where: { $0.id == drift.id }) {
                 if let lat = drift.latitude, let lng = drift.longitude, let userLoc = userLocation {
                     let distance = haversineDistance(lat1: userLoc.latitude, lon1: userLoc.longitude, lat2: lat, lon2: lng)

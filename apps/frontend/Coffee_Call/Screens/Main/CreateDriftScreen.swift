@@ -617,6 +617,7 @@ struct CreateDriftSheet: View {
             }
         } else if mode == .edit, let existing = existingDrift {
             viewModel.update(original: existing) { updated in
+                CreatedDriftStore.shared.add(updated)
                 onSave(updated)
                 dismiss()
             }
