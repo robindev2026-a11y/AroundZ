@@ -86,7 +86,7 @@ struct DriftsScreen: View {
                         if viewModel.filteredDrifts.isEmpty {
                             emptyStateView
                         } else {
-                            ForEach(remainingDrifts) { drift in
+                            ForEach(remainingDrifts, id: \.self) { drift in
                                 NavigationLink(value: drift) {
                                     DriftCard(drift: drift, isFeatured: false, onJoin: {})
                                 }
