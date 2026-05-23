@@ -40,6 +40,11 @@ final class CreatedDriftStore: ObservableObject {
         save()
     }
 
+    func remove(driftId: UUID) {
+        createdDrifts.removeAll(where: { $0.id == driftId })
+        save()
+    }
+
     private func save() {
         do {
             let encoded = try JSONEncoder().encode(createdDrifts)

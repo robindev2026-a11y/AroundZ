@@ -128,7 +128,10 @@ class ManageDriftViewModel: ObservableObject {
                     print("Error deleting drift: \(error)")
                     self?.presentError("Failed to delete drift: \(error.localizedDescription)")
                 case .finished:
-                    self?.didDelete = true
+                    guard let self = self else { return }
+                    CreatedDriftStore.shared.remove(driftId: self.drift.id)
+                    NotificationCenter.default.post(name: NSNotification.Name("DriftDeleted"), object: nil, userInfo: ["driftId": self.drift.id])
+                    self.didDelete = true
                 }
             }, receiveValue: { })
             .store(in: &cancellables)

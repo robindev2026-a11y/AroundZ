@@ -143,6 +143,16 @@ class DriftsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
             
+        NotificationCenter.default.publisher(for: NSNotification.Name("DriftDeleted"))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] notification in
+                if let driftId = notification.userInfo?["driftId"] as? UUID {
+                    self?.baseDrifts.removeAll(where: { $0.id == driftId })
+                    self?.mergeDrifts()
+                }
+            }
+            .store(in: &cancellables)
+            
         loadDrifts()
     }
     
