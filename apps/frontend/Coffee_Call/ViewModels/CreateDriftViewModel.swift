@@ -181,6 +181,11 @@ final class CreateDriftViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func cancelRequest() {
+        cancellables.removeAll()
+        isCreating = false
+    }
+
     func buildDrift() -> Drift {
         let capacityValue = isOpenToAllCapacity ? 50 : selectedCapacityCount
         let vibeTags = selectedVibe.map { [$0.title] } ?? []

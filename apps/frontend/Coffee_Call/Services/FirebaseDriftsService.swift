@@ -146,7 +146,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 subject.send(drifts)
             }
             
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
@@ -216,7 +216,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             }
         }
         
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
@@ -240,7 +240,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             }
         }
         
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
@@ -311,7 +311,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             }
         }
         
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error> {
@@ -361,7 +361,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             }
         }
         
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error> {
@@ -385,7 +385,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             }
         }
         
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     // MARK: - Update Drift (full fields)
@@ -426,7 +426,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 subject.send(completion: .finished)
             }
         }
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
     
     // MARK: - Delete Drift
@@ -449,7 +449,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 subject.send(completion: .finished)
             }
         }
-        return subject.eraseToAnyPublisher()
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
 
 }

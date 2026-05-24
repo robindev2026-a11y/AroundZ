@@ -594,8 +594,14 @@ struct CreateDriftSheet: View {
     }
 
     private func closeTapped() {
+        if viewModel.isCreating {
+            viewModel.cancelRequest()
+            showDiscardConfirmation = true
+            return
+        }
+
         if mode == .create {
-            if viewModel.hasUnsavedChanges || viewModel.isCreating {
+            if viewModel.hasUnsavedChanges {
                 showDiscardConfirmation = true
                 return
             }
@@ -604,7 +610,6 @@ struct CreateDriftSheet: View {
             return
         }
 
-        guard !viewModel.isCreating else { return }
         dismiss()
     }
 
