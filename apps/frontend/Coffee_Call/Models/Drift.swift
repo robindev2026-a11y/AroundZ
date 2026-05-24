@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct Drift: Identifiable, Hashable, Codable {
+struct Drift: Identifiable, Codable {
     var id: UUID = UUID()
     let title: String
     let description: String
@@ -89,15 +89,6 @@ struct Drift: Identifiable, Hashable, Codable {
         self.unreadCount = unreadCount
         self.latitude = latitude
         self.longitude = longitude
-    }
-    
-    // Hashable conformance (synthesized)
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-    static func == (lhs: Drift, rhs: Drift) -> Bool {
-        lhs.id == rhs.id
     }
 }
 

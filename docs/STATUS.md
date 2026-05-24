@@ -1,7 +1,7 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-22
+Last updated: 2026-05-24
 
 This file is the current progress ledger.
 
@@ -51,3 +51,4 @@ Align the live app and all AI guidance around a single active source of truth. T
 - **2026-05-21**: Relocated Vibe compose field to main Create page. Added `LazyView` wrappers to prevent eager routing crashes. Integrated native `UIActivityViewController` sharing. Implemented live GPS location tracking and geohash uploads to Firestore `users/{uid}`. Added dynamic distance recalculations for nearby Drifts using CoreLocation updates. Fixed existing-user OTP login routing loops.
 - **2026-05-22**: Flattened `apps/frontend/` layout, moved Xcode files up, moved active docs to root of `docs/`, deleted empty/obsolete folders, and staged restructuring in Git. Resolved ISSUE-012 (connected share and reminder stubs with local notifications) and ISSUE-022 (implemented profile image picker, camera capture, local caching, and Firebase Storage persistence). Resolved Profile/You section location hardcoding by implementing dynamic GPS coordinates lookup, reverse geocoding to city/locality names, and dynamic Location Sheet updates. Fixed missing Manage/Edit Drift strings that caused a SwiftUI `Form {}` compile error in `EditDriftScreen`. Fixed Manage Drift host actions (Edit navigation, Delete confirmation + pop-on-success) and made the native share sheet presentation more resilient. Rebuilt Edit Drift as the same UI as Create Drift (no `Form`, not presented as a sheet) with a real update call; fixed `Drift.notes` so hook/notes persist in the model.
 - **2026-05-23**: Migrated Drifts data flow to a SwiftUI-native `@EnvironmentObject` store (`GlobalDriftStore`), removing `CreatedDriftStore` and Notification-based drift syncing. `DriftsViewModel` is now UI-only; create/edit/delete paths update the shared store so Drifts lists update instantly. Verification: not run here (per repo rules); validate in Xcode.
+- **2026-05-24**: Fixed stale Drifts listing updates after editing a Drift by removing `Drift`'s id-only `Hashable/Equatable` behavior and switching value-based navigation (`NavigationLink(value:)` / `navigationDestination(for:)`) to use `UUID` drift IDs. Verification: not run here (per repo rules); validate in Xcode.

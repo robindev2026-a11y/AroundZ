@@ -51,8 +51,21 @@ struct ProfileScreen: View {
                     }
                 }
             )
-            .navigationDestination(for: Drift.self) { drift in
-                DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+            .navigationDestination(for: UUID.self) { driftId in
+                if let drift = viewModel.savedDrifts.first(where: { $0.id == driftId }) {
+                    DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+                } else {
+                    VStack(spacing: AppConstants.Layout.elementSpacing) {
+                        Text("Drift not found")
+                            .font(.heading2)
+                            .foregroundColor(.textPrimary)
+                        Text("This plan may have been removed from your bookmarks.")
+                            .font(.bodyStandard)
+                            .foregroundColor(.textSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(AppConstants.Layout.standardPadding)
+                }
             }
             .sheet(isPresented: $showingEditProfile) {
                 EditProfileScreen(viewModel: viewModel)
@@ -310,15 +323,15 @@ struct ProfileScreen: View {
                         .stroke(Color.appBorder, lineWidth: 1)
                 )
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: AppConstants.Layout.elementSpacing) {
-                        ForEach(viewModel.savedDrifts) { drift in
-                            NavigationLink(value: drift) {
-                                savedDriftCard(drift)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+	                ScrollView(.horizontal, showsIndicators: false) {
+	                    HStack(spacing: AppConstants.Layout.elementSpacing) {
+	                        ForEach(viewModel.savedDrifts) { drift in
+	                            NavigationLink(value: drift.id) {
+	                                savedDriftCard(drift)
+	                            }
+	                            .buttonStyle(.plain)
+	                        }
+	                    }
                     .padding(.horizontal, 4)
                     .padding(.vertical, 4)
                 }

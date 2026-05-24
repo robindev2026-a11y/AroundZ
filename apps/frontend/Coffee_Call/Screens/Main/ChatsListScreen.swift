@@ -27,8 +27,21 @@ struct ChatsListScreen: View {
                 subtitle: viewModel.subtitle ?? AppStrings.Chat.subtitle,
                 scrollable: false
             )
-            .navigationDestination(for: Drift.self) { drift in
-                DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
+            .navigationDestination(for: UUID.self) { driftId in
+                if let drift = viewModel.allChats.first(where: { $0.id == driftId }) {
+                    DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
+                } else {
+                    VStack(spacing: AppConstants.Layout.elementSpacing) {
+                        Text("Chat not found")
+                            .font(.heading2)
+                            .foregroundColor(.textPrimary)
+                        Text("This conversation may have ended or is no longer available.")
+                            .font(.bodyStandard)
+                            .foregroundColor(.textSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(AppConstants.Layout.standardPadding)
+                }
             }
         }
         .onAppear {
@@ -74,7 +87,7 @@ struct ChatsListScreen: View {
         ScrollView {
             VStack(spacing: 12) {
                 ForEach(chats) { drift in
-                    NavigationLink(value: drift) {
+                    NavigationLink(value: drift.id) {
                         CompactChatRow(drift: drift)
                     }
                     .buttonStyle(.plain)

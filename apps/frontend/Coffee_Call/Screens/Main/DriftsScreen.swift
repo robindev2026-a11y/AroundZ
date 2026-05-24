@@ -76,7 +76,7 @@ struct DriftsScreen: View {
                         // Featured Section (Only in discover, default category, "All" time tab)
                         if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all && viewModel.selectedCategory == nil && viewModel.searchQuery.isEmpty {
                             if let first = filteredDrifts.first {
-                                NavigationLink(value: first) {
+                                NavigationLink(value: first.id) {
                                     DriftCard(drift: first, isFeatured: true, onJoin: {})
                                 }
                                 .buttonStyle(.plain)
@@ -91,8 +91,8 @@ struct DriftsScreen: View {
                         if filteredDrifts.isEmpty {
                             emptyStateView
                         } else {
-                            ForEach(remainingDrifts, id: \.self) { drift in
-                                NavigationLink(value: drift) {
+                            ForEach(remainingDrifts) { drift in
+                                NavigationLink(value: drift.id) {
                                     DriftCard(drift: drift, isFeatured: false, onJoin: {})
                                 }
                                 .buttonStyle(.plain)
@@ -141,11 +141,24 @@ struct DriftsScreen: View {
                     }
                 }
             )
-            .navigationDestination(for: Drift.self) { drift in
-                if viewModel.selectedMode == .mine {
-                    ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))
+            .navigationDestination(for: UUID.self) { driftId in
+                if let drift = driftStore.drifts.first(where: { $0.id == driftId }) {
+                    if drift.isMine {
+                        ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))
+                    } else {
+                        DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+                    }
                 } else {
-                    DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+                    VStack(spacing: AppConstants.Layout.elementSpacing) {
+                        Text("Drift not found")
+                            .font(.heading2)
+                            .foregroundColor(.textPrimary)
+                        Text("This plan may have been deleted or is no longer available.")
+                            .font(.bodyStandard)
+                            .foregroundColor(.textSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(AppConstants.Layout.standardPadding)
                 }
             }
             .sheet(isPresented: $showingFilterPanel) {
@@ -227,25 +240,25 @@ struct DriftsScreen: View {
     }
     
     // MARK: - Section Lists
-    private func driftSection(title: String, drifts: [Drift]) -> some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            if !drifts.isEmpty {
-                Text(title)
-                    .font(.system(size: AppConstants.Typography.sizeHeadline - 2, weight: .black))
+	    private func driftSection(title: String, drifts: [Drift]) -> some View {
+	        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
+	            if !drifts.isEmpty {
+	                Text(title)
+	                    .font(.system(size: AppConstants.Typography.sizeHeadline - 2, weight: .black))
                     .foregroundColor(.textPrimary)
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
                     .padding(.top, 4)
                 
-                ForEach(drifts) { drift in
-                    NavigationLink(value: drift) {
-                        DriftCard(drift: drift, isFeatured: false, onJoin: {})
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                }
-            }
-        }
-    }
+	                ForEach(drifts) { drift in
+	                    NavigationLink(value: drift.id) {
+	                        DriftCard(drift: drift, isFeatured: false, onJoin: {})
+	                    }
+	                    .buttonStyle(.plain)
+	                    .padding(.horizontal, AppConstants.Layout.standardPadding)
+	                }
+	            }
+	        }
+	    }
     
     // MARK: - Empty States (DESIGN.md matching specs)
     private var emptyStateView: some View {
