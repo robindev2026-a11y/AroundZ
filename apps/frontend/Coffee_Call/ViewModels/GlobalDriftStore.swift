@@ -5,6 +5,36 @@ import Combine
 final class GlobalDriftStore: ObservableObject {
     @Published private(set) var drifts: [Drift] = []
 
+    /// MVP Dynamically Generated Notifications
+    var activeNotifications: [AppNotification] {
+        var notifications: [AppNotification] = []
+
+        let myHostedDrifts = drifts.filter { $0.isMine && $0.status != .ended }
+        for drift in myHostedDrifts {
+            if drift.pendingRequests.count > 0 {
+                let idString = "\(drift.id.uuidString)-requests"
+                // Generate a deterministic ID so the list doesn't jump randomly
+                var hasher = Hasher()
+                hasher.combine(idString)
+                hasher.combine(drift.pendingRequests.count)
+                let notifId = UUID(uuidString: String(format: "%032llx", hasher.finalize())) ?? UUID()
+
+                let notif = AppNotification(
+                    id: notifId,
+                    driftId: drift.id,
+                    title: "Join Requests",
+                    message: "You have \(drift.pendingRequests.count) pending request(s) for '\(drift.title)'.",
+                    timestamp: "Just now",
+                    isRead: false,
+                    type: .joinRequest
+                )
+                notifications.append(notif)
+            }
+        }
+
+        return notifications
+    }
+
     private let driftsService: DriftsServiceProtocol
     private let locationService: LocationService
 

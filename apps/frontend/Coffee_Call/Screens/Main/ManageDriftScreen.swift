@@ -72,8 +72,12 @@ struct ManageDriftScreen: View {
                     dismissButton: .default(Text(AppStrings.Common.ok))
                 )
             }
-            
-
+            .onReceive(driftStore.$drifts) { drifts in
+                if let updated = drifts.first(where: { $0.id == viewModel.drift.id }) {
+                    // Update the local view model
+                    viewModel.drift = updated
+                }
+            }
         }
     }
     

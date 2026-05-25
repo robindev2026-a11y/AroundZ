@@ -113,8 +113,8 @@ class ProfileViewModel: ObservableObject {
         }
         setupBookmarkSubscription()
         // setupLocationObservation() removed – location handled by LocationService
-        // Subscribe to location updates and update profile location automatically
-        LocationService.shared.$currentLocation
+        // Subscribe to location updates from PermissionsManager to automatically update profile location
+        PermissionsManager.shared.$currentLocation
             .receive(on: RunLoop.main)
             .compactMap { $0 }
             .sink { [weak self] location in

@@ -3,8 +3,10 @@ import SwiftUI
 struct DriftsScreen: View {
     @StateObject private var viewModel: DriftsViewModel
     @State private var showingFilterPanel = false
+    @State private var showingNotifications = false
+    @State private var navPath: [UUID] = []
     @EnvironmentObject private var driftStore: GlobalDriftStore
-    
+
     init(viewModel: DriftsViewModel = DriftsViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -12,11 +14,11 @@ struct DriftsScreen: View {
     private var filteredDrifts: [Drift] {
         viewModel.filteredDrifts(from: driftStore.drifts)
     }
-    
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navPath) {
             VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-                
+
                 // 1. Search Bar Input (ISSUE-007)
                 if viewModel.isSearchActive {
                     HStack(spacing: AppConstants.Layout.subElementSpacing) {
@@ -24,7 +26,7 @@ struct DriftsScreen: View {
                             Image(systemName: "magnifyingglass")
                                 .font(.bodyBold)
                                 .foregroundColor(.textSecondary)
-                            
+
                             TextField("Search Drifts...", text: $viewModel.searchQuery)
                                 .font(.bodyStandard)
                                 .foregroundColor(.textPrimary)
@@ -32,7 +34,7 @@ struct DriftsScreen: View {
                                 .onSubmit {
                                     hideKeyboard()
                                 }
-                            
+
                             if !viewModel.searchQuery.isEmpty {
                                 Button(action: { viewModel.searchQuery = "" }) {
                                     Image(systemName: "xmark.circle.fill")
@@ -45,7 +47,7 @@ struct DriftsScreen: View {
                         .background(Color.surfaceSecondary.opacity(AppConstants.UI.opacityNormal + 0.1))
                         .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
-                        
+
                         Button("Cancel") {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 viewModel.isSearchActive = false
@@ -59,20 +61,20 @@ struct DriftsScreen: View {
                     .padding(.top, 12) // Moved down slightly for better selectability
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
-                
+
                 // 2. Interactive Mode Switch & Time Tabs (Lego Blocks!)
                 VStack(spacing: AppConstants.Layout.subElementSpacing) {
                     DriftModeSwitch(selectedMode: $viewModel.selectedMode)
                         .padding(.horizontal, AppConstants.Layout.standardPadding)
                         .padding(.top, 4)
-                    
+
                     TimeStateTabs(selectedState: $viewModel.selectedTimeState)
                 }
-                
+
                 // 4. Main List / Scrollable Container
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
-                        
+
                         // Featured Section (Only in discover, default category, "All" time tab)
                         if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all && viewModel.selectedCategory == nil && viewModel.searchQuery.isEmpty {
                             if let first = filteredDrifts.first {
@@ -83,11 +85,11 @@ struct DriftsScreen: View {
                                 .padding(.horizontal, AppConstants.Layout.standardPadding)
                             }
                         }
-                        
+
                         let remainingDrifts = (viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all && viewModel.selectedCategory == nil && viewModel.searchQuery.isEmpty)
                             ? Array(filteredDrifts.dropFirst())
                             : filteredDrifts
-                        
+
                         if filteredDrifts.isEmpty {
                             emptyStateView
                         } else {
@@ -114,6 +116,20 @@ struct DriftsScreen: View {
                 scrollable: false,
                 rightView: {
                     HStack(spacing: AppConstants.Layout.subElementSpacing) {
+                        // Notifications Bell Button
+                        ZStack(alignment: .topTrailing) {
+                            CoffeeHeaderButton(icon: AppIcons.bell) {
+                                showingNotifications = true
+                            }
+
+                            if !driftStore.activeNotifications.isEmpty {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 10, height: 10)
+                                    .offset(x: -2, y: 2)
+                            }
+                        }
+
                         // Search Toggle Button (ISSUE-006)
                         CoffeeHeaderButton(icon: AppIcons.search) {
                             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
@@ -128,7 +144,7 @@ struct DriftsScreen: View {
                             CoffeeHeaderButton(icon: AppIcons.filter) {
                                 showingFilterPanel = true
                             }
-                            
+
                             if viewModel.activeFilterCount > 0 {
                                 Text("\(viewModel.activeFilterCount)")
                                     .font(.system(size: 10, weight: .bold))
@@ -173,6 +189,18 @@ struct DriftsScreen: View {
                         .presentationDragIndicator(.visible)
                 }
             }
+            .sheet(isPresented: $showingNotifications) {
+                if #available(iOS 16.4, *) {
+                    NotificationsSheet(navigationPath: $navPath)
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackground(.ultraThinMaterial)
+                } else {
+                    NotificationsSheet(navigationPath: $navPath)
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                }
+            }
             .onAppear {
                 NavigationManager.shared.resetTabBarVisibility()
                 driftStore.start()
@@ -180,7 +208,7 @@ struct DriftsScreen: View {
             .dismissKeyboardOnTap()
         }
     }
-    
+
     // MARK: - Category Chips Row Component
     private var categoryChipsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -206,7 +234,7 @@ struct DriftsScreen: View {
                         )
                 }
                 .pressScale(0.95)
-                
+
                 // Categories
                 ForEach(DriftCategory.allCases, id: \.self) { category in
                     Button(action: {
@@ -238,7 +266,7 @@ struct DriftsScreen: View {
             .padding(.horizontal, AppConstants.Layout.standardPadding)
         }
     }
-    
+
     // MARK: - Section Lists
 	    private func driftSection(title: String, drifts: [Drift]) -> some View {
 	        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
@@ -248,7 +276,7 @@ struct DriftsScreen: View {
                     .foregroundColor(.textPrimary)
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
                     .padding(.top, 4)
-                
+
 	                ForEach(drifts) { drift in
 	                    NavigationLink(value: drift.id) {
 	                        DriftCard(drift: drift, isFeatured: false, onJoin: {})
@@ -259,7 +287,7 @@ struct DriftsScreen: View {
 	            }
 	        }
 	    }
-    
+
     // MARK: - Empty States (DESIGN.md matching specs)
     private var emptyStateView: some View {
         VStack {
@@ -273,7 +301,7 @@ struct DriftsScreen: View {
                             .font(.system(size: 28))
                             .foregroundColor(.brandPrimary)
                     }
-                    
+
                     VStack(spacing: 4) {
                         Text("No active Drifts")
                             .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
@@ -284,7 +312,7 @@ struct DriftsScreen: View {
                             .multilineTextAlignment(.center)
                     }
                     .padding(.horizontal, 16)
-                    
+
                     Button("Browse Nearby") {
                         withAnimation {
                             viewModel.selectedMode = .discover
@@ -317,7 +345,7 @@ struct DriftsScreen: View {
                             .font(.system(size: 28))
                             .foregroundColor(.brandPrimary)
                     }
-                    
+
                     VStack(spacing: 4) {
                         Text("No Drifts nearby yet")
                             .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
@@ -342,14 +370,14 @@ struct DriftsScreen: View {
             }
         }
     }
-    
+
 }
 
 // MARK: - DriftsFilterSheet Subview (Step 4.2 / MVP Refinement)
 struct DriftsFilterSheet: View {
     @ObservedObject var viewModel: DriftsViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Top Pull-Handle Line
@@ -358,7 +386,7 @@ struct DriftsFilterSheet: View {
                 .frame(width: AppConstants.Layout.sheetHandleWidth, height: AppConstants.Layout.sheetHandleHeight)
                 .padding(.top, AppConstants.Layout.sheetHandleTopPadding)
                 .padding(.bottom, AppConstants.Layout.sheetHandleBottomPadding)
-            
+
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                     // Header Title
@@ -369,23 +397,23 @@ struct DriftsFilterSheet: View {
                         Spacer()
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    
+
                     // 1. Distance Radius Section
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         Text("1. Distance")
                             .font(.outfitBold(size: 16, relativeTo: .headline))
                             .foregroundColor(.textPrimary)
-                        
+
                         TactileSlider(value: $viewModel.selectedDistanceRadius, range: 1.0...10.0, step: 0.5)
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    
+
                     // 2. Time Picker Section
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         Text("2. Time")
                             .font(.outfitBold(size: 16, relativeTo: .headline))
                             .foregroundColor(.textPrimary)
-                        
+
                         HStack(spacing: 8) {
                             ForEach(["All", "Today", "Tomorrow", "This Weekend"], id: \.self) { timeframe in
                                 let isSelected = viewModel.selectedTimeframe == timeframe
@@ -397,9 +425,9 @@ struct DriftsFilterSheet: View {
                                     case "This Weekend": return Color.brandPurple
                                     default: return Color.brandPrimary
                                     }
-                                    
+
                                 }()
-                                
+
                                 Button(action: {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
                                         viewModel.selectedTimeframe = timeframe
@@ -426,13 +454,13 @@ struct DriftsFilterSheet: View {
                         }
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    
+
                     // 3. Activity Types Section
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         Text("3. Activity Types")
                             .font(.outfitBold(size: 16, relativeTo: .headline))
                             .foregroundColor(.textPrimary)
-                        
+
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                             ForEach(DriftCategory.allCases, id: \.self) { category in
                                 let isSelected = viewModel.selectedCategory == category
@@ -471,7 +499,7 @@ struct DriftsFilterSheet: View {
                         }
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    
+
                     // Action Buttons (Apply & Reset)
                     VStack(spacing: AppConstants.Layout.elementSpacing) {
                         Button(action: {
@@ -487,7 +515,7 @@ struct DriftsFilterSheet: View {
                                 .shadow(color: Color.brandPrimary.opacity(0.2), radius: 8, x: 0, y: 4)
                         }
                         .pressScale(0.96)
-                        
+
                         Button("Reset") {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 viewModel.selectedDistanceRadius = 10.0
@@ -516,7 +544,7 @@ struct TactileSlider: View {
     @Binding var value: Double
     let range: ClosedRange<Double>
     let step: Double
-    
+
     var body: some View {
         VStack(spacing: 6) {
             GeometryReader { geometry in
@@ -526,7 +554,7 @@ struct TactileSlider: View {
                 let bubbleWidth: CGFloat = 90
                 // Calculate centered position for the bubble above thumb
                 let bubbleOffset = percentage * (width - thumbSize) + thumbSize / 2 - bubbleWidth / 2
-                
+
                 ZStack(alignment: .leading) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
@@ -536,7 +564,7 @@ struct TactileSlider: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.brandPrimary.opacity(0.2), lineWidth: 0.8)
                             )
-                        
+
                         Text("\(Int(value)) km radius")
                             .font(.outfitBold(size: 11, relativeTo: .caption))
                             .foregroundColor(.brandPrimary)
@@ -546,10 +574,10 @@ struct TactileSlider: View {
                 }
             }
             .frame(height: 26)
-            
+
             Slider(value: $value, in: range, step: step)
                 .accentColor(.brandPrimary)
-            
+
             HStack {
                 Text("\(Int(range.lowerBound)) km")
                     .font(.outfitMedium(size: 11, relativeTo: .caption))

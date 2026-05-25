@@ -32,7 +32,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                     return
                 }
                 
-                let currentUid = Auth.auth().currentUser?.uid
+                let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
                 let drifts: [Drift] = documents.compactMap { doc -> Drift? in
                     let data = doc.data()
                     
@@ -157,7 +157,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
         let postId = drift.id.uuidString
-        let currentUid = Auth.auth().currentUser?.uid ?? ""
+        let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
         
         var postData: [String: Any] = [
             "title": drift.title,

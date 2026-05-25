@@ -41,6 +41,10 @@
 	<string>CoffeeCall uses your location to find activities within 10km of you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>CoffeeCall needs access to your photos to set a profile picture.</string>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>CoffeeCall needs write access to your calendar to schedule drift reminders.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>CoffeeCall needs access to your calendar to schedule drift reminders.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Outfit-Regular.ttf</string>

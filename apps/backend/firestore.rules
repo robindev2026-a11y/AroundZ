@@ -19,10 +19,7 @@ service cloud.firestore {
     }
 
     match /acceptances/{acceptanceId} {
-      allow read: if signedIn() && (
-        resource.data.acceptorId == request.auth.uid || 
-        resource.data.creatorId == request.auth.uid
-      );
+      allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.acceptorId == request.auth.uid;
       allow update, delete: if signedIn() && (
         resource.data.acceptorId == request.auth.uid || 

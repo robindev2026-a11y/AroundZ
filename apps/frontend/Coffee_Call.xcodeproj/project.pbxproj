@@ -79,6 +79,15 @@
 		8B1ECD662FC048830060CEB9 /* EditDriftScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD652FC048830060CEB9 /* EditDriftScreen.swift */; };
 		8B1ECD682FC048C40060CEB9 /* ManageDriftScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1ECD672FC048C40060CEB9 /* ManageDriftScreen.swift */; };
 		8B3EE9232FC2BCDF004A7D46 /* NetworkInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9222FC2BCDF004A7D46 /* NetworkInterceptor.swift */; };
+		8B3EE92B2FC30A27004A7D46 /* ChatsListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9242FC30A27004A7D46 /* ChatsListScreen.swift */; };
+		8B3EE92C2FC30A27004A7D46 /* EditProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9282FC30A27004A7D46 /* EditProfileScreen.swift */; };
+		8B3EE92D2FC30A27004A7D46 /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE92A2FC30A27004A7D46 /* ProfileScreen.swift */; };
+		8B3EE92E2FC30A27004A7D46 /* DriftChatScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9252FC30A27004A7D46 /* DriftChatScreen.swift */; };
+		8B3EE92F2FC30A27004A7D46 /* DriftDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9262FC30A27004A7D46 /* DriftDetailScreen.swift */; };
+		8B3EE9302FC30A27004A7D46 /* NotificationsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9292FC30A27004A7D46 /* NotificationsSheet.swift */; };
+		8B3EE9312FC30A27004A7D46 /* DriftsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9272FC30A27004A7D46 /* DriftsScreen.swift */; };
+		8B3EE9332FC30B1F004A7D46 /* AppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9322FC30B1F004A7D46 /* AppNotification.swift */; };
+		8B3EE9352FC3171D004A7D46 /* EventKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3EE9342FC3171D004A7D46 /* EventKitManager.swift */; };
 		8B5A8CE62FBDEA2C003090FE /* CountryCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5A8CE52FBDEA2C003090FE /* CountryCode.swift */; };
 		8B5A8CE82FBDEBAF003090FE /* CountryPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5A8CE72FBDEBAF003090FE /* CountryPickerView.swift */; };
 		8BAB29A62FBD9005004556D9 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8BAB29A52FBD9005004556D9 /* FirebaseAuth */; };
@@ -198,6 +207,15 @@
 		8B1ECD652FC048830060CEB9 /* EditDriftScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDriftScreen.swift; sourceTree = "<group>"; };
 		8B1ECD672FC048C40060CEB9 /* ManageDriftScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDriftScreen.swift; sourceTree = "<group>"; };
 		8B3EE9222FC2BCDF004A7D46 /* NetworkInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInterceptor.swift; sourceTree = "<group>"; };
+		8B3EE9242FC30A27004A7D46 /* ChatsListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsListScreen.swift; sourceTree = "<group>"; };
+		8B3EE9252FC30A27004A7D46 /* DriftChatScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftChatScreen.swift; sourceTree = "<group>"; };
+		8B3EE9262FC30A27004A7D46 /* DriftDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftDetailScreen.swift; sourceTree = "<group>"; };
+		8B3EE9272FC30A27004A7D46 /* DriftsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriftsScreen.swift; sourceTree = "<group>"; };
+		8B3EE9282FC30A27004A7D46 /* EditProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileScreen.swift; sourceTree = "<group>"; };
+		8B3EE9292FC30A27004A7D46 /* NotificationsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSheet.swift; sourceTree = "<group>"; };
+		8B3EE92A2FC30A27004A7D46 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
+		8B3EE9322FC30B1F004A7D46 /* AppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppNotification.swift; path = Models/AppNotification.swift; sourceTree = "<group>"; };
+		8B3EE9342FC3171D004A7D46 /* EventKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitManager.swift; sourceTree = "<group>"; };
 		8B5A8CE52FBDEA2C003090FE /* CountryCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryCode.swift; sourceTree = "<group>"; };
 		8B5A8CE72FBDEBAF003090FE /* CountryPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryPickerView.swift; sourceTree = "<group>"; };
 		8BD07EB62FC0688200E32A8D /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
@@ -312,6 +330,7 @@
 		3374CEEB2FB732DB0020F28D /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8B3EE9342FC3171D004A7D46 /* EventKitManager.swift */,
 				8B3EE9222FC2BCDF004A7D46 /* NetworkInterceptor.swift */,
 				8BD07EB62FC0688200E32A8D /* NetworkManager.swift */,
 				8B1ECD5E2FC033440060CEB9 /* NotificationPermissionService.swift */,
@@ -393,6 +412,13 @@
 		6C7F7ABFC2D113FA3339DA3D /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				8B3EE9242FC30A27004A7D46 /* ChatsListScreen.swift */,
+				8B3EE9252FC30A27004A7D46 /* DriftChatScreen.swift */,
+				8B3EE9262FC30A27004A7D46 /* DriftDetailScreen.swift */,
+				8B3EE9272FC30A27004A7D46 /* DriftsScreen.swift */,
+				8B3EE9282FC30A27004A7D46 /* EditProfileScreen.swift */,
+				8B3EE9292FC30A27004A7D46 /* NotificationsSheet.swift */,
+				8B3EE92A2FC30A27004A7D46 /* ProfileScreen.swift */,
 				8BD07EC22FC15ACB00E32A8D /* CreateDriftScreen.swift */,
 				8B1ECD672FC048C40060CEB9 /* ManageDriftScreen.swift */,
 				8B1ECD652FC048830060CEB9 /* EditDriftScreen.swift */,
@@ -469,6 +495,7 @@
 		A616335262E59CBA3EF3D878 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8B3EE9322FC30B1F004A7D46 /* AppNotification.swift */,
 				8BD07EC02FC14FF600E32A8D /* Domain */,
 				8B5A8CE52FBDEA2C003090FE /* CountryCode.swift */,
 				3374CEE52FB732DB0020F28D /* RadarPerson.swift */,
@@ -695,6 +722,13 @@
 				19EC0F93C9B06FB7DF92EC07 /* GlassmorphicCard.swift in Sources */,
 				338E3B1A2FB435F40048FC32 /* AppImages.swift in Sources */,
 				8BE4A1B52FB860B40064EE09 /* DriftContextCard.swift in Sources */,
+				8B3EE92B2FC30A27004A7D46 /* ChatsListScreen.swift in Sources */,
+				8B3EE92C2FC30A27004A7D46 /* EditProfileScreen.swift in Sources */,
+				8B3EE92D2FC30A27004A7D46 /* ProfileScreen.swift in Sources */,
+				8B3EE92E2FC30A27004A7D46 /* DriftChatScreen.swift in Sources */,
+				8B3EE92F2FC30A27004A7D46 /* DriftDetailScreen.swift in Sources */,
+				8B3EE9302FC30A27004A7D46 /* NotificationsSheet.swift in Sources */,
+				8B3EE9312FC30A27004A7D46 /* DriftsScreen.swift in Sources */,
 				8D765F7B6FC3CB7138781486 /* PillBadge.swift in Sources */,
 				EF4851B28FDBB8D3CD720882 /* PrimaryButton.swift in Sources */,
 				3374CEDE2FB725060020F28D /* CreateDriftScreen.swift in Sources */,
@@ -707,6 +741,7 @@
 				338E3B1F2FB44DFF0048FC32 /* CategoryChip.swift in Sources */,
 				423DC19141E1AE084C6EDC3A /* PhoneAuthScreen.swift in Sources */,
 				3374CED52FB6FDF10020F28D /* ProfileViewModel.swift in Sources */,
+				8B3EE9352FC3171D004A7D46 /* EventKitManager.swift in Sources */,
 				86BE7EA9CAAB5F2B9C8085E8 /* OTPVerificationScreen.swift in Sources */,
 				64A8171065A4149F79ED8800 /* AuthViewModel.swift in Sources */,
 				3374CED42FB6FDF10020F28D /* DriftChatViewModel.swift in Sources */,
@@ -718,6 +753,7 @@
 				338E3B282FB46EA60048FC32 /* View+Availability.swift in Sources */,
 				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
 				338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */,
+				8B3EE9332FC30B1F004A7D46 /* AppNotification.swift in Sources */,
 				3374CEE02FB725670020F28D /* CreateDriftViewModel.swift in Sources */,
 				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,
 				3374CEC12FB6E7A50020F28D /* TimeStateTabs.swift in Sources */,

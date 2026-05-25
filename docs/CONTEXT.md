@@ -1,7 +1,7 @@
 # CoffeeCall Shared AI Context
 
 Status: ACTIVE
-Last updated: 2026-05-16
+Last updated: 2026-05-24
 
 This is the shared ground truth for every AI agent working on CoffeeCall.
 
@@ -58,6 +58,26 @@ Before making UI changes, search active docs for conflicts and state which activ
 4. For product or data behavior, read `docs/PLAN.md` and `docs/ARCHITECTURE.md`.
 5. Before changing files, identify active conflicts if any.
 6. After meaningful work, update `docs/STATUS.md` with what changed, files touched, verification, and remaining gaps.
+
+## AI File Scope (Three Circle Rule)
+
+When collaborating with an AI assistant, use this “three circle” rule for opening files.
+
+### Scope Root
+
+- Allowed scope root: `~/Documents/Projects/` (including `CoffeeCall/` and `ObsidianVault/`)
+
+### 1st circle (OK)
+
+- Files directly related to the current task (bug/feature/refactor).
+
+### 2nd circle (OK, with caution)
+
+- Files that a 1st-circle file explicitly points to (e.g. referenced docs/types).
+
+### 3rd circle and beyond (ASK FIRST)
+
+- Exploratory expansion: opening new files just to “see if there’s a reason” without a direct reference chain from the task’s primary files.
 
 ## Current Design Focus
 

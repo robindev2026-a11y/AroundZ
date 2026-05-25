@@ -4,44 +4,45 @@ struct DriftDetailScreen: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: DriftDetailViewModel
     @StateObject private var navManager = NavigationManager.shared
+    @EnvironmentObject private var driftStore: GlobalDriftStore
     @State private var tabBarVisibilitySource = UUID().uuidString
     @State private var showingHostContext = false
     @State private var showingWhoIsComing = false
     @State private var selectedDriftForNavigation: Drift? = nil
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             heroSection
                 .padding(.horizontal, AppConstants.Layout.standardPadding)
                 .padding(.top, 20) // Pushed up under the VStack header
-            
+
             // Summary Info Grid
             summaryInfoGrid
                 .padding(.horizontal, AppConstants.Layout.standardPadding)
                 .padding(.top, AppConstants.Layout.elementSpacing)
-            
+
             VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                 // About Section
                 aboutSection
-                
+
                 // Map Section
                 mapSection
-                
+
                 // Hosted By Section
                 hostSection
-                
+
                 // Who's Coming Section
                 participantsSection
-                
+
                 // Details List Section
                 detailsListSection
-                
+
                 // Safety Banner
                 safetyBanner
             }
             .padding(.horizontal, AppConstants.Layout.standardPadding)
             .padding(.top, AppConstants.Layout.sectionSpacing + 4)
-            
+
             Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100) // Padding for overlay sticky CTA
         }
         .asCoffeePage(
@@ -96,9 +97,36 @@ struct DriftDetailScreen: View {
         .onDisappear {
             navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
         }
+        .onReceive(driftStore.$drifts) { drifts in
+            if let updated = drifts.first(where: { $0.id == viewModel.drift.id }) {
+                // Keep drift up to date
+                viewModel.drift = updated
+
+                // If we were waiting for approval and are now in the participants list, upgrade status!
+                if viewModel.joinStatus == .requested {
+                    let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+                    if updated.participantInitials.contains(userInitials) {
+                        viewModel.joinStatus = .joined
+                    }
+                }
+            }
+        }
+        .alert("Add to Calendar?", isPresented: $viewModel.showCalendarAddConfirmation) {
+            Button("Add", role: .none) {
+                viewModel.confirmAddReminderToCalendar()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will schedule '\(viewModel.drift.title)' in your Apple Calendar.")
+        }
+        .alert("Remove from Calendar", isPresented: $viewModel.showCalendarUntapDisclaimer) {
+            Button("Close", role: .cancel) {}
+        } message: {
+            Text("This Drift is already scheduled in your Apple Calendar. To remove it, please delete the event manually from the Calendar app.")
+        }
     }
-    
-    
+
+
     // MARK: - Hero Content
     private var heroSection: some View {
         HStack(alignment: .top, spacing: AppConstants.Layout.standardPadding) {
@@ -116,14 +144,14 @@ struct DriftDetailScreen: View {
                     .background(viewModel.drift.status.color.opacity(AppConstants.UI.opacityLight))
                     .cornerRadius(AppConstants.UI.cornerRadiusMedium)
                 }
-                
+
                 Text(viewModel.drift.description.split(separator: ".").first ?? "")
                     .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
-            
+
             Spacer()
-            
+
             // Hero Image
             Image("drift_walk") // Placeholder for viewModel.drift.imageUrl
                 .resizable()
@@ -133,8 +161,8 @@ struct DriftDetailScreen: View {
                 .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacityLight), radius: 10, x: 0, y: 5)
         }
     }
-    
-    
+
+
 //    private func headerAction(icon: String, isSpecial: Bool = false, action: @escaping () -> Void) -> some View {
 //        Button(action: action) {
 //            Image(systemName: icon)
@@ -146,8 +174,8 @@ struct DriftDetailScreen: View {
 //                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall).stroke(Color.appBorder, lineWidth: 1))
 //        }
 //    }
-    
-    
+
+
     // MARK: - Summary Info Grid
     private var summaryInfoGrid: some View {
         HStack(spacing: 0) {
@@ -165,13 +193,13 @@ struct DriftDetailScreen: View {
         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
         .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium).stroke(Color.appBorder, lineWidth: 1))
     }
-    
+
     private func summaryInfoItem(icon: String, title: String, subtitle: String) -> some View {
         VStack(spacing: AppConstants.Layout.miniPadding + 2) {
             Image(systemName: icon)
                 .font(.system(size: AppConstants.Typography.sizeTitle))
                 .foregroundColor(.brandPrimary)
-            
+
             VStack(spacing: 2) {
                 Text(title)
                     .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
@@ -183,24 +211,24 @@ struct DriftDetailScreen: View {
         }
         .frame(maxWidth: .infinity)
     }
-    
+
     // MARK: - Map Section
     private var mapSection: some View {
         DriftMapView(joinStatus: viewModel.joinStatus, location: viewModel.drift.location)
     }
-    
+
     // MARK: - About Section
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.aboutHeader)
                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
-            
+
             Text(viewModel.drift.description)
                 .font(.system(size: AppConstants.Typography.sizeBody, weight: .medium))
                 .foregroundColor(.textSecondary)
                 .lineSpacing(4)
-            
+
             HStack(spacing: 8) {
                 ForEach(viewModel.drift.vibeTags, id: \.self) { tag in
                     Text(tag)
@@ -214,20 +242,20 @@ struct DriftDetailScreen: View {
             }
         }
     }
-    
+
     private func tagColor(for tag: String) -> Color {
         if tag == "Casual" || tag == "Chill" { return .brandPrimary }
         if tag == "Friendly" || tag == "Good for conversations" { return .brandPurple }
         return .brandSecondary
     }
-    
+
     // MARK: - Host Section
     private var hostSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.hostHeader)
                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
-            
+
             Button(action: { showingHostContext = true }) {
                 HStack(spacing: AppConstants.Layout.elementSpacing) {
                     ZStack(alignment: .bottomTrailing) {
@@ -239,7 +267,7 @@ struct DriftDetailScreen: View {
                                     .font(.system(size: 14, weight: .black))
                                     .foregroundColor(.brandSecondary)
                             )
-                        
+
                         if viewModel.drift.host.isVerified {
                             AppIcons.verifiedImage
                                 .font(.system(size: 14))
@@ -248,7 +276,7 @@ struct DriftDetailScreen: View {
                                 .offset(x: 2, y: 2)
                         }
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 2) {
                         Text(viewModel.drift.host.name)
                             .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
@@ -257,9 +285,9 @@ struct DriftDetailScreen: View {
                             .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .medium))
                             .foregroundColor(.textSecondary)
                     }
-                    
+
                     Spacer()
-                    
+
                     AppIcons.chevronRightImage
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.textSecondary)
@@ -271,16 +299,16 @@ struct DriftDetailScreen: View {
             }
         }
     }
-    
+
     // MARK: - Participants Section
     private var participantsSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.participantsHeader)
                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
-            
+
             let isLocked = viewModel.joinStatus == .notJoined || viewModel.joinStatus == .requested
-            
+
             HStack(spacing: AppConstants.Layout.elementSpacing) {
                 if isLocked {
                     // MARK: - Locked State
@@ -293,7 +321,7 @@ struct DriftDetailScreen: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.brandPrimary)
                         }
-                        
+
                         VStack(alignment: .leading, spacing: 2) {
                             Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
                                 .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
@@ -303,9 +331,9 @@ struct DriftDetailScreen: View {
                                 .foregroundColor(.textSecondary)
                         }
                     }
-                    
+
                     Spacer()
-                    
+
                     AppIcons.chevronRightImage
                         .font(.system(size: AppConstants.Layout.elementSpacing + 2, weight: .bold))
                         .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityMuted))
@@ -322,7 +350,7 @@ struct DriftDetailScreen: View {
                                     .overlay(Circle().stroke(Color.white, lineWidth: 2))
                             }
                         }
-                        
+
                         VStack(alignment: .leading, spacing: 2) {
                             Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
                                 .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
@@ -336,9 +364,9 @@ struct DriftDetailScreen: View {
                     .onTapGesture {
                         showingWhoIsComing = true
                     }
-                    
+
                     Spacer()
-                    
+
                     Button(AppStrings.Drifts.seeAll) {
                         showingWhoIsComing = true
                     }
@@ -356,17 +384,17 @@ struct DriftDetailScreen: View {
             .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + AppConstants.Layout.miniPadding).stroke(Color.appBorder, lineWidth: 1))
         }
     }
-    
+
     // MARK: - Details List Section
     private var detailsListSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing + AppConstants.Layout.miniPadding) {
             Text(AppStrings.Drifts.Detail.detailsHeader)
                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
-            
+
             VStack(spacing: 0) {
                 detailRow(icon: AppIcons.clockFill, label: AppStrings.Drifts.Detail.timeLabel, value: "\(viewModel.drift.time) – \(viewModel.drift.endTime)")
-                
+
                 // Meeting Point - Restricted until joined
                 let isLocked = viewModel.joinStatus == .notJoined || viewModel.joinStatus == .requested
                 detailRow(
@@ -376,7 +404,7 @@ struct DriftDetailScreen: View {
                     hasChevron: !isLocked,
                     isLocked: isLocked
                 )
-                
+
                 detailRow(icon: AppIcons.briefcase, label: AppStrings.Drifts.Detail.bringLabel, value: viewModel.drift.whatToBring.joined(separator: ", "))
                 detailRow(icon: AppIcons.sparkles, label: AppStrings.Drifts.Detail.vibeLabel, value: viewModel.drift.vibeTags.joined(separator: " • "))
                 detailRow(icon: AppIcons.notes, label: AppStrings.Drifts.Detail.notesLabel, value: viewModel.drift.notes ?? "No extra notes.", isLast: true)
@@ -387,7 +415,7 @@ struct DriftDetailScreen: View {
             .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium).stroke(Color.appBorder, lineWidth: 1))
         }
     }
-    
+
     private func detailRow(icon: String, label: String, value: String, hasChevron: Bool = false, isLast: Bool = false, isLocked: Bool = false) -> some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
@@ -395,20 +423,20 @@ struct DriftDetailScreen: View {
                     .font(.system(size: 18))
                     .foregroundColor(isLocked ? .textSecondary : .brandPrimary)
                     .frame(width: AppConstants.Layout.sectionSpacing)
-                
+
                 VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding) {
                     Text(label)
                         .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                         .foregroundColor(.textSecondary)
-                    
+
                     Text(value)
                         .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
                         .foregroundColor(isLocked ? .textSecondary : .textPrimary)
                         .blur(radius: isLocked ? AppConstants.Layout.miniPadding : 0)
                 }
-                
+
                 Spacer()
-                
+
                 if hasChevron {
                     AppIcons.chevronRightImage
                         .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
@@ -417,13 +445,13 @@ struct DriftDetailScreen: View {
                 }
             }
             .padding(.vertical, AppConstants.Layout.buttonPaddingHorizontal)
-            
+
             if !isLast {
                 Divider()
             }
         }
     }
-    
+
     // MARK: - Safety Banner
     private var safetyBanner: some View {
         VStack(spacing: AppConstants.Layout.elementSpacing) {
@@ -431,7 +459,7 @@ struct DriftDetailScreen: View {
                 AppIcons.shieldImage
                     .font(.system(size: AppConstants.Typography.sizeHeadline))
                     .foregroundColor(.brandPurple)
-                
+
                 VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding) {
                     Text(AppStrings.Drifts.Detail.safetyTitle)
                         .font(.system(size: AppConstants.Typography.sizeBody - 1, weight: .bold))
@@ -440,9 +468,9 @@ struct DriftDetailScreen: View {
                         .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
                         .foregroundColor(.textSecondary)
                 }
-                
+
                 Spacer()
-                
+
                 AppIcons.chevronRightImage
                     .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
                     .foregroundColor(.brandPurple)
@@ -450,7 +478,7 @@ struct DriftDetailScreen: View {
             .padding(AppConstants.Layout.standardPadding)
             .background(Color.brandPurple.opacity(AppConstants.UI.opacitySubtle))
             .cornerRadius(AppConstants.UI.cornerRadiusSmall + AppConstants.Layout.miniPadding)
-            
+
             HStack(spacing: AppConstants.Layout.subElementSpacing) {
                 AppIcons.lockImage
                     .font(.system(size: AppConstants.Typography.sizeTiny + 1))
@@ -460,12 +488,12 @@ struct DriftDetailScreen: View {
             .foregroundColor(.textSecondary)
         }
     }
-    
+
     // MARK: - Sticky CTA Footer
     private var stickyCTAFooter: some View {
         VStack(spacing: 0) {
             Divider().opacity(0.1)
-            
+
             HStack {
                 if viewModel.drift.isMine {
                     NavigationLink(destination: LazyView(ManageDriftScreen(viewModel: ManageDriftViewModel(drift: viewModel.drift)))) {
@@ -496,7 +524,7 @@ struct DriftDetailScreen: View {
                 .ignoresSafeArea(edges: .bottom)
         )
     }
-    
+
     private var manageButtonContent: some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
             Circle()
@@ -507,7 +535,7 @@ struct DriftDetailScreen: View {
                         .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                         .foregroundColor(.white)
                 )
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(AppStrings.Manage.title)
                     .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
@@ -516,9 +544,9 @@ struct DriftDetailScreen: View {
                     .opacity(0.9)
             }
             .foregroundColor(.white)
-            
+
             Spacer()
-            
+
             AppIcons.chevronRightImage
                 .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                 .foregroundColor(.white.opacity(0.6))
@@ -530,7 +558,7 @@ struct DriftDetailScreen: View {
         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
         .shadow(color: Color.brandPurple.opacity(AppConstants.UI.opacityMuted), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
     }
-    
+
     private var ctaButtonContent: some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
             Circle()
@@ -541,7 +569,7 @@ struct DriftDetailScreen: View {
                         .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                         .foregroundColor(.white)
                 )
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(ctaTitle)
                     .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
@@ -550,9 +578,9 @@ struct DriftDetailScreen: View {
                     .opacity(0.9)
             }
             .foregroundColor(.white)
-            
+
             Spacer()
-            
+
             AppIcons.chevronRightImage
                 .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                 .foregroundColor(.white.opacity(0.6))
@@ -564,9 +592,9 @@ struct DriftDetailScreen: View {
         .cornerRadius(AppConstants.UI.cornerRadiusMedium)
         .shadow(color: ctaColor.opacity(AppConstants.UI.opacityMuted), radius: AppConstants.UI.shadowRadius, x: 0, y: AppConstants.UI.shadowY)
     }
-    
+
     // MARK: - Computed Properties for CTA
-    
+
     // MARK: - Computed CTA Props
     private var ctaTitle: String {
         switch viewModel.joinStatus {
@@ -577,7 +605,7 @@ struct DriftDetailScreen: View {
         case .ended: return AppStrings.Drifts.Detail.CTA.ended
         }
     }
-    
+
     private var ctaSubtitle: String {
         switch viewModel.joinStatus {
         case .notJoined: return AppStrings.Drifts.Detail.CTA.joinSubtitle
@@ -587,7 +615,7 @@ struct DriftDetailScreen: View {
         case .ended: return AppStrings.Drifts.Detail.CTA.endedSubtitle
         }
     }
-    
+
     private var ctaIcon: String {
         switch viewModel.joinStatus {
         case .notJoined: return AppIcons.participants
@@ -597,7 +625,7 @@ struct DriftDetailScreen: View {
         case .ended: return AppIcons.checkCircleFill
         }
     }
-    
+
     private var ctaColor: Color {
         switch viewModel.joinStatus {
         case .notJoined: return .brandPrimary
@@ -642,7 +670,7 @@ struct DriftDetailScreen_Previews: PreviewProvider {
 struct HostContextCardSheet: View {
     let host: Host
     var onSelectDrift: (Drift) -> Void
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Soft drag handle line at the top
@@ -651,7 +679,7 @@ struct HostContextCardSheet: View {
                 .frame(width: AppConstants.Layout.sheetHandleWidth, height: AppConstants.Layout.sheetHandleHeight)
                 .padding(.top, AppConstants.Layout.sheetHandleTopPadding)
                 .padding(.bottom, AppConstants.Layout.sheetHandleBottomPadding)
-            
+
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
                     // 1. Identity Header
@@ -661,61 +689,61 @@ struct HostContextCardSheet: View {
                             Circle()
                                 .fill(Color.brandSecondary.opacity(AppConstants.UI.opacityLight))
                                 .frame(width: AppConstants.Layout.avatarSizeXXLarge, height: AppConstants.Layout.avatarSizeXXLarge)
-                            
+
                             Text(host.initials)
                                 .font(.heading2)
                                 .foregroundColor(.brandSecondary)
                         }
-                        
+
                         VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding) {
                             HStack(spacing: AppConstants.Layout.subElementSpacing - 2) {
                                 Text(host.name)
                                     .font(.heading2)
                                     .foregroundColor(.textPrimary)
-                                
+
                                 if host.verified {
                                     AppIcons.verifiedImage
                                         .font(.system(size: AppConstants.Layout.standardPadding))
                                         .foregroundColor(.brandPrimary)
                                 }
                             }
-                            
+
                             Text(host.role)
                                 .font(.bodySmall)
                                 .foregroundColor(.textSecondary)
                         }
-                        
+
                         Spacer()
                     }
-                    
+
                     // 2. Trust Stats 2x2 Grid
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing), GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing)], spacing: AppConstants.Layout.elementSpacing) {
                         // Hosted
                         statTile(icon: AppIcons.person, color: .brandPrimary, count: "\(host.hostedCount)", label: AppStrings.Profile.hostedLabel)
-                        
+
                         // Joined
                         statTile(icon: AppIcons.participants, color: .brandSecondary, count: "\(host.joinedCount)", label: AppStrings.Profile.joinedLabel)
-                        
+
                         // Completed
                         statTile(icon: AppIcons.checkCircleFill, color: .brandPrimary, count: "\(host.completedCount)", label: "Completed")
-                        
+
                         // Active since
                         activeSinceTile(icon: AppIcons.calendar, color: .brandPurple, year: "April 2026")
                     }
-                    
+
                     // 3. Interest tags capsule row
                     HStack(spacing: AppConstants.Layout.subElementSpacing) {
                         ForEach(host.interests, id: \.self) { interest in
                             interestCapsule(interest: interest)
                         }
                     }
-                    
+
                     // 4. Other plans section
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing + 2) {
                         Text(String(format: AppStrings.Manage.otherPlans, host.name.components(separatedBy: " ").first ?? host.name))
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.textPrimary)
-                        
+
                         if host.otherActiveDrifts.isEmpty {
                             Text(AppStrings.Manage.noOtherPlans)
                                 .font(.bodyStandard)
@@ -734,13 +762,13 @@ struct HostContextCardSheet: View {
                             }
                         }
                     }
-                    
+
                     // 5. Past completed plans
                     VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
                         Text(AppStrings.Manage.pastPlans)
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.textPrimary)
-                        
+
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: AppConstants.Layout.elementSpacing) {
                                 ForEach(Array(host.pastDrifts.enumerated()), id: \.offset) { index, pastDrift in
@@ -757,7 +785,7 @@ struct HostContextCardSheet: View {
         }
         .background(Color.surfaceMain.ignoresSafeArea())
     }
-    
+
     // MARK: - Trust Grid Stat Tile
     private func statTile(icon: String, color: Color, count: String, label: String) -> some View {
         HStack(spacing: 10) {
@@ -765,22 +793,22 @@ struct HostContextCardSheet: View {
                 Circle()
                     .fill(color.opacity(AppConstants.UI.opacityLight - 0.03))
                     .frame(width: AppConstants.Layout.avatarSizeSmall, height: AppConstants.Layout.avatarSizeSmall)
-                
+
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(color)
             }
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(count)
                     .font(.system(size: AppConstants.Typography.sizeTitle, weight: .bold))
                     .foregroundColor(.textPrimary)
-                
+
                 Text(label)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
-            
+
             Spacer(minLength: 0)
         }
         .padding(.horizontal, AppConstants.Layout.elementSpacing)
@@ -793,7 +821,7 @@ struct HostContextCardSheet: View {
                 .stroke(Color.appBorder, lineWidth: 1)
         )
     }
-    
+
     // MARK: - Trust Grid Active Since Tile
     private func activeSinceTile(icon: String, color: Color, year: String) -> some View {
         HStack(spacing: 10) {
@@ -801,22 +829,22 @@ struct HostContextCardSheet: View {
                 Circle()
                     .fill(color.opacity(AppConstants.UI.opacityLight - 0.03))
                     .frame(width: AppConstants.Layout.avatarSizeSmall, height: AppConstants.Layout.avatarSizeSmall)
-                
+
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(color)
             }
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(AppStrings.Manage.activeSince)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
-                
+
                 Text(year)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.textPrimary)
             }
-            
+
             Spacer(minLength: 0)
         }
         .padding(.horizontal, AppConstants.Layout.elementSpacing)
@@ -829,7 +857,7 @@ struct HostContextCardSheet: View {
                 .stroke(Color.appBorder, lineWidth: 1)
         )
     }
-    
+
     // MARK: - Interest Capsules
     private func interestCapsule(interest: String) -> some View {
         let (bgColor, fgColor, iconName) = interestCapsuleDetails(for: interest)
@@ -845,7 +873,7 @@ struct HostContextCardSheet: View {
         .background(bgColor)
         .clipShape(Capsule())
     }
-    
+
     private func interestCapsuleDetails(for interest: String) -> (Color, Color, String) {
         switch interest.lowercased() {
         case "walks", "walk":
@@ -858,7 +886,7 @@ struct HostContextCardSheet: View {
             return (Color.brandPrimary.opacity(0.1), Color.brandPrimary, AppIcons.sparkles)
         }
     }
-    
+
     // MARK: - Upcoming Drift Row
     private func upcomingDriftRow(drift: Drift) -> some View {
         HStack(spacing: AppConstants.Layout.elementSpacing) {
@@ -869,13 +897,13 @@ struct HostContextCardSheet: View {
                 .frame(width: AppConstants.Layout.cardThumbnailWidth, height: AppConstants.Layout.cardThumbnailHeight)
                 .cornerRadius(AppConstants.UI.cornerRadiusSmall)
                 .clipped()
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(drift.title)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.textPrimary)
                     .lineLimit(1)
-                
+
                 HStack(spacing: AppConstants.Layout.subElementSpacing) {
                     HStack(spacing: 3) {
                         AppIcons.calendarImage
@@ -883,10 +911,10 @@ struct HostContextCardSheet: View {
                         Text(drift.date)
                             .font(.system(size: 11, weight: .medium))
                     }
-                    
+
                     Text("•")
                         .font(.system(size: 11))
-                    
+
                     HStack(spacing: 3) {
                         AppIcons.clockImage
                             .font(.system(size: AppConstants.Typography.sizeTiny))
@@ -895,7 +923,7 @@ struct HostContextCardSheet: View {
                     }
                 }
                 .foregroundColor(.textSecondary)
-                
+
                 // Category Tag
                 HStack(spacing: AppConstants.Layout.miniPadding) {
                     Image(systemName: drift.category.icon)
@@ -909,9 +937,9 @@ struct HostContextCardSheet: View {
                 .background(drift.category.color.opacity(0.12))
                 .clipShape(Capsule())
             }
-            
+
             Spacer()
-            
+
             AppIcons.chevronRightImage
                 .font(.system(size: AppConstants.Layout.elementSpacing, weight: .bold))
                 .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityNormal))
@@ -924,15 +952,15 @@ struct HostContextCardSheet: View {
                 .stroke(Color.appBorder, lineWidth: 1)
         )
     }
-    
+
     // MARK: - Past Completed Card
     private var pastImages: [String] {
         ["drift_walk", "drift_dinner", "drift_movie"] // Fallbacks
     }
-    
+
     private func pastCompletedCard(title: String, index: Int) -> some View {
         let fallbackImage = pastImages[index % pastImages.count]
-        
+
         return VStack(alignment: .leading, spacing: AppConstants.Layout.subElementSpacing) {
             ZStack(alignment: .topLeading) {
                 Image(fallbackImage)
@@ -941,7 +969,7 @@ struct HostContextCardSheet: View {
                     .frame(width: AppConstants.Layout.cardGalleryWidth, height: AppConstants.Layout.cardGalleryHeight)
                     .cornerRadius(AppConstants.UI.cornerRadiusSmall)
                     .clipped()
-                
+
                 // Completed grey badge overlay
                 Text("Completed")
                     .font(.system(size: 9, weight: .bold))
@@ -952,13 +980,13 @@ struct HostContextCardSheet: View {
                     .cornerRadius(AppConstants.UI.cornerRadiusSmall - 4)
                     .padding(AppConstants.Layout.cornerRadiusTiny)
             }
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: AppConstants.Layout.elementSpacing, weight: .bold))
                     .foregroundColor(.textPrimary)
                     .lineLimit(1)
-                
+
                 Text(index == 0 ? "Apr 20" : (index == 1 ? "Apr 12" : "Apr 5"))
                     .font(.system(size: AppConstants.Typography.sizeTiny, weight: .medium))
                     .foregroundColor(.textSecondary)
@@ -978,7 +1006,7 @@ struct HostContextCardSheet: View {
 // MARK: - Who's Coming Participant Sheet (ISSUE-014)
 struct WhoIsComingSheet: View {
     let participants: [ParticipantDetail]
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Soft drag handle line at the top
@@ -1011,7 +1039,7 @@ struct WhoIsComingSheet: View {
                     .foregroundColor(.textSecondary)
             }
             .padding(.bottom, AppConstants.Layout.sectionSpacing)
-            
+
             // Scrollable List
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: AppConstants.Layout.elementSpacing) {
@@ -1029,20 +1057,20 @@ struct WhoIsComingSheet: View {
                                     .font(.system(size: 14, weight: .black))
                                     .foregroundColor(brandColor)
                             }
-                            
+
                             // Center: First name and initial, join time
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(participant.name)
                                     .font(.bodyStandard)
                                     .foregroundColor(.textPrimary)
-                                
+
                                 Text(participant.joinTimeDescription)
                                     .font(.metadata)
                                     .foregroundColor(.textSecondary)
                             }
-                            
+
                             Spacer()
-                            
+
                             // Trailing: Interest icons
                             HStack(spacing: 8) {
                                 ForEach(participant.interests, id: \.self) { interest in
@@ -1067,7 +1095,7 @@ struct WhoIsComingSheet: View {
         }
         .background(Color.surfaceMain.ignoresSafeArea())
     }
-    
+
     // Helpers
     private func avatarColor(for initials: String) -> Color {
         if initials == "LJ" || initials == "DG" {
@@ -1080,7 +1108,7 @@ struct WhoIsComingSheet: View {
             return Color.brandPrimary
         }
     }
-    
+
     private func interestIcon(for interest: String) -> Image {
         switch interest.lowercased() {
         case "walks", "walk":
@@ -1095,7 +1123,7 @@ struct WhoIsComingSheet: View {
             return AppIcons.sparklesImage
         }
     }
-    
+
     private func interestIconColor(for interest: String) -> Color {
         switch interest.lowercased() {
         case "walks", "walk":
@@ -1114,13 +1142,13 @@ struct WhoIsComingSheet: View {
 struct DriftMapView: View {
     let joinStatus: DriftDetailViewModel.JoinStatus
     let location: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
             Text(AppStrings.Drifts.Detail.locationHeader)
                 .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .bold))
                 .foregroundColor(.textPrimary)
-            
+
             ZStack {
                 // Background stylized map
                 RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
@@ -1143,7 +1171,7 @@ struct DriftMapView: View {
                             .stroke(Color.appBorder.opacity(AppConstants.UI.opacityNormal), lineWidth: 1)
                         }
                     )
-                
+
                 if joinStatus == .joined {
                     // Precise Pin
                     VStack(spacing: AppConstants.Layout.miniPadding) {
@@ -1151,7 +1179,7 @@ struct DriftMapView: View {
                             .font(.system(size: AppConstants.Layout.mappinSize))
                             .foregroundColor(.brandPrimary)
                             .shadow(color: Color.black.opacity(AppConstants.UI.opacityLight), radius: 8, x: 0, y: 4)
-                        
+
                         Text(location)
                             .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .black))
                             .padding(.horizontal, 10)
@@ -1166,7 +1194,7 @@ struct DriftMapView: View {
                         .stroke(Color.brandPrimary.opacity(AppConstants.UI.opacityMuted), lineWidth: 2)
                         .background(Circle().fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight)))
                         .frame(width: AppConstants.Layout.mapRadiusSize, height: AppConstants.Layout.mapRadiusSize)
-                    
+
                     VStack(spacing: AppConstants.Layout.miniPadding) {
                         Text(AppStrings.Drifts.Detail.Location.approxTitle)
                             .font(.system(size: AppConstants.Typography.sizeTiny, weight: .bold))
@@ -1180,7 +1208,7 @@ struct DriftMapView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium))
             .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium).stroke(Color.appBorder, lineWidth: 1))
-            
+
             if joinStatus == .joined {
                 Button(action: {
                     // Open in Apple Maps
@@ -1207,7 +1235,7 @@ struct DriftMapView: View {
 struct RequestSentConfirmationSheet: View {
     let drift: Drift
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Soft drag handle line at the top
@@ -1216,31 +1244,31 @@ struct RequestSentConfirmationSheet: View {
                 .frame(width: AppConstants.Layout.sheetHandleWidth, height: AppConstants.Layout.sheetHandleHeight)
                 .padding(.top, AppConstants.Layout.sheetHandleTopPadding)
                 .padding(.bottom, AppConstants.Layout.sheetHandleBottomPadding)
-            
+
             VStack(spacing: AppConstants.Layout.sectionSpacing) {
                 // Success Icon
                 ZStack {
                     Circle()
                         .fill(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
                         .frame(width: AppConstants.Layout.avatarSizeXXXLarge, height: AppConstants.Layout.avatarSizeXXXLarge)
-                    
+
                     AppIcons.checkCircleFillImage
                         .font(.system(size: AppConstants.Layout.mapGridStep, weight: .bold))
                         .foregroundColor(.brandPrimary)
                 }
-                
+
                 VStack(spacing: AppConstants.Layout.subElementSpacing) {
                     Text(AppStrings.Drifts.Detail.CTA.requested)
                         .font(.heading1)
                         .foregroundColor(.textPrimary)
-                    
+
                     Text(String(format: AppStrings.Drifts.Detail.Confirmation.sentSubtitle, drift.title, drift.host.name))
                         .font(.bodyStandard)
                         .foregroundColor(.textSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, AppConstants.Layout.sectionSpacing + AppConstants.Layout.subElementSpacing)
                 }
-                
+
                 VStack(spacing: AppConstants.Layout.elementSpacing) {
                     HStack(spacing: AppConstants.Layout.subElementSpacing) {
                         AppIcons.clockFillImage
@@ -1254,9 +1282,9 @@ struct RequestSentConfirmationSheet: View {
                     .background(Color.brandPurple.opacity(AppConstants.UI.opacityLight))
                     .cornerRadius(AppConstants.UI.cornerRadiusSmall)
                 }
-                
+
                 Spacer()
-                
+
                 Button(action: { dismiss() }) {
                     Text(AppStrings.Common.ok)
                         .font(.buttonText)

@@ -19,6 +19,8 @@ class DriftDetailViewModel: ObservableObject {
     @Published var savedDrifts: [Drift] = []
     @Published var showingRequestSentConfirmation = false
     @Published var isReminderSet = false
+    @Published var showCalendarAddConfirmation = false
+    @Published var showCalendarUntapDisclaimer = false
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -149,7 +151,7 @@ class DriftDetailViewModel: ObservableObject {
     }
     
     func requestToJoin() {
-        let currentUid = Auth.auth().currentUser?.uid ?? ""
+        let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
 
         // Use real profile data from UserDefaults (written by ProfileViewModel on save/fetch).
         // Falls back to MockData only if UserDefaults has nothing (offline preview mode).
@@ -373,179 +375,28 @@ class DriftDetailViewModel: ObservableObject {
     }
     
     func checkReminderStatus() {
-        let identifier = "drift_reminder_\(drift.id.uuidString)"
-        UNUserNotificationCenter.current().getPendingNotificationRequests { [weak self] requests in
-            let exists = requests.contains(where: { $0.identifier == identifier })
-            DispatchQueue.main.async {
-                self?.isReminderSet = exists
-            }
-        }
+        let key = "calendar_added_\(drift.id.uuidString)"
+        isReminderSet = UserDefaults.standard.bool(forKey: key)
     }
     
     func setReminder() {
-        let identifier = "drift_reminder_\(drift.id.uuidString)"
         if isReminderSet {
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
-            isReminderSet = false
+            showCalendarUntapDisclaimer = true
             return
         }
-        
-        let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound]) { [weak self] granted, error in
-            guard let self = self, granted, error == nil else { return }
-            
-            self.scheduleNotification()
-        }
+        showCalendarAddConfirmation = true
     }
     
-    private func scheduleNotification() {
-        let identifier = "drift_reminder_\(drift.id.uuidString)"
-        let meetupDate = resolveDriftDateTime()
-        let calendar = Calendar.current
-        
-        // Calculate trigger date: 2 hours before meetupDate
-        let triggerDate = calendar.date(byAdding: .hour, value: -2, to: meetupDate) ?? meetupDate
-        
-        // If triggerDate is in the past, trigger immediately (e.g. 5 seconds from now)
-        var timeInterval = triggerDate.timeIntervalSinceNow
-        if timeInterval <= 0 {
-            timeInterval = 5 // trigger in 5 seconds
-        }
-        
-        let content = UNMutableNotificationContent()
-        content.title = "Reminder: \(drift.title)"
-        if meetupDate.timeIntervalSinceNow > 2 * 3600 {
-            content.body = "Your meetup starts in 2 hours at \(drift.location)."
-        } else {
-            content.body = "Your meetup starts soon (at \(drift.time)) at \(drift.location)."
-        }
-        content.sound = .default
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { [weak self] error in
-            if let error = error {
-                print("Failed to schedule notification: \(error.localizedDescription)")
+    func confirmAddReminderToCalendar() {
+        EventKitManager.shared.addDriftToCalendar(drift: drift) { [weak self] success, error in
+            guard let self = self else { return }
+            if success {
+                self.isReminderSet = true
+                let key = "calendar_added_\(self.drift.id.uuidString)"
+                UserDefaults.standard.set(true, forKey: key)
             } else {
-                DispatchQueue.main.async {
-                    self?.isReminderSet = true
-                }
+                print("Failed to add to calendar: \(error?.localizedDescription ?? "Unknown error")")
             }
         }
-    }
-    
-    func resolveDriftDateTime() -> Date {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        var baseDate = now
-        let dateStr = drift.date.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        
-        if dateStr == "today" {
-            baseDate = now
-        } else if dateStr == "tomorrow" {
-            if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) {
-                baseDate = tomorrow
-            }
-        } else {
-            // Check for weekday names
-            let weekdayMap: [String: Int] = [
-                "sunday": 1, "monday": 2, "tuesday": 3, "wednesday": 4,
-                "thursday": 5, "friday": 6, "saturday": 7
-            ]
-            
-            if let targetWeekday = weekdayMap[dateStr] {
-                let currentWeekday = calendar.component(.weekday, from: now)
-                var daysToAdd = targetWeekday - currentWeekday
-                if daysToAdd < 0 {
-                    daysToAdd += 7
-                } else if daysToAdd == 0 {
-                    // Check if time has already passed today
-                    // If it has, schedule for next week
-                    if let timeComps = parseTime(drift.time) {
-                        var targetComps = calendar.dateComponents([.year, .month, .day], from: now)
-                        targetComps.hour = timeComps.hour
-                        targetComps.minute = timeComps.minute
-                        targetComps.second = 0
-                        if let targetDateToday = calendar.date(from: targetComps), targetDateToday < now {
-                            daysToAdd = 7
-                        }
-                    }
-                }
-                if let nextDate = calendar.date(byAdding: .day, value: daysToAdd, to: now) {
-                    baseDate = nextDate
-                }
-            } else {
-                // Absolute date parser fallback e.g. "May 25", "25 May", etc.
-                let formats = ["MMMM d, yyyy", "MMMM d", "d MMMM", "yyyy-MM-dd"]
-                let fmt = DateFormatter()
-                fmt.locale = Locale(identifier: "en_US_POSIX")
-                for format in formats {
-                    fmt.dateFormat = format
-                    if let parsedDate = fmt.date(from: drift.date) {
-                        baseDate = parsedDate
-                        // Ensure year is set correctly if not parsed
-                        if !format.contains("yyyy") {
-                            var comps = calendar.dateComponents([.month, .day], from: parsedDate)
-                            comps.year = calendar.component(.year, from: now)
-                            if let mergedDate = calendar.date(from: comps) {
-                                baseDate = mergedDate
-                            }
-                        }
-                        break
-                    }
-                }
-            }
-        }
-        
-        // Merge time component
-        if let timeComps = parseTime(drift.time) {
-            var comps = calendar.dateComponents([.year, .month, .day], from: baseDate)
-            comps.hour = timeComps.hour
-            comps.minute = timeComps.minute
-            comps.second = 0
-            if let finalDate = calendar.date(from: comps) {
-                return finalDate
-            }
-        }
-        
-        return now
-    }
-    
-    private func parseTime(_ timeStr: String) -> (hour: Int, minute: Int)? {
-        let cleaned = timeStr.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        if let date = formatter.date(from: cleaned.uppercased()) {
-            let comps = Calendar.current.dateComponents([.hour, .minute], from: date)
-            return (comps.hour ?? 0, comps.minute ?? 0)
-        }
-        formatter.dateFormat = "HH:mm"
-        if let date = formatter.date(from: cleaned) {
-            let comps = Calendar.current.dateComponents([.hour, .minute], from: date)
-            return (comps.hour ?? 0, comps.minute ?? 0)
-        }
-        
-        // Fallback manual parsing if formatters fail
-        let parts = cleaned.components(separatedBy: ":")
-        if parts.count == 2 {
-            let hourStr = parts[0].trimmingCharacters(in: CharacterSet.decimalDigits.inverted)
-            if let hour = Int(hourStr) {
-                var finalHour = hour
-                let minPart = parts[1]
-                let minStr = String(minPart.prefix(2)).trimmingCharacters(in: CharacterSet.decimalDigits.inverted)
-                if let min = Int(minStr) {
-                    if minPart.contains("pm") && finalHour < 12 {
-                        finalHour += 12
-                    } else if minPart.contains("am") && finalHour == 12 {
-                        finalHour = 0
-                    }
-                    return (finalHour, min)
-                }
-            }
-        }
-        return nil
     }
 }
