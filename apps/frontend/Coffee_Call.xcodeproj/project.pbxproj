@@ -937,12 +937,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Coffee_Call/Preview Content\"";
-				DEVELOPMENT_TEAM = 5S8HZ77935;
+				DEVELOPMENT_TEAM = JVJZXPS8LZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Coffee_Call/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Coffee Call";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -964,12 +965,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Coffee_Call/Preview Content\"";
-				DEVELOPMENT_TEAM = 5S8HZ77935;
+				DEVELOPMENT_TEAM = JVJZXPS8LZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Coffee_Call/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Coffee Call";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
