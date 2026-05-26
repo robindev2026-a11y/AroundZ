@@ -119,6 +119,10 @@ struct DriftsScreen: View {
                         // Notifications Bell Button
                         ZStack(alignment: .topTrailing) {
                             CoffeeHeaderButton(icon: AppIcons.bell) {
+                                JoinRequestDebugTracer.trace(
+                                    "DriftsScreen notification bell tapped",
+                                    details: "activeNotifications=\(driftStore.activeNotifications.count)"
+                                )
                                 showingNotifications = true
                             }
 
@@ -203,6 +207,7 @@ struct DriftsScreen: View {
             }
             .onAppear {
                 NavigationManager.shared.resetTabBarVisibility()
+                JoinRequestDebugTracer.trace("DriftsScreen appeared; ensuring GlobalDriftStore started")
                 driftStore.start()
             }
             .dismissKeyboardOnTap()

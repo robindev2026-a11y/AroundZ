@@ -8,6 +8,7 @@ struct MainTabView: View {
     @State private var showCreateDriftSheet = false
     @StateObject private var driftsViewModel = DriftsViewModel()
     @StateObject private var navManager = NavigationManager.shared
+    @EnvironmentObject private var driftStore: GlobalDriftStore
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -51,6 +52,10 @@ struct MainTabView: View {
         }
         .ignoresSafeArea(edges: .bottom)
         .animation(.spring(), value: navManager.isTabBarHidden)
+        .onAppear {
+            JoinRequestDebugTracer.trace("MainTabView appeared; starting GlobalDriftStore")
+            driftStore.start()
+        }
         .sheet(isPresented: $showCreateDriftSheet) {
             if #available(iOS 16.4, *) {
                 CreateDriftSheet(onCreateSucceeded: {
@@ -95,5 +100,6 @@ struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
         MainTabView()
             .environmentObject(AuthViewModel())
+            .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
     }
 }

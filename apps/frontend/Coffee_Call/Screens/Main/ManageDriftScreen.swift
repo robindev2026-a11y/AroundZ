@@ -74,6 +74,11 @@ struct ManageDriftScreen: View {
             }
             .onReceive(driftStore.$drifts) { drifts in
                 if let updated = drifts.first(where: { $0.id == viewModel.drift.id }) {
+                    JoinRequestDebugTracer.trace(
+                        "ManageDriftScreen received drift store update",
+                        driftId: updated.id,
+                        details: "pendingRequests=\(updated.pendingRequests.count)"
+                    )
                     // Update the local view model
                     viewModel.drift = updated
                 }

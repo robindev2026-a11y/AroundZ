@@ -106,6 +106,11 @@ struct DriftDetailScreen: View {
                 if viewModel.joinStatus == .requested {
                     let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
                     if updated.participantInitials.contains(userInitials) {
+                        JoinRequestDebugTracer.trace(
+                            "DriftDetailScreen observed accepted request",
+                            driftId: updated.id,
+                            details: "userInitials=\(userInitials)"
+                        )
                         viewModel.joinStatus = .joined
                     }
                 }
@@ -507,6 +512,11 @@ struct DriftDetailScreen: View {
                     .buttonStyle(.plain)
                 } else {
                     Button(action: {
+                        JoinRequestDebugTracer.trace(
+                            "DriftDetailScreen join CTA tapped",
+                            driftId: viewModel.drift.id,
+                            details: "joinStatus=\(viewModel.joinStatus)"
+                        )
                         if viewModel.joinStatus == .notJoined {
                             viewModel.requestToJoin()
                         }

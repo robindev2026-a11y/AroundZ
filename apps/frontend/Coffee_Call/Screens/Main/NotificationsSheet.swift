@@ -39,6 +39,11 @@ struct NotificationsSheet: View {
                         VStack(spacing: 12) {
                             ForEach(driftStore.activeNotifications) { notif in
                                 Button {
+                                    JoinRequestDebugTracer.trace(
+                                        "NotificationsSheet notification tapped",
+                                        driftId: notif.driftId,
+                                        details: "type=\(notif.type)"
+                                    )
                                     // Navigate to Manage Drift
                                     navigationPath.append(notif.driftId)
                                     dismiss()

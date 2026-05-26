@@ -12,6 +12,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
     
     func fetchDrifts() -> AnyPublisher<[Drift], Error> {
+        JoinRequestDebugTracer.trace("FirebaseDriftsService.fetchDrifts called")
         guard isFirebaseEnabled else {
             return MockDriftsService().fetchDrifts()
         }
@@ -23,6 +24,10 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { querySnapshot, error in
                 if let error = error {
+                    JoinRequestDebugTracer.trace(
+                        "FirebaseDriftsService.fetchDrifts snapshot failed",
+                        details: "error=\(error.localizedDescription)"
+                    )
                     subject.send(completion: .failure(error))
                     return
                 }
@@ -144,6 +149,10 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 }
                 
                 subject.send(drifts)
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.fetchDrifts snapshot sent",
+                    details: "drifts=\(drifts.count), pendingRequests=\(drifts.reduce(0) { $0 + $1.pendingRequests.count })"
+                )
             }
             
         return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
@@ -220,6 +229,12 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
     
     func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "FirebaseDriftsService.requestToJoin called",
+            driftId: driftId,
+            requestId: request.id,
+            details: "userId=\(request.userId)"
+        )
         guard isFirebaseEnabled else {
             return MockDriftsService().requestToJoin(driftId: driftId, request: request)
         }
@@ -233,8 +248,19 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             "pendingRequests": FieldValue.arrayUnion([request.dictionary])
         ]) { error in
             if let error = error {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.requestToJoin Firestore update failed",
+                    driftId: driftId,
+                    requestId: request.id,
+                    details: "error=\(error.localizedDescription)"
+                )
                 subject.send(completion: .failure(error))
             } else {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.requestToJoin Firestore update succeeded",
+                    driftId: driftId,
+                    requestId: request.id
+                )
                 subject.send(())
                 subject.send(completion: .finished)
             }
@@ -244,6 +270,11 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
     
     func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "FirebaseDriftsService.acceptJoinRequest called",
+            driftId: driftId,
+            requestId: request.id
+        )
         guard isFirebaseEnabled else {
             return MockDriftsService().acceptJoinRequest(driftId: driftId, request: request)
         }
@@ -304,8 +335,19 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             return nil
         }) { (object, error) in
             if let error = error {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.acceptJoinRequest failed",
+                    driftId: driftId,
+                    requestId: request.id,
+                    details: "error=\(error.localizedDescription)"
+                )
                 subject.send(completion: .failure(error))
             } else {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.acceptJoinRequest succeeded",
+                    driftId: driftId,
+                    requestId: request.id
+                )
                 subject.send(())
                 subject.send(completion: .finished)
             }
@@ -315,6 +357,11 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
     
     func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "FirebaseDriftsService.rejectJoinRequest called",
+            driftId: driftId,
+            requestId: requestId
+        )
         guard isFirebaseEnabled else {
             return MockDriftsService().rejectJoinRequest(driftId: driftId, requestId: requestId)
         }
@@ -354,8 +401,19 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             return nil
         }) { (object, error) in
             if let error = error {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.rejectJoinRequest failed",
+                    driftId: driftId,
+                    requestId: requestId,
+                    details: "error=\(error.localizedDescription)"
+                )
                 subject.send(completion: .failure(error))
             } else {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.rejectJoinRequest succeeded",
+                    driftId: driftId,
+                    requestId: requestId
+                )
                 subject.send(())
                 subject.send(completion: .finished)
             }

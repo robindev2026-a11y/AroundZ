@@ -42,6 +42,7 @@ final class GlobalDriftStore: ObservableObject {
     private var fetchCancellable: AnyCancellable?
     private var baseDrifts: [Drift] = []
     private var localDrifts: [Drift] = []
+    private let prefersRemoteDrifts: Bool
 
     // Backwards-compatible with `CreatedDriftStore` so existing caches keep working.
     private let storageKey = "created_drifts"
@@ -51,11 +52,12 @@ final class GlobalDriftStore: ObservableObject {
         locationService: LocationService = .shared
     ) {
         self.locationService = locationService
+        let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        self.prefersRemoteDrifts = driftsService == nil && isFirebaseEnabled
 
         if let driftsService {
             self.driftsService = driftsService
         } else {
-            let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
             self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
         }
 
@@ -65,11 +67,16 @@ final class GlobalDriftStore: ObservableObject {
     }
 
     func start() {
+        JoinRequestDebugTracer.trace("GlobalDriftStore.start")
         fetchDrifts()
     }
 
     func fetchDrifts() {
-        guard fetchCancellable == nil else { return }
+        JoinRequestDebugTracer.trace("GlobalDriftStore.fetchDrifts requested")
+        guard fetchCancellable == nil else {
+            JoinRequestDebugTracer.trace("GlobalDriftStore.fetchDrifts already listening")
+            return
+        }
 
         fetchCancellable = driftsService.fetchDrifts()
             .receive(on: RunLoop.main)
@@ -78,6 +85,10 @@ final class GlobalDriftStore: ObservableObject {
                 self.fetchCancellable = nil
             }, receiveValue: { [weak self] drifts in
                 guard let self else { return }
+                JoinRequestDebugTracer.trace(
+                    "GlobalDriftStore.fetchDrifts received snapshot",
+                    details: "drifts=\(drifts.count), pendingRequests=\(drifts.reduce(0) { $0 + $1.pendingRequests.count })"
+                )
                 baseDrifts = drifts
                 mergeDrifts()
             })
@@ -123,8 +134,19 @@ final class GlobalDriftStore: ObservableObject {
     private func mergeDrifts() {
         var merged: [Drift] = []
         let userLocation = locationService.currentLocationModel
+        let baseIds = Set(baseDrifts.map(\.id))
+        let localIds = Set(localDrifts.map(\.id))
+        let candidates: [Drift]
 
-        for var drift in localDrifts + baseDrifts {
+        if prefersRemoteDrifts {
+            let localOnlyDrifts = localDrifts.filter { !baseIds.contains($0.id) }
+            candidates = localOnlyDrifts + baseDrifts
+        } else {
+            let baseOnlyDrifts = baseDrifts.filter { !localIds.contains($0.id) }
+            candidates = localDrifts + baseOnlyDrifts
+        }
+
+        for var drift in candidates {
             guard !merged.contains(where: { $0.id == drift.id }) else { continue }
 
             if let lat = drift.latitude, let lng = drift.longitude, let userLoc = userLocation {
@@ -140,6 +162,10 @@ final class GlobalDriftStore: ObservableObject {
         }
 
         drifts = merged
+        JoinRequestDebugTracer.trace(
+            "GlobalDriftStore.mergeDrifts completed",
+            details: "drifts=\(drifts.count), activeNotifications=\(activeNotifications.count), prefersRemote=\(prefersRemoteDrifts)"
+        )
     }
 
     private func loadLocalDrifts() {

@@ -118,6 +118,10 @@ class MockDriftsService: DriftsServiceProtocol {
     }
     
     func fetchDrifts() -> AnyPublisher<[Drift], Error> {
+        JoinRequestDebugTracer.trace(
+            "MockDriftsService.fetchDrifts called",
+            details: "drifts=\(MockDriftsService.mockDrifts.count)"
+        )
         return Just(MockDriftsService.mockDrifts)
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
@@ -131,10 +135,21 @@ class MockDriftsService: DriftsServiceProtocol {
     }
     
     func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "MockDriftsService.requestToJoin called",
+            driftId: driftId,
+            requestId: request.id
+        )
         if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
             var updatedDrift = MockDriftsService.mockDrifts[index]
             updatedDrift.pendingRequests.append(request)
             MockDriftsService.mockDrifts[index] = updatedDrift
+            JoinRequestDebugTracer.trace(
+                "MockDriftsService.requestToJoin appended request",
+                driftId: driftId,
+                requestId: request.id,
+                details: "pendingRequests=\(updatedDrift.pendingRequests.count)"
+            )
         }
         return Just(())
             .setFailureType(to: Error.self)
@@ -142,6 +157,11 @@ class MockDriftsService: DriftsServiceProtocol {
     }
     
     func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "MockDriftsService.acceptJoinRequest called",
+            driftId: driftId,
+            requestId: request.id
+        )
         if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
             var updatedDrift = MockDriftsService.mockDrifts[index]
             updatedDrift.pendingRequests.removeAll { $0.id == request.id }
@@ -160,6 +180,11 @@ class MockDriftsService: DriftsServiceProtocol {
     }
     
     func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "MockDriftsService.rejectJoinRequest called",
+            driftId: driftId,
+            requestId: requestId
+        )
         if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
             var updatedDrift = MockDriftsService.mockDrifts[index]
             updatedDrift.pendingRequests.removeAll { $0.id == requestId }
@@ -197,5 +222,24 @@ class MockDriftsService: DriftsServiceProtocol {
         return Just(())
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
+    }
+}
+
+enum JoinRequestDebugTracer {
+    static func trace(
+        _ step: String,
+        driftId: UUID? = nil,
+        requestId: UUID? = nil,
+        details: String = "",
+        file: StaticString = #fileID,
+        line: UInt = #line
+    ) {
+        #if DEBUG
+        let driftText = driftId.map { " driftId=\($0.uuidString)" } ?? ""
+        let requestText = requestId.map { " requestId=\($0.uuidString)" } ?? ""
+        let detailText = details.isEmpty ? "" : " \(details)"
+        print("[JoinRequestFlow] \(step)\(driftText)\(requestText)\(detailText) @ \(file):\(line)")
+        // BREAKPOINT: Set one Xcode breakpoint here to pause on every join-request flow trace.
+        #endif
     }
 }

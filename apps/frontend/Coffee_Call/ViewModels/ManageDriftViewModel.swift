@@ -40,16 +40,32 @@ class ManageDriftViewModel: ObservableObject {
     
     // MARK: - Join Requests
     func acceptRequest(_ request: JoinRequest) {
+        JoinRequestDebugTracer.trace(
+            "ManageDriftViewModel.acceptRequest tapped",
+            driftId: drift.id,
+            requestId: request.id
+        )
         isLoading = true
         driftsService.acceptJoinRequest(driftId: drift.id, request: request)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completionResult in
                 self?.isLoading = false
                 if case .failure(let error) = completionResult {
+                    JoinRequestDebugTracer.trace(
+                        "ManageDriftViewModel.acceptRequest failed",
+                        driftId: self?.drift.id,
+                        requestId: request.id,
+                        details: "error=\(error.localizedDescription)"
+                    )
                     print("Error accepting join request: \(error)")
                 }
             }, receiveValue: { [weak self] in
                 guard let self = self else { return }
+                JoinRequestDebugTracer.trace(
+                    "ManageDriftViewModel.acceptRequest succeeded locally",
+                    driftId: self.drift.id,
+                    requestId: request.id
+                )
                 withAnimation {
                     self.drift.pendingRequests.removeAll { $0.id == request.id }
                     if !self.drift.participantInitials.contains(request.userInitials) {
@@ -65,16 +81,32 @@ class ManageDriftViewModel: ObservableObject {
     }
     
     func rejectRequest(_ request: JoinRequest) {
+        JoinRequestDebugTracer.trace(
+            "ManageDriftViewModel.rejectRequest tapped",
+            driftId: drift.id,
+            requestId: request.id
+        )
         isLoading = true
         driftsService.rejectJoinRequest(driftId: drift.id, requestId: request.id)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completionResult in
                 self?.isLoading = false
                 if case .failure(let error) = completionResult {
+                    JoinRequestDebugTracer.trace(
+                        "ManageDriftViewModel.rejectRequest failed",
+                        driftId: self?.drift.id,
+                        requestId: request.id,
+                        details: "error=\(error.localizedDescription)"
+                    )
                     print("Error rejecting join request: \(error)")
                 }
             }, receiveValue: { [weak self] in
                 guard let self = self else { return }
+                JoinRequestDebugTracer.trace(
+                    "ManageDriftViewModel.rejectRequest succeeded locally",
+                    driftId: self.drift.id,
+                    requestId: request.id
+                )
                 withAnimation {
                     self.drift.pendingRequests.removeAll { $0.id == request.id }
                 }

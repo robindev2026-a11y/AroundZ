@@ -151,6 +151,12 @@ class DriftDetailViewModel: ObservableObject {
     }
     
     func requestToJoin() {
+        let driftId = drift.id
+        JoinRequestDebugTracer.trace(
+            "DriftDetailViewModel.requestToJoin started",
+            driftId: driftId,
+            details: "currentStatus=\(joinStatus)"
+        )
         let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
 
         // Use real profile data from UserDefaults (written by ProfileViewModel on save/fetch).
@@ -173,15 +179,32 @@ class DriftDetailViewModel: ObservableObject {
             message: "Hey, I'd love to join your drift!",
             timestamp: timestamp
         )
+        JoinRequestDebugTracer.trace(
+            "DriftDetailViewModel built JoinRequest",
+            driftId: driftId,
+            requestId: joinRequest.id,
+            details: "userId=\(currentUid), userName=\(currentUserName)"
+        )
 
-        driftsService.requestToJoin(driftId: drift.id, request: joinRequest)
+        driftsService.requestToJoin(driftId: driftId, request: joinRequest)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completionResult in
                 if case .failure(let error) = completionResult {
+                    JoinRequestDebugTracer.trace(
+                        "DriftDetailViewModel.requestToJoin failed",
+                        driftId: driftId,
+                        requestId: joinRequest.id,
+                        details: "error=\(error.localizedDescription)"
+                    )
                     print("Error requesting to join: \(error)")
                 }
             }, receiveValue: { [weak self] in
                 guard let self = self else { return }
+                JoinRequestDebugTracer.trace(
+                    "DriftDetailViewModel.requestToJoin succeeded",
+                    driftId: self.drift.id,
+                    requestId: joinRequest.id
+                )
                 withAnimation(.spring()) {
                     self.joinStatus = .requested
                     self.showingRequestSentConfirmation = true

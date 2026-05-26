@@ -1,7 +1,7 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-24
+Last updated: 2026-05-26
 
 This file is the current progress ledger.
 
@@ -15,6 +15,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 - Keep the admin panel separate from the consumer iOS app and gate it with admin-only auth claims.
 - Around radar uses anonymous nearby user presence as ambient signal, while Drifts remains the concrete discovery/action surface.
 - Around radar Firebase behavior uses one-time presence snapshots and one-hour-throttled current-user location writes instead of live user listeners.
+- Future engineering cleanup: audit Swift files for correct access specifiers, add `final` where inheritance is not intended, and organize related behavior into focused extensions to improve code clarity and maintainability.
 
 ## UX Status
 
@@ -39,7 +40,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 | Notifications | Complete | Connected share and reminder stubs in DriftDetailViewModel and DriftDetailScreen. |
 
 ## Known Mismatches
-- None. (All major spec and alignment issues resolved in recent batches).
+- None confirmed. Drift join-request in-app notification fix is pending user validation in Xcode; no build or simulator validation run here per repo rules.
 
 ## Historical Milestones
 
@@ -53,3 +54,4 @@ Align the live app and all AI guidance around a single active source of truth. T
 - **2026-05-23**: Migrated Drifts data flow to a SwiftUI-native `@EnvironmentObject` store (`GlobalDriftStore`), removing `CreatedDriftStore` and Notification-based drift syncing. `DriftsViewModel` is now UI-only; create/edit/delete paths update the shared store so Drifts lists update instantly. Verification: not run here (per repo rules); validate in Xcode.
 - **2026-05-24**: Fixed stale Drifts listing updates after editing a Drift by removing `Drift`'s id-only `Hashable/Equatable` behavior and switching value-based navigation (`NavigationLink(value:)` / `navigationDestination(for:)`) to use `UUID` drift IDs. Verification: not run here (per repo rules); validate in Xcode.
 - **2026-05-24**: Documented the AI “Three Circle” file-scope rule in `docs/CONTEXT.md` and the Obsidian vault so future debugging stays intentional and permission-gated when exploring beyond directly related files.
+- **2026-05-26**: Applied Drift join-request in-app notification fixes. `MainTabView` now starts `GlobalDriftStore` as soon as the authenticated main app appears, so the Firestore snapshot listener can run before the host manually opens Drifts. `GlobalDriftStore.mergeDrifts()` now prefers Firebase/base Drifts over duplicate locally cached Drifts when Firebase is active, preventing stale local hosted Drifts from hiding fresh `pendingRequests`. Added DEBUG-only `JoinRequestDebugTracer.trace(...)` calls through the join-request path (`DriftDetailScreen`, `DriftDetailViewModel`, `FirebaseDriftsService`/`MockDriftsService`, `GlobalDriftStore`, `DriftsScreen`, `NotificationsSheet`, and `ManageDriftViewModel`). Set one Xcode breakpoint inside `JoinRequestDebugTracer.trace` to pause on every traced step; console prints use the `[JoinRequestFlow]` prefix. Verification: not run here (per repo rules); validate in Xcode.
