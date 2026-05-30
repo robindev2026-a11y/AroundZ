@@ -30,6 +30,7 @@ struct Drift: Identifiable, Codable {
     var unreadCount: Int = 0
     let latitude: Double?
     let longitude: Double?
+    let joinMode: JoinMode
     
     init(
         id: UUID = UUID(),
@@ -59,7 +60,8 @@ struct Drift: Identifiable, Codable {
         lastMessageTime: String? = nil,
         unreadCount: Int = 0,
         latitude: Double? = nil,
-        longitude: Double? = nil
+        longitude: Double? = nil,
+        joinMode: JoinMode = .open
     ) {
         self.id = id
         self.title = title
@@ -89,6 +91,7 @@ struct Drift: Identifiable, Codable {
         self.unreadCount = unreadCount
         self.latitude = latitude
         self.longitude = longitude
+        self.joinMode = joinMode
     }
 }
 

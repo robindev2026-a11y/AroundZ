@@ -18,6 +18,7 @@ struct CreateDriftSheet: View {
     @State private var showDiscardConfirmation = false
     @State private var showSuccessState = false
     @State private var showHookTooltip = false
+    @State private var showingMapPicker = false
 
     init(
         mode: Mode = .create,
@@ -39,7 +40,7 @@ struct CreateDriftSheet: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack {
             Color.backgroundMain.ignoresSafeArea()
 
             glassBackdrop
@@ -62,11 +63,18 @@ struct CreateDriftSheet: View {
                     }
                     .padding(.horizontal, AppConstants.Layout.standardPadding)
                     .padding(.top, AppConstants.Layout.subElementSpacing)
-                    .padding(.bottom, AppConstants.Layout.createSheetFooterHeight + AppConstants.Layout.createSheetFooterSpacing + AppConstants.Layout.screenBottomSpacer)
+                    .padding(.bottom, AppConstants.Layout.standardPadding)
                 }
+                
+                stickyFooter
             }
-
-            stickyFooter
+        }
+        .sheet(isPresented: $showingMapPicker) {
+            MapPickerSheet { address, lat, lng in
+                viewModel.approximateLocation = address
+                viewModel.selectedLatitude = lat
+                viewModel.selectedLongitude = lng
+            }
         }
         .interactiveDismissDisabled(mode == .create)
         .onChange(of: viewModel.selectedActivity) { newValue in
@@ -330,7 +338,11 @@ struct CreateDriftSheet: View {
         Group {
             if horizontalSizeClass == .regular {
                 LazyVGrid(columns: locationCapacityColumns, spacing: AppConstants.Layout.elementSpacing) {
-                    ApproximateLocationCard(location: viewModel.approximateLocation)
+                    Button(action: { showingMapPicker = true }) {
+                        ApproximateLocationCard(location: viewModel.approximateLocation)
+                    }
+                    .buttonStyle(.plain)
+                    
                     CapacityChipScrollCard(
                         selectedCapacityCount: viewModel.selectedCapacityCount,
                         isOpenToAllCapacity: viewModel.isOpenToAllCapacity,
@@ -340,7 +352,11 @@ struct CreateDriftSheet: View {
                 }
             } else {
                 VStack(spacing: AppConstants.Layout.elementSpacing) {
-                    ApproximateLocationCard(location: viewModel.approximateLocation)
+                    Button(action: { showingMapPicker = true }) {
+                        ApproximateLocationCard(location: viewModel.approximateLocation)
+                    }
+                    .buttonStyle(.plain)
+                    
                     CapacityChipScrollCard(
                         selectedCapacityCount: viewModel.selectedCapacityCount,
                         isOpenToAllCapacity: viewModel.isOpenToAllCapacity,
@@ -997,28 +1013,39 @@ private struct VibeMenuRow: View {
     }
 }
 
-private struct JoinModeToggleCard: View {
-    let selectedMode: JoinMode
-    let onSelect: (JoinMode) -> Void
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
-        HStack(spacing: AppConstants.Layout.elementSpacing) {
-            joinModeOption(
-                mode: .open,
-                title: AppStrings.Create.joinModeOpen,
-                subtitle: AppStrings.Create.joinModeOpenSubtitle,
-                icon: AppIcons.participants,
-                tint: Color.brandPrimary
-            )
-
-            joinModeOption(
-                mode: .approval,
-                title: AppStrings.Create.joinModeApproval,
-                subtitle: AppStrings.Create.joinModeApprovalSubtitle,
-                icon: AppIcons.lock,
-                tint: Color.brandPurple
-            )
+        Group {
+            if horizontalSizeClass == .regular {
+                HStack(spacing: AppConstants.Layout.elementSpacing) {
+                    options
+                }
+            } else {
+                VStack(spacing: AppConstants.Layout.elementSpacing) {
+                    options
+                }
+            }
         }
+    }
+
+    @ViewBuilder
+    private var options: some View {
+        joinModeOption(
+            mode: .open,
+            title: AppStrings.Create.joinModeOpen,
+            subtitle: AppStrings.Create.joinModeOpenSubtitle,
+            icon: AppIcons.participants,
+            tint: Color.brandPrimary
+        )
+
+        joinModeOption(
+            mode: .approval,
+            title: AppStrings.Create.joinModeApproval,
+            subtitle: AppStrings.Create.joinModeApprovalSubtitle,
+            icon: AppIcons.lock,
+            tint: Color.brandPurple
+        )
     }
 
     private func joinModeOption(
