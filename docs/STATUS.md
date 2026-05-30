@@ -1,7 +1,7 @@
 # CoffeeCall Status
 
 Status: ACTIVE
-Last updated: 2026-05-26
+Last updated: 2026-05-30
 
 This file is the current progress ledger.
 
@@ -55,3 +55,7 @@ Align the live app and all AI guidance around a single active source of truth. T
 - **2026-05-24**: Fixed stale Drifts listing updates after editing a Drift by removing `Drift`'s id-only `Hashable/Equatable` behavior and switching value-based navigation (`NavigationLink(value:)` / `navigationDestination(for:)`) to use `UUID` drift IDs. Verification: not run here (per repo rules); validate in Xcode.
 - **2026-05-24**: Documented the AI “Three Circle” file-scope rule in `docs/CONTEXT.md` and the Obsidian vault so future debugging stays intentional and permission-gated when exploring beyond directly related files.
 - **2026-05-26**: Applied Drift join-request in-app notification fixes. `MainTabView` now starts `GlobalDriftStore` as soon as the authenticated main app appears, so the Firestore snapshot listener can run before the host manually opens Drifts. `GlobalDriftStore.mergeDrifts()` now prefers Firebase/base Drifts over duplicate locally cached Drifts when Firebase is active, preventing stale local hosted Drifts from hiding fresh `pendingRequests`. Added DEBUG-only `JoinRequestDebugTracer.trace(...)` calls through the join-request path (`DriftDetailScreen`, `DriftDetailViewModel`, `FirebaseDriftsService`/`MockDriftsService`, `GlobalDriftStore`, `DriftsScreen`, `NotificationsSheet`, and `ManageDriftViewModel`). Set one Xcode breakpoint inside `JoinRequestDebugTracer.trace` to pause on every traced step; console prints use the `[JoinRequestFlow]` prefix. Verification: not run here (per repo rules); validate in Xcode.
+- **2026-05-26**: Updated Drift request-state persistence. `DriftDetailViewModel` now derives `.requested` from the current user's `Drift.pendingRequests`, so the pending state survives closing and reopening the Drift until the host accepts/rejects or the user cancels. Added `cancelJoinRequest` to `DriftsServiceProtocol`, `FirebaseDriftsService`, and `MockDriftsService`, wired the pending CTA to undo the request, and kept the success sheet title separate from the undo CTA label. Verification: not run here (per repo rules); validate in Xcode.
+- **2026-05-30**: Resolved ISSUE-049 (fixed simulator freeze/crash when tapping "Open Chat" and "Manage Drift" by migrating from eager NavigationLinks to state-driven programmatic navigation destinations), ISSUE-050 (implemented "Leave Drift" action sheet dialog and service hook), ISSUE-051 (implemented "Report Drift" reason picker and backend reporting logging), ISSUE-052 (implemented member blocking selector sheet), and ISSUE-053 (fixed "View Drift" back navigation in chat info sheet to dismiss chat view and pop back to drift details). Verification: not run here (per repo rules); validate in Xcode.
+
+- **2026-05-30**: Resolved Batch 1 Issues (Dashboard & Feed Discovery). Wrapped `DiscoveryScreen` in `NavigationStack` for navigation path binding, unified the notifications bell with `NotificationsSheet` to show live unread counts and enable deep-linking, forced location fetching on dashboard load (`onAppear`), and populated realistic coordinates in `MockDriftsService` to support dynamic distance calculation and verify radius filtering. Verification: not run here (per repo rules); validate in Xcode.

@@ -119,12 +119,7 @@ class DriftDetailViewModel: ObservableObject {
             fetchParticipants()
             fetchHostOtherActiveDrifts()
         } else {
-            self.participants = [
-                ParticipantDetail(name: "Liam", initials: "LJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 2:14 PM"),
-                ParticipantDetail(name: "Maya", initials: "MM", interests: ["Coffee", "Walks", "Music"], joinTimeDescription: "Joined today 1:45 PM"),
-                ParticipantDetail(name: "Sarah", initials: "SJ", interests: ["Walks", "Coffee", "Music"], joinTimeDescription: "Joined today 12:30 PM"),
-                ParticipantDetail(name: "Dev", initials: "DG", interests: ["Music", "Coffee", "Walks"], joinTimeDescription: "Joined today 11:15 AM")
-            ]
+            rebuildMockParticipants()
         }
         
         if let initialJoinStatus {
@@ -133,10 +128,8 @@ class DriftDetailViewModel: ObservableObject {
             self.joinStatus = .ended
         } else if drift.isMine {
             self.joinStatus = .joined
-        } else if drift.spotsLeft == 0 {
-            self.joinStatus = .full
         } else {
-            self.joinStatus = .notJoined
+            self.refreshJoinStatus()
         }
         
         setupBookmarkSubscription()
@@ -149,15 +142,71 @@ class DriftDetailViewModel: ObservableObject {
             .assign(to: \.savedDrifts, on: self)
             .store(in: &cancellables)
     }
+
+    func syncDrift(_ updatedDrift: Drift) {
+        drift = updatedDrift
+        refreshJoinStatus()
+        if isFirebaseEnabled {
+            fetchParticipants()
+        } else {
+            rebuildMockParticipants()
+        }
+        JoinRequestDebugTracer.trace(
+            "DriftDetailViewModel synced drift",
+            driftId: updatedDrift.id,
+            details: "joinStatus=\(joinStatus), pendingRequests=\(updatedDrift.pendingRequests.count)"
+        )
+    }
+
+    private func refreshJoinStatus() {
+        if drift.status == .ended {
+            joinStatus = .ended
+        } else if drift.isMine {
+            joinStatus = .joined
+        } else if isCurrentUserParticipant(in: drift) {
+            joinStatus = .joined
+        } else if hasCurrentUserPendingRequest(in: drift) {
+            joinStatus = .requested
+        } else if drift.spotsLeft == 0 {
+            joinStatus = .full
+        } else {
+            joinStatus = .notJoined
+        }
+    }
+
+    private func hasCurrentUserPendingRequest(in drift: Drift) -> Bool {
+        let userId = currentUserId
+        let initials = currentUserInitials
+        return drift.pendingRequests.contains { request in
+            if !request.userId.isEmpty {
+                return request.userId == userId
+            }
+            return request.userInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == initials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        }
+    }
+
+    private func isCurrentUserParticipant(in drift: Drift) -> Bool {
+        let userInitStr = currentUserInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        return drift.participantInitials.contains { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == userInitStr }
+    }
+
+    private var currentUserId: String {
+        Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
+    }
+
+    private var currentUserInitials: String {
+        UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+    }
     
     func requestToJoin() {
         let driftId = drift.id
+        guard joinStatus == .notJoined else { return }
         JoinRequestDebugTracer.trace(
             "DriftDetailViewModel.requestToJoin started",
             driftId: driftId,
             details: "currentStatus=\(joinStatus)"
         )
-        let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
+        let currentUid = currentUserId
 
         // Use real profile data from UserDefaults (written by ProfileViewModel on save/fetch).
         // Falls back to MockData only if UserDefaults has nothing (offline preview mode).
@@ -206,8 +255,51 @@ class DriftDetailViewModel: ObservableObject {
                     requestId: joinRequest.id
                 )
                 withAnimation(.spring()) {
-                    self.joinStatus = .requested
+                    if !self.drift.pendingRequests.contains(where: { $0.id == joinRequest.id }) {
+                        self.drift.pendingRequests.append(joinRequest)
+                    }
+                    self.refreshJoinStatus()
                     self.showingRequestSentConfirmation = true
+                }
+            })
+            .store(in: &cancellables)
+    }
+
+    func cancelJoinRequest() {
+        let driftId = drift.id
+        let userId = currentUserId
+        guard joinStatus == .requested else { return }
+        JoinRequestDebugTracer.trace(
+            "DriftDetailViewModel.cancelJoinRequest started",
+            driftId: driftId,
+            details: "userId=\(userId)"
+        )
+
+        driftsService.cancelJoinRequest(driftId: driftId, userId: userId)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completionResult in
+                if case .failure(let error) = completionResult {
+                    JoinRequestDebugTracer.trace(
+                        "DriftDetailViewModel.cancelJoinRequest failed",
+                        driftId: driftId,
+                        details: "error=\(error.localizedDescription)"
+                    )
+                    print("Error cancelling join request: \(error)")
+                }
+            }, receiveValue: { [weak self] in
+                guard let self else { return }
+                JoinRequestDebugTracer.trace(
+                    "DriftDetailViewModel.cancelJoinRequest succeeded",
+                    driftId: self.drift.id
+                )
+                withAnimation(.spring()) {
+                    self.drift.pendingRequests.removeAll { request in
+                        if !request.userId.isEmpty {
+                            return request.userId == userId
+                        }
+                        return request.userInitials == self.currentUserInitials
+                    }
+                    self.refreshJoinStatus()
                 }
             })
             .store(in: &cancellables)
@@ -219,51 +311,113 @@ class DriftDetailViewModel: ObservableObject {
     }
 
     func fetchParticipants() {
-        guard isFirebaseEnabled else { return }
+        guard isFirebaseEnabled else {
+            rebuildMockParticipants()
+            return
+        }
+        
         let db = Firestore.firestore()
         let postId = drift.id.uuidString
-
-        db.collection("acceptances")
-            .whereField("postId", isEqualTo: postId)
-            .getDocuments { [weak self] snapshot, error in
-                guard let self = self, let docs = snapshot?.documents, error == nil else { return }
-
-                let group = DispatchGroup()
-                var fetched: [ParticipantDetail] = []
-
-                for doc in docs {
-                    let data = doc.data()
-                    guard let acceptorId = data["acceptorId"] as? String else { continue }
-
-                    group.enter()
-                    db.collection("users").document(acceptorId).getDocument { userSnap, _ in
-                        defer { group.leave() }
-                        let userData = userSnap?.data() ?? [:]
+        let hostUid = drift.host.firestoreUID
+        
+        db.collection("messageThreads").document(postId).getDocument { [weak self] snapshot, error in
+            guard let self = self else { return }
+            if let error = error {
+                print("Error fetching message thread (likely not a member yet): \(error.localizedDescription)")
+                self.generateFallbackParticipants()
+                return
+            }
+            
+            guard let data = snapshot?.data(),
+                  let participantIds = data["participants"] as? [String] else {
+                self.generateFallbackParticipants()
+                return
+            }
+            
+            // If the current user UID is in participantIds, override joinStatus to .joined
+            let currentUid = self.currentUserId
+            if participantIds.contains(currentUid) {
+                DispatchQueue.main.async {
+                    if self.joinStatus != .joined {
+                        self.joinStatus = .joined
+                    }
+                }
+            }
+            
+            // Filter out host from participants list
+            let guestIds = participantIds.filter { $0 != hostUid }
+            
+            if guestIds.isEmpty {
+                DispatchQueue.main.async {
+                    self.participants = []
+                }
+                return
+            }
+            
+            let group = DispatchGroup()
+            var fetched: [ParticipantDetail] = []
+            
+            for userId in guestIds {
+                group.enter()
+                db.collection("users").document(userId).getDocument { userSnap, userError in
+                    defer { group.leave() }
+                    if let userData = userSnap?.data(), userSnap?.exists == true {
                         let name = userData["name"] as? String ?? "Someone"
                         let parts = name.components(separatedBy: " ")
                         let initials = parts.compactMap { $0.first }.map { String($0) }.joined().uppercased()
                         let interests = userData["interestTags"] as? [String] ?? []
-
-                        var joinTimeDesc = "Joined recently"
-                        if let ts = data["acceptedAt"] as? Timestamp {
-                            let fmt = DateFormatter()
-                            fmt.timeStyle = .short
-                            joinTimeDesc = "Joined \(fmt.string(from: ts.dateValue()))"
-                        }
-
+                        
                         fetched.append(ParticipantDetail(
                             name: name,
-                            initials: initials,
+                            initials: initials.isEmpty ? "P" : initials,
                             interests: interests,
-                            joinTimeDescription: joinTimeDesc
+                            joinTimeDescription: "Joined recently"
                         ))
                     }
                 }
-
-                group.notify(queue: .main) { [weak self] in
-                    self?.participants = fetched
-                }
             }
+            
+            group.notify(queue: .main) {
+                self.participants = fetched
+            }
+        }
+    }
+    
+    private func generateFallbackParticipants() {
+        let guestInitials = drift.participantInitials
+        var fetched: [ParticipantDetail] = []
+        
+        let namesMap = ["LJ": "Liam", "MM": "Maya", "SJ": "Sarah", "DG": "Dev", "AL": "Albin", "RI": "Riya", "MA": "Maya A.", "SR": "Sneha", "KM": "Karthik"]
+        let interestsMap = [
+            "LJ": ["Walks", "Coffee", "Music"],
+            "MM": ["Coffee", "Walks", "Music"],
+            "SJ": ["Walks", "Coffee", "Music"],
+            "DG": ["Music", "Coffee", "Walks"],
+            "AL": ["Walks", "Coffee"],
+            "RI": ["Coffee", "Music"],
+            "MA": ["Movies", "Music"],
+            "SR": ["Walks", "Coffee"],
+            "KM": ["Movies", "Coffee"]
+        ]
+        
+        for initials in guestInitials {
+            let name = namesMap[initials] ?? "Member"
+            let interests = interestsMap[initials] ?? ["Coffee"]
+            fetched.append(ParticipantDetail(
+                name: name,
+                initials: initials,
+                interests: interests,
+                joinTimeDescription: "Joined recently"
+            ))
+        }
+        
+        DispatchQueue.main.async {
+            self.participants = fetched
+        }
+    }
+    
+    private func rebuildMockParticipants() {
+        generateFallbackParticipants()
     }
     
     func fetchHostOtherActiveDrifts() {

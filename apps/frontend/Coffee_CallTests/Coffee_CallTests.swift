@@ -107,6 +107,54 @@ final class Coffee_CallTests: XCTestCase {
                     .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
             }
+
+            func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func cancelJoinRequest(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func updateDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+
+            func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error> {
+                Just(())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
         }
         
         let stubService = StubDriftsService()
@@ -173,6 +221,31 @@ final class Coffee_CallTests: XCTestCase {
         
         viewModel.requestToJoin()
         
+        XCTAssertEqual(viewModel.joinStatus, .requested)
+        XCTAssertFalse(viewModel.canAccessChat)
+    }
+
+    func testDriftDetailViewModelRestoresPendingRequestState() throws {
+        let previousInitials = UserDefaults.standard.string(forKey: "profile_initials")
+        UserDefaults.standard.set(AppConstants.MockData.userInitials, forKey: "profile_initials")
+        defer {
+            if let previousInitials {
+                UserDefaults.standard.set(previousInitials, forKey: "profile_initials")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "profile_initials")
+            }
+        }
+
+        let pendingRequest = JoinRequest(
+            userName: AppConstants.MockData.userName,
+            userInitials: AppConstants.MockData.userInitials,
+            userRole: "Member",
+            message: "Hey, I'd love to join your drift!",
+            timestamp: "Now"
+        )
+        let drift = makeDrift(pendingRequests: [pendingRequest])
+        let viewModel = DriftDetailViewModel(drift: drift)
+
         XCTAssertEqual(viewModel.joinStatus, .requested)
         XCTAssertFalse(viewModel.canAccessChat)
     }
@@ -259,7 +332,7 @@ final class Coffee_CallTests: XCTestCase {
         XCTAssertFalse(navigationManager.isTabBarHidden)
     }
     
-    private func makeDrift(isMine: Bool = false) -> Drift {
+    private func makeDrift(isMine: Bool = false, pendingRequests: [JoinRequest] = []) -> Drift {
         Drift(
             title: "Coffee Drift",
             description: "Spontaneous coffee meetup.",
@@ -281,6 +354,7 @@ final class Coffee_CallTests: XCTestCase {
             notes: "Meet near the entrance.",
             participantInitials: ["AR", "MY", "YU"],
             imageUrl: nil,
+            pendingRequests: pendingRequests,
             isMine: isMine
         )
     }

@@ -92,13 +92,34 @@ struct DriftChatScreen: View {
             .shadow(color: Color.textPrimary.opacity(AppConstants.UI.opacitySubtle), radius: 10, x: 0, y: -5)
         }
         .sheet(isPresented: $showInfoSheet) {
+            let detailSheet = DriftChatDetailSheet(
+                drift: viewModel.drift,
+                participants: viewModel.participants,
+                onViewDrift: {
+                    dismiss()
+                },
+                onLeaveDrift: {
+                    viewModel.leaveDrift { success in
+                        if success {
+                            dismiss()
+                        }
+                    }
+                },
+                onReportDrift: { reason in
+                    viewModel.reportDrift(reason: reason) { _ in }
+                },
+                onBlockUser: { name in
+                    viewModel.blockUser(name: name) { _ in }
+                }
+            )
+            
             if #available(iOS 16.4, *) {
-                DriftChatDetailSheet(drift: viewModel.drift, participants: viewModel.participants)
+                detailSheet
                     .presentationDetents([.fraction(0.85)])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(30)
             } else {
-                DriftChatDetailSheet(drift: viewModel.drift, participants: viewModel.participants)
+                detailSheet
                     .presentationDetents([.fraction(0.85)])
                     .presentationDragIndicator(.visible)
             }
@@ -307,16 +328,44 @@ struct ChatBubble: View {
                         .padding(.bottom, AppConstants.Layout.miniPadding / 2)
                     }
                     
-                    if message.type == .image, let uiImage = message.attachmentImage {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(maxWidth: 220, maxHeight: 180)
-                            .clipShape(MessageBubbleShape(isSelf: message.isSelf))
-                            .overlay(
-                                MessageBubbleShape(isSelf: message.isSelf)
-                                    .stroke(Color.appBorder, lineWidth: 1)
-                            )
+                    if message.type == .image {
+                        if let uiImage = message.attachmentImage {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(maxWidth: 220, maxHeight: 180)
+                                .clipShape(MessageBubbleShape(isSelf: message.isSelf))
+                                .overlay(
+                                    MessageBubbleShape(isSelf: message.isSelf)
+                                        .stroke(Color.appBorder, lineWidth: 1)
+                                )
+                        } else if let url = URL(string: message.content) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .frame(width: 220, height: 180)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(maxWidth: 220, maxHeight: 180)
+                                        .clipShape(MessageBubbleShape(isSelf: message.isSelf))
+                                        .overlay(
+                                            MessageBubbleShape(isSelf: message.isSelf)
+                                                .stroke(Color.appBorder, lineWidth: 1)
+                                        )
+                                case .failure:
+                                    Image(systemName: "photo")
+                                        .foregroundColor(.textSecondary)
+                                        .frame(width: 220, height: 180)
+                                        .background(Color.surfaceSecondary)
+                                        .clipShape(MessageBubbleShape(isSelf: message.isSelf))
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        }
                     } else if message.type == .location {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 6) {
@@ -457,10 +506,19 @@ struct ChatComposer: View {
 struct DriftChatDetailSheet: View {
     let drift: Drift
     let participants: [ParticipantInfo]
+    var onViewDrift: () -> Void
+    var onLeaveDrift: () -> Void
+    var onReportDrift: (String) -> Void
+    var onBlockUser: (String) -> Void
+
     @Environment(\.dismiss) var dismiss
     @State private var isMuted = false
     @State private var showBlockAlert = false
     @State private var selectedUserToBlock = ""
+    @State private var showBlockOptions = false
+    @State private var showLeaveAlert = false
+    @State private var showReportOptions = false
+    @State private var showReportSuccessAlert = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -577,7 +635,10 @@ struct DriftChatDetailSheet: View {
                         Divider()
                         
                         HStack(spacing: AppConstants.Layout.elementSpacing) {
-                            Button(action: { dismiss() }) {
+                            Button(action: {
+                                dismiss()
+                                onViewDrift()
+                            }) {
                                 Text(AppStrings.Chat.viewDrift)
                                     .font(.bodySmall)
                                     .foregroundColor(.brandPrimary)
@@ -702,7 +763,9 @@ struct DriftChatDetailSheet: View {
                         
                         VStack(spacing: 0) {
                             // Report Drift
-                            Button(action: {}) {
+                            Button(action: {
+                                showReportOptions = true
+                            }) {
                                 HStack {
                                     AppIcons.reportImage
                                         .foregroundColor(.statusError)
@@ -716,13 +779,42 @@ struct DriftChatDetailSheet: View {
                                 }
                                 .padding(.vertical, AppConstants.Layout.elementSpacing + 2)
                             }
+                            .confirmationDialog("Report Drift", isPresented: $showReportOptions, titleVisibility: .visible) {
+                                Button("Inappropriate Content") {
+                                    onReportDrift("Inappropriate Content")
+                                    showReportSuccessAlert = true
+                                }
+                                Button("Spam or Harassment") {
+                                    onReportDrift("Spam or Harassment")
+                                    showReportSuccessAlert = true
+                                }
+                                Button("Suspicious Activity") {
+                                    onReportDrift("Suspicious Activity")
+                                    showReportSuccessAlert = true
+                                }
+                                Button("Other") {
+                                    onReportDrift("Other")
+                                    showReportSuccessAlert = true
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            }
+                            .alert("Drift Reported", isPresented: $showReportSuccessAlert) {
+                                Button("OK", role: .cancel) {}
+                            } message: {
+                                Text("Thank you. Our moderation team will review this Drift and take appropriate action.")
+                            }
                             
                             Divider()
                             
                             // Block user
                             Button(action: {
-                                selectedUserToBlock = drift.host.name
-                                showBlockAlert = true
+                                let others = participants.filter { !$0.isMe }
+                                if others.count > 1 {
+                                    showBlockOptions = true
+                                } else if let singleOther = others.first {
+                                    selectedUserToBlock = singleOther.name
+                                    showBlockAlert = true
+                                }
                             }) {
                                 HStack {
                                     AppIcons.blockImage
@@ -737,11 +829,22 @@ struct DriftChatDetailSheet: View {
                                 }
                                 .padding(.vertical, AppConstants.Layout.elementSpacing + 2)
                             }
+                            .confirmationDialog("Select Member to Block", isPresented: $showBlockOptions, titleVisibility: .visible) {
+                                ForEach(participants.filter { !$0.isMe }) { p in
+                                    Button(p.name) {
+                                        selectedUserToBlock = p.name
+                                        showBlockAlert = true
+                                    }
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            }
                             
                             Divider()
                             
                             // Leave Drift
-                            Button(action: {}) {
+                            Button(action: {
+                                showLeaveAlert = true
+                            }) {
                                 HStack {
                                     AppIcons.logoutImage
                                         .foregroundColor(.statusError)
@@ -754,6 +857,15 @@ struct DriftChatDetailSheet: View {
                                         .foregroundColor(.statusError)
                                 }
                                 .padding(.vertical, AppConstants.Layout.elementSpacing + 2)
+                            }
+                            .alert("Leave Drift?", isPresented: $showLeaveAlert) {
+                                Button("Leave", role: .destructive) {
+                                    onLeaveDrift()
+                                    dismiss()
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            } message: {
+                                Text("Are you sure you want to leave this Drift? You will lose access to this chat room.")
                             }
                         }
                     }
@@ -776,7 +888,7 @@ struct DriftChatDetailSheet: View {
                 title: Text("Block \(selectedUserToBlock)?"),
                 message: Text("You will no longer see their Drifts or messages."),
                 primaryButton: .destructive(Text("Block")) {
-                    // Block execution logic
+                    onBlockUser(selectedUserToBlock)
                 },
                 secondaryButton: .cancel()
             )

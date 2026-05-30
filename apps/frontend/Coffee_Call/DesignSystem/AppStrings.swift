@@ -210,6 +210,7 @@ enum AppStrings {
             }
             
             enum Confirmation {
+                static let sentTitle = "Request Sent"
                 static let sentSubtitle = "Your request to join '%@' has been sent to %@."
                 static let notifyNote = "You'll be notified once they accept."
             }
@@ -217,8 +218,8 @@ enum AppStrings {
             enum CTA {
                 static let join = "Join Drift"
                 static let joinSubtitle = "You'll be able to chat after joining"
-                static let requested = "Request Sent"
-                static let requestedSubtitle = "Host will review your request"
+                static let requested = "Undo Request"
+                static let requestedSubtitle = "Request sent. Tap to undo"
                 static let joined = "Open Chat"
                 static let joinedSubtitle = "Coordination is happening here"
                 static let full = "Drift Full"

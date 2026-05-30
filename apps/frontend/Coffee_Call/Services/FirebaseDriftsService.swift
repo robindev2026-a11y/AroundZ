@@ -268,6 +268,66 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         
         return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
+
+    func cancelJoinRequest(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "FirebaseDriftsService.cancelJoinRequest called",
+            driftId: driftId,
+            details: "userId=\(userId)"
+        )
+        guard isFirebaseEnabled else {
+            return MockDriftsService().cancelJoinRequest(driftId: driftId, userId: userId)
+        }
+
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postRef = db.collection("posts").document(driftId.uuidString)
+
+        db.runTransaction({ transaction, errorPointer -> Any? in
+            let postDocument: DocumentSnapshot
+            do {
+                try postDocument = transaction.getDocument(postRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+
+            guard let postData = postDocument.data() else {
+                let error = NSError(domain: "FirebaseDriftsService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Post document not found"])
+                errorPointer?.pointee = error
+                return nil
+            }
+
+            let pendingRequestsData = postData["pendingRequests"] as? [[String: Any]] ?? []
+            let updatedPendingRequests = pendingRequestsData.filter { dict in
+                (dict["userId"] as? String) != userId
+            }
+
+            transaction.updateData([
+                "pendingRequests": updatedPendingRequests
+            ], forDocument: postRef)
+
+            return nil
+        }) { _, error in
+            if let error = error {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.cancelJoinRequest failed",
+                    driftId: driftId,
+                    details: "error=\(error.localizedDescription)"
+                )
+                subject.send(completion: .failure(error))
+            } else {
+                JoinRequestDebugTracer.trace(
+                    "FirebaseDriftsService.cancelJoinRequest succeeded",
+                    driftId: driftId
+                )
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
+    }
     
     func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error> {
         JoinRequestDebugTracer.trace(
@@ -507,6 +567,96 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 subject.send(completion: .finished)
             }
         }
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
+    }
+
+    func leaveDrift(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().leaveDrift(driftId: driftId, userId: userId)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let postId = driftId.uuidString
+        
+        let postRef = db.collection("posts").document(postId)
+        let threadRef = db.collection("messageThreads").document(postId)
+        
+        let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
+        
+        db.runTransaction({ (transaction, errorPointer) -> Any? in
+            let postDocument: DocumentSnapshot
+            do {
+                try postDocument = transaction.getDocument(postRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+            
+            guard let postData = postDocument.data() else {
+                let error = NSError(domain: "FirebaseDriftsService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Post document not found"])
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            var participantInitials = postData["participantInitials"] as? [String] ?? []
+            if !userInitials.isEmpty {
+                participantInitials.removeAll { $0 == userInitials }
+            }
+            
+            let participantCount = postData["participantCount"] as? Int ?? 1
+            let capacity = postData["capacity"] as? Int ?? 5
+            let newParticipantCount = max(participantCount - 1, 1)
+            let newSpotsLeft = max(capacity - newParticipantCount, 0)
+            
+            transaction.updateData([
+                "participantInitials": participantInitials,
+                "participantCount": newParticipantCount,
+                "spotsLeft": newSpotsLeft
+            ], forDocument: postRef)
+            
+            transaction.updateData([
+                "participants": FieldValue.arrayRemove([userId])
+            ], forDocument: threadRef)
+            
+            return nil
+        }) { (object, error) in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
+        return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
+    }
+
+    func reportDrift(driftId: UUID, reason: String) -> AnyPublisher<Void, Error> {
+        guard isFirebaseEnabled else {
+            return MockDriftsService().reportDrift(driftId: driftId, reason: reason)
+        }
+        
+        let subject = PassthroughSubject<Void, Error>()
+        let db = Firestore.firestore()
+        let currentUid = Auth.auth().currentUser?.uid ?? "anonymous"
+        
+        let reportData: [String: Any] = [
+            "postId": driftId.uuidString,
+            "reporterId": currentUid,
+            "reason": reason,
+            "createdAt": FieldValue.serverTimestamp()
+        ]
+        
+        db.collection("reports").addDocument(data: reportData) { error in
+            if let error = error {
+                subject.send(completion: .failure(error))
+            } else {
+                subject.send(())
+                subject.send(completion: .finished)
+            }
+        }
+        
         return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())
     }
 

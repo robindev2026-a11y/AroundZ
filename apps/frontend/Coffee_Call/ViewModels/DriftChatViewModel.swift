@@ -3,6 +3,7 @@ import Combine
 import FirebaseCore
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseStorage
 
 struct DriftChatThreadContext {
     let systemMessages: [SystemMessage]
@@ -33,7 +34,9 @@ class DriftChatViewModel: ObservableObject {
     @Published var isSending = false
     
     private let threadService: DriftChatThreadServiceProtocol
+    private let driftsService: DriftsServiceProtocol
     private var listenerRegistration: ListenerRegistration?
+    private var cancellables = Set<AnyCancellable>()
     
     private var isFirebaseEnabled: Bool {
         return Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
@@ -41,7 +44,8 @@ class DriftChatViewModel: ObservableObject {
     
     init(
         drift: Drift,
-        threadService: DriftChatThreadServiceProtocol? = nil
+        threadService: DriftChatThreadServiceProtocol? = nil,
+        driftsService: DriftsServiceProtocol? = nil
     ) {
         self.drift = drift
         if let threadService = threadService {
@@ -49,6 +53,13 @@ class DriftChatViewModel: ObservableObject {
         } else {
             let isFirebase = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
             self.threadService = isFirebase ? FirebaseChatService() : MockDriftChatThreadService()
+        }
+        
+        if let driftsService = driftsService {
+            self.driftsService = driftsService
+        } else {
+            let isFirebase = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+            self.driftsService = isFirebase ? FirebaseDriftsService() : MockDriftsService()
         }
         loadThread()
     }
@@ -178,25 +189,51 @@ class DriftChatViewModel: ObservableObject {
     }
     
     func sendImageMessage(image: UIImage) {
-        // In real Firebase, we would upload to Firebase Storage, get URL, and send a message.
-        // For MVP frontend code integration:
         if isFirebaseEnabled {
-            // Placeholder: upload logic or mock image send
-            let trimmedMessage = "[Image attachment]"
             guard let currentUid = Auth.auth().currentUser?.uid else { return }
             let db = Firestore.firestore()
             let threadId = drift.id.uuidString
             
-            db.collection("messageThreads")
-                .document(threadId)
-                .collection("messages")
-                .addDocument(data: [
-                    "senderId": currentUid,
-                    "senderName": "You",
-                    "text": trimmedMessage,
-                    "timestamp": FieldValue.serverTimestamp(),
-                    "type": "image"
-                ])
+            // Get sender profile name
+            db.collection("users").document(currentUid).getDocument { [weak self] document, error in
+                guard let self = self else { return }
+                let senderName = document?.data()?["name"] as? String ?? "You"
+                
+                // Compress and convert to data
+                guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+                
+                let storageRef = Storage.storage().reference()
+                let photoId = UUID().uuidString
+                let photoRef = storageRef.child("chat_attachments/\(threadId)/\(photoId).jpg")
+                
+                let metadata = StorageMetadata()
+                metadata.contentType = "image/jpeg"
+                
+                photoRef.putData(data, metadata: metadata) { metadata, error in
+                    if let error = error {
+                        print("Failed to upload chat image: \(error.localizedDescription)")
+                        return
+                    }
+                    
+                    photoRef.downloadURL { url, error in
+                        guard let downloadURL = url?.absoluteString, error == nil else {
+                            print("Failed to get download URL for chat image")
+                            return
+                        }
+                        
+                        db.collection("messageThreads")
+                            .document(threadId)
+                            .collection("messages")
+                            .addDocument(data: [
+                                "senderId": currentUid,
+                                "senderName": senderName,
+                                "text": downloadURL,
+                                "timestamp": FieldValue.serverTimestamp(),
+                                "type": "image"
+                            ])
+                    }
+                }
+            }
             return
         }
         
@@ -256,5 +293,57 @@ class DriftChatViewModel: ObservableObject {
             return
         }
         messages.removeAll(where: { $0.id == message.id })
+    }
+
+    func leaveDrift(completion: @escaping (Bool) -> Void) {
+        let userId = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
+        driftsService.leaveDrift(driftId: drift.id, userId: userId)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completionResult in
+                if case .failure(let error) = completionResult {
+                    print("Error leaving drift: \(error)")
+                    completion(false)
+                }
+            }, receiveValue: {
+                completion(true)
+            })
+            .store(in: &cancellables)
+    }
+
+    func reportDrift(reason: String, completion: @escaping (Bool) -> Void) {
+        driftsService.reportDrift(driftId: drift.id, reason: reason)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completionResult in
+                if case .failure(let error) = completionResult {
+                    print("Error reporting drift: \(error)")
+                    completion(false)
+                }
+            }, receiveValue: {
+                completion(true)
+            })
+            .store(in: &cancellables)
+    }
+
+    func blockUser(name: String, completion: @escaping (Bool) -> Void) {
+        var blocked = UserDefaults.standard.stringArray(forKey: "blocked_users") ?? []
+        if !blocked.contains(name) {
+            blocked.append(name)
+            UserDefaults.standard.set(blocked, forKey: "blocked_users")
+        }
+        
+        if isFirebaseEnabled, let currentUid = Auth.auth().currentUser?.uid {
+            let db = Firestore.firestore()
+            db.collection("users").document(currentUid).updateData([
+                "blockedUsers": FieldValue.arrayUnion([name])
+            ]) { error in
+                DispatchQueue.main.async {
+                    completion(error == nil)
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                completion(true)
+            }
+        }
     }
 }

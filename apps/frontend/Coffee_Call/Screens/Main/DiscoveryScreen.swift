@@ -6,6 +6,7 @@ struct DiscoveryScreen: View {
 
     @StateObject private var viewModel: DiscoveryViewModel
     @ObservedObject private var permissions = PermissionsManager.shared
+    @EnvironmentObject private var driftStore: GlobalDriftStore
     @Binding var selectedTab: Int
 
     init(viewModel: DiscoveryViewModel = DiscoveryViewModel(), selectedTab: Binding<Int>) {
@@ -15,6 +16,8 @@ struct DiscoveryScreen: View {
 
     @State private var selectedPerson: RadarPerson? = nil
     @State private var showNotificationDropdown = false
+    @State private var showingNotifications = false
+    @State private var navPath: [UUID] = []
 
     // Bottom Sheet
     @State private var sheetOffset: CGFloat = AppConstants.Layout.sheetCollapsedOffset
@@ -59,7 +62,8 @@ struct DiscoveryScreen: View {
     // MARK: - Body
 
     var body: some View {
-        GeometryReader { geo in
+        NavigationStack(path: $navPath) {
+            GeometryReader { geo in
             ZStack {
                 // MARK: Background Tap dismiss
                 Color.clear
@@ -256,21 +260,55 @@ struct DiscoveryScreen: View {
                         permissions.toggleRadarVisibility()
                     }
 
-                    NotificationIconButton(count: isFirebaseEnabled ? 0 : 3) {
-                        if !isFirebaseEnabled {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                showNotificationDropdown.toggle()
-                            }
-                        }
+                    NotificationIconButton(count: driftStore.activeNotifications.filter { !$0.isRead }.count) {
+                        JoinRequestDebugTracer.trace(
+                            "DiscoveryScreen notification bell tapped",
+                            details: "activeNotifications=\(driftStore.activeNotifications.count)"
+                        )
+                        showingNotifications = true
                     }
                 }
             }
         )
+        .sheet(isPresented: $showingNotifications) {
+            if #available(iOS 16.4, *) {
+                NotificationsSheet(navigationPath: $navPath)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(.ultraThinMaterial)
+            } else {
+                NotificationsSheet(navigationPath: $navPath)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
+        }
+        .navigationDestination(for: UUID.self) { driftId in
+            if let drift = driftStore.drifts.first(where: { $0.id == driftId }) {
+                if drift.isMine {
+                    ManageDriftScreen(viewModel: ManageDriftViewModel(drift: drift))
+                } else {
+                    DriftDetailScreen(viewModel: DriftDetailViewModel(drift: drift))
+                }
+            } else {
+                VStack(spacing: AppConstants.Layout.elementSpacing) {
+                    Text("Drift not found")
+                        .font(.heading2)
+                        .foregroundColor(.textPrimary)
+                    Text("This plan may have been deleted or is no longer available.")
+                        .font(.bodyStandard)
+                        .foregroundColor(.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(AppConstants.Layout.standardPadding)
+            }
+        }
         .onAppear {
             NavigationManager.shared.resetTabBarVisibility()
             permissions.syncRadarVisibilityPreference()
-            permissions.requestLocation()
+            permissions.requestLocation(force: true)
+            LocationService.shared.requestLocation(force: true)
             viewModel.refreshRadarSnapshot()
+        }
         }
     }
 }

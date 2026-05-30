@@ -5,11 +5,14 @@ protocol DriftsServiceProtocol {
     func fetchDrifts() -> AnyPublisher<[Drift], Error>
     func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error>
     func requestToJoin(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error>
+    func cancelJoinRequest(driftId: UUID, userId: String) -> AnyPublisher<Void, Error>
     func acceptJoinRequest(driftId: UUID, request: JoinRequest) -> AnyPublisher<Void, Error>
     func rejectJoinRequest(driftId: UUID, requestId: UUID) -> AnyPublisher<Void, Error>
     func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error>
     func updateDrift(_ drift: Drift) -> AnyPublisher<Void, Error>
     func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error>
+    func leaveDrift(driftId: UUID, userId: String) -> AnyPublisher<Void, Error>
+    func reportDrift(driftId: UUID, reason: String) -> AnyPublisher<Void, Error>
 }
 
 class MockDriftsService: DriftsServiceProtocol {
@@ -46,7 +49,9 @@ class MockDriftsService: DriftsServiceProtocol {
                 notes: "Just a quick chat.",
                 participantInitials: ["AL", "RI", "MA"],
                 imageUrl: "drift_coffee",
-                isMine: true
+                isMine: true,
+                latitude: 9.9634,
+                longitude: 76.2949
             ),
             Drift(
                 title: "Evening Walk",
@@ -68,7 +73,9 @@ class MockDriftsService: DriftsServiceProtocol {
                 whatToBring: ["Comfortable shoes", "Water"],
                 notes: "Beginner-friendly. No running.",
                 participantInitials: ["SA", "TH"],
-                imageUrl: "drift_walk"
+                imageUrl: "drift_walk",
+                latitude: 9.9806,
+                longitude: 76.2758
             ),
             Drift(
                 title: "Movie Drift",
@@ -90,7 +97,9 @@ class MockDriftsService: DriftsServiceProtocol {
                 whatToBring: ["Popcorn money"],
                 notes: "Starting soon!",
                 participantInitials: ["PR", "DK", "MR", "NP"],
-                imageUrl: "drift_movie"
+                imageUrl: "drift_movie",
+                latitude: 10.0270,
+                longitude: 76.3080
             ),
             Drift(
                 title: "Dinner & Chats",
@@ -112,7 +121,9 @@ class MockDriftsService: DriftsServiceProtocol {
                 whatToBring: ["Appetite"],
                 notes: "Reservation is under CoffeeCall.",
                 participantInitials: ["RO", "LM", "KK"],
-                imageUrl: "drift_dinner"
+                imageUrl: "drift_dinner",
+                latitude: 9.9658,
+                longitude: 76.2421
             )
         ]
     }
@@ -148,6 +159,27 @@ class MockDriftsService: DriftsServiceProtocol {
                 "MockDriftsService.requestToJoin appended request",
                 driftId: driftId,
                 requestId: request.id,
+                details: "pendingRequests=\(updatedDrift.pendingRequests.count)"
+            )
+        }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+
+    func cancelJoinRequest(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
+        JoinRequestDebugTracer.trace(
+            "MockDriftsService.cancelJoinRequest called",
+            driftId: driftId,
+            details: "userId=\(userId)"
+        )
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
+            var updatedDrift = MockDriftsService.mockDrifts[index]
+            updatedDrift.pendingRequests.removeAll { $0.userId == userId }
+            MockDriftsService.mockDrifts[index] = updatedDrift
+            JoinRequestDebugTracer.trace(
+                "MockDriftsService.cancelJoinRequest removed request",
+                driftId: driftId,
                 details: "pendingRequests=\(updatedDrift.pendingRequests.count)"
             )
         }
@@ -219,6 +251,29 @@ class MockDriftsService: DriftsServiceProtocol {
 
     func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error> {
         MockDriftsService.mockDrifts.removeAll { $0.id == driftId }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+
+    func leaveDrift(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
+        if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
+            var updatedDrift = MockDriftsService.mockDrifts[index]
+            let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? "ME"
+            updatedDrift.participantInitials.removeAll { $0 == userInitials }
+            updatedDrift.peopleGoing = max(updatedDrift.peopleGoing - 1, 1)
+            if let spots = updatedDrift.spotsLeft {
+                updatedDrift.spotsLeft = spots + 1
+            }
+            MockDriftsService.mockDrifts[index] = updatedDrift
+        }
+        return Just(())
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+    }
+
+    func reportDrift(driftId: UUID, reason: String) -> AnyPublisher<Void, Error> {
+        print("MockDriftsService: Drift \(driftId) reported for reason: \(reason)")
         return Just(())
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()

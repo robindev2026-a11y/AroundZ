@@ -9,12 +9,14 @@ struct DriftDetailScreen: View {
     @State private var showingHostContext = false
     @State private var showingWhoIsComing = false
     @State private var selectedDriftForNavigation: Drift? = nil
+    @State private var chatDrift: Drift? = nil
+    @State private var manageDrift: Drift? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             heroSection
                 .padding(.horizontal, AppConstants.Layout.standardPadding)
-                .padding(.top, 20) // Pushed up under the VStack header
+                .padding(.top, 0) // Align to the top page bounds
 
             // Summary Info Grid
             summaryInfoGrid
@@ -42,8 +44,6 @@ struct DriftDetailScreen: View {
             }
             .padding(.horizontal, AppConstants.Layout.standardPadding)
             .padding(.top, AppConstants.Layout.sectionSpacing + 4)
-
-            Spacer(minLength: AppConstants.Layout.screenBottomSpacer + 100) // Padding for overlay sticky CTA
         }
         .asCoffeePage(
             .sub,
@@ -73,7 +73,7 @@ struct DriftDetailScreen: View {
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingWhoIsComing) {
-            WhoIsComingSheet(participants: viewModel.participants)
+            WhoIsComingSheet(participants: viewModel.participants, meetingPoint: viewModel.drift.meetingPoint)
                 .presentationDetents([.fraction(0.65), .large])
                 .presentationDragIndicator(.visible)
         }
@@ -90,6 +90,22 @@ struct DriftDetailScreen: View {
                 DriftDetailScreen(viewModel: DriftDetailViewModel(drift: targetDrift))
             }
         }
+        .navigationDestination(isPresented: Binding(
+            get: { chatDrift != nil },
+            set: { if !$0 { chatDrift = nil } }
+        )) {
+            if let targetDrift = chatDrift {
+                DriftChatScreen(viewModel: DriftChatViewModel(drift: targetDrift))
+            }
+        }
+        .navigationDestination(isPresented: Binding(
+            get: { manageDrift != nil },
+            set: { if !$0 { manageDrift = nil } }
+        )) {
+            if let targetDrift = manageDrift {
+                ManageDriftScreen(viewModel: ManageDriftViewModel(drift: targetDrift))
+            }
+        }
         .navigationBarHidden(true)
         .onAppear {
             navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
@@ -99,21 +115,7 @@ struct DriftDetailScreen: View {
         }
         .onReceive(driftStore.$drifts) { drifts in
             if let updated = drifts.first(where: { $0.id == viewModel.drift.id }) {
-                // Keep drift up to date
-                viewModel.drift = updated
-
-                // If we were waiting for approval and are now in the participants list, upgrade status!
-                if viewModel.joinStatus == .requested {
-                    let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
-                    if updated.participantInitials.contains(userInitials) {
-                        JoinRequestDebugTracer.trace(
-                            "DriftDetailScreen observed accepted request",
-                            driftId: updated.id,
-                            details: "userInitials=\(userInitials)"
-                        )
-                        viewModel.joinStatus = .joined
-                    }
-                }
+                viewModel.syncDrift(updated)
             }
         }
         .alert("Add to Calendar?", isPresented: $viewModel.showCalendarAddConfirmation) {
@@ -314,79 +316,79 @@ struct DriftDetailScreen: View {
 
             let isLocked = viewModel.joinStatus == .notJoined || viewModel.joinStatus == .requested
 
-            HStack(spacing: AppConstants.Layout.elementSpacing) {
-                if isLocked {
-                    // MARK: - Locked State
-                    HStack(spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.brandPrimary.opacity(0.1))
-                                .frame(width: 44, height: 44)
-                            AppIcons.lockImage
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.brandPrimary)
-                        }
+            Button(action: {
+                showingWhoIsComing = true
+            }) {
+                HStack(spacing: AppConstants.Layout.elementSpacing) {
+                    if isLocked {
+                        // MARK: - Locked State
+                        HStack(spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.brandPrimary.opacity(0.1))
+                                    .frame(width: 44, height: 44)
+                                AppIcons.lockImage
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.brandPrimary)
+                            }
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
-                                .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
-                                .foregroundColor(.textPrimary)
-                            Text(AppStrings.Manage.joinToSeeParticipants)
-                                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
-                                .foregroundColor(.textSecondary)
-                        }
-                    }
-
-                    Spacer()
-
-                    AppIcons.chevronRightImage
-                        .font(.system(size: AppConstants.Layout.elementSpacing + 2, weight: .bold))
-                        .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityMuted))
-                } else {
-                    // MARK: - Open State
-                    HStack(spacing: AppConstants.Layout.elementSpacing) {
-                        HStack(spacing: -(AppConstants.Layout.elementSpacing)) {
-                            ForEach(Array(viewModel.drift.participantInitials.prefix(3).enumerated()), id: \.offset) { index, initial in
-                                Text(initial)
-                                    .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: AppConstants.Layout.mapGridStep, height: AppConstants.Layout.mapGridStep)
-                                    .background(Circle().fill(Color.brandPrimary))
-                                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
+                                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
+                                    .foregroundColor(.textPrimary)
+                                Text(AppStrings.Manage.joinToSeeParticipants)
+                                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
+                                    .foregroundColor(.textSecondary)
                             }
                         }
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
-                                .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
-                                .foregroundColor(.textPrimary)
-                            Text(AppStrings.Manage.capacity(count: viewModel.drift.capacity))
-                                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
-                                .foregroundColor(.textSecondary)
+                        Spacer()
+
+                        AppIcons.chevronRightImage
+                            .font(.system(size: AppConstants.Layout.elementSpacing + 2, weight: .bold))
+                            .foregroundColor(.textSecondary.opacity(AppConstants.UI.opacityMuted))
+                    } else {
+                        // MARK: - Open State
+                        HStack(spacing: AppConstants.Layout.elementSpacing) {
+                            HStack(spacing: -(AppConstants.Layout.elementSpacing)) {
+                                ForEach(Array(viewModel.drift.participantInitials.prefix(3).enumerated()), id: \.offset) { index, initial in
+                                    Text(initial)
+                                        .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: AppConstants.Layout.mapGridStep, height: AppConstants.Layout.mapGridStep)
+                                        .background(Circle().fill(Color.brandPrimary))
+                                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                                }
+                            }
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(AppStrings.Manage.joinedCount(count: viewModel.drift.peopleGoing))
+                                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
+                                    .foregroundColor(.textPrimary)
+                                Text(AppStrings.Manage.capacity(count: viewModel.drift.capacity))
+                                    .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
+                                    .foregroundColor(.textSecondary)
+                            }
                         }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        showingWhoIsComing = true
-                    }
 
-                    Spacer()
+                        Spacer()
 
-                    Button(AppStrings.Drifts.seeAll) {
-                        showingWhoIsComing = true
+                        Text(AppStrings.Drifts.seeAll)
+                            .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
+                            .foregroundColor(.brandPrimary)
+                            .padding(.horizontal, AppConstants.Layout.buttonPaddingHorizontal)
+                            .padding(.vertical, AppConstants.Layout.buttonPaddingVertical)
+                            .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                            .cornerRadius(AppConstants.UI.cornerRadiusSmall)
                     }
-                    .font(.system(size: AppConstants.Typography.sizeCaption + 1, weight: .bold))
-                    .foregroundColor(.brandPrimary)
-                    .padding(.horizontal, AppConstants.Layout.buttonPaddingHorizontal)
-                    .padding(.vertical, AppConstants.Layout.buttonPaddingVertical)
-                    .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
-                    .cornerRadius(AppConstants.UI.cornerRadiusSmall)
                 }
+                .padding(AppConstants.Layout.buttonPaddingHorizontal)
+                .background(Color.surfaceMain)
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall + AppConstants.Layout.miniPadding)
+                .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + AppConstants.Layout.miniPadding).stroke(Color.appBorder, lineWidth: 1))
             }
-            .padding(AppConstants.Layout.buttonPaddingHorizontal)
-            .background(Color.surfaceMain)
-            .cornerRadius(AppConstants.UI.cornerRadiusSmall + AppConstants.Layout.miniPadding)
-            .overlay(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall + AppConstants.Layout.miniPadding).stroke(Color.appBorder, lineWidth: 1))
+            .buttonStyle(.plain)
+            .disabled(isLocked)
         }
     }
 
@@ -501,12 +503,16 @@ struct DriftDetailScreen: View {
 
             HStack {
                 if viewModel.drift.isMine {
-                    NavigationLink(destination: LazyView(ManageDriftScreen(viewModel: ManageDriftViewModel(drift: viewModel.drift)))) {
+                    Button(action: {
+                        manageDrift = viewModel.drift
+                    }) {
                         manageButtonContent
                     }
                     .buttonStyle(.plain)
                 } else if viewModel.joinStatus == .joined {
-                    NavigationLink(destination: LazyView(DriftChatScreen(viewModel: DriftChatViewModel(drift: viewModel.drift)))) {
+                    Button(action: {
+                        chatDrift = viewModel.drift
+                    }) {
                         ctaButtonContent
                     }
                     .buttonStyle(.plain)
@@ -519,6 +525,8 @@ struct DriftDetailScreen: View {
                         )
                         if viewModel.joinStatus == .notJoined {
                             viewModel.requestToJoin()
+                        } else if viewModel.joinStatus == .requested {
+                            viewModel.cancelJoinRequest()
                         }
                     }) {
                         ctaButtonContent
@@ -629,7 +637,7 @@ struct DriftDetailScreen: View {
     private var ctaIcon: String {
         switch viewModel.joinStatus {
         case .notJoined: return AppIcons.participants
-        case .requested: return AppIcons.clockFill
+        case .requested: return AppIcons.close
         case .joined: return AppIcons.chatGroup
         case .full: return AppIcons.lock
         case .ended: return AppIcons.checkCircleFill
@@ -1016,6 +1024,7 @@ struct HostContextCardSheet: View {
 // MARK: - Who's Coming Participant Sheet (ISSUE-014)
 struct WhoIsComingSheet: View {
     let participants: [ParticipantDetail]
+    let meetingPoint: String
 
     var body: some View {
         VStack(spacing: 0) {
@@ -1044,9 +1053,24 @@ struct WhoIsComingSheet: View {
                 }
 
                 Text(AppStrings.Manage.preciseLocationNote)
-
                     .font(.bodyStandard)
                     .foregroundColor(.textSecondary)
+
+                if !meetingPoint.isEmpty {
+                    HStack(spacing: 8) {
+                        Image(systemName: AppIcons.mappin)
+                            .foregroundColor(.brandPrimary)
+                            .font(.system(size: 14, weight: .bold))
+                        Text(meetingPoint)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.textPrimary)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.brandPrimary.opacity(AppConstants.UI.opacityLight))
+                    .cornerRadius(8)
+                    .padding(.top, 4)
+                }
             }
             .padding(.bottom, AppConstants.Layout.sectionSpacing)
 
@@ -1268,7 +1292,7 @@ struct RequestSentConfirmationSheet: View {
                 }
 
                 VStack(spacing: AppConstants.Layout.subElementSpacing) {
-                    Text(AppStrings.Drifts.Detail.CTA.requested)
+                    Text(AppStrings.Drifts.Detail.Confirmation.sentTitle)
                         .font(.heading1)
                         .foregroundColor(.textPrimary)
 

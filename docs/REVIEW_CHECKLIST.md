@@ -28,6 +28,29 @@ Primary files:
 - [DiscoveryViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DiscoveryViewModel.swift)
 - [CoffeeHeader.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Components/Navigation/CoffeeHeader.swift)
 
+Open Issues:
+- [ ] **ISSUE-039**
+  - Priority: P1
+  - Type: UI
+  - Summary: The notification icon in the dashboard is not the correct icon. In-app notification data is not populating.
+  - Files: [DiscoveryScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DiscoveryScreen.swift), [DiscoveryViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DiscoveryViewModel.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-040**
+  - Priority: P1
+  - Type: UX
+  - Summary: Clicking the notification icon does nothing — the notification bottom sheet is not appearing.
+  - Files: [DiscoveryScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DiscoveryScreen.swift), [NotificationsSheet.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/NotificationsSheet.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-041**
+  - Priority: P2
+  - Type: State
+  - Summary: Location is not being set or refreshed when the dashboard opens. User has to manually go to profile and update location for it to reflect. Should auto-trigger on dashboard load.
+  - Files: [DiscoveryScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DiscoveryScreen.swift), [DiscoveryViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DiscoveryViewModel.swift)
+  - Status: Open
+  - Owner: Unassigned
+
 Completed Issues:
 - [x] ISSUE-001 (P1 UI): Radar person tooltip overflows off-screen. Fixed with edge-clamped tooltip positioning.
 - [x] ISSUE-002 (P1 UX): Tooltip showing "Start Drift" CTA. Changed to show anonymous active interests only.
@@ -50,6 +73,15 @@ Primary files:
 - [DriftCard.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Components/DriftCard.swift)
 - [DriftsViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DriftsViewModel.swift)
 
+Open Issues:
+- [ ] **ISSUE-042**
+  - Priority: P2
+  - Type: Verification
+  - Summary: The 1–10 km radius slider in the filter panel needs to be verified — it's unclear if it's actually filtering results correctly.
+  - Files: [DriftsScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftsScreen.swift), [DriftsViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DriftsViewModel.swift)
+  - Status: Open
+  - Owner: Unassigned
+
 Completed Issues:
 - [x] ISSUE-006 (P1 UX): Non-working search/filter buttons in header. Wired search toggle and radius filter sheet.
 - [x] ISSUE-007 (P1 State): Unused search text query. Integrated dynamic search filter in view model.
@@ -67,6 +99,29 @@ Primary files:
 - [CreateDriftButton.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Components/CreateDriftButton.swift)
 - [CreateDriftScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/CreateDriftScreen.swift)
 - [CreateDriftViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/CreateDriftViewModel.swift)
+
+Open Issues:
+- [ ] **ISSUE-055**
+  - Priority: P2
+  - Type: UI Layout
+  - Summary: The create drift sheet has overflow/padding issues on smaller iPhone screens. Content looks cramped and overflows the layout.
+  - Files: [CreateDriftScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/CreateDriftScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-056**
+  - Priority: P1
+  - Type: Feature completeness
+  - Summary: When tapping the location field in the create drift sheet, the map picker is not implemented. Needs to be built out.
+  - Files: [CreateDriftScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/CreateDriftScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-057**
+  - Priority: P2
+  - Type: Verification
+  - Summary: Need to verify that the 'Anyone can join' vs 'Request to join' toggle and approval flow is functioning correctly end-to-end.
+  - Files: [CreateDriftScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/CreateDriftScreen.swift), [CreateDriftViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/CreateDriftViewModel.swift)
+  - Status: Open
+  - Owner: Unassigned
 
 Completed Issues:
 - [x] ISSUE-010 (P1 UX): Outdated compose UI. Implemented premium sliding bottom sheet compose flow.
@@ -103,6 +158,22 @@ Primary files:
 - [DriftChatScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftChatScreen.swift)
 - [DriftChatViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DriftChatViewModel.swift)
 
+Open Issues:
+- [ ] **ISSUE-053**
+  - Priority: P2
+  - Type: Navigation
+  - Summary: Inside the chat info sheet (opened via the ⓘ button in chat nav bar), the 'View Drift' button does nothing. It should navigate back to the drift detail view.
+  - Files: [DriftChatScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftChatScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-054**
+  - Priority: P1
+  - Type: UI / Feature
+  - Summary: When a user sends an image, the chat shows '[Image attachment]' as plain text instead of rendering the image inline.
+  - Files: [DriftChatScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftChatScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+
 Completed Issues:
 - [x] ISSUE-018 (P1 Navigation): Chat thread showing bottom navigation. Hidden tab bar dynamically during navigation.
 - [x] ISSUE-019 (P1 UX): Dead composer actions and attachments. Removed attachment button, polished text/color contrast.
@@ -128,6 +199,76 @@ Open Issues:
   - Expected: Each action should have a real destination or sheet, or be hidden until available.
   - Notes: `shareDrift()` and `setReminder()` only print to console. `saveDrift()` is implemented via BookmarkManager.
   - Files: [DriftDetailViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DriftDetailViewModel.swift), [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [x] **ISSUE-043**
+  - Priority: P3
+  - Type: UI
+  - Summary: Multiple unexpected white spaces and gaps visible throughout the detail view.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Complete
+  - Owner: Unassigned
+- [ ] **ISSUE-044**
+  - Priority: P1
+  - Type: Feature completeness
+  - Summary: The location section shows a blank grid placeholder instead of an actual map. The map view is not implemented. 'Open in Apple Maps' link exists but the map preview is broken.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [x] **ISSUE-045**
+  - Priority: P1
+  - Type: State / Data binding
+  - Summary: Clicking 'See all' in the Who's Coming section opens a sheet showing 0 members and empty list — even though 2 people have joined. Data is not being passed to the sheet correctly.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Complete
+  - Owner: Unassigned
+- [x] **ISSUE-046**
+  - Priority: P2
+  - Type: Interaction
+  - Summary: The joined count section should be locked for non-members but clickable after joining. Even after joining, it does not respond to taps.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Complete
+  - Owner: Unassigned
+- [x] **ISSUE-047**
+  - Priority: P1
+  - Type: Feature Visibility
+  - Summary: After joining, the sheet says 'Precise meeting coordinate is unlocked' but doesn't actually show the location. Location should be revealed once the user joins.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Complete
+  - Owner: Unassigned
+- [x] **ISSUE-048**
+  - Priority: P1
+  - Type: Logic
+  - Summary: When the final slot is filled (e.g. 4th of 4 people), that last joiner sees 'Drift Locked' instead of 'Open Chat'. Logic error — full drift should still show Open Chat to all members.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Complete
+  - Owner: Unassigned
+- [ ] **ISSUE-049**
+  - Priority: P1
+  - Type: Stability / Memory
+  - Summary: Clicking 'Open Chat' or navigating to the chat from the detail view causes the simulator to freeze completely on iOS 16.2. Likely a memory leak. Needs investigation.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift), [DriftChatScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftChatScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-050**
+  - Priority: P1
+  - Type: Feature completeness
+  - Summary: Tapping 'Leave Drift' has no effect. The action is not triggering any API call or UI update.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift), [DriftDetailViewModel.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/ViewModels/DriftDetailViewModel.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-051**
+  - Priority: P2
+  - Type: Feature completeness
+  - Summary: There is no option to report a drift. This feature needs to be added.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
+  - Status: Open
+  - Owner: Unassigned
+- [ ] **ISSUE-052**
+  - Priority: P1
+  - Type: Logic / UX
+  - Summary: Tapping 'Block User' immediately blocks the host. It should instead show a list of members in the drift so the user can select who to block individually.
+  - Files: [DriftDetailScreen.swift](file:///Users/developer/Documents/Projects/CoffeeCall/apps/frontend/Coffee_Call/Screens/Main/DriftDetailScreen.swift)
   - Status: Open
   - Owner: Unassigned
 
