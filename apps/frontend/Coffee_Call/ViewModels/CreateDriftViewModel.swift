@@ -23,6 +23,8 @@ final class CreateDriftViewModel: ObservableObject {
     @Published var isOpenToAllCapacity: Bool = false
     @Published var selectedJoinMode: JoinMode = .open
     @Published var approximateLocation: String = AppStrings.Create.sampleLocation
+    @Published var selectedLatitude: Double? = nil
+    @Published var selectedLongitude: Double? = nil
     // Alias for capacity used in drift model
     var capacity: Int { selectedCapacityCount }
     @Published var customActivityText: String = ""
@@ -72,6 +74,8 @@ final class CreateDriftViewModel: ObservableObject {
         hookText = drift.hook ?? ""
         notesText = drift.notes ?? ""
         selectedVibe = Self.vibeOption(for: drift.vibeTags)
+        selectedLatitude = drift.latitude
+        selectedLongitude = drift.longitude
     }
     
     // Helper to combine separate date and time pickers into a single Date
@@ -233,8 +237,8 @@ final class CreateDriftViewModel: ObservableObject {
             participantInitials: [creatorInitials],
             imageUrl: nil,
             isMine: true,
-            latitude: LocationService.shared.currentLocation?.coordinate.latitude,
-            longitude: LocationService.shared.currentLocation?.coordinate.longitude
+            latitude: selectedLatitude ?? LocationService.shared.currentLocation?.coordinate.latitude,
+            longitude: selectedLongitude ?? LocationService.shared.currentLocation?.coordinate.longitude
         )
     }
 
@@ -277,8 +281,8 @@ final class CreateDriftViewModel: ObservableObject {
             lastMessage: original.lastMessage,
             lastMessageTime: original.lastMessageTime,
             unreadCount: original.unreadCount,
-            latitude: original.latitude,
-            longitude: original.longitude
+            latitude: selectedLatitude ?? original.latitude,
+            longitude: selectedLongitude ?? original.longitude
         )
     }
 
