@@ -238,7 +238,8 @@ final class CreateDriftViewModel: ObservableObject {
             imageUrl: nil,
             isMine: true,
             latitude: selectedLatitude ?? LocationService.shared.currentLocation?.coordinate.latitude,
-            longitude: selectedLongitude ?? LocationService.shared.currentLocation?.coordinate.longitude
+            longitude: selectedLongitude ?? LocationService.shared.currentLocation?.coordinate.longitude,
+            joinMode: selectedJoinMode
         )
     }
 
@@ -278,11 +279,11 @@ final class CreateDriftViewModel: ObservableObject {
             imageUrl: original.imageUrl,
             pendingRequests: original.pendingRequests,
             isMine: original.isMine,
-            lastMessage: original.lastMessage,
             lastMessageTime: original.lastMessageTime,
             unreadCount: original.unreadCount,
             latitude: selectedLatitude ?? original.latitude,
-            longitude: selectedLongitude ?? original.longitude
+            longitude: selectedLongitude ?? original.longitude,
+            joinMode: selectedJoinMode
         )
     }
 
