@@ -305,8 +305,21 @@ class DriftChatViewModel: ObservableObject {
                     print("Error leaving drift: \(error)")
                     completion(false)
                 }
-            }, receiveValue: {
-                print("[LeaveDrift] Service call succeeded from Chat. Posting DriftStateChanged notification.")
+            }, receiveValue: { [weak self] in
+                guard let self = self else { return }
+                print("[LeaveDrift] Service call succeeded from Chat. Updating local state and posting notification.")
+                
+                let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+                self.drift.participantInitials.removeAll { 
+                    $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == 
+                    userInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                }
+                self.drift.participantIds?.removeAll { $0 == userId }
+                self.drift.peopleGoing = max(self.drift.peopleGoing - 1, 1)
+                if let spots = self.drift.spotsLeft {
+                    self.drift.spotsLeft = spots + 1
+                }
+                
                 NotificationCenter.default.post(name: NSNotification.Name("DriftStateChanged"), object: nil)
                 completion(true)
             })

@@ -1,69 +1,30 @@
 # CHANGELOG - CoffeeCall
 
-## [2026-06-01] - Context Management Migration & Resilient Leave Flow
+## [2026-06-01] - Documentation Consolidation
 **What changed:** 
-- Initialized `AI.md` as the primary entry point for all agents.
-- Created `CURRENT_STATE.md` to house architectural and product truth.
-- Created `CHANGELOG.md` to track decision history chronologically.
-- **Implemented "Bottom-Up" Leave Drift:** Refactored the leave flow to clean up `acceptances` documents before updating threads and posts.
-- **Transaction-less Resiliency:** Switched from a single Firestore transaction to sequential writes to pinpoint failures and handle missing documents gracefully.
-- **Fixed Permission Logic:** Broadened rules temporarily and then refined them to support decentralized cleanup.
-- Deprecated `AGENTS.md`, `docs/STATUS.md`, and `docs/CONTEXT.md`.
+- Merged all unique content from `docs/` and `AGENTS.md` into `CURRENT_STATE.md` and `CHANGELOG.md`.
+- Deleted redundant legacy files.
+- Consolidated "Completed Issues" from the Screen Review Checklist into historical logs.
 
 **Why:** 
-- To resolve persistent "Permission Denied" errors caused by complex multi-document dependencies.
-- To ensure that leaving a drift properly cleans up all related data (acceptances, threads, posts).
-
-**Affected areas:** 
-- Project root documentation.
+- To reduce documentation rot and establish a single, high-density source of truth.
 
 ---
 
-## [2026-05-30] - UX & Deep-linking Polish
+## [2026-06-01] - AI System Initialization & Resilient Leave Flow
 **What changed:** 
-- Resolved Batch 1 & 2 Issues (Dashboard, Feed, Participant State).
-- Unified notifications bell with live unread counts.
-- Fixed UI gaps in `DriftDetailScreen`.
-- Programmatic navigation migration (removed eager NavigationLinks).
-- Implemented Leave/Report/Block flows.
+- Initialized `AI.md` and `.ai_cache/` for semantic memory.
+- Implemented "Bottom-Up" Leave Drift flow (Thread -> Acceptance -> Post).
+- Fixed Code 7 permission errors by sequentializing writes.
+- Implemented dual-layer UI synchronization (Instant + onAppear sync).
 
 ---
 
-## [2026-05-26] - Join Request & Persistence
-**What changed:** 
-- Fixed stale Drifts listing updates using UUID-based navigation.
-- Implemented `JoinRequestDebugTracer` for flow auditing.
-- Derived `.requested` state from `Drift.pendingRequests` for persistence.
-- Added `cancelJoinRequest` support.
-
----
-
-## [2026-05-23] - State Management Refactor
-**What changed:** 
-- Migrated to `GlobalDriftStore` (@EnvironmentObject).
-- Removed `CreatedDriftStore` and notification-based syncing.
-- UI now updates instantly via shared store.
-
----
-
-## [2026-05-22] - Location & Profile Services
-**What changed:** 
-- Implemented dynamic GPS coordinates lookup and reverse geocoding.
-- Added profile image picker with Firebase Storage persistence.
-- Rebuilt Edit Drift UI to match Create Drift.
-- Fixed `Drift.notes` persistence.
-
----
-
-## [2026-05-18] - UI Foundation & Page Structures
-**What changed:** 
-- Overhauled Chats list and detail info sheets.
-- Implemented generic `CoffeeBasePage` and `CoffeeHeader`.
-- Added dynamic stats and Activity Log to Profile.
-- Added CPU/Energy optimizations for unread dots.
-
----
-
-## [2026-05-16] - Documentation Reset
-**What changed:** 
-- Established active markdown files in `docs/` and archived legacy documentation.
+## [Historical Milestones - May 2026]
+- **UX Polish:** Resolved Dashboard/Feed issues; unified notification bell; programmatic navigation migration (May 30).
+- **Safety Flows:** Implemented Leave/Report/Block flows (May 30).
+- **Join/Persistence:** UUID-based navigation; JoinRequestDebugTracer; cancelJoinRequest support (May 26).
+- **State Refactor:** Migrated to `GlobalDriftStore` (@EnvironmentObject); removed old notification-sync (May 23).
+- **Location/Profile:** Dynamic GPS coordinates; reverse geocoding; Firebase Storage profile images (May 22).
+- **UI Foundation:** CoffeeBasePage & CoffeeHeader overhaul; Profile stats & Activity Log (May 18).
+- **Core Setup:** Established active markdown files and archived legacy docs (May 16).

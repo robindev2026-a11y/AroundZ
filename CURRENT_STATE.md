@@ -1,41 +1,58 @@
 # CURRENT STATE - CoffeeCall
 
 ## Project Overview
-CoffeeCall is an activity-based meetup app where users create "Drifts" (activities), others join, and coordination happens via in-app messages.
-- **Goal:** Activity first, person second.
-- **Unit of Action:** The Drift.
+CoffeeCall is a native SwiftUI iOS app (using Skip for Kotlin transpilation) backed by Firebase.
+- **Mission:** Activity-first, person-second social meetup platform.
+- **Drift Lifecycle:** Create -> Nearby Discovery -> Join/Accept -> Confirm -> Message -> Meet.
 
 ## Active Focus
-- Resolving lingering bugs: sharing, reminders, profile photo features.
-- Validating full flows (Around -> Drift -> Join -> Chat).
-- Performance optimizations for Radar and Chat unread pulse dots.
+- **Priority:** Resolving lingering bugs in sharing and reminder stubs.
+- **Safety:** Resilient "Leave Flow" implemented (Awaiting User Verification).
+- **UX:** Finalizing Social Refresh UX in Around screen.
 
 ## Architecture & Tech Stack
-- **Frontend:** SwiftUI (using Skip for Kotlin transpilation) in `apps/frontend`.
-- **Backend:** Firebase (Auth, Firestore, Storage, Messaging, Functions).
-- **Store:** `GlobalDriftStore` (SwiftUI-native `@EnvironmentObject`) handles Firestore syncing and local caching.
-- **Geohashing:** Used for location-based discovery (10km fixed radius).
+- **Frontend:** SwiftUI (Skip) in `apps/frontend`.
+- **Backend:** Firebase (Auth, Firestore, Storage, Functions).
+- **Primary Pattern:** Vertical slices; pure stateless SwiftUI; zero-exception architecture.
+- **Data Model:**
+  - `users`: Profile, lastLocation (geohash), isRadarVisible.
+  - `posts` (Drifts): creatorId, purpose, location, hook, participants, spotsLeft.
+  - `acceptances`: Join request tracking (postId, acceptorId, status).
+  - `messageThreads`: Drift-tied conversations.
+- **Discovery:** 10km fixed radius geohashing. Around radar uses anonymous ambient signals (initials/interests).
 
-## Non-Negotiables (Product Principles)
-- No cold direct messages.
-- No person browsing from Around (profiles hidden until Drift context).
-- Chat only after joining/hosting a Drift.
-- No phone number exchange in MVP.
-- Async messaging only (2-5 sec latency).
-- Posts stay active after acceptance (group support).
-- Online/Offline presence toggle for Radar.
+## Design System (The Design Contract)
+- **Personality:** Warm, social, premium, native iOS. NOT a dating app.
+- **Colors (Assets only):**
+  - `coffeePrimary` (#53B8A6): Mint accents/actions.
+  - `coffeePurple` (#8E7DBE): Secondary lavender accent.
+  - `coffeePeach` (#E88C6B): Warm peach accent.
+  - `coffeeBackground` (#F6F1EB): Main background.
+- **Typography:** Outfit (Headlines/Buttons) + SF Pro (Body/Metadata).
+- **Engineering Rules:**
+  - No raw HEX strings; use `AppColors.swift`.
+  - No hardcoded paddings; use `AppConstants.Layout` tokens.
+  - Mandatory Dynamic Type support; use `@ScaledMetric` for spacing.
+
+## Product Guardrails (Non-Negotiables)
+- **Activity-First:** Profiles hidden until Drift context.
+- **No Cold DMs:** Chat unlocks only after joining/hosting a Drift.
+- **Privacy:** No phone numbers in MVP; Radar uses anonymous initials.
+- **Maps:** 500m radius ring pre-join; precise pin + "Open in Maps" post-join.
 
 ## Engineering Conventions
 - **Naming:** camelCase (variables), PascalCase (Classes), UPPER_SNAKE_CASE (constants).
-- **Structure:** Vertical slices per feature.
-- **SwiftUI:** Pure stateless zero-exception architecture. Avoid `AnyView`, prefer generic composition and `@ViewBuilder`.
-- **Validation:** User validates all builds; agents do NOT run `xcodebuild` or simulators.
+- **Navigation:** Floating glass bottom nav; avoid nested stacks.
+- **Validation:** User validates all builds; agents do NOT run `xcodebuild`.
 
-## Active Goals
-1. [Bugs] Fix sharing and reminder stubs.
-2. [UI] Finalize Social Refresh UX in Around screen.
-3. [Safety] Resilient "Leave Flow" implemented (Awaiting User Verification).
+## Open Issues (Screen Ledger)
+- **Around:** Issue-039 (Notification icon/data), Issue-040 (Notification sheet), Issue-041 (Location refresh).
+- **Drifts:** Issue-042 (Radius filter verification).
+- **Create:** Issue-055 (Layout overflow), Issue-056 (Map picker implementation).
+- **Chat:** Issue-053 (View Drift back-nav), Issue-054 (Inline image rendering).
+- **Detail:** Issue-012 (Share/Reminder stubs), Issue-044 (Map preview implementation), Issue-049 (iOS 16.2 simulator freeze).
+- **Profile:** Issue-022 (Image capture/upload flow).
 
 ## Known Issues / Open Decisions
-- Internal web admin panel planned for post-MVP.
+- Internal web admin panel planned post-MVP.
 - Swift access specifier audit and `final` keyword cleanup needed.

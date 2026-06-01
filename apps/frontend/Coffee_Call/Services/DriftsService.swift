@@ -259,9 +259,12 @@ class MockDriftsService: DriftsServiceProtocol {
     func leaveDrift(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
         if let index = MockDriftsService.mockDrifts.firstIndex(where: { $0.id == driftId }) {
             var updatedDrift = MockDriftsService.mockDrifts[index]
-            let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+            let rawInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+            let userInitials = rawInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
             print("[LeaveDrift] MockDriftsService.leaveDrift called for drift: \(updatedDrift.title). Removing userInitials: \(userInitials)")
-            updatedDrift.participantInitials.removeAll { $0 == userInitials }
+            updatedDrift.participantInitials.removeAll { 
+                $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == userInitials 
+            }
             updatedDrift.peopleGoing = max(updatedDrift.peopleGoing - 1, 1)
             if let spots = updatedDrift.spotsLeft {
                 updatedDrift.spotsLeft = spots + 1

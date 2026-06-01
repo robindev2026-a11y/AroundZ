@@ -133,6 +133,17 @@ final class GlobalDriftStore: ObservableObject {
         persistLocalDrifts()
     }
 
+    func updateDriftInStore(_ drift: Drift) {
+        if let index = baseDrifts.firstIndex(where: { $0.id == drift.id }) {
+            baseDrifts[index] = drift
+        }
+        if let index = localDrifts.firstIndex(where: { $0.id == drift.id }) {
+            localDrifts[index] = drift
+            persistLocalDrifts()
+        }
+        mergeDrifts()
+    }
+
     private func bindLocationUpdates() {
         locationService.$currentLocation
             .receive(on: RunLoop.main)
@@ -146,16 +157,12 @@ final class GlobalDriftStore: ObservableObject {
         var merged: [Drift] = []
         let userLocation = locationService.currentLocationModel
         let baseIds = Set(baseDrifts.map(\.id))
-        let localIds = Set(localDrifts.map(\.id))
         let candidates: [Drift]
 
-        if prefersRemoteDrifts {
-            let localOnlyDrifts = localDrifts.filter { !baseIds.contains($0.id) }
-            candidates = localOnlyDrifts + baseDrifts
-        } else {
-            let baseOnlyDrifts = baseDrifts.filter { !localIds.contains($0.id) }
-            candidates = localDrifts + baseOnlyDrifts
-        }
+        // Canonical base drifts from the service should ALWAYS take precedence over local cache
+        // to prevent stale local data (e.g. from UserDefaults) from overwriting actual updates.
+        let localOnlyDrifts = localDrifts.filter { !baseIds.contains($0.id) }
+        candidates = localOnlyDrifts + baseDrifts
 
         for var drift in candidates {
             guard !merged.contains(where: { $0.id == drift.id }) else { continue }

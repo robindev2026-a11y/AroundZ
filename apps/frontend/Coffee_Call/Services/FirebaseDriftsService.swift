@@ -95,6 +95,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                     let whatToBring = data["whatToBring"] as? [String] ?? []
                     let participantInitials = data["participantInitials"] as? [String] ?? []
                     let participantIds = data["participantIds"] as? [String]
+                    print("[FirebaseFetch] Drift title: '\(title)', participantIds: \(String(describing: participantIds)), participantInitials: \(participantInitials)")
                     let imageUrl = data["imageUrl"] as? String
                     let pendingRequestsData = data["pendingRequests"] as? [[String: Any]] ?? []
                     let pendingRequests = pendingRequestsData.compactMap { reqDict -> JoinRequest? in
@@ -643,9 +644,12 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                             return
                         }
                         
+                        print("[LeaveDrift] Loaded postData: participantIds = \(String(describing: postData["participantIds"])), participantInitials = \(String(describing: postData["participantInitials"]))")
+                        
+                        let cleanInitials = userInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
                         var participantInitials = postData["participantInitials"] as? [String] ?? []
-                        if let index = participantInitials.firstIndex(of: userInitials) {
-                            participantInitials.remove(at: index)
+                        participantInitials.removeAll { 
+                            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == cleanInitials 
                         }
                         
                         let participantCount = postData["participantCount"] as? Int ?? 1
@@ -658,7 +662,8 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         ]
                         
                         if postData["participantIds"] != nil {
-                            updateData["participantIds"] = FieldValue.arrayRemove([userId])
+                            let cleanUserId = userId.trimmingCharacters(in: .whitespacesAndNewlines)
+                            updateData["participantIds"] = FieldValue.arrayRemove([cleanUserId])
                         }
                         
                         postRef.updateData(updateData) { finalErr in

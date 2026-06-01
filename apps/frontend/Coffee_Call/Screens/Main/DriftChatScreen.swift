@@ -103,6 +103,7 @@ struct DriftChatScreen: View {
                 onLeaveDrift: {
                     viewModel.leaveDrift { success in
                         if success {
+                            driftStore.updateDriftInStore(viewModel.drift)
                             showInfoSheet = false
                             showLeaveSuccessAlert = true
                         }

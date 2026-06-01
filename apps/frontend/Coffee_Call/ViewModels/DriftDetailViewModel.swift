@@ -22,6 +22,8 @@ class DriftDetailViewModel: ObservableObject {
     @Published var showCalendarAddConfirmation = false
     @Published var showCalendarUntapDisclaimer = false
     
+    var onDriftUpdated: ((Drift) -> Void)?
+    
     private var cancellables = Set<AnyCancellable>()
     
     enum JoinStatus {
@@ -270,6 +272,7 @@ class DriftDetailViewModel: ObservableObject {
                     self.refreshJoinStatus()
                     self.showingRequestSentConfirmation = true
                 }
+                self.onDriftUpdated?(self.drift)
             })
             .store(in: &cancellables)
     }
@@ -310,6 +313,7 @@ class DriftDetailViewModel: ObservableObject {
                     }
                     self.refreshJoinStatus()
                 }
+                self.onDriftUpdated?(self.drift)
             })
             .store(in: &cancellables)
     }
@@ -345,6 +349,8 @@ class DriftDetailViewModel: ObservableObject {
                         self.currentUserInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() 
                     }
                 }
+                
+                self.onDriftUpdated?(self.drift)
                 
                 // 2. Notify the global store to re-fetch and sync everything
                 NotificationCenter.default.post(name: NSNotification.Name("DriftStateChanged"), object: nil)
@@ -389,18 +395,23 @@ class DriftDetailViewModel: ObservableObject {
                 self.generateFallbackParticipants()
                 return
             }
+            print("[FirebaseDetail] messageThreads document participants: \(String(describing: data["participants"]))")
             
-            // If the current user UID is in participantIds, override joinStatus to .joined
+            // If the current user UID is in participantIds of the thread, override joinStatus to .joined
             let currentUid = self.currentUserId
             if participantIds.contains(currentUid) {
                 DispatchQueue.main.async {
-                    if self.drift.participantIds?.contains(currentUid) != true {
-                        var ids = self.drift.participantIds ?? []
-                        ids.append(currentUid)
-                        self.drift.participantIds = Array(Set(ids))
-                    }
-                    if self.joinStatus != .joined {
-                        self.joinStatus = .joined
+                    // Only override to .joined if the user is also recognized as a participant in the canonical post document
+                    let wasParticipantInPost = self.drift.participantIds?.contains(currentUid) ?? false
+                    if wasParticipantInPost {
+                        if self.drift.participantIds?.contains(currentUid) != true {
+                            var ids = self.drift.participantIds ?? []
+                            ids.append(currentUid)
+                            self.drift.participantIds = Array(Set(ids))
+                        }
+                        if self.joinStatus != .joined {
+                            self.joinStatus = .joined
+                        }
                     }
                 }
             } else {

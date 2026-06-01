@@ -114,6 +114,9 @@ struct DriftDetailScreen: View {
         }
         .navigationBarHidden(true)
         .onAppear {
+            viewModel.onDriftUpdated = { updatedDrift in
+                driftStore.updateDriftInStore(updatedDrift)
+            }
             navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
             // Force refresh from store on return
             if let updated = driftStore.drifts.first(where: { $0.id == viewModel.drift.id }) {
