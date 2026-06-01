@@ -186,7 +186,13 @@ class DriftDetailViewModel: ObservableObject {
     }
 
     private func isCurrentUserParticipant(in drift: Drift) -> Bool {
+        if isFirebaseEnabled {
+            return drift.participantIds?.contains(currentUserId) == true
+        }
+
         let userInitStr = currentUserInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        guard !userInitStr.isEmpty else { return false }
+
         return drift.participantInitials.contains { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == userInitStr }
     }
 
@@ -195,7 +201,8 @@ class DriftDetailViewModel: ObservableObject {
     }
 
     private var currentUserInitials: String {
-        UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+        let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
+        return savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? AppConstants.MockData.userInitials : savedInitials
     }
     
     func requestToJoin() {
@@ -212,8 +219,10 @@ class DriftDetailViewModel: ObservableObject {
         // Falls back to MockData only if UserDefaults has nothing (offline preview mode).
         let currentUserName = UserDefaults.standard.string(forKey: "profile_name")
             ?? AppConstants.MockData.userName
-        let currentUserInitials = UserDefaults.standard.string(forKey: "profile_initials")
-            ?? AppConstants.MockData.userInitials
+        let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
+        let currentUserInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? AppConstants.MockData.userInitials
+            : savedInitials
         let currentUserRole = "Member"
 
         let formatter = DateFormatter()
@@ -305,6 +314,46 @@ class DriftDetailViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func leaveDrift(completion: @escaping (Bool) -> Void) {
+        let userId = currentUserId
+        print("[LeaveDrift] Detail ViewModel calling service. leaveDrift(driftId: \(drift.id), userId: \(userId))")
+        driftsService.leaveDrift(driftId: drift.id, userId: userId)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completionResult in
+                if case .failure(let error) = completionResult {
+                    print("Error leaving drift: \(error)")
+                    completion(false)
+                }
+            }, receiveValue: { [weak self] in
+                guard let self = self else { return }
+                print("[LeaveDrift] Service call succeeded. Resetting local ViewModel state.")
+                
+                // 1. Immediately update local state for instant UI feedback
+                withAnimation(.spring()) {
+                    self.drift.participantInitials.removeAll { initStr in
+                        initStr.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == 
+                        self.currentUserInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                    }
+                    self.drift.participantIds?.removeAll { $0 == userId }
+                    self.drift.peopleGoing = max(self.drift.peopleGoing - 1, 1)
+                    if let spots = self.drift.spotsLeft {
+                        self.drift.spotsLeft = spots + 1
+                    }
+                    
+                    self.refreshJoinStatus()
+                    self.participants.removeAll { $0.initials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == 
+                        self.currentUserInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() 
+                    }
+                }
+                
+                // 2. Notify the global store to re-fetch and sync everything
+                NotificationCenter.default.post(name: NSNotification.Name("DriftStateChanged"), object: nil)
+                
+                completion(true)
+            })
+            .store(in: &cancellables)
+    }
+
     // MARK: - Firebase Participants Fetch
     private var isFirebaseEnabled: Bool {
         Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
@@ -324,7 +373,14 @@ class DriftDetailViewModel: ObservableObject {
             guard let self = self else { return }
             if let error = error {
                 print("Error fetching message thread (likely not a member yet): \(error.localizedDescription)")
-                self.generateFallbackParticipants()
+                DispatchQueue.main.async {
+                    let currentUid = self.currentUserId
+                    self.drift.participantIds?.removeAll { $0 == currentUid }
+                    if !self.drift.isMine && self.drift.status != .ended {
+                        self.refreshJoinStatus()
+                    }
+                    self.generateFallbackParticipants()
+                }
                 return
             }
             
@@ -338,8 +394,20 @@ class DriftDetailViewModel: ObservableObject {
             let currentUid = self.currentUserId
             if participantIds.contains(currentUid) {
                 DispatchQueue.main.async {
+                    if self.drift.participantIds?.contains(currentUid) != true {
+                        var ids = self.drift.participantIds ?? []
+                        ids.append(currentUid)
+                        self.drift.participantIds = Array(Set(ids))
+                    }
                     if self.joinStatus != .joined {
                         self.joinStatus = .joined
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.drift.participantIds?.removeAll { $0 == currentUid }
+                    if !self.drift.isMine && self.drift.status != .ended {
+                        self.refreshJoinStatus()
                     }
                 }
             }

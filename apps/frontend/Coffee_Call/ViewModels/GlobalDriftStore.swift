@@ -1,5 +1,7 @@
 import Foundation
 import Combine
+import UIKit
+import FirebaseAuth
 
 @MainActor
 final class GlobalDriftStore: ObservableObject {
@@ -63,6 +65,15 @@ final class GlobalDriftStore: ObservableObject {
 
         loadLocalDrifts()
         bindLocationUpdates()
+        
+        // Listen for manual triggers from Detail screens (e.g., Leave Drift)
+        NotificationCenter.default.publisher(for: NSNotification.Name("DriftStateChanged"))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.fetchDrifts()
+            }
+            .store(in: &cancellables)
+            
         mergeDrifts()
     }
 
@@ -189,5 +200,38 @@ final class GlobalDriftStore: ObservableObject {
         } catch {
             print("Error encoding local drifts: \(error)")
         }
+    }
+
+    func requestToJoin(driftId: UUID) {
+        let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
+        let currentUserName = UserDefaults.standard.string(forKey: "profile_name") ?? AppConstants.MockData.userName
+        let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
+        let currentUserInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? AppConstants.MockData.userInitials
+            : savedInitials
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        let timestamp = formatter.string(from: Date())
+
+        let joinRequest = JoinRequest(
+            userId: currentUid,
+            userName: currentUserName,
+            userInitials: currentUserInitials,
+            userRole: "Member",
+            message: "Hey, I'd love to join your drift!",
+            timestamp: timestamp
+        )
+
+        driftsService.requestToJoin(driftId: driftId, request: joinRequest)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("Error requesting to join drift: \(error)")
+                }
+            }, receiveValue: { [weak self] in
+                guard let self = self else { return }
+                self.fetchDrifts()
+            })
+            .store(in: &cancellables)
     }
 }

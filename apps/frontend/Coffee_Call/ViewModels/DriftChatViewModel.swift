@@ -297,6 +297,7 @@ class DriftChatViewModel: ObservableObject {
 
     func leaveDrift(completion: @escaping (Bool) -> Void) {
         let userId = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
+        print("[LeaveDrift] Chat ViewModel calling service. leaveDrift(driftId: \(drift.id), userId: \(userId))")
         driftsService.leaveDrift(driftId: drift.id, userId: userId)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completionResult in
@@ -305,6 +306,8 @@ class DriftChatViewModel: ObservableObject {
                     completion(false)
                 }
             }, receiveValue: {
+                print("[LeaveDrift] Service call succeeded from Chat. Posting DriftStateChanged notification.")
+                NotificationCenter.default.post(name: NSNotification.Name("DriftStateChanged"), object: nil)
                 completion(true)
             })
             .store(in: &cancellables)

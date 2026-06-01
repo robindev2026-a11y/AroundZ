@@ -407,6 +407,7 @@ class ProfileViewModel: ObservableObject {
         let vibeTags = data["vibeTags"] as? [String] ?? []
         let whatToBring = data["whatToBring"] as? [String] ?? []
         let participantInitials = data["participantInitials"] as? [String] ?? []
+        let participantIds = data["participantIds"] as? [String]
         let imageUrl = data["imageUrl"] as? String
         let pendingRequestsData = data["pendingRequests"] as? [[String: Any]] ?? []
         let pendingRequests = pendingRequestsData.compactMap { reqDict -> JoinRequest? in
@@ -454,6 +455,7 @@ class ProfileViewModel: ObservableObject {
             vibeTags: vibeTags,
             whatToBring: whatToBring,
             participantInitials: participantInitials,
+            participantIds: participantIds,
             imageUrl: imageUrl,
             pendingRequests: pendingRequests,
             isMine: isMine

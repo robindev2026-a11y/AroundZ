@@ -89,6 +89,7 @@ class FirebaseChatService: ChatServiceProtocol, DriftChatThreadServiceProtocol {
                         }
                         
                         let participantInitials = data["participantInitials"] as? [String] ?? []
+                        let participantIds = data["participantIds"] as? [String]
                         
                         let chatDrift = Drift(
                             id: id,
@@ -106,6 +107,7 @@ class FirebaseChatService: ChatServiceProtocol, DriftChatThreadServiceProtocol {
                             peopleGoing: data["participantCount"] as? Int ?? 1,
                             capacity: data["capacity"] as? Int ?? 5,
                             participantInitials: participantInitials,
+                            participantIds: participantIds,
                             isMine: (data["creatorId"] as? String ?? "") == currentUid,
                             lastMessage: lastMessage,
                             lastMessageTime: lastMessageTime,

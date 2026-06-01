@@ -60,3 +60,7 @@ client_secret.json
 .DS_Store
 *.swp
 *.swo
+
+# AI Context System Binaries
+.ai_cache/*.db
+.ai_cache/vector_db/

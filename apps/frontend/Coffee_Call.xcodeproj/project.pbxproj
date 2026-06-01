@@ -107,6 +107,7 @@
 		9E04FFF08F3A7B125341F872 /* OnboardingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C39A4B09C2CFB09B67CB8F4 /* OnboardingScreen.swift */; };
 		A2A9829ACEBF4571D697AC19 /* DiscoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F35CA43B73D544B4C03A78A /* DiscoveryScreen.swift */; };
 		AA000001000000000000AA02 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AA01 /* GoogleService-Info.plist */; };
+		BCEA8E3F2FCBE701004C7D6C /* MapPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEA8E3E2FCBE701004C7D6C /* MapPickerSheet.swift */; };
 		CAB5558C60DD469F954FC8AB /* Outfit-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 94EC35158C624F3B88616235 /* Outfit-Medium.ttf */; };
 		CC001FB1000000000000001 /* FirebaseDriftsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA1000000000000001 /* FirebaseDriftsService.swift */; };
 		CC001FB2000000000000002 /* FirebaseDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */; };
@@ -234,6 +235,7 @@
 		AF04B3901F064B1893505DB3 /* ProfileImageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileImageHelper.swift; sourceTree = "<group>"; };
 		B860AAD253DC8B95B03AF333 /* MainTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		B97063A5DDF717D0608C7F29 /* ProfileSetupScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileSetupScreen.swift; sourceTree = "<group>"; };
+		BCEA8E3E2FCBE701004C7D6C /* MapPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPickerSheet.swift; sourceTree = "<group>"; };
 		BEE3583296AC425C8923F28A /* Outfit-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file.ttf; name = "Outfit-Bold.ttf"; path = "Fonts/Outfit-Bold.ttf"; sourceTree = "<group>"; };
 		CC001FA1000000000000001 /* FirebaseDriftsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseDriftsService.swift; sourceTree = "<group>"; };
 		CC001FA2000000000000002 /* FirebaseDiscoveryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseDiscoveryService.swift; sourceTree = "<group>"; };
@@ -444,6 +446,7 @@
 		854F67326A3D7D34D2066BA2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				BCEA8E3E2FCBE701004C7D6C /* MapPickerSheet.swift */,
 				3374CEDD2FB725060020F28D /* CreateDriftScreen.swift */,
 				3374CED92FB708630020F28D /* EditProfileScreen.swift */,
 				3374CECD2FB6FDD80020F28D /* ChatsListScreen.swift */,
@@ -753,6 +756,7 @@
 				338E3B282FB46EA60048FC32 /* View+Availability.swift in Sources */,
 				7A5E4B021B884196F7FFA7F3 /* PermissionsScreen.swift in Sources */,
 				338E3B1B2FB435F40048FC32 /* AppStrings.swift in Sources */,
+				BCEA8E3F2FCBE701004C7D6C /* MapPickerSheet.swift in Sources */,
 				8B3EE9332FC30B1F004A7D46 /* AppNotification.swift in Sources */,
 				3374CEE02FB725670020F28D /* CreateDriftViewModel.swift in Sources */,
 				08625224EED924E620A740B9 /* ReadyScreen.swift in Sources */,

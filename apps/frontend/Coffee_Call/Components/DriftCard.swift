@@ -1,10 +1,47 @@
 import SwiftUI
+import FirebaseAuth
 
 struct DriftCard: View {
     let drift: Drift
     let isFeatured: Bool
     let onJoin: () -> Void
-    
+
+    private var isJoined: Bool {
+        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+            guard let currentUid = Auth.auth().currentUser?.uid else { return false }
+            return drift.participantIds?.contains(currentUid) == true
+        }
+
+        let userInitStr = (UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        guard !userInitStr.isEmpty else { return false }
+
+        return drift.participantInitials.contains {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == userInitStr
+        }
+    }
+
+    private var buttonText: String {
+        if drift.isMine {
+            return "Hosting"
+        } else if isJoined {
+            return "Joined"
+        } else {
+            return AppStrings.Drifts.imIn
+        }
+    }
+
+    private var buttonColor: Color {
+        if drift.isMine {
+            return .brandPurple
+        } else if isJoined {
+            return .brandSecondary
+        } else {
+            return .brandPrimary
+        }
+    }
+
     var body: some View {
         VStack(spacing: AppConstants.Layout.elementSpacing) {
             HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
@@ -124,12 +161,12 @@ struct DriftCard: View {
                 
                 // Join Button
                 Button(action: onJoin) {
-                    Text(AppStrings.Drifts.imIn)
+                    Text(buttonText)
                         .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.brandPrimary)
+                        .background(buttonColor)
                         .clipShape(Capsule())
                 }
                 .pressScale(0.9)

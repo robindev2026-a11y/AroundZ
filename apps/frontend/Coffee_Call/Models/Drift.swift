@@ -22,6 +22,7 @@ struct Drift: Identifiable, Codable {
     let whatToBring: [String]
     let notes: String?
     var participantInitials: [String]
+    var participantIds: [String]?
     let imageUrl: String?
     var pendingRequests: [JoinRequest] = []
     var isMine: Bool = false
@@ -53,6 +54,7 @@ struct Drift: Identifiable, Codable {
         whatToBring: [String] = [],
         notes: String? = nil,
         participantInitials: [String] = [],
+        participantIds: [String]? = nil,
         imageUrl: String? = nil,
         pendingRequests: [JoinRequest] = [],
         isMine: Bool = false,
@@ -83,6 +85,7 @@ struct Drift: Identifiable, Codable {
         self.whatToBring = whatToBring
         self.notes = notes
         self.participantInitials = participantInitials
+        self.participantIds = participantIds
         self.imageUrl = imageUrl
         self.pendingRequests = pendingRequests
         self.isMine = isMine
@@ -277,7 +280,7 @@ public enum VibeOption: String, CaseIterable, Identifiable {
     public var id: String { rawValue }
 }
 
-public enum JoinMode: String, CaseIterable, Identifiable {
+public enum JoinMode: String, CaseIterable, Identifiable,Codable {
     case open, approval
     public var id: String { rawValue }
 }

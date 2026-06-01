@@ -199,6 +199,7 @@ final class CreateDriftViewModel: ObservableObject {
         let creatorName = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_name") ?? "") : AppConstants.MockData.userName
         let creatorInitials = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_initials") ?? "") : AppConstants.MockData.userInitials
         let creatorUid = isFirebaseEnabled ? (Auth.auth().currentUser?.uid ?? "") : ""
+        let normalizedCreatorInitials = creatorInitials.trimmingCharacters(in: .whitespacesAndNewlines)
         
         let host = Host(
             name: creatorName,
@@ -234,7 +235,8 @@ final class CreateDriftViewModel: ObservableObject {
             vibeTags: vibeTags,
             whatToBring: [],
             notes: cleanedText(notesText),
-            participantInitials: [creatorInitials],
+            participantInitials: normalizedCreatorInitials.isEmpty ? [] : [normalizedCreatorInitials],
+            participantIds: creatorUid.isEmpty ? nil : [creatorUid],
             imageUrl: nil,
             isMine: true,
             latitude: selectedLatitude ?? LocationService.shared.currentLocation?.coordinate.latitude,
@@ -276,6 +278,7 @@ final class CreateDriftViewModel: ObservableObject {
             whatToBring: original.whatToBring,
             notes: cleanedText(notesText),
             participantInitials: original.participantInitials,
+            participantIds: original.participantIds,
             imageUrl: original.imageUrl,
             pendingRequests: original.pendingRequests,
             isMine: original.isMine,

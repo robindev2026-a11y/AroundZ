@@ -94,6 +94,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                     let vibeTags = data["vibeTags"] as? [String] ?? []
                     let whatToBring = data["whatToBring"] as? [String] ?? []
                     let participantInitials = data["participantInitials"] as? [String] ?? []
+                    let participantIds = data["participantIds"] as? [String]
                     let imageUrl = data["imageUrl"] as? String
                     let pendingRequestsData = data["pendingRequests"] as? [[String: Any]] ?? []
                     let pendingRequests = pendingRequestsData.compactMap { reqDict -> JoinRequest? in
@@ -140,6 +141,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         vibeTags: vibeTags,
                         whatToBring: whatToBring,
                         participantInitials: participantInitials,
+                        participantIds: participantIds,
                         imageUrl: imageUrl,
                         pendingRequests: pendingRequests,
                         isMine: isMine,
@@ -190,6 +192,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             "vibeTags": drift.vibeTags,
             "whatToBring": drift.whatToBring,
             "participantInitials": drift.participantInitials,
+            "participantIds": [currentUid],
             "imageUrl": drift.imageUrl ?? "",
             "createdAt": FieldValue.serverTimestamp()
         ]
@@ -207,6 +210,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         
         batch.setData(postData, forDocument: postRef)
         batch.setData([
+            "postId": postId,
             "participants": [currentUid],
             "lastMessage": [
                 "text": "Drift created! Welcome to the chat room.",
@@ -342,14 +346,18 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
         let postId = driftId.uuidString
+        let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
         
         let postRef = db.collection("posts").document(postId)
         let threadRef = db.collection("messageThreads").document(postId)
         
         db.runTransaction({ (transaction, errorPointer) -> Any? in
             let postDocument: DocumentSnapshot
+            let threadDocument: DocumentSnapshot
+
             do {
                 try postDocument = transaction.getDocument(postRef)
+                try threadDocument = transaction.getDocument(threadRef)
             } catch let fetchError as NSError {
                 errorPointer?.pointee = fetchError
                 return nil
@@ -369,9 +377,10 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 return true
             }
             
+            let requestInitials = request.userInitials.trimmingCharacters(in: .whitespacesAndNewlines)
             var participantInitials = postData["participantInitials"] as? [String] ?? []
-            if !participantInitials.contains(request.userInitials) {
-                participantInitials.append(request.userInitials)
+            if !requestInitials.isEmpty && !participantInitials.contains(requestInitials) {
+                participantInitials.append(requestInitials)
             }
             
             let participantCount = postData["participantCount"] as? Int ?? 1
@@ -382,14 +391,30 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             transaction.updateData([
                 "pendingRequests": updatedPendingRequests,
                 "participantInitials": participantInitials,
+                "participantIds": FieldValue.arrayUnion([request.userId]),
                 "participantCount": newParticipantCount,
                 "spotsLeft": newSpotsLeft
             ], forDocument: postRef)
             
             if !request.userId.isEmpty {
-                transaction.updateData([
-                    "participants": FieldValue.arrayUnion([request.userId])
-                ], forDocument: threadRef)
+                if threadDocument.exists {
+                    transaction.updateData([
+                        "participants": FieldValue.arrayUnion([request.userId])
+                    ], forDocument: threadRef)
+                } else {
+                    // Create the thread if it somehow doesn't exist
+                    let participants = Array(Set([currentUid, request.userId].filter { !$0.isEmpty }))
+                    transaction.setData([
+                        "postId": postId,
+                        "participants": participants,
+                        "lastMessage": [
+                            "text": "Drift joined! Welcome to the chat room.",
+                            "timestamp": FieldValue.serverTimestamp(),
+                            "senderId": "system",
+                            "senderName": "System"
+                        ]
+                    ], forDocument: threadRef)
+                }
             }
             
             return nil
@@ -582,51 +607,72 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         let postRef = db.collection("posts").document(postId)
         let threadRef = db.collection("messageThreads").document(postId)
         
-        let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
+        let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
+        let userInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? AppConstants.MockData.userInitials : savedInitials
         
-        db.runTransaction({ (transaction, errorPointer) -> Any? in
-            let postDocument: DocumentSnapshot
-            do {
-                try postDocument = transaction.getDocument(postRef)
-            } catch let fetchError as NSError {
-                errorPointer?.pointee = fetchError
-                return nil
-            }
-            
-            guard let postData = postDocument.data() else {
-                let error = NSError(domain: "FirebaseDriftsService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Post document not found"])
-                errorPointer?.pointee = error
-                return nil
-            }
-            
-            var participantInitials = postData["participantInitials"] as? [String] ?? []
-            if !userInitials.isEmpty {
-                participantInitials.removeAll { $0 == userInitials }
-            }
-            
-            let participantCount = postData["participantCount"] as? Int ?? 1
-            let capacity = postData["capacity"] as? Int ?? 5
-            let newParticipantCount = max(participantCount - 1, 1)
-            let newSpotsLeft = max(capacity - newParticipantCount, 0)
-            
-            transaction.updateData([
-                "participantInitials": participantInitials,
-                "participantCount": newParticipantCount,
-                "spotsLeft": newSpotsLeft
-            ], forDocument: postRef)
-            
-            transaction.updateData([
-                "participants": FieldValue.arrayRemove([userId])
-            ], forDocument: threadRef)
-            
-            return nil
-        }) { (object, error) in
-            if let error = error {
-                subject.send(completion: .failure(error))
+        print("[LeaveDrift] Starting Resilient Cleanup for postId: \(postId), userId: \(userId)")
+        
+        // 1. Remove from Message Thread FIRST (while user still has 'participant' status)
+        threadRef.updateData([
+            "participants": FieldValue.arrayRemove([userId])
+        ]) { threadErr in
+            if let threadErr = threadErr {
+                print("[LeaveDrift] WARNING: Thread update failed: \(threadErr.localizedDescription)")
             } else {
-                subject.send(())
-                subject.send(completion: .finished)
+                print("[LeaveDrift] SUCCESS: User removed from thread.")
             }
+            
+            // 2. Delete Acceptance Document (The Bottom Connection)
+            db.collection("acceptances")
+                .whereField("postId", isEqualTo: postId)
+                .whereField("acceptorId", isEqualTo: userId)
+                .getDocuments { acceptanceSnap, acceptanceErr in
+                    if let acceptanceErr = acceptanceErr {
+                        print("[LeaveDrift] ERROR finding acceptances: \(acceptanceErr.localizedDescription)")
+                    } else {
+                        for doc in acceptanceSnap?.documents ?? [] {
+                            print("[LeaveDrift] Deleting acceptance: \(doc.documentID)")
+                            doc.reference.delete()
+                        }
+                    }
+                    
+                    // 3. Update Post Metadata
+                    postRef.getDocument { postSnap, postFetchErr in
+                        guard let postSnap = postSnap, postSnap.exists, let postData = postSnap.data() else {
+                            subject.send(completion: .failure(postFetchErr ?? NSError(domain: "Firestore", code: 404)))
+                            return
+                        }
+                        
+                        var participantInitials = postData["participantInitials"] as? [String] ?? []
+                        if let index = participantInitials.firstIndex(of: userInitials) {
+                            participantInitials.remove(at: index)
+                        }
+                        
+                        let participantCount = postData["participantCount"] as? Int ?? 1
+                        let newParticipantCount = max(participantCount - 1, 1)
+                        
+                        var updateData: [String: Any] = [
+                            "participantInitials": participantInitials,
+                            "participantCount": newParticipantCount,
+                            "spotsLeft": FieldValue.increment(Int64(1))
+                        ]
+                        
+                        if postData["participantIds"] != nil {
+                            updateData["participantIds"] = FieldValue.arrayRemove([userId])
+                        }
+                        
+                        postRef.updateData(updateData) { finalErr in
+                            if let finalErr = finalErr {
+                                print("[LeaveDrift] ERROR final post update: \(finalErr.localizedDescription)")
+                                subject.send(completion: .failure(finalErr))
+                            } else {
+                                print("[LeaveDrift] SUCCESS: User has fully left the drift.")
+                                subject.send(())
+                                subject.send(completion: .finished)
+                            }
+                        }
+                    }
+                }
         }
         
         return NetworkInterceptor.shared.execute(subject.eraseToAnyPublisher())

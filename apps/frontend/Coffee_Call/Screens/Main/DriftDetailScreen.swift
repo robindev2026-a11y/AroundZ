@@ -11,6 +11,8 @@ struct DriftDetailScreen: View {
     @State private var selectedDriftForNavigation: Drift? = nil
     @State private var chatDrift: Drift? = nil
     @State private var manageDrift: Drift? = nil
+    @State private var showLeaveConfirmation = false
+    @State private var showLeaveSuccessAlert = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -41,6 +43,10 @@ struct DriftDetailScreen: View {
 
                 // Safety Banner
                 safetyBanner
+
+                if viewModel.joinStatus == .joined && !viewModel.drift.isMine {
+                    leaveDriftSection
+                }
             }
             .padding(.horizontal, AppConstants.Layout.standardPadding)
             .padding(.top, AppConstants.Layout.sectionSpacing + 4)
@@ -109,6 +115,10 @@ struct DriftDetailScreen: View {
         .navigationBarHidden(true)
         .onAppear {
             navManager.setTabBarHidden(true, source: tabBarVisibilitySource)
+            // Force refresh from store on return
+            if let updated = driftStore.drifts.first(where: { $0.id == viewModel.drift.id }) {
+                viewModel.syncDrift(updated)
+            }
         }
         .onDisappear {
             navManager.setTabBarHidden(false, source: tabBarVisibilitySource)
@@ -130,6 +140,26 @@ struct DriftDetailScreen: View {
             Button("Close", role: .cancel) {}
         } message: {
             Text("This Drift is already scheduled in your Apple Calendar. To remove it, please delete the event manually from the Calendar app.")
+        }
+        .alert("Leave Drift?", isPresented: $showLeaveConfirmation) {
+            Button("Leave", role: .destructive) {
+                viewModel.leaveDrift { success in
+                    if success {
+                        showLeaveSuccessAlert = true
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Are you sure you want to leave this Drift? You will lose access to the chat room.")
+        }
+        .alert("You left the Drift", isPresented: $showLeaveSuccessAlert) {
+            Button("OK") {
+                dismiss()
+                driftStore.fetchDrifts()
+            }
+        } message: {
+            Text("You have successfully left this Drift.")
         }
     }
 
@@ -493,6 +523,34 @@ struct DriftDetailScreen: View {
                     .font(.system(size: AppConstants.Typography.sizeTiny + 1, weight: .medium))
             }
             .foregroundColor(.textSecondary)
+        }
+    }
+
+    private var leaveDriftSection: some View {
+        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
+            Button(action: {
+                showLeaveConfirmation = true
+            }) {
+                HStack {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .foregroundColor(.statusError)
+                    Text("Leave Drift")
+                        .font(.system(size: AppConstants.Typography.sizeBody, weight: .bold))
+                        .foregroundColor(.statusError)
+                    Spacer()
+                    AppIcons.chevronRightImage
+                        .font(.system(size: 14))
+                        .foregroundColor(.statusError)
+                }
+                .padding(AppConstants.Layout.standardPadding)
+                .background(Color.surfaceMain)
+                .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+            }
+            .pressScale(0.96)
         }
     }
 

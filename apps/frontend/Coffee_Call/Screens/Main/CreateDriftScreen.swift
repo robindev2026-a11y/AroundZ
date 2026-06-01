@@ -1013,6 +1013,10 @@ private struct VibeMenuRow: View {
     }
 }
 
+private struct JoinModeToggleCard: View {
+    let selectedMode: JoinMode
+    let onSelect: (JoinMode) -> Void
+
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {

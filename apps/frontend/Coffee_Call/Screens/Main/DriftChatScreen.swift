@@ -5,6 +5,8 @@ struct DriftChatScreen: View {
     @StateObject private var navManager = NavigationManager.shared
     @Environment(\.dismiss) var dismiss
     @State private var showInfoSheet = false
+    @EnvironmentObject private var driftStore: GlobalDriftStore
+    @State private var showLeaveSuccessAlert = false
     @State private var tabBarVisibilitySource = UUID().uuidString
     @State private var keyboardHeight: CGFloat = 0
     
@@ -101,7 +103,8 @@ struct DriftChatScreen: View {
                 onLeaveDrift: {
                     viewModel.leaveDrift { success in
                         if success {
-                            dismiss()
+                            showInfoSheet = false
+                            showLeaveSuccessAlert = true
                         }
                     }
                 },
@@ -192,6 +195,14 @@ struct DriftChatScreen: View {
             }
         )
         .dismissKeyboardOnTap()
+        .alert("You left the Drift", isPresented: $showLeaveSuccessAlert) {
+            Button("OK") {
+                dismiss()
+                driftStore.fetchDrifts()
+            }
+        } message: {
+            Text("You have successfully left this Drift.")
+        }
     }
     
     // Custom Sub-Header Banner Context Chips

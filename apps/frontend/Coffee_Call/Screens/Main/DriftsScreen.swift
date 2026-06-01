@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct DriftsScreen: View {
     @StateObject private var viewModel: DriftsViewModel
@@ -6,6 +7,8 @@ struct DriftsScreen: View {
     @State private var showingNotifications = false
     @State private var navPath: [UUID] = []
     @EnvironmentObject private var driftStore: GlobalDriftStore
+    @State private var driftToJoin: Drift? = nil
+    @State private var showingJoinAlert = false
 
     init(viewModel: DriftsViewModel = DriftsViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -13,6 +16,32 @@ struct DriftsScreen: View {
 
     private var filteredDrifts: [Drift] {
         viewModel.filteredDrifts(from: driftStore.drifts)
+    }
+
+    private func handleJoinAttempt(for drift: Drift) {
+        let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+        if isFirebaseEnabled {
+            let currentUid = Auth.auth().currentUser?.uid ?? ""
+            let isJoined = !currentUid.isEmpty && drift.participantIds?.contains(currentUid) == true
+            if !drift.isMine && !isJoined {
+                driftToJoin = drift
+                showingJoinAlert = true
+            }
+            return
+        }
+
+        let userInitStr = (UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        guard !userInitStr.isEmpty else { return }
+
+        let isJoined = drift.participantInitials.contains {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == userInitStr
+        }
+        if !drift.isMine && !isJoined {
+            driftToJoin = drift
+            showingJoinAlert = true
+        }
     }
 
     var body: some View {
@@ -79,7 +108,7 @@ struct DriftsScreen: View {
                         if viewModel.selectedMode == .discover && viewModel.selectedTimeState == .all && viewModel.selectedCategory == nil && viewModel.searchQuery.isEmpty {
                             if let first = filteredDrifts.first {
                                 NavigationLink(value: first.id) {
-                                    DriftCard(drift: first, isFeatured: true, onJoin: {})
+                                    DriftCard(drift: first, isFeatured: true, onJoin: { handleJoinAttempt(for: first) })
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.horizontal, AppConstants.Layout.standardPadding)
@@ -95,7 +124,7 @@ struct DriftsScreen: View {
                         } else {
                             ForEach(remainingDrifts) { drift in
                                 NavigationLink(value: drift.id) {
-                                    DriftCard(drift: drift, isFeatured: false, onJoin: {})
+                                    DriftCard(drift: drift, isFeatured: false, onJoin: { handleJoinAttempt(for: drift) })
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.horizontal, AppConstants.Layout.standardPadding)
@@ -211,6 +240,20 @@ struct DriftsScreen: View {
                 driftStore.start()
             }
             .dismissKeyboardOnTap()
+            .alert("Join Drift?", isPresented: $showingJoinAlert) {
+                Button("Yes") {
+                    if let drift = driftToJoin {
+                        driftStore.requestToJoin(driftId: drift.id)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                if let drift = driftToJoin {
+                    Text("Are you sure you want to join '\(drift.title)'?")
+                } else {
+                    Text("Are you sure you want to join this Drift?")
+                }
+            }
         }
     }
 
@@ -284,7 +327,7 @@ struct DriftsScreen: View {
 
 	                ForEach(drifts) { drift in
 	                    NavigationLink(value: drift.id) {
-	                        DriftCard(drift: drift, isFeatured: false, onJoin: {})
+	                        DriftCard(drift: drift, isFeatured: false, onJoin: { handleJoinAttempt(for: drift) })
 	                    }
 	                    .buttonStyle(.plain)
 	                    .padding(.horizontal, AppConstants.Layout.standardPadding)
