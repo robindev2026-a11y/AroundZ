@@ -243,10 +243,17 @@ class DriftDetailViewModel: ObservableObject {
             "DriftDetailViewModel built JoinRequest",
             driftId: driftId,
             requestId: joinRequest.id,
-            details: "userId=\(currentUid), userName=\(currentUserName)"
+            details: "userId=\(currentUid), userName=\(currentUserName), joinMode=\(drift.joinMode)"
         )
 
-        driftsService.requestToJoin(driftId: driftId, request: joinRequest)
+        let joinPublisher: AnyPublisher<Void, Error>
+        if drift.joinMode == .open {
+            joinPublisher = driftsService.acceptJoinRequest(driftId: driftId, request: joinRequest)
+        } else {
+            joinPublisher = driftsService.requestToJoin(driftId: driftId, request: joinRequest)
+        }
+
+        joinPublisher
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completionResult in
                 if case .failure(let error) = completionResult {
@@ -266,13 +273,31 @@ class DriftDetailViewModel: ObservableObject {
                     requestId: joinRequest.id
                 )
                 withAnimation(.spring()) {
-                    if !self.drift.pendingRequests.contains(where: { $0.id == joinRequest.id }) {
-                        self.drift.pendingRequests.append(joinRequest)
+                    if self.drift.joinMode == .open {
+                        // Directly join the user locally for instant UI update
+                        if self.drift.participantIds?.contains(currentUid) != true {
+                            var ids = self.drift.participantIds ?? []
+                            ids.append(currentUid)
+                            self.drift.participantIds = Array(Set(ids))
+                        }
+                        if !self.drift.participantInitials.contains(currentUserInitials) {
+                            self.drift.participantInitials.append(currentUserInitials)
+                        }
+                        self.drift.peopleGoing += 1
+                        if let spots = self.drift.spotsLeft {
+                            self.drift.spotsLeft = max(spots - 1, 0)
+                        }
+                    } else {
+                        if !self.drift.pendingRequests.contains(where: { $0.id == joinRequest.id }) {
+                            self.drift.pendingRequests.append(joinRequest)
+                        }
+                        self.showingRequestSentConfirmation = true
                     }
                     self.refreshJoinStatus()
-                    self.showingRequestSentConfirmation = true
                 }
                 self.onDriftUpdated?(self.drift)
+                // Notify store to re-fetch/sync
+                NotificationCenter.default.post(name: NSNotification.Name("DriftStateChanged"), object: nil)
             })
             .store(in: &cancellables)
     }

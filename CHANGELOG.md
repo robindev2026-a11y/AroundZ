@@ -1,5 +1,13 @@
 # CHANGELOG - CoffeeCall
 
+## [2026-06-01] - AI Commit Tool Integration & Documentation Sync
+**What changed:**
+- Created standalone local AI Commit tool (`ai_commit.py`) in `/Users/robingeorge/Documents/Projects/AICommit/` and published it to GitHub.
+- Configured local environment rules in `CURRENT_STATE.md` instructing future agents to use the `ai_commit.py` script for structured Conventional Commit logs.
+- Resolved "Leave Drift" UI state synchronization bug by introducing dual-layer UI updating (instant store update + detail View lifecycle triggers).
+- Fixed direct join behavior for `.open` join mode drifts by routing to the immediate acceptance flow and syncing participants list for post and thread documents.
+- Deployed corrected Firestore security rules allowing participants to successfully write to message threads.
+
 ## [2026-06-01] - Documentation Consolidation
 **What changed:** 
 - Merged all unique content from `docs/` and `AGENTS.md` into `CURRENT_STATE.md` and `CHANGELOG.md`.

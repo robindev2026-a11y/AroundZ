@@ -44,6 +44,7 @@ CoffeeCall is a native SwiftUI iOS app (using Skip for Kotlin transpilation) bac
 - **Naming:** camelCase (variables), PascalCase (Classes), UPPER_SNAKE_CASE (constants).
 - **Navigation:** Floating glass bottom nav; avoid nested stacks.
 - **Validation:** User validates all builds; agents do NOT run `xcodebuild`.
+- **Commits:** Use the standalone local AI commit tool `/Users/robingeorge/Documents/Projects/AICommit/ai_commit.py` to draft, review, and push git commits for project changes. Do not commit manually if the tool is available.
 
 ## Open Issues (Screen Ledger)
 - **Around:** Issue-039 (Notification icon/data), Issue-040 (Notification sheet), Issue-041 (Location refresh).

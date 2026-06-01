@@ -120,6 +120,8 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         )
                     }
                     
+                    let joinModeStr = data["joinMode"] as? String ?? "open"
+                    let joinMode = JoinMode(rawValue: joinModeStr.lowercased()) ?? .open
                     let isMine = (creatorId == currentUid)
                     
                     return Drift(
@@ -147,7 +149,8 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                         pendingRequests: pendingRequests,
                         isMine: isMine,
                         latitude: latitude,
-                        longitude: longitude
+                        longitude: longitude,
+                        joinMode: joinMode
                     )
                 }
                 
@@ -195,6 +198,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             "participantInitials": drift.participantInitials,
             "participantIds": [currentUid],
             "imageUrl": drift.imageUrl ?? "",
+            "joinMode": drift.joinMode.rawValue,
             "createdAt": FieldValue.serverTimestamp()
         ]
         
@@ -347,18 +351,15 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
         let postId = driftId.uuidString
-        let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
         
         let postRef = db.collection("posts").document(postId)
         let threadRef = db.collection("messageThreads").document(postId)
         
         db.runTransaction({ (transaction, errorPointer) -> Any? in
             let postDocument: DocumentSnapshot
-            let threadDocument: DocumentSnapshot
 
             do {
                 try postDocument = transaction.getDocument(postRef)
-                try threadDocument = transaction.getDocument(threadRef)
             } catch let fetchError as NSError {
                 errorPointer?.pointee = fetchError
                 return nil
@@ -397,27 +398,6 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 "spotsLeft": newSpotsLeft
             ], forDocument: postRef)
             
-            if !request.userId.isEmpty {
-                if threadDocument.exists {
-                    transaction.updateData([
-                        "participants": FieldValue.arrayUnion([request.userId])
-                    ], forDocument: threadRef)
-                } else {
-                    // Create the thread if it somehow doesn't exist
-                    let participants = Array(Set([currentUid, request.userId].filter { !$0.isEmpty }))
-                    transaction.setData([
-                        "postId": postId,
-                        "participants": participants,
-                        "lastMessage": [
-                            "text": "Drift joined! Welcome to the chat room.",
-                            "timestamp": FieldValue.serverTimestamp(),
-                            "senderId": "system",
-                            "senderName": "System"
-                        ]
-                    ], forDocument: threadRef)
-                }
-            }
-            
             return nil
         }) { (object, error) in
             if let error = error {
@@ -429,13 +409,30 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 )
                 subject.send(completion: .failure(error))
             } else {
-                JoinRequestDebugTracer.trace(
-                    "FirebaseDriftsService.acceptJoinRequest succeeded",
-                    driftId: driftId,
-                    requestId: request.id
-                )
-                subject.send(())
-                subject.send(completion: .finished)
+                if !request.userId.isEmpty {
+                    threadRef.updateData([
+                        "participants": FieldValue.arrayUnion([request.userId])
+                    ]) { threadError in
+                        if let threadError = threadError {
+                            print("Warning: Failed to update message thread participants: \(threadError.localizedDescription)")
+                        }
+                        JoinRequestDebugTracer.trace(
+                            "FirebaseDriftsService.acceptJoinRequest succeeded",
+                            driftId: driftId,
+                            requestId: request.id
+                        )
+                        subject.send(())
+                        subject.send(completion: .finished)
+                    }
+                } else {
+                    JoinRequestDebugTracer.trace(
+                        "FirebaseDriftsService.acceptJoinRequest succeeded (no userId)",
+                        driftId: driftId,
+                        requestId: request.id
+                    )
+                    subject.send(())
+                    subject.send(completion: .finished)
+                }
             }
         }
         
@@ -557,6 +554,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             "whatToBring": drift.whatToBring,
             "participantInitials": drift.participantInitials,
             "imageUrl": drift.imageUrl ?? "",
+            "joinMode": drift.joinMode.rawValue,
             "latitude": drift.latitude as Any,
             "longitude": drift.longitude as Any
         ]
