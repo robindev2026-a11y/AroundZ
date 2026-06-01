@@ -4,6 +4,7 @@
 **What changed:**
 - Created standalone local AI Commit tool (`ai_commit.py`) in `/Users/robingeorge/Documents/Projects/AICommit/` and published it to GitHub.
 - Configured local environment rules in `CURRENT_STATE.md` instructing future agents to use the `ai_commit.py` script for structured Conventional Commit logs.
+- Optimized main discovery feed query by replacing the active Firestore snapshot listener with a one-off fetch (`getDocuments`), triggered on-demand via pull-to-refresh or navigation actions to control database billing.
 - Resolved "Leave Drift" UI state synchronization bug by introducing dual-layer UI updating (instant store update + detail View lifecycle triggers).
 - Fixed direct join behavior for `.open` join mode drifts by routing to the immediate acceptance flow and syncing participants list for post and thread documents.
 - Deployed corrected Firestore security rules allowing participants to successfully write to message threads.

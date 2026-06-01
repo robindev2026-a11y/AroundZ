@@ -22,10 +22,10 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         
         db.collection("posts")
             .order(by: "createdAt", descending: true)
-            .addSnapshotListener { querySnapshot, error in
+            .getDocuments { querySnapshot, error in
                 if let error = error {
                     JoinRequestDebugTracer.trace(
-                        "FirebaseDriftsService.fetchDrifts snapshot failed",
+                        "FirebaseDriftsService.fetchDrifts get failed",
                         details: "error=\(error.localizedDescription)"
                     )
                     subject.send(completion: .failure(error))
@@ -34,6 +34,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 
                 guard let documents = querySnapshot?.documents else {
                     subject.send([])
+                    subject.send(completion: .finished)
                     return
                 }
                 
@@ -100,12 +101,12 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                     let pendingRequestsData = data["pendingRequests"] as? [[String: Any]] ?? []
                     let pendingRequests = pendingRequestsData.compactMap { reqDict -> JoinRequest? in
                         guard let idStr = reqDict["id"] as? String,
-                              let id = UUID(uuidString: idStr),
-                              let userName = reqDict["userName"] as? String,
-                              let userInitials = reqDict["userInitials"] as? String,
-                              let userRole = reqDict["userRole"] as? String,
-                              let message = reqDict["message"] as? String,
-                              let timestamp = reqDict["timestamp"] as? String else {
+                               let id = UUID(uuidString: idStr),
+                               let userName = reqDict["userName"] as? String,
+                               let userInitials = reqDict["userInitials"] as? String,
+                               let userRole = reqDict["userRole"] as? String,
+                               let message = reqDict["message"] as? String,
+                               let timestamp = reqDict["timestamp"] as? String else {
                             return nil
                         }
                         let userId = reqDict["userId"] as? String ?? ""
@@ -155,8 +156,9 @@ class FirebaseDriftsService: DriftsServiceProtocol {
                 }
                 
                 subject.send(drifts)
+                subject.send(completion: .finished)
                 JoinRequestDebugTracer.trace(
-                    "FirebaseDriftsService.fetchDrifts snapshot sent",
+                    "FirebaseDriftsService.fetchDrifts fetch completed",
                     details: "drifts=\(drifts.count), pendingRequests=\(drifts.reduce(0) { $0 + $1.pendingRequests.count })"
                 )
             }
