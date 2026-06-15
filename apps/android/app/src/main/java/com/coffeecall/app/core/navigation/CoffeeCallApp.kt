@@ -99,7 +99,9 @@ fun CoffeeCallApp() {
             onPhoneChanged = authViewModel::updatePhoneNumber,
             onCodeChanged = authViewModel::updateOtpCode,
             onSendOtp = authViewModel::sendOtp,
-            onVerifyOtp = authViewModel::verifyOtp
+            onVerifyOtp = authViewModel::verifyOtp,
+            onBackFromOtp = authViewModel::resetVerificationState,
+            onBackToOnboarding = authViewModel::backToOnboarding
         )
         AuthRoute.ProfileSetup -> ProfileSetupScreen(
             uiState = uiState,

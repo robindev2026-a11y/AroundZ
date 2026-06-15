@@ -52,6 +52,10 @@ class AuthViewModel(
         _uiState.update { it.copy(route = AuthRoute.Auth, errorMessage = null) }
     }
 
+    fun backToOnboarding() {
+        _uiState.update { it.copy(route = AuthRoute.Onboarding, errorMessage = null) }
+    }
+
     fun sendOtp(activity: Activity) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -142,6 +146,16 @@ class AuthViewModel(
                     )
                 }
             }
+        }
+    }
+
+    fun resetVerificationState() {
+        _uiState.update {
+            it.copy(
+                verificationSent = false,
+                otpCode = "",
+                errorMessage = null
+            )
         }
     }
 
