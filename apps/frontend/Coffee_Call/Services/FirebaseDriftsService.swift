@@ -13,9 +13,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     
     func fetchDrifts() -> AnyPublisher<[Drift], Error> {
         JoinRequestDebugTracer.trace("FirebaseDriftsService.fetchDrifts called")
-        guard isFirebaseEnabled else {
-            return MockDriftsService().fetchDrifts()
-        }
+        guard isFirebaseEnabled else { return Just([]).setFailureType(to: Error.self).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<[Drift], Error>()
         let db = Firestore.firestore()
@@ -167,9 +165,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
     
     func createDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
-        guard isFirebaseEnabled else {
-            return MockDriftsService().createDrift(drift)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -246,9 +242,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             requestId: request.id,
             details: "userId=\(request.userId)"
         )
-        guard isFirebaseEnabled else {
-            return MockDriftsService().requestToJoin(driftId: driftId, request: request)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -286,9 +280,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             driftId: driftId,
             details: "userId=\(userId)"
         )
-        guard isFirebaseEnabled else {
-            return MockDriftsService().cancelJoinRequest(driftId: driftId, userId: userId)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
 
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -346,9 +338,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             driftId: driftId,
             requestId: request.id
         )
-        guard isFirebaseEnabled else {
-            return MockDriftsService().acceptJoinRequest(driftId: driftId, request: request)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -447,9 +437,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
             driftId: driftId,
             requestId: requestId
         )
-        guard isFirebaseEnabled else {
-            return MockDriftsService().rejectJoinRequest(driftId: driftId, requestId: requestId)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -508,9 +496,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
     
     func updateDriftStatus(driftId: UUID, status: DriftStatus) -> AnyPublisher<Void, Error> {
-        guard isFirebaseEnabled else {
-            return MockDriftsService().updateDriftStatus(driftId: driftId, status: status)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -533,9 +519,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     
     // MARK: - Update Drift (full fields)
     func updateDrift(_ drift: Drift) -> AnyPublisher<Void, Error> {
-        guard isFirebaseEnabled else {
-            return MockDriftsService().updateDrift(drift)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
         let postRef = db.collection("posts").document(drift.id.uuidString)
@@ -575,9 +559,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     
     // MARK: - Delete Drift
     func deleteDrift(driftId: UUID) -> AnyPublisher<Void, Error> {
-        guard isFirebaseEnabled else {
-            return MockDriftsService().deleteDrift(driftId: driftId)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
         let postRef = db.collection("posts").document(driftId.uuidString)
@@ -597,9 +579,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
 
     func leaveDrift(driftId: UUID, userId: String) -> AnyPublisher<Void, Error> {
-        guard isFirebaseEnabled else {
-            return MockDriftsService().leaveDrift(driftId: driftId, userId: userId)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()
@@ -609,7 +589,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
         let threadRef = db.collection("messageThreads").document(postId)
         
         let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
-        let userInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? AppConstants.MockData.userInitials : savedInitials
+        let userInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "U" : savedInitials
         
         print("[LeaveDrift] Starting Resilient Cleanup for postId: \(postId), userId: \(userId)")
         
@@ -684,9 +664,7 @@ class FirebaseDriftsService: DriftsServiceProtocol {
     }
 
     func reportDrift(driftId: UUID, reason: String) -> AnyPublisher<Void, Error> {
-        guard isFirebaseEnabled else {
-            return MockDriftsService().reportDrift(driftId: driftId, reason: reason)
-        }
+        guard isFirebaseEnabled else { return Fail(error: NSError(domain: "Firebase", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase not enabled"])).eraseToAnyPublisher() }
         
         let subject = PassthroughSubject<Void, Error>()
         let db = Firestore.firestore()

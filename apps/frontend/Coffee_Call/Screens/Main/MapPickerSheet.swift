@@ -8,7 +8,7 @@ struct MapPickerSheet: View {
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
     )
     @State private var searchQuery = ""
-    @State private var searchResults: [MKMapItem] = []
+    @State private var searchResults: [PlacePrediction] = []
     @State private var selectedAddress = "Resolving location..."
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var isSearching = false
@@ -35,11 +35,14 @@ struct MapPickerSheet: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.textSecondary)
                         
-                        TextField("Search location...", text: $searchQuery, onCommit: executeSearch)
+                        TextField("Search location...", text: $searchQuery)
                             .font(.bodyStandard)
                             .foregroundColor(.textPrimary)
                             .tint(.brandPrimary)
                             .submitLabel(.search)
+                            .onChange(of: searchQuery) { newValue in
+                                executeSearch()
+                            }
                         
                         if !searchQuery.isEmpty {
                             Button(action: {
@@ -63,17 +66,19 @@ struct MapPickerSheet: View {
                     if !searchResults.isEmpty {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 0) {
-                                ForEach(searchResults, id: \.self) { item in
+                                ForEach(searchResults, id: \.id) { item in
                                     Button(action: {
                                         selectSearchItem(item)
                                     }) {
                                         VStack(alignment: .leading, spacing: 4) {
-                                            Text(item.name ?? "Unknown place")
+                                            Text(item.mainText)
                                                 .font(.bodyBold)
                                                 .foregroundColor(.textPrimary)
-                                            Text(item.placemark.title ?? "")
-                                                .font(.captionText)
-                                                .foregroundColor(.textSecondary)
+                                            if !item.secondaryText.isEmpty {
+                                                Text(item.secondaryText)
+                                                    .font(.captionText)
+                                                    .foregroundColor(.textSecondary)
+                                            }
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.horizontal, 16)
@@ -148,30 +153,27 @@ struct MapPickerSheet: View {
     }
     
     private func executeSearch() {
-        guard !searchQuery.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = searchQuery
-        request.region = region
-        
-        let search = MKLocalSearch(request: request)
-        search.start { response, error in
-            guard let response = response, error == nil else { return }
-            DispatchQueue.main.async {
-                self.searchResults = response.mapItems
-            }
+        GooglePlacesService.shared.fetchAutocompletePredictions(query: searchQuery, coordinate: selectedCoordinate) { predictions in
+            self.searchResults = predictions
         }
     }
     
-    private func selectSearchItem(_ item: MKMapItem) {
+    private func selectSearchItem(_ item: PlacePrediction) {
         searchResults.removeAll()
         searchQuery = ""
         
-        withAnimation {
-            region = MKCoordinateRegion(
-                center: item.placemark.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-            )
+        GooglePlacesService.shared.fetchPlaceDetails(placeId: item.id) { coordinate, name in
+            if let coordinate = coordinate {
+                withAnimation {
+                    region = MKCoordinateRegion(
+                        center: coordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                    )
+                }
+                if let name = name {
+                    self.selectedAddress = name
+                }
+            }
         }
     }
     

@@ -15,15 +15,7 @@ protocol DriftChatThreadServiceProtocol {
     func loadThread(for drift: Drift) -> DriftChatThreadContext
 }
 
-struct MockDriftChatThreadService: DriftChatThreadServiceProtocol {
-    func loadThread(for drift: Drift) -> DriftChatThreadContext {
-        DriftChatThreadContext(
-            systemMessages: AppConstants.MockData.chatSystemMessages,
-            messages: AppConstants.MockData.chatHistoryMessages,
-            participants: AppConstants.MockData.chatParticipants
-        )
-    }
-}
+
 
 class DriftChatViewModel: ObservableObject {
     @Published var drift: Drift
@@ -48,19 +40,9 @@ class DriftChatViewModel: ObservableObject {
         driftsService: DriftsServiceProtocol? = nil
     ) {
         self.drift = drift
-        if let threadService = threadService {
-            self.threadService = threadService
-        } else {
-            let isFirebase = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.threadService = isFirebase ? FirebaseChatService() : MockDriftChatThreadService()
-        }
-        
-        if let driftsService = driftsService {
-            self.driftsService = driftsService
-        } else {
-            let isFirebase = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.driftsService = isFirebase ? FirebaseDriftsService() : MockDriftsService()
-        }
+        self.drift = drift
+        self.threadService = threadService ?? FirebaseChatService()
+        self.driftsService = driftsService ?? FirebaseDriftsService()
         loadThread()
     }
     
@@ -309,7 +291,7 @@ class DriftChatViewModel: ObservableObject {
                 guard let self = self else { return }
                 print("[LeaveDrift] Service call succeeded from Chat. Updating local state and posting notification.")
                 
-                let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials
+                let userInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? "U"
                 self.drift.participantInitials.removeAll { 
                     $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == 
                     userInitials.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()

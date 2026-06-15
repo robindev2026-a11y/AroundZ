@@ -1,0 +1,168 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* CoffeeCall Design System - Social Refresh */
+
+  /* Colors */
+  --color-brand-mint: #53B8A6;
+  --color-brand-mint-pressed: #3D8D7A;
+  --color-brand-lavender: #8E7DBE;
+  --color-brand-peach: #E88C6B;
+  
+  --color-bg-primary: #F6F1EB;
+  --color-surface-card: #FFFDF9;
+  --color-surface-secondary: #F4F4F8;
+  
+  --color-text-primary: #243447;
+  --color-text-secondary: #5F6368;
+  --color-border-subtle: #E7DED4;
+
+  /* Typography */
+  --font-size: 16px;
+  --font-family-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --font-size-h1: 32px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+  --font-size-body1: 16px;
+  --font-size-body2: 14px;
+  --font-size-caption: 12px;
+
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  --line-height-h1: 1.2;
+  --line-height-h2: 1.3;
+  --line-height-body1: 1.5;
+  --line-height-body2: 1.5;
+
+  /* Spacing */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-circle: 50%;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 12px rgba(36, 52, 71, 0.04);
+  --shadow-card: 0 8px 24px rgba(36, 52, 71, 0.06);
+  --shadow-modal: 0 20px 48px rgba(36, 52, 71, 0.12);
+
+  /* Tailwind compatibility Mapping */
+  --background: var(--color-bg-primary);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-surface-card);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-surface-card);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-brand-mint);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-surface-secondary);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-surface-secondary);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-brand-lavender);
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: var(--color-border-subtle);
+  --input: var(--color-bg-primary);
+  --ring: var(--color-brand-mint);
+  --radius: 1.5rem;
+}
+
+@theme inline {
+  --color-brand-mint: var(--color-brand-mint);
+  --color-brand-mint-pressed: var(--color-brand-mint-pressed);
+  --color-brand-lavender: var(--color-brand-lavender);
+  --color-brand-peach: var(--color-brand-peach);
+  
+  --color-bg-primary: var(--color-bg-primary);
+  --color-surface-card: var(--color-surface-card);
+  --color-surface-secondary: var(--color-surface-secondary);
+  
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-border-subtle: var(--color-border-subtle);
+
+  /* Tailwind Compatibility */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Shadows */
+  --shadow-soft: var(--shadow-soft);
+  --shadow-card: var(--shadow-card);
+  --shadow-modal: var(--shadow-modal);
+
+  /* Radius Overrides for Tailwind Classes */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+    color: var(--color-text-primary);
+  }
+
+  h1 {
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+  }
+
+  h2 {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+  }
+
+  h3 {
+    font-size: var(--font-size-h3);
+  }
+
+  p {
+    line-height: var(--line-height-body1);
+  }
+
+  button {
+    @apply cursor-pointer transition-all duration-200;
+  }
+}

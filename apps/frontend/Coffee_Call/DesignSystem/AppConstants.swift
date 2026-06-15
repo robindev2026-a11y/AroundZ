@@ -175,6 +175,10 @@ enum AppConstants {
     }
     
     enum UI {
+        // Figma "Social Refresh" uses very large radii (24–40px). These are the
+        // tasteful native equivalents shared across the redesigned components.
+        static let cornerRadiusXXLarge: CGFloat = 32 // Immersive cards / hero surfaces
+        static let cornerRadiusXLarge: CGFloat = 28 // Standard photo cards
         static let cornerRadiusLarge: CGFloat = 24
         static let cornerRadiusMedium: CGFloat = 20
         static let cornerRadiusSmall: CGFloat = 12
@@ -190,36 +194,4 @@ enum AppConstants {
         static let opacitySubtle: CGFloat = 0.05
     }
     
-    enum MockData {
-        static let radarDistances: [Double] = [0.35, 0.45, 0.65, 0.75, 0.25, 0.55]
-        static let radarAngles: [Double] = [160, 30, 120, 210, 280, 330]
-        static let radarInitials: [String] = ["DK", "MR", "LM", "NP", "TH", "AL"]
-        static let userInitials = "AR"
-        static let userName = "Arjun R."
-        static let userBio = "Usually up for walks, coffee, and casual food plans."
-        
-        static let chatParticipants: [ParticipantInfo] = [
-            ParticipantInfo(initials: "M", name: "Mira", color: .brandPrimary, isHost: true, isMe: false),
-            ParticipantInfo(initials: "R", name: "Rahul", color: .brandPurple, isHost: false, isMe: false),
-            ParticipantInfo(initials: "A", name: "Aditi", color: .brandSecondary, isHost: false, isMe: false),
-            ParticipantInfo(initials: "N", name: "Neel", color: .blue, isHost: false, isMe: false),
-            ParticipantInfo(initials: "Y", name: "You", color: .brandPrimary, isHost: false, isMe: true)
-        ]
-        
-        static var chatSystemMessages: [SystemMessage] {
-            [
-                SystemMessage(content: "Arjun (Host) created this Drift", icon: AppIcons.person, timestamp: Date().addingTimeInterval(-3600)),
-                SystemMessage(content: "Maya joined the Drift", icon: AppIcons.verified, timestamp: Date().addingTimeInterval(-3000)),
-                SystemMessage(content: "Drift starts in 30 mins", icon: AppIcons.clockFill, timestamp: Date().addingTimeInterval(-2400))
-            ]
-        }
-        
-        static var chatHistoryMessages: [ChatMessage] {
-            [
-                ChatMessage(senderId: "host_1", senderName: "Arjun (Host)", senderInitials: "AR", content: "Hi everyone! Looking forward to a relaxing evening walk. See you there! 🌿", timestamp: Date().addingTimeInterval(-1800), isSelf: false),
-                ChatMessage(senderId: "user_2", senderName: "Sneha R.", senderInitials: "SR", content: "Excited to join! I'll be there.", timestamp: Date().addingTimeInterval(-1500), isSelf: false),
-                ChatMessage(senderId: "user_3", senderName: "Karthik M.", senderInitials: "KM", content: "I might be a few minutes late. See you soon!", timestamp: Date().addingTimeInterval(-1200), isSelf: true)
-            ]
-        }
-    }
 }

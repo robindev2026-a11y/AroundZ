@@ -30,7 +30,7 @@ struct DriftsScreen: View {
             return
         }
 
-        let userInitStr = (UserDefaults.standard.string(forKey: "profile_initials") ?? AppConstants.MockData.userInitials)
+        let userInitStr = (UserDefaults.standard.string(forKey: "profile_initials") ?? "U")
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .uppercased()
         guard !userInitStr.isEmpty else { return }
@@ -650,6 +650,6 @@ struct FilterCategoryItem: Identifiable {
 struct DriftsScreen_Previews: PreviewProvider {
     static var previews: some View {
         DriftsScreen()
-            .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
+            .environmentObject(GlobalDriftStore(driftsService: PreviewDriftsService()))
     }
 }

@@ -42,7 +42,7 @@ class AuthViewModel: ObservableObject {
             }
 
             // Clear mock profile keys if present under Firebase mode
-            if UserDefaults.standard.string(forKey: "profile_name") == AppConstants.MockData.userName {
+            if UserDefaults.standard.string(forKey: "profile_name") == "User" {
                 UserDefaults.standard.removeObject(forKey: "profile_name")
                 UserDefaults.standard.removeObject(forKey: "profile_bio")
                 UserDefaults.standard.removeObject(forKey: "profile_initials")

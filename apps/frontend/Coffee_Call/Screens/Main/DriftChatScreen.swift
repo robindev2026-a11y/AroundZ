@@ -1,9 +1,19 @@
 import SwiftUI
+import CoreLocation
 
 struct DriftChatScreen: View {
     @StateObject var viewModel: DriftChatViewModel
-    @StateObject private var navManager = NavigationManager.shared
+    @ObservedObject private var navManager = NavigationManager.shared
     @Environment(\.dismiss) var dismiss
+    
+    init(drift: Drift) {
+        self._viewModel = StateObject(wrappedValue: DriftChatViewModel(drift: drift))
+    }
+    
+    // Fallback init for existing code that passes a viewmodel directly
+    init(viewModel: DriftChatViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
     @State private var showInfoSheet = false
     @EnvironmentObject private var driftStore: GlobalDriftStore
     @State private var showLeaveSuccessAlert = false
@@ -145,7 +155,21 @@ struct DriftChatScreen: View {
                 showImagePicker = true
             }
             Button("Share Current Location") {
-                viewModel.sendLocationMessage(locationName: "Indiranagar, Bengaluru")
+                if let location = LocationService.shared.currentLocation {
+                    let geocoder = CLGeocoder()
+                    geocoder.reverseGeocodeLocation(location) { placemarks, error in
+                        if let placemark = placemarks?.first {
+                            let locality = placemark.locality ?? placemark.subLocality ?? placemark.name ?? "Current Location"
+                            let subAdmin = placemark.subAdministrativeArea ?? placemark.administrativeArea ?? ""
+                            let name = subAdmin.isEmpty ? locality : "\(locality), \(subAdmin)"
+                            viewModel.sendLocationMessage(locationName: name)
+                        } else {
+                            viewModel.sendLocationMessage(locationName: "Current Location")
+                        }
+                    }
+                } else {
+                    viewModel.sendLocationMessage(locationName: "Unknown Location")
+                }
             }
             Button("Cancel", role: .cancel) {}
         }
@@ -910,32 +934,25 @@ struct DriftChatDetailSheet: View {
 
 struct DriftChatScreen_Previews: PreviewProvider {
     static var previews: some View {
-        let mockHost = Host(name: "Arjun", role: "Hosting", imageUrl: nil, isVerified: true)
         let mockDrift = Drift(
             title: "Coffee Drift",
-            description: "Spontaneous coffee meetup.",
-            location: "Indiranagar",
-            meetingPoint: "Main Entrance",
+            description: "Spontaneous coffee meetup at a nice local cafe.",
+            location: "Panampilly Nagar, Kochi",
+            meetingPoint: "Near the Main Entrance",
             time: "6:30 PM",
             endTime: "7:30 PM",
             date: "Today",
             distance: 1.2,
             status: .open,
             category: .coffee,
-            hook: nil,
-            host: mockHost,
+            host: Host(name: "Arjun", role: "Hosting", imageUrl: nil, isVerified: true),
             peopleGoing: 3,
-            spotsLeft: 2,
-            capacity: 5,
-            vibeTags: ["Casual"],
-            whatToBring: ["Good mood"],
-            notes: nil,
-            participantInitials: ["AL", "RI", "MA"],
-            imageUrl: "drift_coffee"
+            capacity: 5
         )
         
         return NavigationStack {
-            DriftChatScreen(viewModel: DriftChatViewModel(drift: mockDrift))
+            DriftChatScreen(drift: mockDrift)
+                .environmentObject(GlobalDriftStore(driftsService: PreviewDriftsService()))
         }
     }
 }

@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import UIKit
 import FirebaseAuth
+import CoreData
 
 @MainActor
 final class GlobalDriftStore: ObservableObject {
@@ -46,8 +47,6 @@ final class GlobalDriftStore: ObservableObject {
     private var localDrifts: [Drift] = []
     private let prefersRemoteDrifts: Bool
 
-    // Backwards-compatible with `CreatedDriftStore` so existing caches keep working.
-    private let storageKey = "created_drifts"
 
     init(
         driftsService: DriftsServiceProtocol? = nil,
@@ -60,7 +59,7 @@ final class GlobalDriftStore: ObservableObject {
         if let driftsService {
             self.driftsService = driftsService
         } else {
-            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : FirebaseDriftsService()
         }
 
         loadLocalDrifts()
@@ -123,14 +122,53 @@ final class GlobalDriftStore: ObservableObject {
         }
 
         mergeDrifts()
-        persistLocalDrifts()
+        
+        let context = PersistenceController.shared.container.viewContext
+        let fetchRequest: NSFetchRequest<CachedDrift> = CachedDrift.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", drift.id as CVarArg)
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            let cached: CachedDrift
+            if let existing = results.first {
+                cached = existing
+            } else {
+                cached = CachedDrift(context: context)
+                cached.id = drift.id
+                cached.isBookmarked = NSNumber(value: false)
+            }
+            cached.isLocalOnly = NSNumber(value: true)
+            if let data = try? JSONEncoder().encode(drift) {
+                cached.driftData = data
+            }
+            try context.save()
+        } catch {
+            print("Error saving local drift to Core Data: \(error)")
+        }
     }
 
     func remove(_ id: UUID) {
         localDrifts.removeAll { $0.id == id }
         baseDrifts.removeAll { $0.id == id }
         mergeDrifts()
-        persistLocalDrifts()
+        
+        let context = PersistenceController.shared.container.viewContext
+        let fetchRequest: NSFetchRequest<CachedDrift> = CachedDrift.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let cached = results.first {
+                if cached.isBookmarked?.boolValue == true {
+                    cached.isLocalOnly = NSNumber(value: false)
+                } else {
+                    context.delete(cached)
+                }
+                try context.save()
+            }
+        } catch {
+            print("Error removing local drift from Core Data: \(error)")
+        }
     }
 
     func updateDriftInStore(_ drift: Drift) {
@@ -139,7 +177,20 @@ final class GlobalDriftStore: ObservableObject {
         }
         if let index = localDrifts.firstIndex(where: { $0.id == drift.id }) {
             localDrifts[index] = drift
-            persistLocalDrifts()
+            
+            let context = PersistenceController.shared.container.viewContext
+            let fetchRequest: NSFetchRequest<CachedDrift> = CachedDrift.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %@", drift.id as CVarArg)
+            
+            do {
+                let results = try context.fetch(fetchRequest)
+                if let cached = results.first {
+                    cached.driftData = try? JSONEncoder().encode(drift)
+                    try context.save()
+                }
+            } catch {
+                print("Error updating drift in Core Data: \(error)")
+            }
         }
         mergeDrifts()
     }
@@ -187,34 +238,33 @@ final class GlobalDriftStore: ObservableObject {
     }
 
     private func loadLocalDrifts() {
-        guard let data = UserDefaults.standard.data(forKey: storageKey) else {
-            localDrifts = []
-            return
-        }
-
+        let context = PersistenceController.shared.container.viewContext
+        let fetchRequest: NSFetchRequest<CachedDrift> = CachedDrift.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isLocalOnly == %@", NSNumber(value: true))
+        
         do {
-            localDrifts = try JSONDecoder().decode([Drift].self, from: data)
+            let cached = try context.fetch(fetchRequest)
+            let decoder = JSONDecoder()
+            self.localDrifts = cached.compactMap { cachedDrift in
+                guard let data = cachedDrift.driftData else { return nil }
+                return try? decoder.decode(Drift.self, from: data)
+            }
         } catch {
-            print("Error decoding local drifts: \(error)")
-            localDrifts = []
+            print("Error loading local drifts: \(error)")
+            self.localDrifts = []
         }
     }
 
     private func persistLocalDrifts() {
-        do {
-            let encoded = try JSONEncoder().encode(localDrifts)
-            UserDefaults.standard.set(encoded, forKey: storageKey)
-        } catch {
-            print("Error encoding local drifts: \(error)")
-        }
+        // Handled inline in modifying functions
     }
 
     func requestToJoin(driftId: UUID) {
         let currentUid = Auth.auth().currentUser?.uid ?? UIDevice.current.identifierForVendor?.uuidString ?? ""
-        let currentUserName = UserDefaults.standard.string(forKey: "profile_name") ?? AppConstants.MockData.userName
+        let currentUserName = UserDefaults.standard.string(forKey: "profile_name") ?? "User"
         let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
         let currentUserInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            ? AppConstants.MockData.userInitials
+            ? "U"
             : savedInitials
         let formatter = DateFormatter()
         formatter.timeStyle = .short

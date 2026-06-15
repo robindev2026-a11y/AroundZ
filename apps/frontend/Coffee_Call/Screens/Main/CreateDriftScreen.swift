@@ -812,9 +812,9 @@ private struct ApproximateLocationCard: View {
                         .foregroundColor(.brandPrimary)
                 }
 
-                Text(location)
+                Text(location.isEmpty ? "Select Location" : location)
                     .font(.bodyBold)
-                    .foregroundColor(.textPrimary)
+                    .foregroundColor(location.isEmpty ? .textSecondary : .textPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
 
@@ -1208,6 +1208,6 @@ struct CreateDriftSheet_Previews: PreviewProvider {
     static var previews: some View {
         CreateDriftSheet()
             .presentationDetents([.large])
-            .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
+            .environmentObject(GlobalDriftStore(driftsService: PreviewDriftsService()))
     }
 }

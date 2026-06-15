@@ -139,7 +139,7 @@ class ProfileViewModel: ObservableObject {
         let isFirebase = isFirebaseEnabled
         
         if isFirebase {
-            if UserDefaults.standard.string(forKey: "profile_name") == AppConstants.MockData.userName {
+            if UserDefaults.standard.string(forKey: "profile_name") == "User" {
                 UserDefaults.standard.removeObject(forKey: "profile_name")
                 UserDefaults.standard.removeObject(forKey: "profile_bio")
                 UserDefaults.standard.removeObject(forKey: "profile_initials")
@@ -155,17 +155,17 @@ class ProfileViewModel: ObservableObject {
         if let savedName = UserDefaults.standard.string(forKey: "profile_name") {
             self.name = savedName
         } else {
-            self.name = isFirebase ? "" : AppConstants.MockData.userName
+            self.name = isFirebase ? "" : "User"
         }
         if let savedBio = UserDefaults.standard.string(forKey: "profile_bio") {
             self.bio = savedBio
         } else {
-            self.bio = isFirebase ? "" : AppConstants.MockData.userBio
+            self.bio = isFirebase ? "" : "No bio"
         }
         if let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") {
             self.initials = savedInitials
         } else {
-            self.initials = isFirebase ? "U" : AppConstants.MockData.userInitials
+            self.initials = isFirebase ? "U" : "U"
         }
         if let savedLocation = UserDefaults.standard.string(forKey: "profile_location") {
             self.location = savedLocation
@@ -570,9 +570,9 @@ class ProfileViewModel: ObservableObject {
             self.pastDriftsCount = 0
             self.historyDrifts = []
         } else {
-            self.name = AppConstants.MockData.userName
-            self.bio = AppConstants.MockData.userBio
-            self.initials = AppConstants.MockData.userInitials
+            self.name = "User"
+            self.bio = "No bio"
+            self.initials = "U"
             self.location = "Bengaluru, India"
             self.driftsJoined = 24
             self.driftsHosted = 8

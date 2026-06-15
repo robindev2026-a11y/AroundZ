@@ -22,7 +22,7 @@ final class CreateDriftViewModel: ObservableObject {
     @Published var selectedCapacityCount: Int = 3
     @Published var isOpenToAllCapacity: Bool = false
     @Published var selectedJoinMode: JoinMode = .open
-    @Published var approximateLocation: String = AppStrings.Create.sampleLocation
+    @Published var approximateLocation: String = ""
     @Published var selectedLatitude: Double? = nil
     @Published var selectedLongitude: Double? = nil
     // Alias for capacity used in drift model
@@ -47,7 +47,7 @@ final class CreateDriftViewModel: ObservableObject {
             self.driftsService = driftsService
         } else {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : FirebaseDriftsService()
         }
         let now = Date()
         initialScheduledDate = now
@@ -59,7 +59,7 @@ final class CreateDriftViewModel: ObservableObject {
             self.driftsService = driftsService
         } else {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : FirebaseDriftsService()
         }
 
         let seededDate = Self.parseScheduledDate(date: drift.date, time: drift.time) ?? Date()
@@ -101,6 +101,9 @@ final class CreateDriftViewModel: ObservableObject {
         !planTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         && selectedVibe != nil
         && (selectedActivity != .custom || !customActivityText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        && !approximateLocation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        && selectedLatitude != nil
+        && selectedLongitude != nil
         && !isCreating
     }
 
@@ -196,8 +199,8 @@ final class CreateDriftViewModel: ObservableObject {
         
         let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
         
-        let creatorName = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_name") ?? "") : AppConstants.MockData.userName
-        let creatorInitials = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_initials") ?? "") : AppConstants.MockData.userInitials
+        let creatorName = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_name") ?? "") : "User"
+        let creatorInitials = isFirebaseEnabled ? (UserDefaults.standard.string(forKey: "profile_initials") ?? "") : "U"
         let creatorUid = isFirebaseEnabled ? (Auth.auth().currentUser?.uid ?? "") : ""
         let normalizedCreatorInitials = creatorInitials.trimmingCharacters(in: .whitespacesAndNewlines)
         

@@ -100,6 +100,6 @@ struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
         MainTabView()
             .environmentObject(AuthViewModel())
-            .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
+            .environmentObject(GlobalDriftStore(driftsService: PreviewDriftsService()))
     }
 }

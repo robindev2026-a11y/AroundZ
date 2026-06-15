@@ -314,7 +314,7 @@ struct ManageDriftScreen: View {
     
     // MARK: - Open Chat Button
     private var openChatButton: some View {
-        NavigationLink(destination: LazyView(DriftChatScreen(viewModel: DriftChatViewModel(drift: viewModel.drift)))) {
+        NavigationLink(destination: LazyView(DriftChatScreen(drift: viewModel.drift))) {
             HStack(spacing: AppConstants.Layout.elementSpacing) {
                 ZStack {
                     Circle()
@@ -470,6 +470,6 @@ struct ManageDriftScreen_Previews: PreviewProvider {
                 isMine: true
             )))
         }
-        .environmentObject(GlobalDriftStore(driftsService: MockDriftsService()))
+        .environmentObject(GlobalDriftStore(driftsService: PreviewDriftsService()))
     }
 }

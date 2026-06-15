@@ -20,7 +20,7 @@ class ManageDriftViewModel: ObservableObject {
             self.driftsService = driftsService
         } else {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : FirebaseDriftsService()
         }
         
         // Populate sample pending requests for non‑Firebase debug builds

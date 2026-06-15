@@ -3,7 +3,14 @@
     <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
     </entity>
+    <entity name="CachedDrift" representedClassName="CachedDrift" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="driftData" optional="YES" attributeType="Binary" usesScalarValueType="NO"/>
+        <attribute name="isBookmarked" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
+        <attribute name="isLocalOnly" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
+    </entity>
     <elements>
         <element name="Item" positionX="-63" positionY="-18" width="128" height="44"/>
+        <element name="CachedDrift" positionX="80" positionY="-18" width="128" height="44"/>
     </elements>
 </model>

@@ -26,7 +26,7 @@ class DriftDetailViewModel: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
-    enum JoinStatus {
+    enum JoinStatus: Equatable {
         case notJoined
         case requested
         case joined
@@ -45,7 +45,7 @@ class DriftDetailViewModel: ObservableObject {
             self.driftsService = driftsService
         } else {
             let isFirebaseEnabled = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
-            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : MockDriftsService()
+            self.driftsService = isFirebaseEnabled ? FirebaseDriftsService() : FirebaseDriftsService()
         }
         // Build rich mock details for the host to display in the Host Context Card
         let hostName = drift.host.name
@@ -204,7 +204,7 @@ class DriftDetailViewModel: ObservableObject {
 
     private var currentUserInitials: String {
         let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
-        return savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? AppConstants.MockData.userInitials : savedInitials
+        return savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "U" : savedInitials
     }
     
     func requestToJoin() {
@@ -220,10 +220,10 @@ class DriftDetailViewModel: ObservableObject {
         // Use real profile data from UserDefaults (written by ProfileViewModel on save/fetch).
         // Falls back to MockData only if UserDefaults has nothing (offline preview mode).
         let currentUserName = UserDefaults.standard.string(forKey: "profile_name")
-            ?? AppConstants.MockData.userName
+            ?? "User"
         let savedInitials = UserDefaults.standard.string(forKey: "profile_initials") ?? ""
         let currentUserInitials = savedInitials.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            ? AppConstants.MockData.userInitials
+            ? "U"
             : savedInitials
         let currentUserRole = "Member"
 

@@ -29,7 +29,7 @@ struct ChatsListScreen: View {
             )
             .navigationDestination(for: UUID.self) { driftId in
                 if let drift = viewModel.allChats.first(where: { $0.id == driftId }) {
-                    DriftChatScreen(viewModel: DriftChatViewModel(drift: drift))
+                    DriftChatScreen(drift: drift)
                 } else {
                     VStack(spacing: AppConstants.Layout.elementSpacing) {
                         Text("Chat not found")
