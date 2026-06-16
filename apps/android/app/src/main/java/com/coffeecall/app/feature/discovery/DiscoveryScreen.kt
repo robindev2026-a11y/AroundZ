@@ -3,13 +3,14 @@ package com.coffeecall.app.feature.discovery
 import android.Manifest
 import android.app.Application
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,24 +21,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,12 +52,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -65,18 +71,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.coffeecall.app.core.design.CoffeeAvatar
 import com.coffeecall.app.core.design.CoffeeBackground
 import com.coffeecall.app.core.design.CoffeeBorder
-import com.coffeecall.app.core.design.CoffeeButton
-import com.coffeecall.app.core.design.CoffeeButtonVariant
 import com.coffeecall.app.core.design.CoffeeCallTheme
-import com.coffeecall.app.core.design.CoffeeDriftCard
-import com.coffeecall.app.core.design.CoffeeEmptyState
 import com.coffeecall.app.core.design.CoffeeError
-import com.coffeecall.app.core.design.CoffeeGlassBadge
 import com.coffeecall.app.core.design.CoffeeIcons
 import com.coffeecall.app.core.design.CoffeeInk
 import com.coffeecall.app.core.design.CoffeeMuted
 import com.coffeecall.app.core.design.CoffeePeach
-import com.coffeecall.app.core.design.CoffeePillBadge
 import com.coffeecall.app.core.design.CoffeePrimary
 import com.coffeecall.app.core.design.CoffeePrimaryDark
 import com.coffeecall.app.core.design.CoffeePurple
@@ -92,14 +92,10 @@ import com.coffeecall.app.core.location.GeoHash
 import com.coffeecall.app.core.location.LocationState
 import com.coffeecall.app.core.location.haversineDistanceKm
 import com.coffeecall.app.core.permissions.LocationPermissionState
-import com.coffeecall.app.data.repository.FirebasePostRepository
-import com.coffeecall.app.data.repository.FirebaseUserRepository
-import com.coffeecall.app.domain.model.DriftCategory
-import com.coffeecall.app.domain.model.DriftPost
+import com.coffeecall.app.core.state.GlobalDriftStore
+import com.coffeecall.app.data.repository.RepositoryProvider
 import com.coffeecall.app.domain.model.GeoLocation
-import com.coffeecall.app.domain.model.JoinMode
 import com.coffeecall.app.domain.model.UserProfile
-import com.coffeecall.app.domain.repository.PostRepository
 import com.coffeecall.app.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.async
@@ -110,11 +106,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.graphics.Brush
 
 @Composable
 fun DiscoveryScreen(
     onDriftClick: (String) -> Unit = {},
-    onNavigateToCreate: () -> Unit = {}
+    onNavigateToDrifts: () -> Unit = {},
+    onInterestSelected: (String) -> Unit = {}
 ) {
     val application = LocalContext.current.applicationContext as Application
     val viewModel: DiscoveryViewModel = viewModel(
@@ -133,318 +140,51 @@ fun DiscoveryScreen(
         viewModel.refreshIfPermissionAlreadyGranted()
     }
 
-    val context = LocalContext.current
-    var searchQuery by remember { mutableStateOf("") }
-    var activeFilter by remember { mutableStateOf("all") }
-    var showAcceptModal by remember { mutableStateOf(false) }
-    var showMatchModal by remember { mutableStateOf(false) }
-    var selectedDrift by remember { mutableStateOf<DriftPost?>(null) }
-    var isMapView by remember { mutableStateOf(false) }
+    var showNotificationsSheet by remember { mutableStateOf(false) }
 
-    // Client-side filtering
-    val filteredDrifts = uiState.nearbyDrifts.filter { drift ->
-        val matchesFilter = activeFilter == "all" || 
-            drift.category.firestoreValue.equals(activeFilter, ignoreCase = true) ||
-            (activeFilter == "walks" && drift.category == DriftCategory.Walk)
-        val matchesSearch = drift.title.contains(searchQuery, ignoreCase = true) ||
-            drift.hook.contains(searchQuery, ignoreCase = true) ||
-            drift.location.contains(searchQuery, ignoreCase = true) ||
-            drift.creatorName.contains(searchQuery, ignoreCase = true)
-        matchesFilter && matchesSearch
-    }
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(CoffeeBackground)
+    ) {
+        val screenHeight = maxHeight
+        val density = LocalDensity.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (isMapView) {
-            // Full Screen Map / Radar view Mode
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(CoffeeBackground)
-                    .statusBarsPadding()
-                    .padding(CoffeeSpacing.screen),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Header for Map mode
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Around Radar",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Black,
-                            color = CoffeeInk,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .shadow(2.dp, CoffeeShapes.medium)
-                                .clip(CoffeeShapes.medium)
-                                .background(Color.White)
-                                .border(1.dp, CoffeeBorder, CoffeeShapes.medium)
-                                .clickable { isMapView = false },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = CoffeeIcons.close,
-                                contentDescription = "Close Map",
-                                tint = CoffeeInk,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
+        val collapsedOffset = screenHeight * 0.7f
+        val expandedOffset = 100.dp
 
-                    // Render Radar
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        when (uiState.locationState) {
-                            LocationState.Denied -> PermissionCard {
-                                permissionLauncher.launch(
-                                    arrayOf(
-                                        Manifest.permission.ACCESS_FINE_LOCATION,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION
-                                    )
-                                )
-                            }
-                            LocationState.Unavailable -> MessageCard(
-                                title = "Location unavailable",
-                                body = "We could not resolve your current area.",
-                                actionLabel = "Try again",
-                                onAction = { viewModel.refresh(forceLocationWrite = true) }
-                            )
-                            LocationState.Loading -> LoadingRadar()
-                            is LocationState.Available -> AroundRadar(uiState.radarPeople)
-                        }
-                    }
+        val collapsedPx = with(density) { collapsedOffset.toPx() }
+        val expandedPx = with(density) { expandedOffset.toPx() }
 
-                    CoffeeButton(
-                        title = "Show List View",
-                        onClick = { isMapView = false },
-                        variant = CoffeeButtonVariant.Secondary
-                    )
+        val animatableOffset = remember { Animatable(collapsedPx) }
+        val coroutineScope = rememberCoroutineScope()
+
+        LaunchedEffect(screenHeight) {
+            animatableOffset.snapTo(collapsedPx)
+        }
+
+        val totalPx = collapsedPx - expandedPx
+        val movedPx = collapsedPx - animatableOffset.value
+        val progress = if (totalPx > 0f) (movedPx / totalPx).coerceIn(0f, 1f) else 0f
+
+        val radarScale = 1.0f - (progress * 0.08f)
+        val radarOpacity = 1.0f - (progress * 0.65f)
+        val radarBlur = (progress * 8f).dp
+
+        // 1. Radar Layer in the background
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 112.dp)
+                .graphicsLayer {
+                    scaleX = radarScale
+                    scaleY = radarScale
+                    alpha = radarOpacity
                 }
-            }
-        } else {
-            // Scrollable List Feed
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(CoffeeBackground)
-                    .statusBarsPadding()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = CoffeeSpacing.screen)
-                    .padding(top = CoffeeSpacing.md, bottom = CoffeeSpacing.screenBottomSpacer),
-                verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
-            ) {
-                // Top Header Section
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Hey ${uiState.currentUserName.ifBlank { "there" }}",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = CoffeeInk,
-                            fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            text = "${filteredDrifts.size} meetups happening nearby",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = CoffeeMuted,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Notifications button
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .shadow(elevation = 2.dp, shape = CoffeeShapes.medium)
-                                .clip(CoffeeShapes.medium)
-                                .background(Color.White)
-                                .border(1.dp, CoffeeBorder, CoffeeShapes.medium)
-                                .clickable {
-                                    Toast.makeText(context, "No new notifications", Toast.LENGTH_SHORT).show()
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = CoffeeIcons.bell,
-                                contentDescription = "Notifications",
-                                tint = CoffeePurple,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            // Notification dot
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(top = 12.dp, end = 12.dp)
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(CoffeePrimary)
-                                    .border(1.dp, Color.White, CircleShape)
-                            )
-                        }
-
-                        // Map view mode toggle
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .shadow(elevation = 2.dp, shape = CoffeeShapes.medium)
-                                .clip(CoffeeShapes.medium)
-                                .background(Color.White)
-                                .border(1.dp, CoffeeBorder, CoffeeShapes.medium)
-                                .clickable { isMapView = true },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = CoffeeIcons.map,
-                                contentDescription = "Map view",
-                                tint = CoffeePrimary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-
-                        // Avatar
-                        CoffeeAvatar(
-                            name = uiState.currentUserName,
-                            imageUrl = uiState.currentUserPhotoUrl,
-                            size = 48.dp,
-                            ringColor = CoffeePrimary.copy(alpha = 0.2f)
-                        )
-                    }
-                }
-
-                // Floating Search Bar
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .shadow(elevation = 4.dp, shape = CoffeeShapes.large)
-                        .background(Color.White, CoffeeShapes.large)
-                        .border(1.dp, CoffeeBorder, CoffeeShapes.large)
-                        .padding(horizontal = CoffeeSpacing.md),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-                    ) {
-                        Icon(
-                            imageVector = CoffeeIcons.search,
-                            contentDescription = "Search icon",
-                            tint = CoffeeMuted,
-                            modifier = Modifier.size(22.dp)
-                        )
-
-                        BasicTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                color = CoffeeInk,
-                                fontWeight = FontWeight.Medium
-                            ),
-                            modifier = Modifier.weight(1f),
-                            decorationBox = { innerTextField ->
-                                if (searchQuery.isEmpty()) {
-                                    Text(
-                                        text = "Search moments, vibes, or people...",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = CoffeeMuted.copy(alpha = 0.6f)
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CoffeeShapes.small)
-                                .background(CoffeeBackground)
-                                .clickable {
-                                    searchQuery = ""
-                                    activeFilter = "all"
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = CoffeeIcons.filter,
-                                contentDescription = "Clear filters",
-                                tint = CoffeeInk,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-
-                // Filter Chips Horizontal List
-                val filterOptions = listOf(
-                    "all" to "All",
-                    "coffee" to "Coffee",
-                    "walks" to "Walks",
-                    "study" to "Study",
-                    "food" to "Food",
-                    "gaming" to "Gaming",
-                    "creative" to "Creative"
-                )
-
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(filterOptions) { (id, label) ->
-                        val isActive = activeFilter == id
-                        val containerColor = if (isActive) CoffeePrimary else Color.White
-                        val contentColor = if (isActive) Color.White else CoffeeInk
-                        val borderModifier = if (isActive) Modifier else Modifier.border(1.dp, CoffeeBorder, CircleShape)
-                        val shadowModifier = if (isActive) Modifier.shadow(8.dp, CircleShape, ambientColor = CoffeePrimary.copy(alpha = 0.2f), spotColor = CoffeePrimary.copy(alpha = 0.2f)) else Modifier
-
-                        Row(
-                            modifier = Modifier
-                                .then(shadowModifier)
-                                .clip(CircleShape)
-                                .background(containerColor)
-                                .then(borderModifier)
-                                .clickable { activeFilter = id }
-                                .padding(horizontal = CoffeeSpacing.lg, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = CoffeeIcons.category(id),
-                                contentDescription = label,
-                                tint = contentColor,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = label,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = contentColor
-                            )
-                        }
-                    }
-                }
-
-                // Radar header & radar view toggler
-                RadarHeader(
-                    isRadarVisible = uiState.isRadarVisible,
-                    isRefreshing = uiState.isRefreshing,
-                    onToggleRadar = viewModel::toggleRadarVisibility,
-                    onRefresh = { viewModel.refresh(forceLocationWrite = true) }
-                )
-
+                .blur(radarBlur),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Box(modifier = Modifier.padding(top = screenHeight * 0.15f)) {
                 when (uiState.locationState) {
                     LocationState.Denied -> PermissionCard {
                         permissionLauncher.launch(
@@ -456,427 +196,410 @@ fun DiscoveryScreen(
                     }
                     LocationState.Unavailable -> MessageCard(
                         title = "Location unavailable",
-                        body = "We could not resolve your area. Try again.",
+                        body = "We could not resolve your current area. Try again.",
                         actionLabel = "Try again",
-                        onAction = { viewModel.refresh(forceLocationWrite = true) }
+                        onAction = { viewModel.refreshNearby() }
                     )
                     LocationState.Loading -> LoadingRadar()
-                    is LocationState.Available -> AroundRadar(uiState.radarPeople)
-                }
-
-                val errorMsg = uiState.errorMessage
-                if (errorMsg != null) {
-                    MessageCard(
-                        title = "Discovery paused",
-                        body = errorMsg,
-                        actionLabel = "Refresh",
-                        onAction = { viewModel.refresh(forceLocationWrite = true) },
-                        isError = true
+                    is LocationState.Available -> AroundRadar(
+                        people = uiState.radarPeople,
+                        isScanning = uiState.isScanning
                     )
-                }
-
-                // Header for Nearby Drifts list
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = CoffeeSpacing.sm)
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Nearby Drifts",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = CoffeeInk,
-                            fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            text = "Within 10 km, refreshed on demand",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = CoffeeMuted
-                        )
-                    }
-                    CoffeePillBadge(
-                        title = "${filteredDrifts.size}",
-                        containerColor = CoffeePrimary.copy(alpha = 0.12f),
-                        contentColor = CoffeePrimaryDark
-                    )
-                }
-
-                // Drifts Feed
-                if (uiState.isRefreshing && filteredDrifts.isEmpty()) {
-                    CoffeeEmptyState(
-                        title = "Finding nearby plans",
-                        subtitle = "Discovery is checking your area for open Drifts.",
-                        symbol = "..."
-                    )
-                } else if (filteredDrifts.isEmpty()) {
-                    CoffeeEmptyState(
-                        title = "No meetups found",
-                        subtitle = "Try adjusting your filters or search to find different social vibes.",
-                        symbol = "✨",
-                        actionLabel = "Clear Filters",
-                        onAction = {
-                            activeFilter = "all"
-                            searchQuery = ""
-                        }
-                    )
-                } else {
-                for (drift in filteredDrifts) {
-                    CoffeeDriftCard(
-                        title = drift.title.ifBlank { drift.hook.ifBlank { "Open Drift" } },
-                        hostName = drift.creatorName,
-                        category = drift.category.firestoreValue,
-                        distanceText = "${String.format("%.1f", drift.distance)} km",
-                        timeText = drift.time,
-                        imageUrl = drift.imageUrl,
-                        hostImageUrl = drift.creatorImageUrl,
-                        statusLabel = drift.status.firestoreValue,
-                        vibe = drift.vibeTags.firstOrNull(),
-                        peopleGoing = drift.participantCount,
-                        isFeatured = drift.participantCount > 2,
-                        actionLabel = "Join Moment",
-                        onJoin = {
-                            selectedDrift = drift
-                            showAcceptModal = true
-                        },
-                        onClick = { onDriftClick(drift.id) }
-                    )
-                }
                 }
             }
         }
 
-        // Floating Slate Dark Plus FAB
-        if (!isMapView) {
+        // 2. Fixed Header Section overlay at the top
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = CoffeeSpacing.screen, vertical = CoffeeSpacing.sm),
+            shape = CoffeeShapes.xlarge,
+            color = CoffeeSurface,
+            shadowElevation = 12.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Around",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = CoffeeInk,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = "People nearby are open to plans",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = CoffeeMuted,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Presence Toggle Button
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(CoffeeBackground)
+                            .border(1.dp, CoffeeBorder.copy(alpha = 0.5f), CircleShape)
+                            .clickable { viewModel.toggleRadarVisibility() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = CoffeeIcons.antenna,
+                            contentDescription = "Toggle Presence",
+                            tint = if (uiState.isRadarVisible) CoffeePrimary else CoffeeMuted,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    // Notifications Bell Button
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(CoffeeBackground)
+                            .border(1.dp, CoffeeBorder.copy(alpha = 0.5f), CircleShape)
+                            .clickable { showNotificationsSheet = true },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = CoffeeIcons.bell,
+                            contentDescription = "Notifications",
+                            tint = CoffeeInk,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        if (uiState.notifications.isNotEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(top = 16.dp, end = 16.dp)
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(CoffeePrimary)
+                                    .border(1.5.dp, Color.White, CircleShape)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Draggable Bottom Sheet Layer
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .offset { IntOffset(0, animatableOffset.value.roundToInt()) }
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = CoffeeBorder.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp)
+                )
+        ) {
+            // Drag Handle Area
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures(
+                            onDragEnd = {
+                                val target = if (animatableOffset.value < (collapsedPx + expandedPx) / 2) {
+                                    expandedPx
+                                } else {
+                                    collapsedPx
+                                }
+                                coroutineScope.launch {
+                                    animatableOffset.animateTo(
+                                        targetValue = target,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessLow
+                                        )
+                                    )
+                                }
+                            },
+                            onDragCancel = {
+                                val target = if (animatableOffset.value < (collapsedPx + expandedPx) / 2) {
+                                    expandedPx
+                                } else {
+                                    collapsedPx
+                                }
+                                coroutineScope.launch {
+                                    animatableOffset.animateTo(
+                                        targetValue = target,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessLow
+                                        )
+                                    )
+                                }
+                            },
+                            onVerticalDrag = { change, dragAmount ->
+                                change.consume()
+                                coroutineScope.launch {
+                                    animatableOffset.snapTo(
+                                        (animatableOffset.value + dragAmount).coerceIn(expandedPx, collapsedPx)
+                                    )
+                                }
+                            }
+                        )
+                    }
+                    .padding(top = 16.dp, bottom = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 50.dp, height = 5.dp)
+                        .clip(CircleShape)
+                        .background(CoffeeMuted.copy(alpha = 0.2f))
+                )
+            }
+
+            // Scrollable Content
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 120.dp)
+            ) {
+                // Nearby Drifts Pill
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    color = CoffeeBackground.copy(alpha = 0.4f),
+                    border = BorderStroke(1.dp, CoffeeBorder.copy(alpha = 0.5f))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .clickable { onNavigateToDrifts() }
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(CoffeePrimary.copy(alpha = 0.15f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = CoffeeIcons.people,
+                                contentDescription = null,
+                                tint = CoffeePrimary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Nearby Drifts are forming",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Black,
+                                color = CoffeeInk
+                            )
+                            Text(
+                                text = "Join one or create your own.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = CoffeeMuted
+                            )
+                        }
+
+                        Icon(
+                            imageVector = CoffeeIcons.chevronRight,
+                            contentDescription = null,
+                            tint = CoffeeMuted.copy(alpha = 0.5f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Your interests nearby Header
+                Text(
+                    text = "Your interests nearby",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Black,
+                    color = CoffeeInk
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // 4-column Interests Grid
+                val categories = uiState.interestCategories
+                val columns = 4
+                val rows = (categories.size + columns - 1) / columns
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    for (r in 0 until rows) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            for (c in 0 until columns) {
+                                val index = r * columns + c
+                                if (index < categories.size) {
+                                    val category = categories[index]
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        InterestCard(
+                                            category = category,
+                                            onClick = {
+                                                onInterestSelected(category.id)
+                                            }
+                                        )
+                                    }
+                                } else {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
+
+
+        // 4. Floating Refresh Button
+        val refreshButtonOpacity by animateFloatAsState(
+            targetValue = if (progress < 0.55f) 1f else 0f,
+            animationSpec = tween(durationMillis = 200),
+            label = "RefreshButtonOpacity"
+        )
+
+        val refreshRotation = remember { Animatable(0f) }
+        LaunchedEffect(uiState.isScanning) {
+            if (uiState.isScanning) {
+                refreshRotation.animateTo(
+                    targetValue = 360f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 1000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Restart
+                    )
+                )
+            } else {
+                refreshRotation.snapTo(0f)
+            }
+        }
+
+        if (refreshButtonOpacity > 0f) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .navigationBarsPadding()
-                    .padding(end = CoffeeSpacing.screen, bottom = 100.dp)
-                    .size(64.dp)
-                    .shadow(16.dp, CoffeeShapes.xlarge, ambientColor = CoffeeInk.copy(alpha = 0.3f), spotColor = CoffeeInk.copy(alpha = 0.3f))
-                    .clip(CoffeeShapes.xlarge)
-                    .background(CoffeeInk)
-                    .border(4.dp, Color.White, CoffeeShapes.xlarge)
-                    .clickable { onNavigateToCreate() },
+                    .padding(end = CoffeeSpacing.screen, bottom = 120.dp)
+                    .graphicsLayer {
+                        alpha = refreshButtonOpacity
+                    }
+                    .zIndex(20f)
+                    .size(58.dp)
+                    .shadow(elevation = 6.dp, shape = CircleShape)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)), CircleShape)
+                    .clickable(enabled = !uiState.isScanning) {
+                        viewModel.refreshNearby()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = CoffeeIcons.create,
-                    contentDescription = "Create",
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    imageVector = CoffeeIcons.refresh,
+                    contentDescription = "Refresh Nearby",
+                    tint = CoffeePrimary,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .graphicsLayer {
+                            rotationZ = refreshRotation.value
+                        }
                 )
             }
         }
 
-        // Join / Accept Confirmation Dialog Modal
-        if (showAcceptModal && selectedDrift != null) {
-            androidx.compose.ui.window.Dialog(onDismissRequest = { showAcceptModal = false }) {
-                Surface(
-                    shape = CoffeeShapes.hero,
-                    color = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = CoffeeSpacing.xs)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
-                    ) {
-                        Box(contentAlignment = Alignment.BottomEnd) {
-                            CoffeeAvatar(
-                                name = selectedDrift!!.creatorName,
-                                imageUrl = selectedDrift!!.creatorImageUrl,
-                                size = 80.dp,
-                                ringColor = CoffeeBackground
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(CoffeePrimary)
-                                    .border(2.dp, Color.White, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = CoffeeIcons.category(selectedDrift!!.category.firestoreValue),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            }
-                        }
-
-                        Text(
-                            text = "Join ${selectedDrift!!.creatorName}?",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Black,
-                            color = CoffeeInk
-                        )
-
-                        Text(
-                            text = selectedDrift!!.title.ifBlank { selectedDrift!!.hook },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = CoffeeMuted,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(CoffeeShapes.medium)
-                                .background(CoffeeBackground)
-                                .border(1.dp, CoffeeBorder, CoffeeShapes.medium)
-                                .padding(CoffeeSpacing.md),
-                            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-                            ) {
-                                Icon(
-                                    imageVector = CoffeeIcons.clock,
-                                    contentDescription = null,
-                                    tint = CoffeePurple,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    text = selectedDrift!!.time,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = CoffeeInk
-                                )
-                            }
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-                            ) {
-                                Icon(
-                                    imageVector = CoffeeIcons.location,
-                                    contentDescription = null,
-                                    tint = CoffeePrimary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    text = selectedDrift!!.location,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = CoffeeMuted
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(CoffeeSpacing.xs))
-
-                        CoffeeButton(
-                            title = "Send Request",
-                            onClick = {
-                                showAcceptModal = false
-                                showMatchModal = true
-                            },
-                            variant = CoffeeButtonVariant.Primary
-                        )
-
-                        Text(
-                            text = "Maybe later",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = CoffeeMuted,
-                            modifier = Modifier
-                                .clickable { showAcceptModal = false }
-                                .padding(vertical = CoffeeSpacing.xs)
-                        )
-                    }
+        if (showNotificationsSheet) {
+            NotificationsSheet(
+                notifications = uiState.notifications,
+                onDismiss = { showNotificationsSheet = false },
+                onNotificationClick = { notification ->
+                    showNotificationsSheet = false
+                    onDriftClick(notification.driftId)
                 }
-            }
-        }
-
-        // Match Confirmed Dialog Modal
-        if (showMatchModal && selectedDrift != null) {
-            androidx.compose.ui.window.Dialog(onDismissRequest = { showMatchModal = false }) {
-                Surface(
-                    shape = CoffeeShapes.hero,
-                    color = CoffeePrimary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = CoffeeSpacing.xs)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(28.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(88.dp)
-                                .shadow(8.dp, CoffeeShapes.xlarge)
-                                .background(Color.White, CoffeeShapes.xlarge),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("🤝", style = MaterialTheme.typography.headlineLarge)
-                        }
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
-                        ) {
-                            Text(
-                                text = "It's a Match!",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Black,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "You and ${selectedDrift!!.creatorName} are hanging out!",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White.copy(alpha = 0.9f),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy((-16).dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CoffeeAvatar(
-                                name = uiState.currentUserName.ifBlank { "You" },
-                                imageUrl = uiState.currentUserPhotoUrl,
-                                size = 64.dp,
-                                ringColor = CoffeePrimary
-                            )
-                            CoffeeAvatar(
-                                name = selectedDrift!!.creatorName,
-                                imageUrl = selectedDrift!!.creatorImageUrl,
-                                size = 64.dp,
-                                ringColor = CoffeePrimary
-                            )
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(CoffeeShapes.medium)
-                                .background(Color.Black.copy(alpha = 0.12f))
-                                .border(1.dp, Color.White.copy(alpha = 0.2f), CoffeeShapes.medium)
-                                .padding(CoffeeSpacing.md),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "MOMENT",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Black,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.padding(top = 4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = CoffeeIcons.category(selectedDrift!!.category.firestoreValue),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Text(
-                                    text = selectedDrift!!.category.firestoreValue.replaceFirstChar { it.uppercase() },
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(CoffeeSpacing.xs))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 48.dp)
-                                .shadow(elevation = 12.dp, shape = CoffeeShapes.medium)
-                                .clip(CoffeeShapes.medium)
-                                .background(Color.White)
-                                .clickable {
-                                    showMatchModal = false
-                                    onDriftClick(selectedDrift!!.id)
-                                }
-                                .padding(horizontal = CoffeeSpacing.lg, vertical = CoffeeSpacing.sm),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Say Hello",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = CoffeePrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Text(
-                            text = "Keep Discovering",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier
-                                .clickable { showMatchModal = false }
-                                .padding(vertical = CoffeeSpacing.xs)
-                        )
-                    }
-                }
-            }
+            )
         }
     }
 }
 
 @Composable
-private fun RadarHeader(
-    isRadarVisible: Boolean,
-    isRefreshing: Boolean,
-    onToggleRadar: () -> Unit,
-    onRefresh: () -> Unit
+private fun InterestCard(
+    category: InterestCategory,
+    onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(112.dp),
+        shape = RoundedCornerShape(22.dp),
+        color = Color.White,
+        border = BorderStroke(0.5.dp, CoffeeBorder.copy(alpha = 0.3f)),
+        shadowElevation = 1.dp
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Around Radar",
-                style = MaterialTheme.typography.titleMedium,
-                color = CoffeeInk,
-                fontWeight = FontWeight.Black
-            )
-            Text(
-                text = if (isRadarVisible) "Anonymous signals from people nearby" else "Radar presence is offline",
-                style = MaterialTheme.typography.bodyMedium,
-                color = CoffeeMuted
-            )
-        }
-        Surface(
-            onClick = onToggleRadar,
-            shape = CircleShape,
-            color = if (isRadarVisible) CoffeePrimary.copy(alpha = 0.14f) else CoffeeSurfaceSecondary
+        Column(
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = if (isRadarVisible) "ON" else "OFF",
-                style = MaterialTheme.typography.labelMedium,
-                color = if (isRadarVisible) CoffeePrimaryDark else CoffeeMuted,
-                modifier = Modifier.padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.xs)
-            )
-        }
-        Spacer(modifier = Modifier.width(CoffeeSpacing.sm))
-        Surface(
-            onClick = onRefresh,
-            shape = CircleShape,
-            color = CoffeeSurface,
-            shadowElevation = 4.dp
-        ) {
-            Text(
-                text = if (isRefreshing) "..." else "Refresh",
-                style = MaterialTheme.typography.titleMedium,
-                color = CoffeePrimary,
-                modifier = Modifier.padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.xs)
-            )
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(category.color.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = CoffeeIcons.category(category.label),
+                    contentDescription = null,
+                    tint = category.color,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Text(
+                    text = category.label,
+                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = CoffeeInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "${category.count} nearby",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = CoffeeMuted.copy(alpha = 0.7f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -917,95 +640,284 @@ private fun LoadingRadar() {
     }
 }
 
+
+private data class RadarParticle(
+    val x: Float,
+    val y: Float,
+    val size: Float,
+    val color: Color
+)
+
+private fun getInterestEmoji(interest: String): String = when (interest.lowercase().trim()) {
+    "walks", "walk" -> "🚶"
+    "coffee" -> "☕"
+    "movies", "movie" -> "🎬"
+    else -> "✨"
+}
+
 @Composable
-private fun AroundRadar(people: List<RadarPerson>) {
-    Surface(
+private fun AroundRadar(
+    people: List<RadarPerson>,
+    isScanning: Boolean
+) {
+    var selectedPerson by remember { mutableStateOf<RadarPerson?>(null) }
+
+    // Sweep Angle Animatable for energy-efficient timed scanning animation
+    val sweepAngle = remember { Animatable(0f) }
+    LaunchedEffect(isScanning) {
+        if (isScanning) {
+            sweepAngle.animateTo(
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 4000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                )
+            )
+        } else {
+            sweepAngle.snapTo(0f)
+        }
+    }
+
+    // Twinkle transition
+    val infiniteTransition = rememberInfiniteTransition(label = "RadarTwinkle")
+    val twinklePhase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = (2 * Math.PI).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 8000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "Twinkle"
+    )
+
+    // Background atmospheric particles
+    val particles = remember {
+        List(12) {
+            RadarParticle(
+                x = (Math.random() * 320 - 160).toFloat(),
+                y = (Math.random() * 320 - 160).toFloat(),
+                size = (Math.random() * 4 + 4).toFloat(),
+                color = if (Math.random() > 0.5) CoffeePrimary else CoffeePurple
+            )
+        }
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(320.dp),
-        shape = CoffeeShapes.large,
-        color = CoffeeSurface,
-        shadowElevation = 8.dp
+            .height(360.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val center = Offset(size.width / 2, size.height / 2)
-                val maxRadius = minOf(size.width, size.height) * 0.42f
-                listOf(0.33f, 0.66f, 1f).forEach { scale ->
-                    drawCircle(
-                        color = Color(0xFF53B8A6).copy(alpha = 0.15f),
-                        radius = maxRadius * scale,
-                        center = center,
-                        style = Stroke(width = 2.dp.toPx())
-                    )
-                }
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val center = Offset(size.width / 2, size.height / 2)
+            val maxRadius = minOf(size.width, size.height) * 0.42f
+
+            // Draw particles
+            particles.forEachIndexed { index, particle ->
+                val twinkleVal = kotlin.math.sin(twinklePhase + index).absoluteValue
+                val alpha = (0.1f + 0.2f * twinkleVal).coerceIn(0f, 1f)
                 drawCircle(
-                    color = Color(0xFF53B8A6).copy(alpha = 0.10f),
-                    radius = 16.dp.toPx(),
-                    center = center
+                    color = particle.color.copy(alpha = alpha),
+                    radius = particle.size.dp.toPx(),
+                    center = Offset(center.x + particle.x.dp.toPx(), center.y + particle.y.dp.toPx())
                 )
             }
 
+            // Draw Dashed Concentric rings
+            listOf(0.33f, 0.66f, 1f).forEach { scale ->
+                drawCircle(
+                    color = CoffeeBorder.copy(alpha = 0.5f),
+                    radius = maxRadius * scale,
+                    center = center,
+                    style = Stroke(
+                        width = 1.dp.toPx(),
+                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 8f), 0f)
+                    )
+                )
+            }
+
+            // Draw scanning sweep
+            if (isScanning) {
+                val sweepBrush = Brush.sweepGradient(
+                    colors = listOf(
+                        CoffeePrimary.copy(alpha = 0.25f),
+                        CoffeePrimary.copy(alpha = 0.05f),
+                        Color.Transparent,
+                        Color.Transparent
+                    ),
+                    center = center
+                )
+                rotate(sweepAngle.value, pivot = center) {
+                    drawCircle(
+                        brush = sweepBrush,
+                        radius = maxRadius,
+                        center = center
+                    )
+                }
+            }
+
+            // Draw central YOU shadow ring
+            drawCircle(
+                color = CoffeePrimary.copy(alpha = 0.10f),
+                radius = 24.dp.toPx(),
+                center = center
+            )
+        }
+
+        // Center "You" bubble
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .size(46.dp)
+                    .size(56.dp)
+                    .shadow(8.dp, CircleShape)
                     .clip(CircleShape)
                     .background(CoffeePrimary),
                 contentAlignment = Alignment.Center
             ) {
-                Text("YOU", style = MaterialTheme.typography.labelSmall, color = CoffeeTextOnBrand)
-            }
-
-            for (person in people.take(8)) {
-                RadarDot(person)
-            }
-
-            if (people.isEmpty()) {
-                Text(
-                    text = "No anonymous radar signals nearby",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = CoffeeMuted,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = CoffeeSpacing.lg)
+                Icon(
+                    imageVector = CoffeeIcons.profile,
+                    contentDescription = "You",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
             }
+            Text(
+                text = "You",
+                style = MaterialTheme.typography.labelMedium,
+                color = CoffeeMuted,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // Radar People Dots
+        for (person in people.take(8)) {
+            val angleRadians = Math.toRadians(person.angleDegrees)
+            val dotX = (cos(angleRadians) * person.normalizedDistance * 112).dp
+            val dotY = (sin(angleRadians) * person.normalizedDistance * 112).dp
+
+            Box(
+                modifier = Modifier
+                    .offset(x = dotX, y = dotY)
+                    .zIndex(if (selectedPerson?.id == person.id) 50f else 10f)
+            ) {
+                RadarDot(
+                    person = person,
+                    isSelected = selectedPerson?.id == person.id,
+                    onClick = {
+                        selectedPerson = if (selectedPerson?.id == person.id) null else person
+                    }
+                )
+            }
+        }
+
+        // Activity Tooltip overlay
+        selectedPerson?.let { person ->
+            val angleRadians = Math.toRadians(person.angleDegrees)
+            val dotX = (cos(angleRadians) * person.normalizedDistance * 112).dp
+            val dotY = (sin(angleRadians) * person.normalizedDistance * 112).dp
+
+            val isBelow = dotY.value < -30
+            val tooltipY = if (isBelow) dotY + 54.dp else dotY - 54.dp
+
+            Box(
+                modifier = Modifier
+                    .offset(x = dotX, y = tooltipY)
+                    .shadow(8.dp, RoundedCornerShape(12.dp))
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .border(1.dp, CoffeeBorder, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                    .widthIn(max = 190.dp)
+                    .zIndex(100f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(person.color.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = getInterestEmoji(person.interests.firstOrNull() ?: ""),
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Column {
+                        Text(
+                            text = person.interests.joinToString(" & "),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = CoffeeInk,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Someone nearby is open to plans",
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                            color = CoffeeMuted,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+        }
+
+        if (people.isEmpty()) {
+            Text(
+                text = "No anonymous radar signals nearby",
+                style = MaterialTheme.typography.bodyMedium,
+                color = CoffeeMuted,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 12.dp)
+            )
         }
     }
 }
 
 @Composable
-private fun RadarDot(person: RadarPerson) {
-    val angleRadians = Math.toRadians(person.angleDegrees)
-    val x = (cos(angleRadians) * person.normalizedDistance * 112).dp
-    val y = (sin(angleRadians) * person.normalizedDistance * 112).dp
-    Column(
-        modifier = Modifier.offset(x = x, y = y),
-        horizontalAlignment = Alignment.CenterHorizontally
+private fun RadarDot(
+    person: RadarPerson,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .size(56.dp),
+        contentAlignment = Alignment.Center
     ) {
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(CircleShape)
+                    .background(CoffeePrimary.copy(alpha = 0.2f))
+            )
+        }
         Box(
             modifier = Modifier
                 .size(42.dp)
+                .shadow(elevation = 4.dp, shape = CircleShape)
                 .clip(CircleShape)
-                .background(person.color.copy(alpha = 0.92f))
-                .border(2.dp, CoffeeSurface, CircleShape),
+                .background(Color.White)
+                .border(2.dp, person.color, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = person.initials,
                 style = MaterialTheme.typography.labelMedium,
-                color = CoffeeTextOnBrand,
+                color = person.color,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1
-            )
-        }
-        if (person.interests.isNotEmpty()) {
-            Text(
-                text = person.interests.take(2).joinToString(" / "),
-                style = MaterialTheme.typography.labelSmall,
-                color = CoffeeMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.width(92.dp)
             )
         }
     }
@@ -1047,10 +959,10 @@ private fun MessageCard(
 
 class DiscoveryViewModel(
     application: Application,
-    private val postRepository: PostRepository = FirebasePostRepository(),
-    private val userRepository: UserRepository = FirebaseUserRepository(),
+    private val userRepository: UserRepository = RepositoryProvider.userRepository,
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val locationProvider: AndroidLocationProvider = AndroidLocationProvider(application)
+    private val locationProvider: AndroidLocationProvider = AndroidLocationProvider(application),
+    private val store: GlobalDriftStore = GlobalDriftStore.getInstance(application)
 ) : AndroidViewModel(application) {
     private val preferences = application.getSharedPreferences("CoffeeCall.discovery", Context.MODE_PRIVATE)
     private val _uiState = MutableStateFlow(DiscoveryUiState())
@@ -1112,12 +1024,6 @@ class DiscoveryViewModel(
 
             runCatching {
                 updateUserLocationIfNeeded(location, forceLocationWrite)
-                val nearbyDeferred = async {
-                    postRepository.fetchNearbyPosts(
-                        latitude = location.latitude,
-                        longitude = location.longitude
-                    )
-                }
                 val radarDeferred = async {
                     userRepository.fetchRecentRadarProfiles().toRadarPeople(location, auth.currentUser?.uid)
                 }
@@ -1125,7 +1031,6 @@ class DiscoveryViewModel(
                 _uiState.update {
                     it.copy(
                         locationState = LocationState.Available(location),
-                        nearbyDrifts = nearbyDeferred.await(),
                         radarPeople = radarPeople,
                         interestCategories = radarPeople.toInterestCategories(),
                         isRefreshing = false,
@@ -1144,6 +1049,16 @@ class DiscoveryViewModel(
         }
     }
 
+    fun refreshNearby() {
+        if (_uiState.value.isScanning) return
+        _uiState.update { it.copy(isScanning = true) }
+        refresh(forceLocationWrite = true)
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(3000)
+            _uiState.update { it.copy(isScanning = false) }
+        }
+    }
+
     fun toggleRadarVisibility() {
         val nextValue = !_uiState.value.isRadarVisible
         preferences.edit().putBoolean(RADAR_VISIBLE_KEY, nextValue).apply()
@@ -1152,7 +1067,7 @@ class DiscoveryViewModel(
         viewModelScope.launch {
             val uid = auth.currentUser?.uid ?: return@launch
             runCatching { userRepository.updateRadarVisibility(uid, nextValue) }
-            if (nextValue) refresh(forceLocationWrite = true)
+            if (nextValue) refreshNearby()
         }
     }
 
@@ -1213,11 +1128,20 @@ class DiscoveryViewModel(
         }
     }
 
+    private fun observeNotifications() {
+        viewModelScope.launch {
+            store.notifications.collect { notifications ->
+                _uiState.update { it.copy(notifications = notifications.take(20)) }
+            }
+        }
+    }
+
     init {
         _uiState.update {
             it.copy(isRadarVisible = preferences.getBoolean(RADAR_VISIBLE_KEY, true))
         }
         loadUserProfile()
+        observeNotifications()
     }
 }
 
@@ -1247,9 +1171,9 @@ private fun List<UserProfile>.toRadarPeople(location: CoffeeLocation, currentUid
 private fun List<RadarPerson>.toInterestCategories(): List<InterestCategory> {
     val counts = flatMap { it.interests }.groupingBy { it }.eachCount()
     return listOf("Coffee", "Walks", "Movies", "Food", "Music", "Gaming", "Books", "Workout")
-        .mapNotNull { interest ->
+        .map { interest ->
             val count = counts[interest] ?: 0
-            if (count == 0) null else InterestCategory(interest, interest, count, colorForInterests(listOf(interest)))
+            InterestCategory(interest, interest, count, colorForInterests(listOf(interest)))
         }
 }
 
@@ -1274,16 +1198,6 @@ private fun colorForInterests(interests: List<String>): Color =
         interests.any { it.equals("Food", true) || it.equals("Gaming", true) } -> CoffeePeach
         else -> CoffeePurple
     }
-
-private fun categoryColor(category: DriftCategory): Color =
-    when (category) {
-        DriftCategory.Coffee, DriftCategory.Study, DriftCategory.Yoga -> CoffeePrimary
-        DriftCategory.Food, DriftCategory.Gaming, DriftCategory.Event -> CoffeePeach
-        DriftCategory.Walk, DriftCategory.Movie, DriftCategory.Music -> CoffeePurple
-    }
-
-private fun categoryLabel(category: DriftCategory): String =
-    category.firestoreValue.replaceFirstChar { it.uppercase() }
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 900)
 @Composable
@@ -1328,9 +1242,10 @@ data class DiscoveryUiState(
     val locationState: LocationState = LocationState.Loading,
     val isRadarVisible: Boolean = true,
     val isRefreshing: Boolean = false,
-    val nearbyDrifts: List<DriftPost> = emptyList(),
+    val isScanning: Boolean = false,
     val radarPeople: List<RadarPerson> = emptyList(),
     val interestCategories: List<InterestCategory> = emptyList(),
+    val notifications: List<DiscoveryNotification> = emptyList(),
     val errorMessage: String? = null,
     val currentUserName: String = "",
     val currentUserPhotoUrl: String = ""
@@ -1357,4 +1272,3 @@ private data class RadarPosition(
 )
 
 private const val DISCOVERY_RADIUS_KM = 10.0
-

@@ -533,7 +533,7 @@ private fun CoffeeComponentsPreviewSmall() {
                 .padding(CoffeeSpacing.screen),
             verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
-            CoffeeTopAppBar(title = "Around", subtitle = "People nearby are open to plans")
+            CoffeeTopAppBar(title = "Around", subtitle = "People nearby are open to plans") // kept for preview parity but main header is implemented in DiscoveryScreen as a pill Surface
             CoffeePrimaryButton(title = "Find meetups nearby", trailingSymbol = "↗", onClick = {})
             FlowRow(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
                 CoffeeCategoryChip(title = "Coffee", selected = true, symbol = "C", count = 8, onClick = {})

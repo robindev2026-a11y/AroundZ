@@ -3,6 +3,7 @@ package com.coffeecall.app.core.navigation
 import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
@@ -16,10 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,11 +60,11 @@ import androidx.navigation.compose.rememberNavController
 import com.coffeecall.app.core.design.CoffeeBackground
 import com.coffeecall.app.core.design.CoffeeBorder
 import com.coffeecall.app.core.design.CoffeeCallTheme
+import com.coffeecall.app.core.design.CoffeeIcons
 import com.coffeecall.app.core.design.CoffeeDarkOverlay
 import com.coffeecall.app.core.design.CoffeeInk
 import com.coffeecall.app.core.design.CoffeeMuted
 import com.coffeecall.app.core.design.CoffeePrimary
-import com.coffeecall.app.core.design.CoffeePrimaryDark
 import com.coffeecall.app.core.design.CoffeeShapes
 import com.coffeecall.app.core.design.CoffeeSpacing
 import com.coffeecall.app.core.design.CoffeeSurface
@@ -126,6 +130,7 @@ private fun LoadingScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CoffeeCallAppShell(
     onSignOut: () -> Unit
@@ -141,10 +146,26 @@ private fun CoffeeCallAppShell(
     val networkMonitor = remember { com.coffeecall.app.core.common.NetworkMonitor(context) }
     val isOnline by networkMonitor.isOnline.collectAsState(initial = true)
 
+    val navManager = remember { NavigationManager.getInstance() }
+    val isTabBarHidden by navManager.isTabBarHidden.collectAsState()
+
     var showNotificationDialog by remember { mutableStateOf(false) }
+    var showCreateSheet by remember { mutableStateOf(false) }
+    val createSheetState = rememberModalBottomSheetState()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { }
+
+    val currentRoute = currentDestination?.route
+    val isDetailOrChat = currentRoute != null && (
+        currentRoute.startsWith("drift_detail") ||
+        currentRoute.startsWith("chat_thread") ||
+        currentRoute == CoffeeCallRoutes.PROFILE_EDIT
+    )
+
+    LaunchedEffect(isDetailOrChat) {
+        navManager.setTabBarHidden(isDetailOrChat)
+    }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -173,8 +194,19 @@ private fun CoffeeCallAppShell(
                     onDriftClick = { id ->
                         navController.navigate("drift_detail/$id")
                     },
-                    onNavigateToCreate = {
-                        navController.navigate(CoffeeCallRoutes.CREATE) {
+                    onNavigateToDrifts = {
+                        navManager.clearInterestFilter()
+                        navController.navigate(CoffeeCallRoutes.DRIFTS) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onInterestSelected = { interest ->
+                        navManager.setActiveInterestFilter(interest)
+                        navController.navigate(CoffeeCallRoutes.DRIFTS) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -188,19 +220,9 @@ private fun CoffeeCallAppShell(
                 DriftsScreen(
                     onDriftClick = { id ->
                         navController.navigate("drift_detail/$id")
-                    }
-                )
-            }
-            composable(CoffeeCallRoutes.CREATE) {
-                CreateScreen(
-                    onCreated = {
-                        navController.navigate(CoffeeCallRoutes.DRIFTS) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                    },
+                    onNavigateToChat = { threadId ->
+                        navController.navigate("chat_thread/$threadId")
                     }
                 )
             }
@@ -238,6 +260,10 @@ private fun CoffeeCallAppShell(
             }
             composable(CoffeeCallRoutes.PROFILE) {
                 ProfileScreen(
+                    onDriftClick = { id ->
+                        navController.navigate("drift_detail/$id")
+                    },
+                    onSignOut = onSignOut,
                     onEditClick = {
                         navController.navigate(CoffeeCallRoutes.PROFILE_EDIT)
                     }
@@ -275,6 +301,9 @@ private fun CoffeeCallAppShell(
                     onBack = { navController.popBackStack() },
                     onNavigateToDrift = { id ->
                         navController.navigate("drift_detail/$id")
+                    },
+                    onNavigateToChat = { id ->
+                        navController.navigate("chat_thread/$id")
                     }
                 )
             }
@@ -305,16 +334,24 @@ private fun CoffeeCallAppShell(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(CoffeePeach)
-                            .padding(vertical = 4.dp),
+                            .padding(horizontal = CoffeeSpacing.screen)
+                            .padding(top = CoffeeSpacing.sm),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "⚠️ Device is offline. Using local caches.",
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Surface(
+                            shape = CircleShape,
+                            color = CoffeePeach.copy(alpha = 0.9f),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+                            shadowElevation = 8.dp
+                        ) {
+                            Text(
+                                text = "⚠️ Device is offline. Using local caches.",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -324,16 +361,24 @@ private fun CoffeeCallAppShell(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .fillMaxWidth()
-                        .background(CoffeePeach)
-                        .padding(vertical = 4.dp),
+                        .padding(horizontal = CoffeeSpacing.screen)
+                        .padding(top = CoffeeSpacing.sm),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "⚠️ Device is offline. Using local caches.",
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Surface(
+                        shape = CircleShape,
+                        color = CoffeePeach.copy(alpha = 0.9f),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+                        shadowElevation = 8.dp
+                    ) {
+                        Text(
+                            text = "⚠️ Device is offline. Using local caches.",
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                        )
+                    }
                 }
             }
         }
@@ -364,20 +409,50 @@ private fun CoffeeCallAppShell(
         }
 
         BottomFade()
-        CoffeeBottomNavigation(
-            destinations = CoffeeCallDestinations,
-            selectedRoute = selectedDestination.route,
-            onDestinationClick = { destination ->
-                navController.navigate(destination.route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
+        if (!isTabBarHidden) {
+            CoffeeBottomNavigation(
+                destinations = CoffeeCallDestinations,
+                selectedRoute = selectedDestination.route,
+                onDestinationClick = { destination ->
+                    if (destination.route == CoffeeCallRoutes.DRIFTS) {
+                        navManager.clearInterestFilter()
                     }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+                    navController.navigate(destination.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onCreateClick = { showCreateSheet = true },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
+
+        if (showCreateSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showCreateSheet = false },
+                sheetState = createSheetState,
+                containerColor = CoffeeBackground,
+                contentColor = CoffeeInk,
+                shape = CoffeeShapes.xlarge,
+                dragHandle = null
+            ) {
+                CreateScreen(
+                    onCreated = {
+                        showCreateSheet = false
+                        navController.navigate(CoffeeCallRoutes.DRIFTS) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -405,6 +480,7 @@ private fun CoffeeBottomNavigation(
     destinations: List<CoffeeCallDestination>,
     selectedRoute: String,
     onDestinationClick: (CoffeeCallDestination) -> Unit,
+    onCreateClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -425,7 +501,14 @@ private fun CoffeeBottomNavigation(
             .padding(horizontal = CoffeeSpacing.xs, vertical = CoffeeSpacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        destinations.forEach { destination ->
+        destinations.forEachIndexed { index, destination ->
+            if (index == 2) {
+                CoffeeCreateNavigationAction(
+                    onClick = onCreateClick,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
             val selected = destination.route == selectedRoute
             CoffeeBottomNavigationItem(
                 destination = destination,
@@ -433,6 +516,44 @@ private fun CoffeeBottomNavigation(
                 onClick = { onDestinationClick(destination) },
                 modifier = Modifier.weight(1f)
             )
+        }
+    }
+}
+
+@Composable
+private fun CoffeeCreateNavigationAction(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            onClick = onClick,
+            modifier = Modifier
+                .size(64.dp)
+                .shadow(
+                    elevation = 16.dp,
+                    shape = CircleShape,
+                    ambientColor = CoffeePrimary.copy(alpha = 0.16f),
+                    spotColor = CoffeePrimary.copy(alpha = 0.20f)
+                ),
+            shape = CircleShape,
+            color = CoffeePrimary,
+            border = BorderStroke(2.dp, CoffeeTextOnBrand.copy(alpha = 0.08f))
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = CoffeeIcons.create,
+                    contentDescription = "Create",
+                    tint = CoffeeTextOnBrand,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
         }
     }
 }
@@ -450,7 +571,7 @@ private fun CoffeeBottomNavigationItem(
     Surface(
         onClick = onClick,
         modifier = modifier
-            .height(56.dp)
+            .height(CoffeeSpacing.primaryButtonHeight)
             .padding(horizontal = 2.dp),
         shape = CoffeeShapes.large,
         color = background
@@ -458,7 +579,7 @@ private fun CoffeeBottomNavigationItem(
         Row(
             modifier = Modifier
                 .padding(horizontal = 6.dp)
-                .widthIn(min = 44.dp),
+                .widthIn(min = CoffeeSpacing.minTouchTarget),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -497,12 +618,13 @@ private fun CoffeeBottomNavigationPreview() {
         Box(
             modifier = Modifier
                 .background(CoffeeBackground)
-                .padding(top = 24.dp)
+                .padding(top = CoffeeSpacing.xl)
         ) {
             CoffeeBottomNavigation(
                 destinations = CoffeeCallDestinations,
                 selectedRoute = CoffeeCallRoutes.DISCOVERY,
-                onDestinationClick = {}
+                onDestinationClick = {},
+                onCreateClick = {}
             )
         }
     }
