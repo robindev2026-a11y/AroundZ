@@ -39,7 +39,6 @@ Batch 1: apps/android core/design, reusable UI, app shell polish
 Batch 2: apps/android core/firebase, data, domain, Firebase config docs
 Batch 3: apps/android feature/auth, feature/onboarding, auth repositories
 Batch 4: apps/android feature/discovery, core/location, permissions
-Batch 5: apps/android feature/create, maps/place picker integration
 Batch 6: apps/android feature/driftDetail, join/leave repositories
 Batch 7: apps/android feature/chat, message thread repositories
 Batch 8: apps/android feature/profile, media/storage repositories
@@ -160,17 +159,6 @@ Build Android location permission handling, location provider, nearby Drift disc
 Owned paths: apps/android/**/feature/discovery/**, apps/android/**/core/location/**, apps/android/**/core/permissions/**, discovery repositories/use cases.
 Read-only parity files: DiscoveryViewModel.swift, FirebaseDiscoveryService.swift, RadarService.swift, DiscoveryScreen.swift.
 Acceptance: denied/granted location states work, nearby posts load, radar does not expose private profile details, build succeeds.
-```
-
-### Batch 5 Prompt - Create Drift
-```text
-Implement Batch 5 - Create Drift.
-
-Build the native Android create flow with activity, hook, time, location, spots, and join mode. Add map/place picker equivalent, validation, and writes compatible with iOS-created Drift documents.
-
-Owned paths: apps/android/**/feature/create/**, create repositories/use cases, map/place picker files.
-Read-only parity files: CreateDriftScreen.swift, CreateDriftViewModel.swift, MapPickerSheet.swift, FirebaseDriftsService.swift.
-Acceptance: Android-created Drifts are schema-compatible with iOS; invalid forms do not write partial documents; build succeeds.
 ```
 
 ### Batch 6 Prompt - Drift Detail And Join Flow

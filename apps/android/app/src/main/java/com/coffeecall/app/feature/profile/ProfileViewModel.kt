@@ -13,9 +13,7 @@ import com.coffeecall.app.core.firebase.FirebaseUnavailableException
 import com.coffeecall.app.core.location.AndroidLocationProvider
 import com.coffeecall.app.core.storage.ProfileImageHelper
 import com.coffeecall.app.core.storage.ProfilePreferencesRepository
-import com.coffeecall.app.data.repository.FirebaseMessageThreadRepository
-import com.coffeecall.app.data.repository.FirebasePostRepository
-import com.coffeecall.app.data.repository.FirebaseUserRepository
+import com.coffeecall.app.data.repository.RepositoryProvider
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.UserProfile
 import com.coffeecall.app.domain.repository.MessageThreadRepository
@@ -47,9 +45,9 @@ data class ProfileUiState(
 
 class ProfileViewModel(
     application: Application,
-    private val userRepository: UserRepository = FirebaseUserRepository(),
-    private val postRepository: PostRepository = FirebasePostRepository(),
-    private val threadRepository: MessageThreadRepository = FirebaseMessageThreadRepository(),
+    private val userRepository: UserRepository = RepositoryProvider.userRepository,
+    private val postRepository: PostRepository = RepositoryProvider.postRepository,
+    private val threadRepository: MessageThreadRepository = RepositoryProvider.messageThreadRepository,
     private val profilePrefs: ProfilePreferencesRepository = ProfilePreferencesRepository(application),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : AndroidViewModel(application) {

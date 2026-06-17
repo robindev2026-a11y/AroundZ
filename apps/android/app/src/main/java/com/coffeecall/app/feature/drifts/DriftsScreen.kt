@@ -8,14 +8,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,13 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.coffeecall.app.core.design.*
+import com.coffeecall.app.core.navigation.NavigationManager
 import com.coffeecall.app.domain.model.DriftCategory
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.DriftStatus
 
 @Composable
 fun DriftsScreen(
-    onDriftClick: (String) -> Unit = {}
+    onDriftClick: (String) -> Unit = {},
+    onNavigateToChat: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as Application
@@ -38,255 +43,348 @@ fun DriftsScreen(
     )
     val uiState by viewModel.uiState.collectAsState()
 
-    var selectedTab by remember { mutableStateOf(0) } // 0 = Joined, 1 = Hosting
+    val navManager = remember { NavigationManager.getInstance() }
+    val activeInterestFilter by navManager.activeInterestFilter.collectAsState()
+
+    var selectedTab by remember { mutableStateOf(0) } // 0 = Discover, 1 = Mine
+    var selectedFilter by remember { mutableStateOf("All") }
+    var selectedInterestFilter by remember { mutableStateOf(activeInterestFilter) }
+    var isSearchActive by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(activeInterestFilter) {
+        selectedInterestFilter = activeInterestFilter
+    }
+
+    val currentList = if (selectedTab == 1) {
+        uiState.hostedDrifts
+    } else {
+        uiState.joinedDrifts
+    }
+
+    val visibleList = remember(currentList, selectedInterestFilter, selectedFilter, searchQuery, isSearchActive) {
+        var filtered = currentList
+        if (selectedInterestFilter != null) {
+            filtered = filtered.filter { it.category.matchesInterest(selectedInterestFilter!!) }
+        }
+        when (selectedFilter) {
+            "Open now" -> filtered = filtered.filter { it.status == DriftStatus.Open }
+            "Starting soon" -> filtered = filtered.filter { it.status == DriftStatus.StartingSoon }
+            "Tonight" -> filtered = filtered.filter { it.status == DriftStatus.Tonight }
+        }
+        if (isSearchActive && searchQuery.isNotBlank()) {
+            val query = searchQuery.trim().lowercase()
+            filtered = filtered.filter { drift ->
+                drift.title.lowercase().contains(query) ||
+                    drift.description.lowercase().contains(query) ||
+                    drift.location.lowercase().contains(query) ||
+                    drift.category.firestoreValue.lowercase().contains(query)
+            }
+        }
+        filtered
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(CoffeeBackground)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = CoffeeSpacing.screen)
-            .padding(top = 104.dp, bottom = CoffeeSpacing.screenBottomSpacer),
+            .padding(bottom = CoffeeSpacing.screenBottomSpacer),
         verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
     ) {
-        if (uiState.isLoading) {
-            Box(
+        // 1. Refreshed Header Card
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.xs),
+            shape = RoundedCornerShape(32.dp),
+            color = Color.White,
+            shadowElevation = 8.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = CoffeeSpacing.xl, vertical = CoffeeSpacing.lg),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Drifts",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = CoffeeInk,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = if (selectedTab == 0) "Plans happening around you" else "Your active plans",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = CoffeeMuted,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    HeaderIcon(icon = CoffeeIcons.bell)
+                    HeaderIcon(icon = CoffeeIcons.search) {
+                        isSearchActive = !isSearchActive
+                        if (!isSearchActive) searchQuery = ""
+                    }
+                    HeaderIcon(icon = CoffeeIcons.filter)
+                }
+            }
+        }
+
+        if (isSearchActive) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = CoffeePrimary)
-            }
-        } else if (uiState.error != null) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = CoffeeShapes.medium,
-                color = CoffeeSurface,
-                border = BorderStroke(1.dp, CoffeeBorder)
-            ) {
-                Column(
-                    modifier = Modifier.padding(CoffeeSpacing.md),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-                ) {
-                    Text(text = "⚠️", fontSize = 24.sp)
-                    Text(text = "Failed to load plans", fontWeight = FontWeight.Bold, color = CoffeeInk)
-                    Text(text = uiState.error ?: "", color = CoffeeMuted, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                    Button(
-                        onClick = { viewModel.loadDrifts() },
-                        colors = ButtonDefaults.buttonColors(containerColor = CoffeePrimary)
-                    ) {
-                        Text("Retry")
+                    .padding(horizontal = CoffeeSpacing.md),
+                singleLine = true,
+                leadingIcon = {
+                    Icon(imageVector = CoffeeIcons.search, contentDescription = null, tint = CoffeeMuted)
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        Icon(
+                            imageVector = CoffeeIcons.close,
+                            contentDescription = "Clear search",
+                            tint = CoffeeMuted,
+                            modifier = Modifier.clickable { searchQuery = "" }
+                        )
                     }
-                }
-            }
-        } else {
-            // Tab switchers
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-            ) {
-                TabButton(
-                    title = "Joined",
-                    isSelected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    modifier = Modifier.weight(1f)
+                },
+                placeholder = { Text("Search Drifts...") },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedBorderColor = CoffeePrimary,
+                    unfocusedBorderColor = CoffeeBorder
                 )
-                TabButton(
-                    title = "Hosting",
-                    isSelected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            )
+        }
 
-            Spacer(modifier = Modifier.height(2.dp))
+        // 2. Discover | Mine Tab Switcher
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = CoffeeSpacing.md)
+                .height(48.dp)
+                .background(CoffeeBackground.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .border(1.dp, CoffeeBorder.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DriftTabButton(
+                title = "Discover",
+                isSelected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                modifier = Modifier.weight(1f)
+            )
+            DriftTabButton(
+                title = "Mine",
+                isSelected = selectedTab == 1,
+                onClick = { selectedTab = 1 },
+                modifier = Modifier.weight(1f)
+            )
+        }
 
-            val currentList = if (selectedTab == 0) uiState.joinedDrifts else uiState.hostedDrifts
+        // 3. Filter Chips Row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = CoffeeSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DriftFilterChip(
+                label = "All",
+                icon = null,
+                isSelected = selectedFilter == "All",
+                onClick = { selectedFilter = "All" }
+            )
+            DriftFilterChip(
+                label = "Open now",
+                icon = CoffeeIcons.bolt,
+                isSelected = selectedFilter == "Open now",
+                onClick = { selectedFilter = "Open now" }
+            )
+            DriftFilterChip(
+                label = "Starting soon",
+                icon = CoffeeIcons.clock,
+                isSelected = selectedFilter == "Starting soon",
+                onClick = { selectedFilter = "Starting soon" }
+            )
+            DriftFilterChip(
+                label = "Tonight",
+                icon = CoffeeIcons.clock,
+                isSelected = selectedFilter == "Tonight",
+                onClick = { selectedFilter = "Tonight" }
+            )
+        }
 
-            if (currentList.isEmpty()) {
-                val emptyTitle = if (selectedTab == 0) "No joined Drifts yet" else "No hosted Drifts yet"
-                val emptySubtitle = if (selectedTab == 0) {
-                    "Browse nearby plans or request to join a coffee meetup to see it here."
-                } else {
-                    "Host your own meetup: share what you're up for and let others join."
+        // 4. Content Area
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = CoffeeSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
+        ) {
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = CoffeePrimary)
                 }
+            } else if (uiState.error != null) {
+                Text(text = "Error: ${uiState.error}", color = Color.Red, modifier = Modifier.padding(CoffeeSpacing.md))
+            } else if (visibleList.isEmpty()) {
                 CoffeeEmptyState(
-                    title = emptyTitle,
-                    subtitle = emptySubtitle,
-                    symbol = if (selectedTab == 0) "J" else "H",
-                    actionLabel = null,
-                    onAction = {}
+                    title = "No drifts found",
+                    subtitle = "Adjust your filters or try creating a new plan yourself.",
+                    icon = CoffeeIcons.drifts,
+                    actionLabel = "Create Drift",
+                    onAction = { /* Navigate to create or show modal */ }
                 )
             } else {
-                currentList.forEach { drift ->
-                    DriftCard(drift = drift, onClick = { onDriftClick(drift.id) })
-                }
+                val auth = remember { com.google.firebase.auth.FirebaseAuth.getInstance() }
+                val currentUserId = auth.currentUser?.uid
+                visibleList.forEach { drift ->
+                    val isHost = currentUserId == drift.creatorId
+                    CoffeeDriftCard(
+                        title = drift.title.ifBlank { "Untitled Drift" },
+                        location = drift.location,
+                        timeText = drift.time,
+                        distanceText = "0.0 km", // Mock distance
+                        category = drift.category.name,
+                        onAction = { onDriftClick(drift.id) },
+                        statusLabel = drift.status.firestoreValue,
+                        isBestMatch = drift.participantCount >= 2,
+                        participants = drift.participantInitials,
+                        participantSummary = "${drift.participantCount}g • 1s • Focused",
+                    actionLabel = if (isHost || selectedTab == 1) "Manage" else "Joined",
+                    actionColor = if (isHost || selectedTab == 1) CoffeePurple else CoffeePrimary,
+                    onClick = { onDriftClick(drift.id) }
+                )
+            }
             }
         }
     }
 }
 
 @Composable
-private fun TabButton(
+private fun HeaderIcon(icon: ImageVector, onClick: () -> Unit = {}) {
+    Box(
+        modifier = Modifier
+            .size(CoffeeSpacing.minTouchTarget)
+            .clip(CircleShape)
+            .background(CoffeeBackground)
+            .border(1.dp, CoffeeBorder.copy(alpha = 0.5f), CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(icon, contentDescription = null, tint = CoffeeInk.copy(alpha = 0.7f), modifier = Modifier.size(CoffeeSpacing.lg))
+    }
+}
+
+@Composable
+private fun DriftTabButton(
     title: String,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) CoffeePrimary else CoffeeSurface
-    val contentColor = if (isSelected) CoffeeTextOnBrand else CoffeeInk
-    val borderColor = if (isSelected) Color.Transparent else CoffeeBorder
-
-    Surface(
-        onClick = onClick,
-        shape = CoffeeShapes.small,
-        color = backgroundColor,
-        border = BorderStroke(1.dp, borderColor),
-        modifier = modifier.height(40.dp)
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
-        Box(contentAlignment = Alignment.Center) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 text = title,
-                color = contentColor,
+                style = MaterialTheme.typography.labelLarge,
+                color = if (isSelected) CoffeePrimary else CoffeeMuted,
+                fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold
+            )
+            if (isSelected) {
+                Spacer(Modifier.height(CoffeeSpacing.xxs))
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(3.dp)
+                        .clip(CircleShape)
+                        .background(CoffeePrimary)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DriftFilterChip(
+    label: String,
+    icon: ImageVector?,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = if (isSelected) CoffeePrimary else Color.White,
+        border = BorderStroke(1.dp, if (isSelected) Color.Transparent else CoffeeBorder.copy(alpha = 0.5f)),
+        modifier = Modifier.height(40.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = CoffeeSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
+        ) {
+            if (label == "All") {
+                Icon(
+                    imageVector = Icons.Rounded.Apps,
+                    contentDescription = null,
+                    tint = if (isSelected) Color.White else CoffeeMuted,
+                    modifier = Modifier.size(CoffeeSpacing.md)
+                )
+            } else if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (isSelected) Color.White else CoffeeMuted,
+                    modifier = Modifier.size(CoffeeSpacing.md)
+                )
+            }
+            Text(
+                text = label,
                 style = MaterialTheme.typography.labelMedium,
+                color = if (isSelected) Color.White else CoffeeInk,
                 fontWeight = FontWeight.Bold
             )
         }
     }
 }
 
-@Composable
-private fun DriftCard(
-    drift: DriftPost,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = CoffeeShapes.large,
-        color = CoffeeSurface,
-        border = BorderStroke(1.dp, CoffeeBorder),
-        shadowElevation = 8.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(CoffeeSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-        ) {
-            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
-                // Category Icon
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(categoryColor(drift.category).copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = categorySymbol(drift.category),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = categoryColor(drift.category)
-                    )
-                }
-
-                // Info
-                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CoffeePillBadge(
-                            title = drift.status.firestoreValue,
-                            containerColor = CoffeePrimary.copy(alpha = 0.12f),
-                            contentColor = CoffeePrimaryDark
-                        )
-                    }
-
-                    Text(
-                        text = drift.title.ifBlank { "Untitled Drift" },
-                        style = MaterialTheme.typography.titleLarge,
-                        color = CoffeeInk,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Text(
-                        text = "${drift.date} • ${drift.time} at ${drift.location}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = CoffeeMuted,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-
-            if (drift.hook.isNotBlank()) {
-                Text(
-                    text = drift.hook,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = CoffeeInk,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(CoffeeShapes.small)
-                        .background(CoffeePeach.copy(alpha = 0.10f))
-                        .padding(CoffeeSpacing.sm),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Participants initials
-                Row(horizontalArrangement = Arrangement.spacedBy((-6).dp)) {
-                    drift.participantInitials.take(3).forEach { initials ->
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .background(CoffeePrimary)
-                                .border(1.5.dp, CoffeeTextOnBrand, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = initials.take(2),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = CoffeeTextOnBrand,
-                                fontSize = 10.sp
-                            )
-                        }
-                    }
-                }
-                val goingLabel = if (drift.participantCount == 1) "1 going" else "${drift.participantCount} going"
-                val spotsLabel = if (drift.spotsLeft == 1) "1 spot left" else "${drift.spotsLeft} spots left"
-                Text(
-                    text = "  $goingLabel • $spotsLabel",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = CoffeeMuted,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
+private fun DriftCategory.matchesInterest(interest: String): Boolean {
+    val normalizedInterest = interest.normalizeInterest()
+    val categoryNames = listOf(name, firestoreValue).map { it.normalizeInterest() }
+    val aliases = when (this) {
+        DriftCategory.Walk -> listOf("walk", "walks")
+        DriftCategory.Movie -> listOf("movie", "movies")
+        DriftCategory.Study -> listOf("study", "books", "book")
+        DriftCategory.Yoga -> listOf("yoga", "workout", "fitness")
+        DriftCategory.Event -> listOf("event", "events")
+        else -> emptyList()
     }
+    return normalizedInterest in categoryNames || normalizedInterest in aliases
 }
 
-private fun categorySymbol(cat: DriftCategory): String =
-    when (cat) {
-        DriftCategory.Coffee -> "☕"
-        DriftCategory.Walk -> "🚶"
-        DriftCategory.Movie -> "🎬"
-        DriftCategory.Food -> "🍔"
-        DriftCategory.Study -> "📖"
-        DriftCategory.Gaming -> "🎮"
-        DriftCategory.Music -> "🎵"
-        DriftCategory.Yoga -> "🧘"
-        DriftCategory.Event -> "🎟️"
-    }
+private fun String.normalizeInterest(): String =
+    trim().lowercase().removeSuffix("s")
 
-private fun categoryColor(cat: DriftCategory): Color =
-    when (cat) {
-        DriftCategory.Coffee -> CoffeePrimary
-        DriftCategory.Walk -> CoffeePeach
-        DriftCategory.Movie -> CoffeePurple
-        else -> CoffeePrimary
-    }
+private fun String.toDisplayInterest(): String =
+    trim().ifBlank { "selected" }.replaceFirstChar { it.uppercase() }

@@ -5,10 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.coffeecall.app.core.firebase.FirebaseUnavailableException
-import com.coffeecall.app.data.repository.FirebasePostRepository
+import com.coffeecall.app.core.state.GlobalDriftStore
 import com.coffeecall.app.domain.model.DriftPost
-import com.coffeecall.app.domain.repository.PostRepository
+import com.coffeecall.app.domain.model.DriftCategory
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,8 +25,8 @@ data class DriftsUiState(
 
 class DriftsViewModel(
     application: Application,
-    private val postRepository: PostRepository = FirebasePostRepository(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val store: GlobalDriftStore = GlobalDriftStore.getInstance(application)
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(DriftsUiState())
@@ -35,6 +34,23 @@ class DriftsViewModel(
 
     init {
         loadDrifts()
+        observeStore()
+    }
+
+    private fun observeStore() {
+        viewModelScope.launch {
+            store.drifts.collect { allDrifts ->
+                val currentUserId = auth.currentUser?.uid
+                if (currentUserId.isNullOrBlank()) return@collect
+                val hosted = allDrifts.filter { it.creatorId == currentUserId }
+                val joined = allDrifts.filter {
+                    it.creatorId != currentUserId && (it.participantIds.contains(currentUserId) || it.participantInitials.isNotEmpty())
+                }
+                _uiState.update {
+                    it.copy(hostedDrifts = hosted, joinedDrifts = joined)
+                }
+            }
+        }
     }
 
     fun loadDrifts() {
@@ -47,26 +63,14 @@ class DriftsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
-                val hosted = postRepository.getHostedPosts(currentUserId)
-                val joined = postRepository.getJoinedPosts(currentUserId)
-                    .filter { it.creatorId != currentUserId }
+                store.fetch()
+                _uiState.update { it.copy(isLoading = false) }
+            }.onFailure { exception ->
                 _uiState.update {
                     it.copy(
-                        hostedDrifts = hosted,
-                        joinedDrifts = joined,
-                        isLoading = false
+                        isLoading = false,
+                        error = exception.localizedMessage ?: "Failed to load Drifts"
                     )
-                }
-            }.onFailure { exception ->
-                if (exception is FirebaseUnavailableException) {
-                    loadMockDrifts()
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = exception.localizedMessage ?: "Failed to load Drifts"
-                        )
-                    }
                 }
             }
         }
@@ -82,7 +86,7 @@ class DriftsViewModel(
                 date = "Tomorrow",
                 creatorId = "mock_user",
                 creatorName = "You",
-                category = com.coffeecall.app.domain.model.DriftCategory.Walk,
+                category = DriftCategory.Walk,
                 spotsLeft = 4,
                 capacity = 5,
                 participantCount = 1,
@@ -98,7 +102,7 @@ class DriftsViewModel(
                 date = "Today",
                 creatorId = "mock_host_123",
                 creatorName = "Siddharth",
-                category = com.coffeecall.app.domain.model.DriftCategory.Coffee,
+                category = DriftCategory.Coffee,
                 spotsLeft = 3,
                 capacity = 5,
                 participantCount = 2,

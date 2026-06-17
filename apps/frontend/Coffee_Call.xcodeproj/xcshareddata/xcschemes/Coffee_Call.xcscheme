@@ -78,17 +78,17 @@
          <AdditionalOption
             key = "MallocStackLogging"
             value = ""
-            isEnabled = "YES">
+            isEnabled = "NO">
          </AdditionalOption>
          <AdditionalOption
             key = "PrefersMallocStackLoggingLite"
             value = ""
-            isEnabled = "YES">
+            isEnabled = "NO">
          </AdditionalOption>
          <AdditionalOption
             key = "NSZombieEnabled"
             value = "YES"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>

@@ -1,16 +1,10 @@
 import SwiftUI
 import FirebaseAuth
 
-/// Immersive, photo-forward Drift card matching the Figma "Social Refresh" design.
-/// Tasteful native adaptation: full-bleed image with a dark gradient, floating
-/// glass status/vibe badges, and the host + meta + join action over the image.
-/// Falls back to a category-tinted gradient when no image is available.
 struct DriftCard: View {
     let drift: Drift
     let isFeatured: Bool
     let onJoin: () -> Void
-
-    private var cardHeight: CGFloat { isFeatured ? 320 : 280 }
 
     private var isJoined: Bool {
         if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
@@ -49,219 +43,138 @@ struct DriftCard: View {
     }
 
     var body: some View {
-        ZStack {
-            imageLayer
+        VStack(spacing: AppConstants.Layout.elementSpacing) {
+            HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
+                // Activity Icon Well (Reduced)
+                ZStack {
+                    Circle()
+                        .fill(drift.category.color.opacity(AppConstants.UI.opacityLight * 1.5))
+                        .frame(width: 48, height: 48)
 
-            // Bottom-anchored legibility gradient.
-            LinearGradient(
-                colors: [.clear, Color.textPrimary.opacity(0.35), Color.textPrimary.opacity(0.92)],
-                startPoint: .center,
-                endPoint: .bottom
-            )
-
-            VStack(alignment: .leading, spacing: 0) {
-                topBadges
-                Spacer(minLength: AppConstants.Layout.elementSpacing)
-                bottomContent
-            }
-            .padding(AppConstants.Layout.standardPadding)
-        }
-        .frame(height: cardHeight)
-        .frame(maxWidth: .infinity)
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusXLarge, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusXLarge, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: Color.textPrimary.opacity(0.10), radius: 16, x: 0, y: 8)
-    }
-
-    // MARK: - Image / Fallback
-
-    @ViewBuilder
-    private var imageLayer: some View {
-        if let urlString = drift.imageUrl,
-           !urlString.trimmingCharacters(in: .whitespaces).isEmpty,
-           let url = URL(string: urlString) {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                default:
-                    fallbackLayer
+                    Image(systemName: drift.category.icon)
+                        .font(.system(size: AppConstants.Typography.sizeHeadline, weight: .semibold))
+                        .foregroundColor(drift.category.color)
                 }
-            }
-        } else {
-            fallbackLayer
-        }
-    }
 
-    private var fallbackLayer: some View {
-        ZStack {
-            LinearGradient(
-                colors: [drift.category.color, drift.category.color.opacity(0.55)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            Image(systemName: drift.category.icon)
-                .font(.system(size: 72, weight: .semibold))
-                .foregroundColor(.white.opacity(0.18))
-        }
-    }
-
-    // MARK: - Top Badges
-
-    private var topBadges: some View {
-        HStack(alignment: .top, spacing: AppConstants.Layout.subElementSpacing) {
-            HStack(spacing: 8) {
-                if isFeatured {
-                    glassBadge {
-                        HStack(spacing: 4) {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        if isFeatured {
                             Text(AppStrings.Drifts.bestMatch)
                                 .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
+                                .foregroundColor(.brandPurple)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(Color.brandPurple.opacity(AppConstants.UI.opacityLight))
+                                .cornerRadius(AppConstants.UI.cornerRadiusTiny)
                         }
-                    }
-                }
 
-                glassBadge {
-                    HStack(spacing: 6) {
-                        if drift.status != .ended {
-                            Circle()
-                                .fill(Color.brandPrimary)
-                                .frame(width: 6, height: 6)
-                        }
+                        Spacer()
+
                         Text(drift.status.rawValue)
                             .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
-                            .textCase(.uppercase)
+                            .foregroundColor(drift.status.color)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(drift.status.color.opacity(AppConstants.UI.opacityLight))
+                            .cornerRadius(AppConstants.UI.cornerRadiusTiny)
+                    }
+
+                    Text(drift.title)
+                        .font(.system(size: AppConstants.Typography.sizeTitle, weight: .black))
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+
+                    Text(drift.location)
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .medium))
+                        .foregroundColor(.textSecondary)
+                        .lineLimit(1)
+
+                    Text("\(drift.time)  •  \(String(format: "%.1f", drift.distance)) km")
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                        .foregroundColor(.textSecondary)
+                }
+            }
+
+            // Hook / Offer
+            if let hook = drift.hook, !hook.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                HStack(spacing: 8) {
+                    AppIcons.giftImage
+                        .font(.system(size: AppConstants.Typography.sizeHeadline))
+                        .foregroundColor(.brandSecondary)
+
+                    Text(hook)
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .semibold))
+                        .foregroundColor(.textPrimary)
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    if drift.category == .coffee {
+                        AppIcons.coffeeFillImage
+                            .font(.system(size: AppConstants.Typography.sizeHeadline + 2))
+                            .foregroundColor(.brandSecondary.opacity(0.4))
                     }
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color.brandSecondary.opacity(AppConstants.UI.opacitySubtle))
+                .cornerRadius(AppConstants.UI.cornerRadiusSmall)
             }
 
-            Spacer(minLength: 0)
-
-            if let vibe = drift.vibeTags.first {
-                Text(vibe)
-                    .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
-                    .textCase(.uppercase)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Capsule().fill(Color.brandPurple))
-                    .lineLimit(1)
-            }
-        }
-    }
-
-    private func glassBadge<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        content()
-            .foregroundColor(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .environment(\.colorScheme, .dark)
-            )
-            .overlay(Capsule().stroke(Color.white.opacity(0.25), lineWidth: 1))
-    }
-
-    // MARK: - Bottom Content
-
-    private var bottomContent: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            // Host row
-            HStack(spacing: AppConstants.Layout.subElementSpacing) {
-                avatar
-                Text(drift.host.name)
-                    .font(.outfitBold(size: AppConstants.Typography.sizeBody, relativeTo: .subheadline))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-
-                if drift.peopleGoing > 1 {
-                    Text("+\(drift.peopleGoing - 1)")
-                        .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
-                        .foregroundColor(.textPrimary)
-                        .frame(width: 28, height: 28)
-                        .background(Circle().fill(Color.white))
-                        .overlay(Circle().stroke(Color.white.opacity(0.6), lineWidth: 1.5))
+            // Footer Section
+            HStack(spacing: 0) {
+                // Participants (Reduced size)
+                HStack(spacing: -8) {
+                    ForEach(Array(drift.participantInitials.prefix(3).enumerated()), id: \.offset) { index, initial in
+                        Text(initial)
+                            .font(.system(size: AppConstants.Typography.sizeMicro, weight: .black))
+                            .foregroundColor(.white)
+                            .frame(width: 28, height: 28)
+                            .background(Circle().fill(Color.brandPrimary))
+                            .overlay(Circle().stroke(Color.white, lineWidth: 1.5))
+                    }
                 }
-            }
 
-            // Title
-            Text(drift.title)
-                .font(.outfitBlack(size: AppConstants.Typography.sizeTitle, relativeTo: .title3))
-                .foregroundColor(.white)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                // Metadata (Fixed wrapping)
+                HStack(spacing: 4) {
+                    Text("\(drift.peopleGoing)\(String(AppStrings.Drifts.going.prefix(1)))") // e.g. "3g"
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
 
-            // Meta row
-            HStack(spacing: AppConstants.Layout.elementSpacing) {
-                metaItem(icon: AppIcons.mappin, tint: .brandPrimary, text: "\(String(format: "%.1f", drift.distance)) km")
-                metaItem(icon: AppIcons.clock, tint: .brandPurple, text: drift.time)
-            }
+                    if let spots = drift.spotsLeft {
+                        Text("•")
+                        Text("\(spots)\(String(AppStrings.Drifts.spotsLeft.prefix(1)))")
+                            .foregroundColor(.brandSecondary)
+                    }
 
-            // Actions
-            HStack(spacing: AppConstants.Layout.subElementSpacing) {
+                    if let vibe = drift.vibeTags.first {
+                        Text("•")
+                        Text(vibe)
+                    }
+                }
+                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
+                .foregroundColor(.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.leading, 8)
+
+                Spacer()
+
+                // Join Button
                 Button(action: onJoin) {
                     Text(buttonText)
-                        .font(.outfitBlack(size: AppConstants.Typography.sizeHeadline, relativeTo: .headline))
+                        .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: AppConstants.Layout.minTouchTarget + 4)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                         .background(buttonColor)
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-                        .shadow(color: buttonColor.opacity(0.4), radius: 10, x: 0, y: 6)
+                        .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
-                .pressScale(0.96)
-            }
-            .padding(.top, AppConstants.Layout.miniPadding)
-        }
-    }
-
-    private var avatar: some View {
-        Group {
-            if let urlString = drift.host.imageUrl,
-               !urlString.trimmingCharacters(in: .whitespaces).isEmpty,
-               let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    if case .success(let image) = phase {
-                        image.resizable().scaledToFill()
-                    } else {
-                        avatarFallback
-                    }
-                }
-            } else {
-                avatarFallback
+                .pressScale(0.9)
             }
         }
-        .frame(width: 36, height: 36)
-        .clipShape(Circle())
-        .overlay(Circle().stroke(Color.white, lineWidth: 2))
-    }
-
-    private var avatarFallback: some View {
-        ZStack {
-            Circle().fill(drift.category.color)
-            Text(drift.host.initials.prefix(2))
-                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .black))
-                .foregroundColor(.white)
-        }
-    }
-
-    private func metaItem(icon: String, tint: Color, text: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
-                .foregroundColor(tint)
-            Text(text)
-                .font(.system(size: AppConstants.Typography.sizeCaption, weight: .bold))
-                .foregroundColor(.white.opacity(0.9))
-                .lineLimit(1)
-        }
+        .padding(AppConstants.Layout.elementSpacing)
+        .background(Color.surfaceMain)
+        .cornerRadius(AppConstants.UI.cornerRadiusMedium)
+        .shadow(color: Color.textPrimary.opacity(0.06), radius: 10, x: 0, y: 5)
     }
 }

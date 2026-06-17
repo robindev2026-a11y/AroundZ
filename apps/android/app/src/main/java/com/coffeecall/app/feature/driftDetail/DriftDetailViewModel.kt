@@ -7,26 +7,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.coffeecall.app.core.firebase.FirebaseUnavailableException
+import com.coffeecall.app.core.firebase.FirebaseCollections
 import com.coffeecall.app.core.session.SessionPreferencesRepository
-import com.coffeecall.app.data.repository.FirebasePostRepository
-import com.coffeecall.app.data.repository.FirebaseUserRepository
+import com.coffeecall.app.core.state.GlobalDriftStore
+import com.coffeecall.app.data.repository.RepositoryProvider
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.DriftStatus
 import com.coffeecall.app.domain.model.JoinMode
 import com.coffeecall.app.domain.model.JoinRequest
 import com.coffeecall.app.domain.model.UserProfile
-import com.coffeecall.app.domain.repository.PostRepository
 import com.coffeecall.app.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -65,10 +63,10 @@ data class ParticipantDetail(
 class DriftDetailViewModel(
     application: Application,
     private val postId: String,
-    private val postRepository: PostRepository = FirebasePostRepository(),
-    private val userRepository: UserRepository = FirebaseUserRepository(),
+    private val userRepository: UserRepository = RepositoryProvider.userRepository,
     private val sessionRepository: SessionPreferencesRepository = SessionPreferencesRepository(application),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val store: GlobalDriftStore = GlobalDriftStore.getInstance(application)
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(DriftDetailUiState())
@@ -79,6 +77,26 @@ class DriftDetailViewModel(
     init {
         loadData()
         checkReminderStatus()
+        observeStore()
+    }
+
+    private fun observeStore() {
+        viewModelScope.launch {
+            store.drifts.collect { allDrifts ->
+                val currentDrift = allDrifts.firstOrNull { it.id == postId } ?: return@collect
+                val currentUid = auth.currentUser?.uid ?: ""
+                val session = sessionRepository.currentState()
+                val userInitials = session.profileInitials.ifBlank { "U" }
+                val status = computeJoinStatus(currentDrift, currentUid, userInitials)
+                _uiState.update {
+                    it.copy(
+                        drift = currentDrift,
+                        joinStatus = status,
+                        currentUserId = currentUid
+                    )
+                }
+            }
+        }
     }
 
     fun loadData() {
@@ -91,7 +109,7 @@ class DriftDetailViewModel(
             val userInitials = session.profileInitials.ifBlank { "U" }
 
             runCatching {
-                val post = postRepository.getPost(postId)
+                val post = store.fetchPost(postId)
                 if (post != null) {
                     val status = computeJoinStatus(post, currentUid, userInitials)
                     _uiState.update {
@@ -104,7 +122,6 @@ class DriftDetailViewModel(
                     fetchParticipants(post)
                     fetchHostDetails(post.creatorId)
                 } else {
-                    // Fallback to Mock Drift if offline or not found
                     loadMockDrift()
                 }
             }.onFailure { exception ->
@@ -168,12 +185,8 @@ class DriftDetailViewModel(
             )
 
             runCatching {
-                if (drift.joinMode == JoinMode.Open) {
-                    postRepository.acceptJoinRequest(postId, joinRequest)
-                } else {
-                    postRepository.requestToJoin(postId, joinRequest)
-                }
-                loadData()
+                store.requestToJoin(postId, joinRequest)
+                _uiState.update { it.copy(isActionLoading = false) }
             }.onFailure { exception ->
                 _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Action failed") }
             }
@@ -188,8 +201,8 @@ class DriftDetailViewModel(
             val currentUid = auth.currentUser?.uid ?: ""
 
             runCatching {
-                postRepository.cancelJoinRequest(postId, currentUid)
-                loadData()
+                store.cancelJoinRequest(postId, currentUid)
+                _uiState.update { it.copy(isActionLoading = false) }
             }.onFailure { exception ->
                 _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to cancel request") }
             }
@@ -206,8 +219,8 @@ class DriftDetailViewModel(
             val initials = session.profileInitials.ifBlank { "U" }
 
             runCatching {
-                postRepository.leavePost(postId, currentUid, initials)
-                loadData()
+                store.leavePost(postId, currentUid, initials)
+                _uiState.update { it.copy(isActionLoading = false) }
             }.onFailure { exception ->
                 _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to leave drift") }
             }
@@ -218,8 +231,8 @@ class DriftDetailViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isActionLoading = true) }
             runCatching {
-                postRepository.acceptJoinRequest(postId, request)
-                loadData()
+                store.acceptJoinRequest(postId, request)
+                _uiState.update { it.copy(isActionLoading = false) }
             }.onFailure { exception ->
                 _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to accept request") }
             }
@@ -230,10 +243,64 @@ class DriftDetailViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isActionLoading = true) }
             runCatching {
-                postRepository.rejectJoinRequest(postId, requestId)
-                loadData()
+                store.rejectJoinRequest(postId, requestId)
+                _uiState.update { it.copy(isActionLoading = false) }
             }.onFailure { exception ->
                 _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to reject request") }
+            }
+        }
+    }
+
+    fun updateHostDrift(title: String, description: String, location: String) {
+        val drift = uiState.value.drift ?: return
+        if (drift.creatorId != uiState.value.currentUserId) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isActionLoading = true, error = null) }
+            runCatching {
+                store.upsertPost(
+                    drift.copy(
+                        title = title.trim().ifBlank { drift.title },
+                        description = description.trim(),
+                        location = location.trim().ifBlank { drift.location }
+                    )
+                )
+                _uiState.update { it.copy(isActionLoading = false) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to update drift") }
+            }
+        }
+    }
+
+    fun closeDrift() {
+        val drift = uiState.value.drift ?: return
+        if (drift.creatorId != uiState.value.currentUserId) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isActionLoading = true, error = null) }
+            runCatching {
+                store.updatePostStatus(postId, DriftStatus.Ended)
+                _uiState.update { it.copy(isActionLoading = false) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to close drift") }
+            }
+        }
+    }
+
+    fun deleteDrift() {
+        val drift = uiState.value.drift ?: return
+        if (drift.creatorId != uiState.value.currentUserId) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isActionLoading = true, error = null) }
+            runCatching {
+                val db = FirebaseFirestore.getInstance()
+                db.collection(FirebaseCollections.POSTS).document(postId).delete().await()
+                db.collection(FirebaseCollections.MESSAGE_THREADS).document(postId).delete().await()
+                store.refresh()
+                _uiState.update { it.copy(drift = null, isActionLoading = false) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(isActionLoading = false, error = exception.localizedMessage ?: "Failed to delete drift") }
             }
         }
     }
@@ -336,7 +403,6 @@ class DriftDetailViewModel(
                 _uiState.update { it.copy(hostProfile = profile) }
             }
 
-            // Fetch other active drifts from host
             val db = FirebaseFirestore.getInstance()
             val snap = db.collection("posts")
                 .whereEqualTo("creatorId", hostId)
@@ -348,14 +414,13 @@ class DriftDetailViewModel(
                 val data = doc.data ?: return@mapNotNull null
                 val statusStr = data["status"] as? String ?: "OPEN"
                 if (statusStr.uppercase() == "ENDED") return@mapNotNull null
-                
-                // Construct a post model from doc
+
                 val title = data["title"] as? String ?: ""
                 val desc = data["description"] as? String ?: ""
                 val loc = data["location"] as? String ?: ""
                 val time = data["time"] as? String ?: ""
                 val date = data["date"] as? String ?: ""
-                
+
                 DriftPost(
                     id = doc.id,
                     title = title,

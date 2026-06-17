@@ -10,6 +10,7 @@ CoffeeCall is a native SwiftUI iOS app backed by Firebase. The Android strategy 
 - **Handoff:** See `docs/ANDROID_UI_REFRESH_HANDOFF.md` — self-contained plan for completing Batches 5–10. Read it before doing UI work.
 - **Native Migration Plan:** Completed (Batches 0 through 10 are all Done).
 - **QA Checklist:** See `docs/ANDROID_QA_CHECKLIST.md` for release smoke testing.
+- **iOS Mapper:** See `docs/IOS_SCREEN_WIDGET_MAPPER.md` for the point-to-point SwiftUI screen/widget responsibility map from Home/Around through Profile.
 
 ## Architecture & Tech Stack
 - **iOS Frontend:** SwiftUI in `apps/frontend`.

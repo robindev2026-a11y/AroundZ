@@ -6,8 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.coffeecall.app.core.firebase.FirebaseUnavailableException
-import com.coffeecall.app.data.repository.FirebaseMessageThreadRepository
-import com.coffeecall.app.data.repository.FirebasePostRepository
+import com.coffeecall.app.data.repository.RepositoryProvider
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.MessageThread
 import com.coffeecall.app.domain.repository.MessageThreadRepository
@@ -34,8 +33,8 @@ data class ChatsListUiState(
 
 class ChatsListViewModel(
     application: Application,
-    private val threadRepository: MessageThreadRepository = FirebaseMessageThreadRepository(),
-    private val postRepository: PostRepository = FirebasePostRepository(),
+    private val threadRepository: MessageThreadRepository = RepositoryProvider.messageThreadRepository,
+    private val postRepository: PostRepository = RepositoryProvider.postRepository,
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : AndroidViewModel(application) {
 

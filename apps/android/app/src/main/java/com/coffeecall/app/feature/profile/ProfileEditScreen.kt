@@ -6,6 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.coffeecall.app.core.design.*
+import com.coffeecall.app.domain.model.DriftCategory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -90,7 +92,7 @@ fun ProfileEditScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = CoffeeSpacing.screen)
         ) {
-            Spacer(modifier = Modifier.height(72.dp)) // Header spacing
+            Spacer(modifier = Modifier.height(CoffeeSpacing.bottomNavHeight)) // Header spacing
 
             // Profile Photo section
             Box(
@@ -102,10 +104,6 @@ fun ProfileEditScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
-                            .size(120.dp)
-                            .clip(RoundedCornerShape(40.dp))
-                            .background(CoffeeSurfaceSecondary)
-                            .border(1.dp, CoffeeBorder, RoundedCornerShape(40.dp))
                             .clickable {
                                 photoPickerLauncher.launch(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -113,36 +111,18 @@ fun ProfileEditScreen(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        if (pickedImageUri != null) {
-                            AsyncImage(
-                                model = pickedImageUri,
-                                contentDescription = "New Profile photo",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else if (!removePhotoFlag && uiState.user?.profilePhotoUrl.orEmpty().isNotBlank()) {
-                            AsyncImage(
-                                model = uiState.user?.profilePhotoUrl,
-                                contentDescription = "Profile photo",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            val initials = uiState.user?.initials.orEmpty().ifBlank { "U" }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(CoffeePurple.copy(alpha = 0.16f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = initials,
-                                    fontSize = 32.sp,
-                                    color = CoffeePurple,
-                                    fontWeight = FontWeight.Black
-                                )
-                            }
+                        val activeImageUrl = when {
+                            pickedImageUri != null -> pickedImageUri.toString()
+                            !removePhotoFlag && uiState.user?.profilePhotoUrl.orEmpty().isNotBlank() -> uiState.user?.profilePhotoUrl
+                            else -> null
                         }
+                        CoffeeAvatar(
+                            name = uiState.user?.name.orEmpty().ifBlank { "User" },
+                            imageUrl = activeImageUrl,
+                            size = 120.dp,
+                            background = CoffeeSurfaceSecondary,
+                            ringColor = CoffeeBorder
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(CoffeeSpacing.sm))
@@ -159,7 +139,7 @@ fun ProfileEditScreen(
                                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                     )
                                 }
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .padding(horizontal = CoffeeSpacing.xs, vertical = CoffeeSpacing.xxs)
                         )
 
                         val hasPhoto = pickedImageUri != null || (uiState.user?.profilePhotoUrl.orEmpty().isNotBlank() && !removePhotoFlag)
@@ -174,7 +154,7 @@ fun ProfileEditScreen(
                                         pickedImageUri = null
                                         removePhotoFlag = true
                                     }
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .padding(horizontal = CoffeeSpacing.xs, vertical = CoffeeSpacing.xxs)
                             )
                         }
                     }
@@ -264,23 +244,17 @@ fun ProfileEditScreen(
                 )
 
                 // GPS button
-                Button(
+                CoffeeButton(
+                    title = "GPS",
                     onClick = {
                         viewModel.fetchLocationAndAddress { resolved ->
                             locationText = resolved
                         }
                     },
-                    modifier = Modifier.size(56.dp),
-                    shape = CoffeeShapes.small,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = CoffeeSurface,
-                        contentColor = CoffeePrimary
-                    ),
-                    contentPadding = PaddingValues(0.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CoffeeBorder)
-                ) {
-                    Text("📍", fontSize = 18.sp)
-                }
+                    variant = CoffeeButtonVariant.Secondary,
+                    fullWidth = false,
+                    height = CoffeeSpacing.primaryButtonHeight
+                )
             }
 
             Spacer(modifier = Modifier.height(CoffeeSpacing.lg))
@@ -291,7 +265,7 @@ fun ProfileEditScreen(
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Black,
                 color = CoffeeMuted,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.xs)
             )
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -356,7 +330,7 @@ fun ProfileEditScreen(
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Black,
                 color = CoffeeMuted,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.xs)
             )
             val availableInterests = listOf("coffee", "walk", "food", "movie", "study")
             FlowRow(
@@ -366,7 +340,15 @@ fun ProfileEditScreen(
             ) {
                 availableInterests.forEach { interest ->
                     val isSelected = selectedInterests.contains(interest)
-                    val chipColor = if (isSelected) CoffeePrimary else CoffeeSurface
+                    val cat = when (interest.lowercase().trim()) {
+                        "coffee" -> DriftCategory.Coffee
+                        "walk", "walks" -> DriftCategory.Walk
+                        "movie", "movies" -> DriftCategory.Movie
+                        "food" -> DriftCategory.Food
+                        "study" -> DriftCategory.Study
+                        else -> DriftCategory.Coffee
+                    }
+                    val chipColor = if (isSelected) categoryColor(cat) else CoffeeSurface
                     val textColor = if (isSelected) CoffeeTextOnBrand else CoffeeInk
                     val borderColor = if (isSelected) Color.Transparent else CoffeeBorder
 
@@ -380,13 +362,15 @@ fun ProfileEditScreen(
                         },
                         shape = CircleShape,
                         color = chipColor,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
-                        modifier = Modifier.height(36.dp)
+                        border = BorderStroke(1.dp, borderColor),
+                        modifier = Modifier.height(CoffeeSpacing.xxl)
                     ) {
-                        Box(
-                            modifier = Modifier.padding(horizontal = CoffeeSpacing.md),
-                            contentAlignment = Alignment.Center
+                        Row(
+                            modifier = Modifier.padding(horizontal = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)
                         ) {
+                            Text(text = categorySymbol(cat), fontSize = 12.sp)
                             Text(
                                 text = interest.replaceFirstChar { it.uppercase() },
                                 color = textColor,
@@ -398,7 +382,7 @@ fun ProfileEditScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(120.dp)) // Spacer for bottom
+            Spacer(modifier = Modifier.height(CoffeeSpacing.screenBottomSpacer)) // Spacer for bottom
         }
 
         // Top Header bar
@@ -414,15 +398,15 @@ fun ProfileEditScreen(
                     .fillMaxWidth()
                     .padding(top = CoffeeSpacing.xs)
                     .padding(horizontal = CoffeeSpacing.screen)
-                    .height(56.dp),
+                    .height(CoffeeSpacing.primaryButtonHeight),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "← Cancel",
-                    color = CoffeeInk,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable(onClick = onBack)
+                CoffeeButton(
+                    title = "Cancel",
+                    onClick = onBack,
+                    variant = CoffeeButtonVariant.Ghost,
+                    fullWidth = false,
+                    height = 40.dp
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -430,12 +414,9 @@ fun ProfileEditScreen(
                 if (uiState.isSaving) {
                     CircularProgressIndicator(color = CoffeePrimary, modifier = Modifier.size(24.dp))
                 } else {
-                    Text(
-                        text = "Save",
-                        color = CoffeePrimary,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Black,
-                        modifier = Modifier.clickable {
+                    CoffeeButton(
+                        title = "Save",
+                        onClick = {
                             viewModel.updateProfile(
                                 name = nameText,
                                 bio = bioText,
@@ -447,7 +428,10 @@ fun ProfileEditScreen(
                                 photoUri = pickedImageUri,
                                 removePhoto = removePhotoFlag
                             )
-                        }
+                        },
+                        variant = CoffeeButtonVariant.Ghost,
+                        fullWidth = false,
+                        height = 40.dp
                     )
                 }
             }
@@ -470,3 +454,24 @@ fun ProfileEditScreen(
         }
     }
 }
+
+private fun categorySymbol(cat: DriftCategory): String =
+    when (cat) {
+        DriftCategory.Coffee -> "☕"
+        DriftCategory.Walk -> "🚶"
+        DriftCategory.Movie -> "🎬"
+        DriftCategory.Food -> "🍔"
+        DriftCategory.Study -> "📖"
+        DriftCategory.Gaming -> "🎮"
+        DriftCategory.Music -> "🎵"
+        DriftCategory.Yoga -> "🧘"
+        DriftCategory.Event -> "🎟️"
+    }
+
+private fun categoryColor(cat: DriftCategory): Color =
+    when (cat) {
+        DriftCategory.Coffee -> CoffeePrimary
+        DriftCategory.Walk -> CoffeePeach
+        DriftCategory.Movie -> CoffeePurple
+        else -> CoffeePrimary
+    }

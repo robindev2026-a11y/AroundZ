@@ -17,13 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -130,7 +127,6 @@ private fun LoadingScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CoffeeCallAppShell(
     onSignOut: () -> Unit
@@ -151,7 +147,6 @@ private fun CoffeeCallAppShell(
 
     var showNotificationDialog by remember { mutableStateOf(false) }
     var showCreateSheet by remember { mutableStateOf(false) }
-    val createSheetState = rememberModalBottomSheetState()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { }
@@ -162,6 +157,7 @@ private fun CoffeeCallAppShell(
         currentRoute.startsWith("chat_thread") ||
         currentRoute == CoffeeCallRoutes.PROFILE_EDIT
     )
+    val shouldShowBottomNavigation = !isTabBarHidden && !isDetailOrChat
 
     LaunchedEffect(isDetailOrChat) {
         navManager.setTabBarHidden(isDetailOrChat)
@@ -408,8 +404,8 @@ private fun CoffeeCallAppShell(
             )
         }
 
-        BottomFade()
-        if (!isTabBarHidden) {
+        if (shouldShowBottomNavigation) {
+            BottomFade()
             CoffeeBottomNavigation(
                 destinations = CoffeeCallDestinations,
                 selectedRoute = selectedDestination.route,
@@ -431,13 +427,11 @@ private fun CoffeeCallAppShell(
         }
 
         if (showCreateSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showCreateSheet = false },
-                sheetState = createSheetState,
-                containerColor = CoffeeBackground,
-                contentColor = CoffeeInk,
-                shape = CoffeeShapes.xlarge,
-                dragHandle = null
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxSize(),
+                color = CoffeeBackground
             ) {
                 CreateScreen(
                     onCreated = {

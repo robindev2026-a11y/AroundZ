@@ -14,9 +14,12 @@ import androidx.compose.material.icons.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.LocalCafe
 import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.Movie
@@ -27,9 +30,11 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.SelfImprovement
+import androidx.compose.material.icons.rounded.SettingsInputAntenna
 import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.ViewAgenda
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -40,8 +45,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
  */
 object CoffeeIcons {
     // Navigation chrome
-    val around: ImageVector = Icons.Rounded.Explore
-    val drifts: ImageVector = Icons.Rounded.ViewAgenda
+    val around: ImageVector = Icons.Rounded.SettingsInputAntenna
+    val drifts: ImageVector = Icons.Rounded.Event
     val create: ImageVector = Icons.Rounded.Add
     val chats: ImageVector = Icons.AutoMirrored.Rounded.Chat
     val profile: ImageVector = Icons.Rounded.Person
@@ -53,6 +58,9 @@ object CoffeeIcons {
     val map: ImageVector = Icons.Rounded.Map
     val location: ImageVector = Icons.Rounded.LocationOn
     val clock: ImageVector = Icons.Rounded.Schedule
+    val calendar: ImageVector = Icons.Rounded.Event
+    val antenna: ImageVector = Icons.Rounded.SettingsInputAntenna
+
     val people: ImageVector = Icons.Rounded.Group
     val heart: ImageVector = Icons.Rounded.FavoriteBorder
     val arrowUpRight: ImageVector = Icons.Rounded.NorthEast
@@ -62,6 +70,9 @@ object CoffeeIcons {
     val bolt: ImageVector = Icons.Rounded.Bolt
     val check: ImageVector = Icons.Rounded.Check
     val close: ImageVector = Icons.Rounded.Close
+    val refresh: ImageVector = Icons.Rounded.Refresh
+    val lock: ImageVector = Icons.Rounded.Lock
+    val info: ImageVector = Icons.Rounded.Info
 
     /** Maps a Drift category (lowercase string) to its activity icon. */
     fun category(category: String): ImageVector = when (category.lowercase().trim()) {
@@ -69,10 +80,11 @@ object CoffeeIcons {
         "walk", "walks" -> Icons.Rounded.DirectionsWalk
         "movie", "movies" -> Icons.Rounded.Movie
         "food" -> Icons.Rounded.Restaurant
-        "study" -> Icons.Rounded.MenuBook
+        "study", "books" -> Icons.Rounded.MenuBook
         "gaming", "games" -> Icons.Rounded.SportsEsports
         "music" -> Icons.Rounded.MusicNote
         "yoga", "fitness" -> Icons.Rounded.SelfImprovement
+        "workout" -> Icons.Rounded.FitnessCenter
         "creative" -> Icons.Rounded.Brush
         "event" -> Icons.Rounded.Event
         else -> Icons.Rounded.Bolt

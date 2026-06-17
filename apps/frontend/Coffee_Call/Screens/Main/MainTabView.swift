@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - Main Tab View
-// Implements the 5-item navigation model with Create as a modal sheet.
+// Implements the 5-item navigation model with Create as a full-screen compose surface.
 
 struct MainTabView: View {
     @State private var selectedTab = 0
@@ -56,41 +56,22 @@ struct MainTabView: View {
             JoinRequestDebugTracer.trace("MainTabView appeared; starting GlobalDriftStore")
             driftStore.start()
         }
-        .sheet(isPresented: $showCreateDriftSheet) {
-            if #available(iOS 16.4, *) {
-                CreateDriftSheet(onCreateSucceeded: {
-                    selectedTab = 1
-                    driftsViewModel.selectedMode = .mine
-                    driftsViewModel.selectedTimeState = .all
-                    driftsViewModel.selectedTimeframe = "All"
-                    driftsViewModel.selectedCategory = nil
-                    driftsViewModel.selectedCategories = []
-                    driftsViewModel.selectedDistanceRadius = 10.0
-                    driftsViewModel.searchQuery = ""
-                    driftsViewModel.debouncedSearchQuery = ""
-                    driftsViewModel.isSearchActive = false
-                })
-                    .presentationDetents([.fraction(0.96)])
-                    .presentationCornerRadius(AppConstants.Layout.createSheetRadius)
-                    .presentationBackground(.clear)
-                    .presentationDragIndicator(.hidden)
-            } else {
-                CreateDriftSheet(onCreateSucceeded: {
-                    selectedTab = 1
-                    driftsViewModel.selectedMode = .mine
-                    driftsViewModel.selectedTimeState = .all
-                    driftsViewModel.selectedTimeframe = "All"
-                    driftsViewModel.selectedCategory = nil
-                    driftsViewModel.selectedCategories = []
-                    driftsViewModel.selectedDistanceRadius = 10.0
-                    driftsViewModel.searchQuery = ""
-                    driftsViewModel.debouncedSearchQuery = ""
-                    driftsViewModel.isSearchActive = false
-                })
-                    .presentationDetents([.fraction(0.96)])
-                    .presentationDragIndicator(.hidden)
-            }
+        .fullScreenCover(isPresented: $showCreateDriftSheet) {
+            CreateDriftSheet(onCreateSucceeded: resetDriftsAfterCreate)
         }
+    }
+
+    private func resetDriftsAfterCreate() {
+        selectedTab = 1
+        driftsViewModel.selectedMode = .mine
+        driftsViewModel.selectedTimeState = .all
+        driftsViewModel.selectedTimeframe = "All"
+        driftsViewModel.selectedCategory = nil
+        driftsViewModel.selectedCategories = []
+        driftsViewModel.selectedDistanceRadius = 10.0
+        driftsViewModel.searchQuery = ""
+        driftsViewModel.debouncedSearchQuery = ""
+        driftsViewModel.isSearchActive = false
     }
 }
 

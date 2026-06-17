@@ -13,9 +13,6 @@ struct DriftDetailScreen: View {
     @State private var manageDrift: Drift? = nil
     @State private var showLeaveConfirmation = false
     @State private var showLeaveSuccessAlert = false
-    @State private var isShowingDetail = false
-    @State private var isShowingChat = false
-    @State private var isShowingManage = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -76,7 +73,6 @@ struct DriftDetailScreen: View {
                 showingHostContext = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     selectedDriftForNavigation = targetDrift
-                    isShowingDetail = true
                 }
             }
             .presentationDetents([.fraction(0.85)])
@@ -92,17 +88,26 @@ struct DriftDetailScreen: View {
                 .presentationDetents([.height(AppConstants.Layout.confirmationSheetHeight)])
                 .presentationDragIndicator(.visible)
         }
-        .navigationDestination(isPresented: $isShowingDetail) {
+        .navigationDestination(isPresented: Binding(
+            get: { selectedDriftForNavigation != nil },
+            set: { if !$0 { selectedDriftForNavigation = nil } }
+        )) {
             if let targetDrift = selectedDriftForNavigation {
                 DriftDetailScreen(viewModel: DriftDetailViewModel(drift: targetDrift))
             }
         }
-        .navigationDestination(isPresented: $isShowingChat) {
+        .navigationDestination(isPresented: Binding(
+            get: { chatDrift != nil },
+            set: { if !$0 { chatDrift = nil } }
+        )) {
             if let targetDrift = chatDrift {
-                DriftChatScreen(drift: targetDrift)
+                DriftChatScreen(viewModel: DriftChatViewModel(drift: targetDrift))
             }
         }
-        .navigationDestination(isPresented: $isShowingManage) {
+        .navigationDestination(isPresented: Binding(
+            get: { manageDrift != nil },
+            set: { if !$0 { manageDrift = nil } }
+        )) {
             if let targetDrift = manageDrift {
                 ManageDriftScreen(viewModel: ManageDriftViewModel(drift: targetDrift))
             }
@@ -561,7 +566,6 @@ struct DriftDetailScreen: View {
                 if viewModel.drift.isMine {
                     Button(action: {
                         manageDrift = viewModel.drift
-                        isShowingManage = true
                     }) {
                         manageButtonContent
                     }
@@ -569,7 +573,6 @@ struct DriftDetailScreen: View {
                 } else if viewModel.joinStatus == .joined {
                     Button(action: {
                         chatDrift = viewModel.drift
-                        isShowingChat = true
                     }) {
                         ctaButtonContent
                     }
@@ -1234,7 +1237,6 @@ struct WhoIsComingSheet: View {
 struct DriftMapView: View {
     let joinStatus: DriftDetailViewModel.JoinStatus
     let location: String
-    @State private var showingMapOptions = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
@@ -1304,7 +1306,11 @@ struct DriftMapView: View {
 
             if joinStatus == .joined {
                 Button(action: {
-                    showingMapOptions = true
+                    // Open in Apple Maps
+                    let url = URL(string: "maps://?q=\(location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")")!
+                    if UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url)
+                    }
                 }) {
                     HStack(spacing: AppConstants.Layout.subElementSpacing - 2) {
                         AppIcons.mapImage
@@ -1314,23 +1320,6 @@ struct DriftMapView: View {
                     }
                     .foregroundColor(.brandPrimary)
                     .padding(.vertical, AppConstants.Layout.subElementSpacing)
-                }
-                .confirmationDialog("Open in Maps", isPresented: $showingMapOptions, titleVisibility: .visible) {
-                    Button("Apple Maps") {
-                        if let url = URL(string: "maps://?q=\(location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"),
-                           UIApplication.shared.canOpenURL(url) {
-                            UIApplication.shared.open(url)
-                        }
-                    }
-                    Button("Google Maps") {
-                        if let url = URL(string: "comgooglemaps://?q=\(location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"),
-                           UIApplication.shared.canOpenURL(url) {
-                            UIApplication.shared.open(url)
-                        } else if let webUrl = URL(string: "https://maps.google.com/?q=\(location.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")") {
-                            UIApplication.shared.open(webUrl)
-                        }
-                    }
-                    Button("Cancel", role: .cancel) {}
                 }
             }
         }

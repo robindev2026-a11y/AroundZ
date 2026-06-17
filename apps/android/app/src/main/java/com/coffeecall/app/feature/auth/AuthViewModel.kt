@@ -9,8 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.coffeecall.app.core.storage.ProfilePreferencesRepository
 import com.coffeecall.app.core.storage.ProfileImageHelper
 import com.coffeecall.app.core.session.SessionPreferencesRepository
-import com.coffeecall.app.data.repository.FirebaseAuthRepository
-import com.coffeecall.app.data.repository.FirebaseUserRepository
+import com.coffeecall.app.data.repository.RepositoryProvider
 import com.coffeecall.app.domain.model.UserProfile
 import com.coffeecall.app.domain.repository.AuthRepository
 import com.coffeecall.app.domain.repository.UserRepository
@@ -22,8 +21,8 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     application: Application,
-    private val authRepository: AuthRepository = FirebaseAuthRepository(),
-    private val userRepository: UserRepository = FirebaseUserRepository(),
+    private val authRepository: AuthRepository = RepositoryProvider.authRepository,
+    private val userRepository: UserRepository = RepositoryProvider.userRepository,
     private val sessionRepository: SessionPreferencesRepository =
         SessionPreferencesRepository(application)
 ) : AndroidViewModel(application) {

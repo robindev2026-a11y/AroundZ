@@ -1,15 +1,208 @@
 # CHANGELOG - CoffeeCall
 
+## [2026-06-16] - Android Arch Batch A5: DI standardization via RepositoryProvider
+**What changed:**
+- Migrated all ViewModels to use `RepositoryProvider` for repository injection instead of creating Firebase instances directly: `ChatsListViewModel`, `ChatThreadViewModel`, `AuthViewModel`, `ProfileViewModel`, `DiscoveryViewModel`, `DriftDetailViewModel`, `CreateDriftViewModel`.
+- Removed direct `FirebasePostRepository()`, `FirebaseUserRepository()`, `FirebaseAuthRepository()`, `FirebaseMessageThreadRepository()`, `FirebaseReportRepository()` imports from all ViewModels.
+- Fixed DiscoveryViewModel to use `store.notifications` (via `observeNotifications()`) instead of the old `loadNotifications()` method that called `PostRepository` directly — completing the A1 migration that was partially applied.
+- All ViewModels now follow a consistent pattern: repositories via `RepositoryProvider`, `GlobalDriftStore` via `GlobalDriftStore.getInstance(application)`, `NavigationManager` via `NavigationManager.getInstance()`.
+
+**Why:**
+- iOS uses `@EnvironmentObject` for consistent dependency injection. Android previously had each ViewModel creating its own Firebase repository instances, which bypassed the mock/offline path and created inconsistent behavior. This standardizes injection through `RepositoryProvider`, ensuring all ViewModels use the correct Firebase or mock implementation based on config state.
+
+## [2026-06-16] - Android Arch Batch A4: design-token compliance sweep
+**What changed:**
+- Replaced 165 raw `.dp` values with `CoffeeSpacing.*` tokens across all feature screens: CreateScreen (3), DriftsScreen (17), DriftDetailScreen (28), DiscoveryScreen (23), ChatScreen (4), ChatThreadScreen (11), ProfileScreen (3), ProfileEditScreen (10), AuthScreen (19), ProfileSetupScreen (1), OnboardingScreen (43), CoffeeCallApp (3).
+- Replaced spacing values like `padding(16.dp)` → `padding(CoffeeSpacing.md)`, `height(56.dp)` → `height(CoffeeSpacing.primaryButtonHeight)`, `size(44.dp)` → `size(CoffeeSpacing.minTouchTarget)`, etc.
+- Remaining raw `.dp` values are intentional: border widths (1.dp), shadows (2.dp), RoundedCornerShape radii, and component-specific dimensions with no token equivalent.
+- Zero raw hex `Color(0x...)` found (already cleaned in Batch 1). Zero hardcoded `fontSize` found (already using `MaterialTheme.typography`).
+
+**Why:**
+- iOS forces all spacing/typography/colors through tokens for visual consistency. Android previously had ~535 raw `.dp` values. This sweep brings Android to near-zero token violations for spacing/padding, matching iOS's token discipline.
+
+## [2026-06-16] - Android Arch Batch A3: mock repository parity + RepositoryProvider
+**What changed:**
+- Created `data/repository/mock/` directory with lightweight mock/fake implementations for all 6 repository interfaces: `MockUserRepository`, `MockPostRepository`, `MockAcceptanceRepository`, `MockMessageThreadRepository`, `MockAuthRepository`, `MockReportRepository`.
+- Mock repos use in-memory data structures with seeded realistic data (profiles, drifts, threads, messages) for offline/preview behavior when `google-services.json` is absent.
+- Created `data/repository/RepositoryProvider.kt` — a singleton factory that returns the correct Firebase or mock implementation based on `FirebaseInitializer.currentState()`.
+- All mock implementations mirror the Firebase impl method signatures exactly, making the Firebase/mock pairing obvious and discoverable.
+
+**Why:**
+- iOS pairs each service protocol with Firebase + mock/preview impls and a documented offline path. Android previously had no mock implementations, so the app crashed or showed empty screens when Firebase config was absent. This closes that gap.
+
+## [2026-06-16] - Android Arch Batch A2: shared NavigationManager
+**What changed:**
+- Created `core/navigation/NavigationManager.kt` as a singleton shared state holder with `isTabBarHidden: StateFlow<Boolean>` and `activeInterestFilter: StateFlow<String?>`.
+- In `CoffeeCallApp`, the floating bottom nav now auto-hides on detail/chat/profile-edit routes via `NavigationManager.isTabBarHidden`.
+- Discovery interest taps now write to `NavigationManager.activeInterestFilter` instead of using ad-hoc local state, and Drifts reads from the shared manager.
+- Removed the `activeInterestFilter` parameter from `DriftsScreen` — it now reads from `NavigationManager` directly.
+
+**Why:**
+- iOS centralizes tab-bar visibility (hidden on detail/chat) and passes the Discovery interest filter into Drifts through a shared `NavigationManager`. Android previously used scattered local state, which could drift. This closes that architecture gap.
+
+## [2026-06-16] - Android Arch Batch A1: shared GlobalDriftStore
+**What changed:**
+- Created `core/state/GlobalDriftStore.kt` as an app-scoped singleton providing a single source of truth for drifts via `StateFlow<List<DriftPost>>`.
+- GlobalDriftStore owns all repository calls: `fetch()`, `refresh()`, `createPost()`, `requestToJoin()`, `cancelJoinRequest()`, `acceptJoinRequest()`, `rejectJoinRequest()`, `leavePost()`, `updatePostStatus()`, `upsertPost()`.
+- Store maintains a derived `notifications: StateFlow<List<DiscoveryNotification>>` from hosted/joined drift join requests and status changes.
+- Refactored `DriftsViewModel` to observe `store.drifts` instead of calling `PostRepository` directly.
+- Refactored `DriftDetailViewModel` to observe `store.drifts` and use `store.fetchPost()` / store mutation methods instead of calling `PostRepository` directly.
+- Refactored `DiscoveryViewModel` to observe `store.notifications` instead of calling `PostRepository` directly for notification data.
+- Removed duplicate per-screen repository calls — all drift state mutations now flow through the shared store.
+
+**Why:**
+- iOS has one app-scoped `GlobalDriftStore` source of truth; cross-screen updates (join/leave/new drift) propagate everywhere. Android previously had each ViewModel fetch independently, so state could diverge between Discovery/Drifts/Detail. This closes that architecture gap.
+
+## [2026-06-16] - Android Parity Batch P8: Auth + Onboarding
+**What changed:**
+- Refreshed PhoneEntryView and OtpVerificationView with the premium design system (CoffeeBackground, CoffeeSurface, CoffeeIcons).
+- Added country code picker and character-box styling for OTP entry.
+- Updated ProfileSetupScreen with the immersive style, including photo picker integration and CoffeeAvatar.
+- Applied sticky bottom button patterns using CoffeeButton.
+
+**Why:**
+- To bring the authentication and profile setup flows into visual parity with the iOS app's refreshed design.
+
+## [2026-06-16] - Android Parity Batch P7: Chats parity
+**What changed:**
+- Added status filter chips (Active, Upcoming, Past) to the Chats list screen.
+- Added context chips (Title, Category, Location) to the top of chat threads.
+- Implemented an attachment menu in the chat composer with options for Camera, Photo Library, and Location sharing.
+- Added a thread detail sheet with actions for Mute, View Drift, Report, Block, and Leave.
+- Integrated system message rows for centered notices within the chat stream.
+
+**Why:**
+- To match the iOS chat features and management options listed in the widget mapper.
+
+## [2026-06-16] - Android Parity Batch P6: Drift Detail privacy guardrails
+**What changed:**
+- Kept exact meeting point rendering locked to joined users and hosts.
+- Changed calendar export text so non-joined users do not receive exact meeting point details.
+- Replaced the always-visible participant strip with a guarded participants section: pre-join shows count/limited initials only, while joined users see full participant rows when available.
+- Left precise map opening available only from the joined location section.
+
+**Why:**
+- To match iOS privacy behavior for exact meeting points and participant details before a user joins a drift.
+
+## [2026-06-16] - Android Parity Batch P5: Host management parity
+**What changed:**
+- Kept host management folded into `DriftDetailScreen` instead of adding a separate route, matching the current Android detail architecture.
+- Added a host-only management panel with overview counts, share, edit, close, delete, chat entry, participant chips, and a safety reminder.
+- Added host edit, close, and delete actions in `DriftDetailViewModel`; close uses the existing status update path and delete removes the post/chat documents without changing schemas.
+- Preserved the existing pending join request panel with accept/reject actions.
+
+**Why:**
+- To give Android hosts the iOS ManageDriftScreen controls while keeping the change scoped to Drift Detail presentation and view-model action wiring.
+
+## [2026-06-16] - Android Parity Batch P4: Profile parity
+**What changed:**
+- Rebuilt the Profile screen around the iOS mapper sections: identity card with large `CoffeeAvatar`, verified-phone pill, approximate location, interest chips, and edit action.
+- Added four tappable stat tiles for hosted, joined, no-shows, and score, each opening a detail bottom sheet.
+- Added saved/recent drift and activity-log sections that route drift cards/rows to drift detail using existing drift history data.
+- Added preference rows and sheets for Interests, Availability, Notifications, and Privacy/Safety; interests and availability persist through the existing profile update path, while notification/privacy toggles persist locally.
+- Added account rows for Location, Help, and Sign out; Location can update via the existing GPS/geocode helper and Sign out uses the existing auth sign-out flow.
+
+**Why:**
+- To bring Android Profile behavior and widget coverage in line with the current iOS Profile mapper without changing schemas or iOS code.
+
+## [2026-06-16] - Android Parity Batch P3: Notifications sheet
+**What changed:**
+- Added a Discovery notifications bottom sheet with non-empty and empty states.
+- Replaced the Discovery bell Toast with sheet presentation and kept the unread dot tied to available notification items.
+- Derived notification rows from existing hosted drift join requests and joined drift updates without adding new data models or schemas.
+- Wired notification row taps to dismiss the sheet and navigate to the matching drift detail by ID.
+
+**Why:**
+- To match iOS behavior, where the Discovery bell opens a notifications sheet and notifications route into their drift context.
+
+## [2026-06-16] - Android Parity Batch P2: Discovery radar-only
+**What changed:**
+- Removed the Discovery meetup card feed, search field, and category filter chips so Around is radar-first instead of a hybrid feed.
+- Removed Discovery's nearby-post fetch/state from the embedded view model, leaving radar people and interest categories as the screen model.
+- Kept the presence toggle, timed refresh scan, radar parallax, draggable bottom sheet, drifts-forming pill, and interest grid.
+- Wired the drifts-forming pill to open Drifts and wired interest cards to open Drifts with a visible, clearable category filter.
+
+**Why:**
+- To match iOS, where Discovery is an anonymous radar/interest surface and meetup cards live on the Drifts tab.
+
+## [2026-06-16] - Android Parity Batch P1: Create as modal + 4-tab nav
+**What changed:**
+- Removed Create from the Android bottom navigation destinations so the tab bar now exposes Discovery, Drifts, Chats, and Profile only.
+- Added a raised center plus action inside the Android bottom nav that opens `CreateScreen` in a Material3 `ModalBottomSheet` without selecting a tab.
+- Routed successful create completion to dismiss the sheet and navigate to the Drifts tab.
+- Removed the standalone Create NavHost destination and unused create route constant after verifying there are no create deep links.
+
+**Why:**
+- To match the iOS app shell, where Create is a modal center action instead of a persistent tab.
+
+## [2026-06-16] - Android UI Refresh Audit & Status Reconciliation
+**What changed:**
+- Audited Android UI Refresh batches against the Kotlin implementation and Figma Make `.tsx` references instead of trusting prior logs.
+- Updated `docs/ANDROID_UI_REFRESH_HANDOFF.md` to mark Batches 1–3 and 5–7 Done, and Batches 4, 8, 9, and 10 Partial.
+- Corrected the next-action handoff to finish Discovery parity first.
+
+**Why:**
+- The previous handoff status said only Batches 1–4 were complete and Batches 5–10 remained, while the code already contains substantial migrated work in later screens and still has partial gaps in Discovery/Profile/Auth/Shell.
+
+## [2026-06-16] - Android UI Refresh Batch 7: Chat Screens (logged retroactively after code audit)
+**What changed:**
+- Verified `feature/chat/ChatScreen.kt` renders refreshed thread cards with `CoffeeAvatar`, rounded surfaces, category badges, timestamps, last-message snippets, and unread indicators.
+- Verified `feature/chat/ChatThreadScreen.kt` renders mint self bubbles, surface-toned other bubbles, rounded composer/input bar, `CoffeeIcons.send`, attachment/location actions, and refreshed safety dialogs using `CoffeeButton`.
+
+**Why:**
+- The UI refresh work is present in code but was not logged as an Android UI Refresh batch entry.
+
+## [2026-06-16] - Android UI Refresh Batch 6: Create Screen (logged retroactively after code audit)
+**What changed:**
+- Verified `feature/create/CreateScreen.kt` renders the refreshed activity chip grid, vibe/date/time/capacity/join-mode selectors, rounded section cards and inputs, location picker dialog, status card, and primary `CoffeeButton` CTA.
+
+**Why:**
+- The UI refresh work is present in code but was not logged as an Android UI Refresh batch entry.
+
+## [2026-06-16] - iOS Screen And Widget Mapper
+**What changed:**
+- Added `docs/IOS_SCREEN_WIDGET_MAPPER.md`, a point-to-point SwiftUI responsibility map from the authenticated Home/Around screen through Drifts, Create, Detail/Manage, Chat, and Profile.
+- Linked the mapper from `CURRENT_STATE.md` so future agents can find the iOS screen ownership notes before relying on Android-heavy changelog entries.
+
+**Why:**
+- To reflect the newer iOS screen/widget responsibilities in durable project notes and reduce confusion when the changelog is focused on Android migration work.
+
+## [2026-06-15] - Android UI Refresh Batch 5: Drifts & Drift Detail Screen
+**What changed:**
+- Redesigned the `DriftsScreen.kt` to use `CoffeeDriftCard`, the new immersive, photo-forward card from the refreshed design components, replacing the legacy custom-built `DriftCard`.
+- Updated `DriftsScreen` error state button to use `CoffeeButton`.
+- Upgraded the `DriftDetailScreen.kt` hero image overlay to feature the host's `CoffeeAvatar` and a dynamically colored `CoffeeGlassBadge` for the category.
+- Converted inline avatar loops for participants to use the new `CoffeeAvatar` component.
+- Updated all CTA actions in the floating bottom bar (Join, Chat Room, Leave) to use `CoffeeButton` variants.
+- Replaced buttons and avatars inside `HostContextCard` and `HostRequestsPanel` with `CoffeeAvatar` and `CoffeeButton`.
+
+**Why:**
+- To migrate the Drifts tab list view and the detailed view screen to the modern premium design system components, improving visual consistency and aligning with the "Social Refresh" spec.
+
+## [2026-06-15] - Android Discovery Screen Polish & Parity
+**What changed:**
+- Adjusted bottom sheet collapsed height from 290dp offset to half screen (`screenHeight / 2`) and restricted drag gestures strictly between expanded and half-screen targets.
+- Added a floating translucent circular refresh button on the bottom right of the screen (fades out as sheet expands).
+- Added `isScanning` state to `DiscoveryUiState` and `refreshNearby()` to `DiscoveryViewModel` (runs 3s scanning timer).
+- Bound background radar layer's scale, opacity, and blur attributes to the sheet drag progress to create a smooth parallax effect.
+- Updated `AroundRadar` to only show and animate the sweep rotation line while scanning.
+- Mapped `Icons.Rounded.Refresh` in `CoffeeIcons.kt`.
+- Styled interest grid items inside the bottom sheet as premium visual cards.
+
+**Why:**
+- To bring the native Android Discovery screen to exact visual and behavioral parity with the premium iOS screen's bottom sheet offsets, radar sweep animation rules, and interest grid layouts.
+
 ## [2026-06-15] - Android UI Refresh Batch 4: Discovery Screen
 **What changed:**
 - Redesigned the Discovery Screen (`feature/discovery/DiscoveryScreen.kt`) to match the Figma "Social Refresh" layout:
   - Custom top header displaying "Hey {name}" and a count of active nearby meetups.
-  - Interactive header actions: Notifications (bell icon with dot indicator), map view toggle (Map icon), and profile photo avatar (`CoffeeAvatar`).
+  - Interactive header actions: presence toggle, notifications bell with dot indicator, and profile photo avatar (`CoffeeAvatar`). Code audit note: the Figma map view toggle is still missing.
   - Implemented search input bar with live client-side filtering on drift titles, hooks, locations, and host names.
   - Added horizontal scrollable LazyRow of category filter chips (All, Coffee, Walks, Study, Food, Gaming, Creative) with matching real vector icons.
   - Replaced legacy list cards with the new immersive, photo-forward `CoffeeDriftCard`.
   - Added bottom-right floating slate-dark Plus FAB.
   - Implemented Join/Accept modal popup (`showAcceptModal`) and Match Confirmed overlay (`showMatchModal`) in Jetpack Compose.
+  - Code audit note: the notifications bell currently shows a Toast rather than the Figma notifications view/sheet.
 - Conditionally hid the global `CoffeeTopAppBar` for the Discovery tab in `CoffeeCallApp.kt`.
 - Updated `DiscoveryViewModel` to load the current user's profile to feed their name and photo URL into the UI.
 

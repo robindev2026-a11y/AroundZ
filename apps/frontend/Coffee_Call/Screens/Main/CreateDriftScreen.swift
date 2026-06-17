@@ -1,24 +1,21 @@
 import SwiftUI
-import Combine
-import FirebaseCore
-import FirebaseAuth
-
 
 struct CreateDriftSheet: View {
     enum Mode { case create, edit }
+
     private let mode: Mode
     private let existingDrift: Drift?
     private let onSave: (Drift) -> Void
     private let onCreateSucceeded: () -> Void
+
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @EnvironmentObject private var driftStore: GlobalDriftStore
-    @FocusState private var focusedField: FocusField?
     @StateObject private var viewModel: CreateDriftViewModel
     @State private var showDiscardConfirmation = false
-    @State private var showSuccessState = false
-    @State private var showHookTooltip = false
     @State private var showingMapPicker = false
+    @State private var activeWhenPicker: WhenPickerKind?
+    @State private var selectedDateAction = "Today"
+    @State private var selectedTimeAction = "In 30 mins"
 
     init(
         mode: Mode = .create,
@@ -32,7 +29,7 @@ struct CreateDriftSheet: View {
         self.onSave = onSave
         self.onCreateSucceeded = onCreateSucceeded
 
-        if mode == .edit, let drift = drift {
+        if mode == .edit, let drift {
             _viewModel = StateObject(wrappedValue: viewModel ?? CreateDriftViewModel(editing: drift))
         } else {
             _viewModel = StateObject(wrappedValue: viewModel ?? CreateDriftViewModel())
@@ -40,33 +37,18 @@ struct CreateDriftSheet: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.backgroundMain.ignoresSafeArea()
+        GeometryReader { proxy in
+            let isTablet = proxy.size.width >= 700
+            ZStack {
+                Color(red: 0.96, green: 0.94, blue: 0.90).ignoresSafeArea()
 
-            glassBackdrop
-
-            VStack(spacing: 0) {
-                if mode == .create {
-                    sheetHandle
+                if isTablet {
+                    tabletLayout
+                        .frame(maxWidth: 980, maxHeight: 720)
+                        .padding(28)
+                } else {
+                    phoneLayout
                 }
-                header
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: AppConstants.Layout.sectionSpacing) {
-                        activitySection
-                        planTitleSection
-                        dateTimeSection
-                        locationCapacitySection
-                        joinModeSection
-                        VibeMenuRow(selectedVibe: $viewModel.selectedVibe)
-                        optionalDetailsSection
-                        privacySection
-                    }
-                    .padding(.horizontal, AppConstants.Layout.standardPadding)
-                    .padding(.top, AppConstants.Layout.subElementSpacing)
-                    .padding(.bottom, AppConstants.Layout.standardPadding)
-                }
-                
-                stickyFooter
             }
         }
         .sheet(isPresented: $showingMapPicker) {
@@ -76,1138 +58,651 @@ struct CreateDriftSheet: View {
                 viewModel.selectedLongitude = lng
             }
         }
-        .interactiveDismissDisabled(mode == .create)
-        .onChange(of: viewModel.selectedActivity) { newValue in
-            if newValue == .custom {
-                focusedField = .customActivity
-            } else if focusedField == .customActivity {
-                focusedField = nil
+        .sheet(item: $activeWhenPicker) { picker in
+            WhenPickerSheet(date: $viewModel.scheduledDate, kind: picker)
+                .presentationDetents([.medium])
+        }
+        .alert("Discard changes?", isPresented: $showDiscardConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Discard", role: .destructive) { dismiss() }
+        } message: {
+            Text("Your current Drift plan details will be lost.")
+        }
+    }
+
+    private var phoneLayout: some View {
+        VStack(spacing: 0) {
+            phoneHeader
+
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    activitySection
+                    planSection
+                    vibeSection
+                    whenSection
+                    locationSection
+                    gatheringSection
+                    notesSection
+                    Spacer(minLength: 92)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
             }
         }
-        .alert(AppStrings.Create.discardTitle, isPresented: $showDiscardConfirmation) {
-            Button(AppStrings.Create.continueEditing, role: .cancel) { }
-            Button(AppStrings.Create.discardAction, role: .destructive) {
-                dismiss()
+        .safeAreaInset(edge: .bottom) {
+            footer
+        }
+    }
+
+    private var tabletLayout: some View {
+        VStack(spacing: 0) {
+            tabletHeader
+
+            HStack(alignment: .top, spacing: 20) {
+                VStack(spacing: 0) {
+                    activitySection
+                    Divider().padding(.vertical, 16)
+                    planSection
+                    Divider().padding(.vertical, 16)
+                    vibeSection
+                    Divider().padding(.vertical, 16)
+                    whenSection
+                }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+
+                VStack(spacing: 14) {
+                    locationSection
+                    gatheringSection
+                    notesSection
+                }
+                .frame(width: 360, alignment: .top)
             }
-        } message: {
-            Text(AppStrings.Create.discardMessage)
+            .padding(.horizontal, 24)
+            .padding(.top, 10)
+
+            Spacer(minLength: 14)
+            footer
         }
-        .alert("Error", isPresented: $viewModel.showErrorAlert) {
-            Button(AppStrings.Common.ok, role: .cancel) { }
-        } message: {
-            Text(viewModel.errorAlertMessage)
-        }
+        .background(Color.white.opacity(0.92))
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Color.appBorder, lineWidth: 1))
+        .shadow(color: Color.black.opacity(0.14), radius: 28, y: 18)
     }
 
-    private var glassBackdrop: some View {
-        ZStack {
-            Circle()
-                .fill(Color.brandPrimary.opacity(0.14))
-                .frame(width: 420, height: 420)
-                .blur(radius: 72)
-                .offset(x: -160, y: -320)
+    private var phoneHeader: some View {
+        VStack(spacing: 10) {
+            Capsule()
+                .fill(Color.appBorder)
+                .frame(width: 42, height: 4)
+                .padding(.top, 8)
 
-            Circle()
-                .fill(Color.brandPrimary.opacity(0.08))
-                .frame(width: 320, height: 320)
-                .blur(radius: 56)
-                .offset(x: 170, y: 220)
+            HStack {
+                Button(action: closeTapped) {
+                    Image(systemName: AppIcons.chevronDown)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.textPrimary)
+                        .frame(width: 40, height: 40)
+                }
 
-            RoundedRectangle(cornerRadius: AppConstants.Layout.createSheetRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    LinearGradient(
-                        colors: [
-                            Color.brandPrimary.opacity(0.10),
-                            Color.surfaceMain.opacity(0.76),
-                            Color.backgroundMain.opacity(0.58)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.Layout.createSheetRadius, style: .continuous)
-                        .stroke(Color.brandPrimary.opacity(0.16), lineWidth: 1)
-                )
-                .shadow(color: Color.brandPrimary.opacity(0.08), radius: 24, x: 0, y: 12)
+                Spacer()
+
+                VStack(spacing: 4) {
+                    Text("NEW DRIFT")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.brandPrimaryDark)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.brandPrimary.opacity(0.12), in: Capsule())
+
+                    Text(mode == .edit ? "Edit Moment" : "Host a Moment")
+                        .font(.system(size: 22, weight: .black))
+                        .foregroundColor(.textPrimary)
+
+                    Text("Create a plan. Invite people. Make it happen.")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundColor(.textSecondary)
+                }
+
+                Spacer()
+
+                Button(action: closeTapped) {
+                    Image(systemName: AppIcons.close)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.textPrimary)
+                        .frame(width: 40, height: 40)
+                }
+            }
+            .padding(.horizontal, 12)
         }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
+        .padding(.bottom, 12)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .bottom) { Divider().opacity(0.8) }
     }
 
-    private var sheetHandle: some View {
-        Capsule()
-            .fill(Color.appBorder)
-            .frame(width: AppConstants.Layout.sheetHandleWidth, height: AppConstants.Layout.sheetHandleHeight)
-            .padding(.top, AppConstants.Layout.sheetHandleTopPadding)
-            .padding(.bottom, AppConstants.Layout.sheetHandleBottomPadding)
-    }
+    private var tabletHeader: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 7) {
+                Text("NEW DRIFT")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.brandPrimaryDark)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 4)
+                    .background(Color.brandPrimary.opacity(0.14), in: Capsule())
 
-    private var header: some View {
-        HStack(alignment: .top, spacing: AppConstants.Layout.elementSpacing) {
-            VStack(alignment: .leading, spacing: AppConstants.Layout.miniPadding) {
-                Text(mode == .edit ? AppStrings.Manage.editTitle : AppStrings.Create.title)
-                    .font(.heading1)
+                Text(mode == .edit ? "Edit Moment" : "Host a Moment")
+                    .font(.system(size: 26, weight: .black))
                     .foregroundColor(.textPrimary)
 
-                Text(mode == .edit ? AppStrings.Manage.editSubtitle : AppStrings.Create.subtitle)
-                    .font(.bodyStandard)
+                Text("Create meaningful moments with people around you.")
+                    .font(.system(size: 13))
                     .foregroundColor(.textSecondary)
             }
 
-            Spacer(minLength: 0)
+            Spacer()
 
             Button(action: closeTapped) {
-                ZStack {
-                    Circle()
-                        .fill(Color.surfaceMain)
-                        .frame(width: AppConstants.Layout.minTouchTarget + 10, height: AppConstants.Layout.minTouchTarget + 10)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.appBorder, lineWidth: 1)
-                        )
-
-                    AppIcons.closeImage
-                        .font(.bodyBold)
-                        .foregroundColor(.textPrimary)
-                }
+                Image(systemName: AppIcons.close)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.textPrimary)
+                    .frame(width: 42, height: 42)
             }
-            .pressScale(0.92)
         }
-        .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .padding(.bottom, AppConstants.Layout.elementSpacing)
+        .padding(.horizontal, 24)
+        .padding(.top, 24)
+        .padding(.bottom, 4)
     }
 
     private var activitySection: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 4) {
-                    requiredSectionTitle(AppStrings.Create.activityTitle)
-
-                    Text(AppStrings.Create.activitySubtitle)
-                        .font(.bodyStandard)
-                        .foregroundColor(.textSecondary)
-                }
-
-                Spacer(minLength: 0)
-
-                Button(action: {
-                    withAnimation(CoffeeAnimation.spring) {
-                        viewModel.setActivity(.custom)
-                    }
-                }) {
-                    HStack(spacing: 6) {
-                        AppIcons.editImage
-                            .font(.captionText)
-                        Text(AppStrings.Create.customActivity)
-                            .font(.captionText)
-                    }
-                    .foregroundColor(viewModel.selectedActivity == .custom ? .brandPrimary : .textPrimary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(viewModel.selectedActivity == .custom ? Color.brandPrimary.opacity(0.12) : Color.surfaceMain)
-                    .overlay(
-                        Capsule()
-                            .stroke(viewModel.selectedActivity == .custom ? Color.brandPrimary.opacity(0.35) : Color.appBorder, lineWidth: 1)
-                    )
-                    .clipShape(Capsule())
-                }
-                .pressScale(0.96)
-            }
-
-            LazyVGrid(columns: activityColumns, spacing: AppConstants.Layout.elementSpacing) {
-                ForEach(visibleActivityItems, id: \.id) { activity in
-                    ActivityTypeCard(
-                        activity: activity,
-                        isSelected: viewModel.selectedActivity == activity
-                    ) {
-                        withAnimation(CoffeeAnimation.spring) {
-                            viewModel.setActivity(activity)
-                        }
-                    }
-                }
-            }
-
-            if activityItems.count > AppConstants.Create.activityGridCollapsedCount {
-                Button(action: {
-                    viewModel.toggleActivityGridExpansion()
-                }) {
-                    HStack(spacing: 6) {
-                        Text(viewModel.isActivityGridExpanded ? AppStrings.Create.viewLessActivities : AppStrings.Create.viewMoreActivities)
-                            .font(.bodyBold)
-                        AppIcons.chevronDownImage
-                            .font(.captionText)
-                            .rotationEffect(.degrees(viewModel.isActivityGridExpanded ? 180 : 0))
-                    }
-                    .foregroundColor(.brandPrimary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.surfaceMain)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                            .stroke(Color.appBorder, lineWidth: 1)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-                }
-                .pressScale(0.97)
-            }
-
-            if viewModel.selectedActivity == .custom {
-                InlineTextFieldRow(
-                    title: AppStrings.Create.customActivityTitle,
-                    placeholder: AppStrings.Create.customActivityPlaceholder,
-                    text: $viewModel.customActivityText,
-                    isRequired: true,
-                    tooltipTitle: nil,
-                    tooltipMessage: nil,
-                    showTooltip: .constant(false),
-                    focusField: .customActivity,
-                    focusedField: $focusedField
-                )
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-    }
-
-    private var planTitleSection: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            requiredSectionTitle(AppStrings.Create.planTitlePrompt)
-
-            TitleField(
-                text: $viewModel.planTitle,
-                focusedField: $focusedField,
-                count: viewModel.titleCount,
-                maxCount: viewModel.maxTitleCount
-            )
-        }
-    }
-
-    private var dateTimeSection: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            requiredSectionTitle(AppStrings.Create.timeTitle)
-
-            Text(AppStrings.Create.timeSubtitle)
-                .font(.bodyStandard)
-                .foregroundColor(.textSecondary)
-
-            HStack(spacing: AppConstants.Layout.elementSpacing) {
-                DatePicker(
-                    "",
-                    selection: $viewModel.scheduledDate,
-                    displayedComponents: [.date]
-                )
-                .datePickerStyle(.compact)
-                .labelsHidden()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, AppConstants.Layout.elementSpacing)
-                .padding(.vertical, AppConstants.Layout.subElementSpacing)
-                .background(Color.surfaceMain)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                        .stroke(Color.appBorder, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-
-                DatePicker(
-                    "",
-                    selection: $viewModel.scheduledDate,
-                    displayedComponents: [.hourAndMinute]
-                )
-                .datePickerStyle(.compact)
-                .labelsHidden()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, AppConstants.Layout.elementSpacing)
-                .padding(.vertical, AppConstants.Layout.subElementSpacing)
-                .background(Color.surfaceMain)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                        .stroke(Color.appBorder, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-            }
-
-            HStack(spacing: AppConstants.Layout.elementSpacing) {
-                dateTimeCaption(AppStrings.Create.dateLabel)
-                dateTimeCaption(AppStrings.Create.timeLabel)
-            }
-        }
-    }
-
-    private var locationCapacitySection: some View {
-        Group {
-            if horizontalSizeClass == .regular {
-                LazyVGrid(columns: locationCapacityColumns, spacing: AppConstants.Layout.elementSpacing) {
-                    Button(action: { showingMapPicker = true }) {
-                        ApproximateLocationCard(location: viewModel.approximateLocation)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    CapacityChipScrollCard(
-                        selectedCapacityCount: viewModel.selectedCapacityCount,
-                        isOpenToAllCapacity: viewModel.isOpenToAllCapacity,
-                        onCapacityChange: { viewModel.setCapacityCount($0) },
-                        onOpenToAllChange: { viewModel.setOpenToAllCapacity($0) }
-                    )
-                }
-            } else {
-                VStack(spacing: AppConstants.Layout.elementSpacing) {
-                    Button(action: { showingMapPicker = true }) {
-                        ApproximateLocationCard(location: viewModel.approximateLocation)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    CapacityChipScrollCard(
-                        selectedCapacityCount: viewModel.selectedCapacityCount,
-                        isOpenToAllCapacity: viewModel.isOpenToAllCapacity,
-                        onCapacityChange: { viewModel.setCapacityCount($0) },
-                        onOpenToAllChange: { viewModel.setOpenToAllCapacity($0) }
-                    )
-                }
-            }
-        }
-    }
-
-    private var joinModeSection: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            requiredSectionTitle(AppStrings.Create.joinModeTitle)
-
-            JoinModeToggleCard(
-                selectedMode: viewModel.selectedJoinMode,
-                onSelect: { mode in
-                    withAnimation(CoffeeAnimation.spring) {
-                        viewModel.setJoinMode(mode)
-                    }
-                }
-            )
-        }
-    }
-
-    private var optionalDetailsSection: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            Button(action: {
-                withAnimation(CoffeeAnimation.springGentle) {
-                    viewModel.optionalDetailsExpanded.toggle()
-                }
-            }) {
-                HStack(alignment: .top, spacing: AppConstants.Layout.miniPadding) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(AppStrings.Create.optionalDetails)
-                            .font(.bodyBold)
-                            .foregroundColor(.textPrimary)
-
-                        Text(AppStrings.Create.optionalDetailsSubtitle)
-                            .font(.bodyStandard)
-                            .foregroundColor(.textSecondary)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    AppIcons.chevronDownImage
-                        .font(.captionText)
-                        .foregroundColor(.textSecondary)
-                        .rotationEffect(.degrees(viewModel.optionalDetailsExpanded ? 180 : 0))
-                }
-                .padding(.horizontal, AppConstants.Layout.elementSpacing)
-                .padding(.vertical, AppConstants.Layout.elementSpacing)
-                .background(Color.surfaceMain)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                        .stroke(Color.appBorder, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-            }
-            .pressScale(0.98)
-
-            if viewModel.optionalDetailsExpanded {
-                VStack(spacing: AppConstants.Layout.elementSpacing) {
-                    InlineTextFieldRow(
-                        title: AppStrings.Create.hookTitle,
-                        placeholder: AppStrings.Create.hookPlaceholder,
-                        text: $viewModel.hookText,
-                        isRequired: false,
-                        tooltipTitle: AppStrings.Create.hookTooltipTitle,
-                        tooltipMessage: AppStrings.Create.hookTooltipMessage,
-                        showTooltip: $showHookTooltip,
-                        focusField: .hook,
-                        focusedField: $focusedField
-                    )
-
-                    NotesFieldRow(
-                        title: AppStrings.Create.notesTitle,
-                        placeholder: AppStrings.Create.notesPlaceholder,
-                        text: $viewModel.notesText,
-                        focusedField: $focusedField
-                    )
-                }
-                .padding(.horizontal, AppConstants.Layout.elementSpacing)
-                .padding(.vertical, AppConstants.Layout.elementSpacing)
-                .background(Color.surfaceMain)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                        .stroke(Color.appBorder, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-    }
-
-    private var privacySection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 8) {
-                AppIcons.shieldVerifiedImage
-                    .font(.captionText)
-                    .foregroundColor(.brandPrimary)
-                    .padding(.top, 1)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(AppStrings.Create.privacyLinePrimary)
-                        .font(.metadata)
-                        .foregroundColor(.textSecondary)
-                        .multilineTextAlignment(.leading)
-
-                    Text(AppStrings.Create.privacyLineSecondary)
-                        .font(.metadata)
-                        .foregroundColor(.textSecondary)
-                }
-            }
-        }
-    }
-
-    private var stickyFooter: some View {
-        VStack(spacing: AppConstants.Layout.createSheetFooterSpacing) {
-            if mode == .create, showSuccessState {
-                successBanner
-            }
-
-            Button(action: postTapped) {
-                HStack(spacing: AppConstants.Layout.subElementSpacing) {
-                    if viewModel.isCreating {
-                        ProgressView()
-                            .tint(viewModel.canPost ? .textOnBrand : .textSecondary)
-                    } else if showSuccessState {
-                        AppIcons.checkCircleFillImage
-                            .font(.bodyBold)
-                    } else if mode == .edit {
-                        AppIcons.checkmarkImage
-                            .font(.bodyBold)
-                    } else {
-                        AppIcons.paperplaneFillImage
-                            .font(.bodyBold)
-                    }
-
-                    Text(footerTitle)
-                        .font(.buttonText)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .foregroundColor(viewModel.canPost || showSuccessState ? .textOnBrand : .textSecondary)
-                .background(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge, style: .continuous)
-                        .fill(footerBackground)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusLarge, style: .continuous)
-                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                )
-            }
-            .disabled(!viewModel.canPost)
-            .pressScale(0.97)
-
-            Text(AppStrings.Create.footerNote)
-                .font(.metadata)
-                .foregroundColor(.textSecondary)
-        }
-        .padding(.horizontal, AppConstants.Layout.standardPadding)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
-        .background(
-            Color.backgroundMain
-                .ignoresSafeArea(edges: .bottom)
-        )
-    }
-
-    private var successBanner: some View {
-        HStack(spacing: AppConstants.Layout.subElementSpacing) {
-            AppIcons.checkCircleFillImage
-                .font(.bodyBold)
-                .foregroundColor(.brandPrimary)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(AppStrings.Create.successTitle)
-                    .font(.bodyBold)
-                    .foregroundColor(.textPrimary)
-
-                Text(AppStrings.Create.successSubtitle)
-                    .font(.metadata)
-                    .foregroundColor(.textSecondary)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, AppConstants.Layout.elementSpacing)
-        .padding(.vertical, AppConstants.Layout.subElementSpacing)
-        .background(Color.surfaceMain)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                .stroke(Color.brandPrimary.opacity(0.24), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-    }
-
-    private var footerTitle: String {
-        switch mode {
-        case .create:
-            if viewModel.isCreating {
-                return AppStrings.Create.postingAction
-            }
-
-            if showSuccessState {
-                return AppStrings.Create.created
-            }
-
-            return AppStrings.Create.postAction
-        case .edit:
-            if viewModel.isCreating {
-                return AppStrings.Manage.savingAction
-            }
-
-            return AppStrings.Common.save
-        }
-    }
-
-    private var footerBackground: LinearGradient {
-        if viewModel.canPost {
-            return LinearGradient(
-                colors: [.brandPrimary, .brandPrimaryDark],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
-
-        return LinearGradient(
-            colors: [.surfaceSecondary, .surfaceSecondary],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    private var activityColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing), count: 3)
-    }
-
-    private var activityItems: [ActivityType] {
-        Array(ActivityType.allCases.dropLast())
-    }
-
-    private var visibleActivityItems: [ActivityType] {
-        if viewModel.isActivityGridExpanded {
-            return activityItems
-        }
-
-        return Array(activityItems.prefix(AppConstants.Create.activityGridCollapsedCount))
-    }
-
-    private func closeTapped() {
-        if viewModel.isCreating {
-            viewModel.cancelRequest()
-            showDiscardConfirmation = true
-            return
-        }
-
-        if mode == .create {
-            if viewModel.hasUnsavedChanges {
-                showDiscardConfirmation = true
-                return
-            }
-
-            dismiss()
-            return
-        }
-
-        dismiss()
-    }
-
-    private func postTapped() {
-        guard viewModel.canPost else { return }
-
-        if mode == .create {
-            viewModel.create { drift in
-                driftStore.addOrUpdate(drift)
-                showSuccessState = true
-                onCreateSucceeded()
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                    dismiss()
-                }
-            }
-        } else if mode == .edit, let existing = existingDrift {
-            viewModel.update(original: existing) { updated in
-                driftStore.addOrUpdate(updated)
-                onSave(updated)
-                dismiss()
-            }
-        }
-    }
-
-    enum FocusField {
-        case title
-        case customActivity
-        case hook
-        case notes
-    }
-
-    private func requiredSectionTitle(_ title: String) -> some View {
-        HStack(spacing: 4) {
-            Text(title)
-            Text(AppStrings.Create.requiredMarker)
-                .foregroundColor(.brandSecondary)
-        }
-        .font(.heading2)
-        .foregroundColor(.textPrimary)
-    }
-
-    private func dateTimeCaption(_ title: String) -> some View {
-        HStack(spacing: 4) {
-            Text(title)
-            Text(AppStrings.Create.requiredMarker)
-                .foregroundColor(.brandSecondary)
-        }
-        .font(.metadata)
-        .foregroundColor(.textSecondary)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var locationCapacityColumns: [GridItem] {
-        [GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing), GridItem(.flexible(), spacing: AppConstants.Layout.elementSpacing)]
-    }
-}
-
-private struct TitleField: View {
-    @Binding var text: String
-    @FocusState.Binding var focusedField: CreateDriftSheet.FocusField?
-    let count: Int
-    let maxCount: Int
-
-    var body: some View {
-        let displayedCount = min(count, maxCount)
-
-        HStack(spacing: AppConstants.Layout.elementSpacing) {
-            ZStack(alignment: .leading) {
-                TextField("", text: $text)
-                    .font(.bodyStandard)
-                    .foregroundColor(.textPrimary)
-                    .focused($focusedField, equals: .title)
-                    .textInputAutocapitalization(.sentences)
-                    .autocorrectionDisabled(false)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                if text.isEmpty {
-                    Text(AppStrings.Create.titlePlaceholder)
-                        .font(.bodyStandard)
-                        .foregroundColor(.textSecondary)
-                        .allowsHitTesting(false)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Text(String(format: AppStrings.Create.titleCounterFormat, displayedCount))
-                .font(.metadata)
-                .foregroundColor(.textSecondary)
-        }
-        .padding(.horizontal, AppConstants.Layout.elementSpacing)
-        .padding(.vertical, AppConstants.Layout.subElementSpacing + 2)
-        .background(Color.surfaceMain)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                .stroke(Color.appBorder, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-    }
-}
-
-private struct ActivityTypeCard: View {
-    let activity: ActivityType
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                Image(systemName: activity.iconName)
-                    .font(.system(size: 21, weight: .regular))
-                    .foregroundColor(isSelected ? activity.tint : .textPrimary)
-                    .frame(height: 24)
-
-                Text(activity.title)
-                    .font(.bodyStandard)
-                    .foregroundColor(.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: AppConstants.Layout.createSheetCardMinHeight + 28)
-            .padding(.vertical, AppConstants.Layout.subElementSpacing)
-            .background(isSelected ? activity.tint.opacity(0.06) : Color.surfaceMain)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                    .stroke(isSelected ? activity.tint.opacity(0.38) : Color.appBorder, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
-        }
-        .pressScale(0.96)
-    }
-}
-
-private struct TimeChip: View {
-    let option: TimeOption
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: option.icon)
-                    .font(.captionText)
-                Text(option.title)
-                    .font(.captionText)
-            }
-            .foregroundColor(isSelected ? .brandPrimary : .textPrimary)
-            .frame(maxWidth: .infinity)
-            .frame(height: AppConstants.Layout.createSheetChipHeight)
-            .padding(.horizontal, 6)
-            .background(isSelected ? Color.brandPrimary.opacity(0.12) : Color.surfaceMain)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                    .stroke(isSelected ? Color.brandPrimary.opacity(0.35) : Color.appBorder, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
-        }
-        .pressScale(0.96)
-    }
-}
-
-private struct ApproximateLocationCard: View {
-    let location: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.subElementSpacing) {
-            HStack(spacing: 4) {
-                Text(AppStrings.Create.locationTitle)
-                Text(AppStrings.Create.requiredMarker)
-                    .foregroundColor(.brandSecondary)
-            }
-            .font(.bodyBold)
-            .foregroundColor(.textPrimary)
-
-            HStack(alignment: .center, spacing: 8) {
-                ZStack {
-                    Circle()
-                        .fill(Color.brandPrimary.opacity(0.12))
-                        .frame(width: 36, height: 36)
-
-                    AppIcons.mappinCircleImage
-                        .font(.bodyBold)
-                        .foregroundColor(.brandPrimary)
-                }
-
-                Text(location.isEmpty ? "Select Location" : location)
-                    .font(.bodyBold)
-                    .foregroundColor(location.isEmpty ? .textSecondary : .textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Spacer(minLength: 0)
-            }
-
-            Text(AppStrings.Create.locationApprox)
-                .font(.bodyStandard)
-                .foregroundColor(.textSecondary)
-
-            Text(AppStrings.Create.locationCardNote)
-                .font(.metadata)
-                .foregroundColor(.textSecondary)
-                .lineLimit(2)
-        }
-        .padding(AppConstants.Layout.elementSpacing)
-        .frame(minHeight: AppConstants.Layout.createSheetLocationCardHeight)
-        .background(Color.surfaceMain)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                .stroke(Color.appBorder, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-    }
-}
-
-private struct CapacityChipScrollCard: View {
-    let selectedCapacityCount: Int
-    let isOpenToAllCapacity: Bool
-    let onCapacityChange: (Int) -> Void
-    let onOpenToAllChange: (Bool) -> Void
-
-    private let capacityOptions = Array(1...50)
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Layout.elementSpacing) {
-            HStack(spacing: 4) {
-                Text(AppStrings.Create.capacityTitle)
-                Text(AppStrings.Create.requiredMarker)
-                    .foregroundColor(.brandSecondary)
-            }
-            .font(.bodyBold)
-            .foregroundColor(.textPrimary)
-
-            Toggle(isOn: Binding(
-                get: { isOpenToAllCapacity },
-                set: { onOpenToAllChange($0) }
-            )) {
-                HStack(spacing: 8) {
-                    ZStack {
-                        Circle()
-                            .fill(isOpenToAllCapacity ? Color.brandPrimary.opacity(0.12) : Color.surfaceSecondary)
-                            .frame(width: 36, height: 36)
-
-                        AppIcons.ellipsisImage
-                            .font(.captionText)
-                            .foregroundColor(isOpenToAllCapacity ? .brandPrimary : .textSecondary)
-                            .rotationEffect(.degrees(isOpenToAllCapacity ? 180 : 0))
-                    }
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(AppStrings.Create.openToAll)
-                            .font(.bodyBold)
-                            .foregroundColor(.textPrimary)
-                        Text(AppStrings.Create.openToAllSubtitle)
-                            .font(.metadata)
-                            .foregroundColor(.textSecondary)
-                    }
-                }
-            }
-            .toggleStyle(SwitchToggleStyle(tint: .brandPrimary))
-            .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isOpenToAllCapacity)
-
+        numberedSection("1. What are we doing?") {
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: AppConstants.Layout.subElementSpacing) {
-                    ForEach(capacityOptions, id: \.self) { value in
-                        Button {
-                            guard !isOpenToAllCapacity else { return }
-                            withAnimation(CoffeeAnimation.spring) {
-                                onCapacityChange(value)
-                            }
-                        } label: {
-                            Text("\(value)")
-                                .font(.bodyBold)
-                                .foregroundColor(selectedCapacityCount == value ? .brandPrimary : .textPrimary)
-                                .frame(width: 52, height: 44)
-                                .background(selectedCapacityCount == value ? Color.brandPrimary.opacity(0.12) : Color.surfaceMain)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous)
-                                        .stroke(selectedCapacityCount == value ? Color.brandPrimary.opacity(0.35) : Color.appBorder, lineWidth: 1)
-                                )
-                                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusSmall, style: .continuous))
-                        }
-                        .disabled(isOpenToAllCapacity)
-                        .pressScale(0.96)
+                HStack(spacing: 10) {
+                    ForEach(activityOptions, id: \.self) { activity in
+                        activityTile(activity)
                     }
                 }
                 .padding(.vertical, 2)
             }
-            .disabled(isOpenToAllCapacity)
-            .opacity(isOpenToAllCapacity ? 0.45 : 1)
-            .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isOpenToAllCapacity)
         }
-        .padding(AppConstants.Layout.elementSpacing)
-        .frame(minHeight: AppConstants.Layout.createSheetLocationCardHeight)
-        .background(Color.surfaceMain)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                .stroke(Color.appBorder, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
     }
-}
 
-private struct VibeMenuRow: View {
-    @Binding var selectedVibe: VibeOption?
+    private var planSection: some View {
+        numberedSection("2. The plan") {
+            VStack(alignment: .leading, spacing: 12) {
+                labeledField(
+                    title: "Drift title",
+                    placeholder: "e.g. Coffee & conversations",
+                    text: $viewModel.planTitle,
+                    limit: viewModel.maxTitleCount,
+                    height: 54
+                )
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
-                Text(AppStrings.Create.vibeTitle)
-                Text(AppStrings.Create.requiredMarker)
-                    .foregroundColor(.brandSecondary)
+                labeledField(
+                    title: "Hook / Icebreaker",
+                    placeholder: "e.g. Bringing my dog, hope that's okay!",
+                    text: $viewModel.hookText,
+                    limit: 120,
+                    height: 58
+                )
             }
-            .font(.bodyBold)
-            .foregroundColor(.textPrimary)
+        }
+    }
 
-            Menu {
-                ForEach(VibeOption.allCases) { vibe in
-                    Button {
-                        withAnimation(CoffeeAnimation.spring) {
-                            selectedVibe = vibe
-                        }
-                    } label: {
-                        HStack(spacing: AppConstants.Layout.subElementSpacing) {
-                            ZStack {
-                                Circle()
-                                    .fill(vibe.tint.opacity(0.14))
-                                    .frame(width: 26, height: 26)
-
-                                Image(systemName: vibe.icon)
-                                    .font(.captionText)
-                                    .foregroundColor(vibe.tint)
-                            }
+    private var vibeSection: some View {
+        numberedSection("3. Vibe") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(VibeOption.allCases) { vibe in
+                        Button { viewModel.selectedVibe = vibe } label: {
                             Text(vibe.title)
-                                .foregroundColor(vibe.tint)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(viewModel.selectedVibe == vibe ? .brandPrimaryDark : .textPrimary)
+                                .padding(.horizontal, 14)
+                                .frame(height: 30)
+                                .background(viewModel.selectedVibe == vibe ? Color.brandPrimary.opacity(0.10) : Color.white)
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(viewModel.selectedVibe == vibe ? Color.brandPrimary : Color.appBorder, lineWidth: 1))
                         }
+                        .buttonStyle(.plain)
                     }
                 }
-            } label: {
-                HStack(spacing: AppConstants.Layout.subElementSpacing) {
-                    if let selectedVibe {
-                        ZStack {
-                            Circle()
-                                .fill(selectedVibe.tint.opacity(0.14))
-                                .frame(width: 28, height: 28)
+            }
+        }
+    }
 
-                            Image(systemName: selectedVibe.icon)
-                                .font(.captionText)
-                                .foregroundColor(selectedVibe.tint)
-                        }
+    private var whenSection: some View {
+        numberedSection("4. When") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Date")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.textSecondary)
+                HStack(spacing: 8) {
+                    presetChip("Today", selected: selectedDateAction == "Today") {
+                        selectedDateAction = "Today"
+                        setDate(daysFromToday: 0)
+                    }
+                    presetChip("Tomorrow", selected: selectedDateAction == "Tomorrow") {
+                        selectedDateAction = "Tomorrow"
+                        setDate(daysFromToday: 1)
+                    }
+                    presetChip("Pick date", selected: selectedDateAction == "Pick date") {
+                        selectedDateAction = "Pick date"
+                        activeWhenPicker = .date
+                    }
+                }
+
+                Text("Time")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.textSecondary)
+                    .padding(.top, 2)
+                HStack(spacing: 8) {
+                    presetChip("In 30 mins", selected: selectedTimeAction == "In 30 mins") {
+                        selectedTimeAction = "In 30 mins"
+                        viewModel.scheduledDate = Date().addingTimeInterval(30 * 60)
+                    }
+                    presetChip("In 1 hour", selected: selectedTimeAction == "In 1 hour") {
+                        selectedTimeAction = "In 1 hour"
+                        viewModel.scheduledDate = Date().addingTimeInterval(60 * 60)
+                    }
+                    presetChip("Pick time", selected: selectedTimeAction == "Pick time") {
+                        selectedTimeAction = "Pick time"
+                        activeWhenPicker = .time
+                    }
+                }
+            }
+        }
+    }
+
+    private var locationSection: some View {
+        numberedSection("5. Where") {
+            Button(action: { showingMapPicker = true }) {
+                VStack(spacing: 0) {
+                    ZStack {
+                        MapGrid()
+                            .frame(height: 96)
+                            .background(Color(red: 0.93, green: 0.92, blue: 0.88))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                        Image(systemName: AppIcons.mappinCircle)
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(.brandPrimaryDark)
                     }
 
-                    Text(selectedVibe?.title ?? AppStrings.Create.vibeSelectionPlaceholder)
-                        .font(.bodyStandard)
-                        .foregroundColor(selectedVibe == nil ? .textSecondary : (selectedVibe?.tint ?? .textPrimary))
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(viewModel.approximateLocation.isEmpty ? "Indiranagar, Bengaluru" : viewModel.approximateLocation)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.textPrimary)
+                                .lineLimit(1)
 
-                    Spacer(minLength: 0)
+                            Text(viewModel.selectedLatitude == nil ? "Near 100 Feet Road" : "Coordinates selected")
+                                .font(.system(size: 11))
+                                .foregroundColor(.textSecondary)
 
-                    AppIcons.chevronDownImage
-                        .font(.captionText)
+                            Text("Change area >")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.brandPrimaryDark)
+                        }
+
+                        Spacer()
+                        Image(systemName: AppIcons.chevronRight)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.textSecondary)
+                    }
+                    .padding(12)
+                }
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.appBorder, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var gatheringSection: some View {
+        numberedSection("6. Gathering") {
+            VStack(spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Spots")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.textPrimary)
+                        Text("How many can join?")
+                            .font(.system(size: 11))
+                            .foregroundColor(.textSecondary)
+                    }
+                    Spacer()
+                    Stepper(value: $viewModel.selectedCapacityCount, in: 1...20) {
+                        Text("\(viewModel.selectedCapacityCount)")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.textPrimary)
+                    }
+                    .fixedSize()
+                }
+
+                Toggle(isOn: $viewModel.isOpenToAllCapacity) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Open to all")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.textPrimary)
+                        Text("Anyone can join without approval")
+                            .font(.system(size: 11))
+                            .foregroundColor(.textSecondary)
+                    }
+                }
+                .tint(.brandPrimaryDark)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Join mode")
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.textSecondary)
-                }
-                .padding(.horizontal, AppConstants.Layout.elementSpacing)
-                .padding(.vertical, AppConstants.Layout.subElementSpacing)
-                .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
-                .background(
-                    LinearGradient(
-                        colors: [
-                            (selectedVibe?.tint ?? Color.surfaceSecondary).opacity(selectedVibe == nil ? 1 : 0.14),
-                            Color.surfaceMain
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                        .stroke(selectedVibe?.tint.opacity(0.32) ?? Color.appBorder, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
-            }
-        }
-    }
-}
-
-private struct JoinModeToggleCard: View {
-    let selectedMode: JoinMode
-    let onSelect: (JoinMode) -> Void
-
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    var body: some View {
-        Group {
-            if horizontalSizeClass == .regular {
-                HStack(spacing: AppConstants.Layout.elementSpacing) {
-                    options
-                }
-            } else {
-                VStack(spacing: AppConstants.Layout.elementSpacing) {
-                    options
+                    HStack(spacing: 10) {
+                        joinModeButton(.open, title: "Open Join", subtitle: "Instant", icon: AppIcons.participants)
+                        joinModeButton(.approval, title: "Approval Required", subtitle: "Manual", icon: AppIcons.privacyShield)
+                    }
                 }
             }
         }
     }
 
-    @ViewBuilder
-    private var options: some View {
-        joinModeOption(
-            mode: .open,
-            title: AppStrings.Create.joinModeOpen,
-            subtitle: AppStrings.Create.joinModeOpenSubtitle,
-            icon: AppIcons.participants,
-            tint: Color.brandPrimary
-        )
+    private var notesSection: some View {
+        numberedSection("7. Notes (Optional)") {
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack(alignment: .topLeading) {
+                    if viewModel.notesText.isEmpty {
+                        Text("Add anything else people should know...")
+                            .font(.system(size: 12))
+                            .foregroundColor(.textSecondary.opacity(0.75))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 13)
+                    }
 
-        joinModeOption(
-            mode: .approval,
-            title: AppStrings.Create.joinModeApproval,
-            subtitle: AppStrings.Create.joinModeApprovalSubtitle,
-            icon: AppIcons.lock,
-            tint: Color.brandPurple
-        )
+                    TextEditor(text: $viewModel.notesText)
+                        .font(.system(size: 13))
+                        .scrollContentBackground(.hidden)
+                        .frame(minHeight: 64)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                }
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Color.appBorder, lineWidth: 1))
+
+                HStack {
+                    suggestionChip("What to bring", icon: "bag")
+                    suggestionChip("Parking info", icon: "parkingsign")
+                    suggestionChip("Group vibe", icon: "face.smiling")
+                }
+            }
+        }
     }
 
-    private func joinModeOption(
-        mode: JoinMode,
-        title: String,
-        subtitle: String,
-        icon: String,
-        tint: Color
-    ) -> some View {
-        Button {
-            onSelect(mode)
-        } label: {
-            HStack(alignment: .center, spacing: AppConstants.Layout.subElementSpacing) {
-                ZStack {
-                    Circle()
-                        .fill((selectedMode == mode ? tint : Color.surfaceSecondary).opacity(selectedMode == mode ? 0.16 : 1))
-                        .frame(width: 40, height: 40)
+    private func numberedSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.system(size: 13, weight: .black))
+                .foregroundColor(.textPrimary)
 
-                    Image(systemName: icon)
-                        .font(.captionText)
-                        .foregroundColor(selectedMode == mode ? tint : .textSecondary)
-                        .rotationEffect(.degrees(selectedMode == mode ? 0 : -10))
-                        .scaleEffect(selectedMode == mode ? 1.04 : 0.96)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.75), value: selectedMode == mode)
+            content()
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 14)
+        .background(Color.white.opacity(0.74))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.appBorder.opacity(0.9), lineWidth: 1))
+    }
+
+    private func activityTile(_ activity: ActivityType) -> some View {
+        let selected = viewModel.selectedActivity == activity
+        return Button { viewModel.setActivity(activity) } label: {
+            VStack(spacing: 8) {
+                Image(systemName: activity.iconName)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundColor(selected ? activity.tint : activity.tint.opacity(0.9))
+                    .frame(height: 22)
+
+                Text(activity.title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(width: 62, height: 64)
+            .background(selected ? activity.tint.opacity(0.09) : Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(selected ? activity.tint : Color.appBorder, lineWidth: selected ? 1.4 : 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func labeledField(title: String, placeholder: String, text: Binding<String>, limit: Int, height: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.textPrimary)
+                if title == "Drift title" {
+                    Text("*").foregroundColor(.statusError)
                 }
+                Spacer()
+                Text("\(min(text.wrappedValue.count, limit))/\(limit)")
+                    .font(.system(size: 11))
+                    .foregroundColor(.textSecondary)
+            }
 
+            TextField(placeholder, text: Binding(
+                get: { text.wrappedValue },
+                set: { text.wrappedValue = String($0.prefix(limit)) }
+            ))
+            .font(.system(size: 13))
+            .padding(.horizontal, 12)
+            .frame(height: height)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Color.appBorder, lineWidth: 1))
+        }
+    }
+
+    private func presetChip(_ label: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(selected ? .brandPrimaryDark : .textPrimary)
+                .padding(.horizontal, 12)
+                .frame(height: 32)
+                .background(selected ? Color.brandPrimary.opacity(0.10) : Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(selected ? Color.brandPrimary : Color.appBorder, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func joinModeButton(_ mode: JoinMode, title: String, subtitle: String, icon: String) -> some View {
+        let selected = viewModel.selectedJoinMode == mode
+        return Button { viewModel.setJoinMode(mode) } label: {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(selected ? .brandPrimaryDark : .textSecondary)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.bodyBold)
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.textPrimary)
-
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                     Text(subtitle)
-                        .font(.metadata)
+                        .font(.system(size: 10))
                         .foregroundColor(.textSecondary)
-                        .lineLimit(2)
                 }
-
                 Spacer(minLength: 0)
             }
-            .padding(AppConstants.Layout.elementSpacing)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: AppConstants.Layout.createSheetJoinModeHeight)
-            .background(selectedMode == mode ? tint.opacity(0.08) : Color.surfaceMain)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous)
-                    .stroke(selectedMode == mode ? tint.opacity(0.35) : Color.appBorder, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadiusMedium, style: .continuous))
+            .padding(.horizontal, 10)
+            .frame(height: 52)
+            .background(selected ? Color.brandPrimary.opacity(0.10) : Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(selected ? Color.brandPrimary : Color.appBorder, lineWidth: 1))
         }
-        .pressScale(0.96)
+        .buttonStyle(.plain)
     }
-}
 
-private struct InlineTextFieldRow: View {
-    let title: String
-    let placeholder: String
-    @Binding var text: String
-    let isRequired: Bool
-    let tooltipTitle: String?
-    let tooltipMessage: String?
-    @Binding var showTooltip: Bool
-    let focusField: CreateDriftSheet.FocusField
-    @FocusState.Binding var focusedField: CreateDriftSheet.FocusField?
+    private func suggestionChip(_ label: String, icon: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(.brandPrimaryDark)
+            Text(label)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(.textPrimary)
+        }
+        .padding(.horizontal, 9)
+        .frame(height: 26)
+        .background(Color.backgroundMain.opacity(0.55), in: Capsule())
+        .overlay(Capsule().stroke(Color.appBorder, lineWidth: 1))
+    }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
-                Text(title)
-                if isRequired {
-                    Text(AppStrings.Create.requiredMarker)
-                        .foregroundColor(.brandSecondary)
-                }
-
-                if let tooltipTitle, let tooltipMessage {
-                    Button {
-                        withAnimation(CoffeeAnimation.springGentle) {
-                            showTooltip.toggle()
-                        }
-                    } label: {
-                        AppIcons.infoCircleImage
-                            .font(.captionText)
-                            .foregroundColor(.textSecondary)
+    private var footer: some View {
+        VStack(spacing: 8) {
+            Button(action: postTapped) {
+                HStack(spacing: 8) {
+                    if viewModel.isCreating {
+                        ProgressView().tint(.white)
+                    } else {
+                        Image(systemName: AppIcons.plus)
+                            .font(.system(size: 15, weight: .bold))
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(tooltipTitle)
-                    .popover(isPresented: $showTooltip, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(tooltipTitle)
-                                .font(.bodyBold)
-                                .foregroundColor(.textPrimary)
-                            Text(tooltipMessage)
-                                .font(.bodyStandard)
-                                .foregroundColor(.textSecondary)
-                        }
-                        .padding(AppConstants.Layout.elementSpacing)
-                        .frame(maxWidth: 240, alignment: .leading)
-                    }
+                    Text(viewModel.isCreating ? "Creating Drift" : "Create Drift")
+                        .font(.system(size: 15, weight: .bold))
                 }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 48)
+                .background(Color.brandPrimaryDark)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .shadow(color: Color.brandPrimaryDark.opacity(0.22), radius: 8, y: 3)
             }
-            .font(.bodyBold)
-            .foregroundColor(.textPrimary)
+            .disabled(!viewModel.canPost)
+            .opacity(viewModel.canPost ? 1 : 0.55)
 
-            TextField("", text: $text)
-                .font(.bodyStandard)
-                .foregroundColor(.textPrimary)
-                .focused($focusedField, equals: focusField)
-                .textInputAutocapitalization(.sentences)
-                .autocorrectionDisabled(false)
-                .overlay(alignment: .leading) {
-                    if text.isEmpty {
-                        Text(placeholder)
-                            .font(.bodyStandard)
-                            .foregroundColor(.textSecondary)
-                            .allowsHitTesting(false)
-                    }
-                }
+            HStack(spacing: 5) {
+                Image(systemName: AppIcons.lock)
+                    .font(.system(size: 10, weight: .bold))
+                Text("You can review everything before it goes live.")
+                    .font(.system(size: 10))
+            }
+            .foregroundColor(.textSecondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(Color.white.opacity(0.92))
+        .overlay(alignment: .top) { Divider().opacity(0.6) }
+    }
+
+    private var activityOptions: [ActivityType] {
+        ActivityType.allCases.filter { $0 != .custom }.prefix(7).map { $0 }
+    }
+
+    private func closeTapped() {
+        if viewModel.hasUnsavedChanges {
+            showDiscardConfirmation = true
+        } else {
+            dismiss()
         }
     }
+
+    private func postTapped() {
+        switch mode {
+        case .create:
+            viewModel.create { drift in
+                driftStore.addOrUpdate(drift)
+                onCreateSucceeded()
+                dismiss()
+            }
+        case .edit:
+            guard let existingDrift else { return }
+            viewModel.update(original: existingDrift) { drift in
+                onSave(drift)
+                driftStore.addOrUpdate(drift)
+                dismiss()
+            }
+        }
+    }
+
+    private func setDate(daysFromToday days: Int) {
+        let calendar = Calendar.current
+        let currentTime = calendar.dateComponents([.hour, .minute], from: viewModel.scheduledDate)
+        var base = calendar.date(byAdding: .day, value: days, to: Date()) ?? Date()
+        base = calendar.startOfDay(for: base)
+        viewModel.scheduledDate = calendar.date(bySettingHour: currentTime.hour ?? 9, minute: currentTime.minute ?? 0, second: 0, of: base) ?? base
+    }
+
 }
 
-private struct NotesFieldRow: View {
-    let title: String
-    let placeholder: String
-    @Binding var text: String
-    @FocusState.Binding var focusedField: CreateDriftSheet.FocusField?
+private enum WhenPickerKind: String, Identifiable {
+    case date
+    case time
+
+    var id: String { rawValue }
+}
+
+private struct WhenPickerSheet: View {
+    @Binding var date: Date
+    let kind: WhenPickerKind
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.bodyBold)
-                .foregroundColor(.textPrimary)
-
-            ZStack(alignment: .topLeading) {
-                if text.isEmpty {
-                    Text(placeholder)
-                        .font(.bodyStandard)
-                        .foregroundColor(.textSecondary)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 8)
-                        .allowsHitTesting(false)
-                }
-
-                TextEditor(text: $text)
-                    .font(.bodyStandard)
+        VStack(spacing: 14) {
+            HStack {
+                Text(kind == .date ? "Select date" : "Select time")
+                    .font(.system(size: 17, weight: .bold))
                     .foregroundColor(.textPrimary)
-                    .focused($focusedField, equals: .notes)
-                    .frame(minHeight: 80)
-                    .scrollContentBackground(.hidden)
-                    .background(Color.clear)
+                Spacer()
+                Button("Done") { dismiss() }
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.brandPrimaryDark)
             }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+
+            if kind == .date {
+                DatePicker("", selection: $date, in: Date()..., displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                    .tint(.brandPrimaryDark)
+                    .padding(.horizontal, 16)
+            } else {
+                DatePicker("", selection: $date, displayedComponents: .hourAndMinute)
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                    .tint(.brandPrimaryDark)
+            }
+
+            Spacer(minLength: 0)
         }
+        .background(Color.backgroundMain.ignoresSafeArea())
     }
 }
 
-struct CreateDriftSheet_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateDriftSheet()
-            .presentationDetents([.large])
-            .environmentObject(GlobalDriftStore(driftsService: PreviewDriftsService()))
+private struct MapGrid: View {
+    var body: some View {
+        Canvas { context, size in
+            let lineColor = Color.brandPrimary.opacity(0.12)
+            for x in stride(from: 0, through: size.width, by: 22) {
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x, y: size.height))
+                context.stroke(path, with: .color(lineColor), lineWidth: 1)
+            }
+            for y in stride(from: 0, through: size.height, by: 22) {
+                var path = Path()
+                path.move(to: CGPoint(x: 0, y: y))
+                path.addLine(to: CGPoint(x: size.width, y: y))
+                context.stroke(path, with: .color(lineColor), lineWidth: 1)
+            }
+            let center = CGPoint(x: size.width / 2, y: size.height / 2)
+            for radius in [22.0, 42.0, 62.0] {
+                let rect = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
+                context.stroke(Path(ellipseIn: rect), with: .color(Color.brandPrimary.opacity(0.20)), lineWidth: 1)
+            }
+        }
     }
 }

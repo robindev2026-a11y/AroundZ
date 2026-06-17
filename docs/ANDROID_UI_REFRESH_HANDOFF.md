@@ -1,8 +1,8 @@
 # Android UI Refresh — Agent Handoff
 
-**Status:** Batches 1–4 of 10 complete. Batches 5–10 remain.
-**Owner of next work:** any agent. Start at Batch 5.
-**Last updated:** 2026-06-15
+**Status:** Code audit on 2026-06-16: Batches 1–3 and 5–7 are Done; Batches 4, 8, 9, and 10 are Partial. Do not rely on older status notes without rechecking code.
+**Owner of next work:** any agent. Start by finishing Batch 4 Discovery parity.
+**Last updated:** 2026-06-16
 
 ---
 
@@ -17,10 +17,7 @@ Re-skin the app so **iOS and Android share one look**, matching the Figma "Socia
 
 ## 2. Source of truth — read this first
 
-The Figma Make export lives in **`design-reference/`** at the repo root.
-
-- **USE:** the real code — `design-reference/src/app/screens/*.tsx`, `design-reference/src/app/components/*.tsx`, and `design-reference/src/styles/theme.css`.
-- **IGNORE (stale):** `design-reference/COFFEECALL_DESIGN_SYSTEM.md` and `design-reference/src/imports/.../coffeecall-mvp-screens.md` — they describe an OLD blue/coral palette that is **not** the live design.
+Use current native product code and user-provided screen references only. Stale exported design markdown has been removed.
 
 **Live palette** (already in Android `Color.kt`): mint `#53B8A6`, mint-pressed `#3D8D7A`, lavender `#8E7DBE`, peach `#E88C6B`, bg `#F6F1EB`, card `#FFFDF9`, surface-secondary `#F4F4F8`, text-primary `#243447`, text-secondary `#5F6368`, border `#E7DED4`.
 
@@ -57,19 +54,18 @@ The Figma Make export lives in **`design-reference/`** at the repo root.
 
 ---
 
-## 5. Remaining batches (4–10)
+## 5. Current audit status (Batches 4–10)
 
-For each: open the matching Figma `.tsx`, restyle the Android screen with the §4 components, then log to CHANGELOG.
+For each: open the matching Figma `.tsx`, restyle the Android screen with the §4 components, then log to CHANGELOG. Status below is from direct code inspection, not from older logs.
 
-| Batch | Android file(s) | Figma reference (`design-reference/src/app/`) | Notes |
-|------|------------------|-----------------------------------------------|-------|
-| **4 — Discovery** | `feature/discovery/DiscoveryScreen.kt` | `screens/Discovery.tsx` (+ `MapView.tsx`, `Notifications.tsx`) | "Hey {name}" header; bell/map/avatar actions; floating search bar; filter chips row (use `CoffeeCategoryChip` w/ `CoffeeIcons.category`); feed of `CoffeeDriftCard`; dark FAB; accept + match modals |
-| **5 — Drifts + Detail** | `feature/drifts/DriftsScreen.kt`, `feature/driftDetail/DriftDetailScreen.kt` | `screens/MyActivities.tsx`, `screens/ActivityDetails.tsx` | List uses `CoffeeDriftCard`; detail = hero image + glass info + join/leave + directions |
-| **6 — Create** | `feature/create/CreateScreen.kt` | `screens/CreateActivity.tsx` (+ `CreateSuccess.tsx`) | Activity chip grid, time/capacity/join-mode selectors, location card, rounded inputs, primary CTA |
-| **7 — Chat** | `feature/chat/ChatScreen.kt`, `feature/chat/ChatThreadScreen.kt` | `screens/Messages.tsx` | Thread list cards; bubble styling (self=mint right, other=surface left), rounded input bar w/ `CoffeeIcons.send`, header actions |
-| **8 — Profile** | `feature/profile/ProfileScreen.kt`, `feature/profile/ProfileEditScreen.kt` | `screens/Profile.tsx` | Large `CoffeeAvatar` header, interest chips, stat cards, settings rows w/ `chevronRight` |
-| **9 — Auth + Onboarding** | `feature/onboarding/OnboardingScreen.kt`, `feature/auth/AuthScreen.kt`, `feature/auth/ProfileSetupScreen.kt` | `screens/Onboarding.tsx`, `screens/auth/{Welcome,PhoneEntry,OTPVerification,CreateProfile,Permissions,AllSet}.tsx` | Single-column, CTA at bottom, OTP boxes, permission cards |
-| **10 — Shell + polish** | `core/navigation/CoffeeCallApp.kt` (top bar, offline banner, notification dialog), `feature/discovery/...MapView`, consistency pass | — | Final pass: shadows, spacing, empty/error/loading states, dynamic type |
+| Batch | Android file(s) | Audit status / next work |
+|------|------------------|--------------------------|
+| **4 — Discovery** | `feature/discovery/DiscoveryScreen.kt` | **Partial.** Refreshed header, search, filter chips, `CoffeeDriftCard` feed, dark FAB, accept/match dialogs, radar sheet polish are present. Missing/incorrect: no map-toggle path is wired in the header, and the bell still shows a Toast instead of a notifications view/sheet. |
+| **5 — Drifts + Detail** | `feature/drifts/DriftsScreen.kt`, `feature/driftDetail/DriftDetailScreen.kt` | **Done.** Drifts list uses `CoffeeDriftCard`; detail has a hero image, `CoffeeAvatar`, `CoffeeGlassBadge`, detail cards, map section, host/request panels, and `CoffeeButton` CTAs. |
+| **6 — Chat** | `feature/chat/ChatScreen.kt`, `feature/chat/ChatThreadScreen.kt` | **Done.** Thread list cards use `CoffeeAvatar` and refreshed surfaces; thread bubbles use mint self/surface other styling, rounded composer, `CoffeeIcons.send`, attachment/location actions, and safety menu dialogs. |
+| **7 — Profile** | `feature/profile/ProfileScreen.kt`, `feature/profile/ProfileEditScreen.kt` | **Partial.** Large `CoffeeAvatar`, interests, stat cards, history, edit photo/name/bio/location/interests are present. Missing: profile settings/account rows with icons/chevrons on the profile screen. |
+| **8 — Auth + Onboarding** | `feature/onboarding/OnboardingScreen.kt`, `feature/auth/AuthScreen.kt`, `feature/auth/ProfileSetupScreen.kt` | **Partial.** Onboarding, phone entry, OTP boxes, bottom CTAs, and profile setup photo/name flow are refreshed. Missing: dedicated permissions-card screen/flow. |
+| **9 — Shell + polish** | `core/navigation/CoffeeCallApp.kt` (top bar, offline banner, notification dialog), `feature/discovery/...MapView`, consistency pass | **Partial.** Real icon bottom nav, top bars, offline banner, notification permission dialog, shadows/spacing/loading states are present. Missing: final consistency pass around Discovery map/notification parity and profile/auth partials. |
 
 The ViewModels and data flow are already wired — these batches are **presentation only**. Don't change repositories, navigation routes, or domain models.
 
@@ -96,6 +92,45 @@ iOS keeps **Outfit + SF Pro**. The full iOS rollout happens after Android is com
 
 ## 8. First step for the next agent
 
-1. Sync Gradle and build to confirm Batches 1–4 compile and show the redesigned Discovery Screen.
-2. Start Batch 5 (Drifts + Detail), referencing `design-reference/src/app/screens/MyActivities.tsx` and `ActivityDetails.tsx`.
-3. Log each completed batch in `CHANGELOG.md`.
+1. Finish Batch 4 Discovery parity first: add the Figma map toggle/path and replace the bell Toast with the notifications view/sheet behavior.
+2. Then finish Batch 8 Profile settings/account rows, Batch 9 permissions/completion auth parity, and Batch 10 final consistency pass.
+3. Log each completed batch in `CHANGELOG.md` after code inspection confirms the refreshed UI is actually present.
+
+---
+
+## 9. iOS↔Android PARITY — authoritative spec (supersedes Figma where they conflict)
+
+**`docs/IOS_SCREEN_WIDGET_MAPPER.md` is the source of truth for what Android must match.**
+It reflects the current iOS app. Re-frame remaining work as *iOS parity*, not exported-template matching.
+
+### Structural decisions (LOCKED by product owner, 2026-06-16)
+- **Discovery = radar-only.** Remove the `CoffeeDriftCard` meetup feed and the search/filter
+  chips from `DiscoveryScreen`. Keep radar + draggable bottom sheet + interest grid +
+  drifts-forming pill. Meetup cards live on the **Drifts** tab only (as on iOS).
+- **Create = center action + 4-tab nav.** `CoffeeCallDestinations` stays Discovery / Drifts / Chats / Profile. The center floating action opens `CreateScreen`.
+
+### Parity Gaps checklist (verified against code 2026-06-16)
+| # | Sev | Gap | iOS (mapper) | Android now | Action |
+|---|-----|-----|--------------|-------------|--------|
+| 1 | HIGH | Discovery model | radar-first, no card feed | hybrid radar + card feed + search/chips | Strip feed + search/chips (decision above) |
+| 2 | HIGH | Create nav | center modal, 4 tabs | 5th nav tab | Modal + 4 tabs (decision above) |
+| 3 | MED | Host management | separate `ManageDriftScreen` (edit/close/delete, accept/reject, participants) | folded into `DriftDetailScreen` (`HostRequestsPanel`) | Verify edit/close/delete parity; split into a Manage screen or confirm in-Detail is sufficient |
+| 4 | MED | Notifications | `NotificationsSheet` from bell, routes to drift IDs | bell shows a Toast | Build a notifications sheet/list |
+| 5 | MED | Profile | 4 stat tiles (+`StatsDetailSheet`), saved drifts row, activity log, 6 preference sheets, verified-phone pill, account rows | most missing | Build out Profile to mapper spec (Batch 8) |
+| 6 | VERIFY | Chats | status filter chips, attachment dialog (camera/library/location), detail sheet (mute/report/block/leave) | confirm present | Audit `ChatScreen`/`ChatThreadScreen` against mapper |
+| 7 | VERIFY | Drift Detail guardrails | meeting point blurred/locked until joined; participants sheet gated behind join | confirm present | Privacy guardrail — must match |
+
+### TODO — added 2026-06-16 (architecture/quality, not yet done)
+| # | Sev | Item | Detail |
+|---|-----|------|--------|
+| 8 | LOW | Design-token compliance sweep | `feature/` still has raw `.dp`, hardcoded `fontSize = .sp`, and raw `Color(0x..)` values. iOS forces everything through `AppConstants.Layout` / `AppColors`. Replace raw `.dp`→`CoffeeSpacing`, hardcoded sizes→`MaterialTheme.typography`, hex→`Color.kt` tokens. |
+| 9 | DECISION | Shared drift-state architecture | iOS centralizes drift state in `GlobalDriftStore` (`@EnvironmentObject`). Android uses independent per-screen ViewModels (no shared store), so cross-screen drift updates differ. Decide: introduce a shared store for true parity, or accept per-screen VMs on Android. |
+
+Also pending from validation (2026-06-16): P7 (Chats) & P8 (Auth+Onboarding) implemented but **unlogged** in CHANGELOG; P9 consistency sweep incomplete (leftover `symbol = "C"` in `ChatScreen.kt:109,123`); confirm P4 Profile has all mapper sheets. A compile bug from the P1/P2 seam (`onNavigateToCreate` on `DiscoveryScreen`) was fixed — `:app:assembleDebug` now succeeds.
+
+### Recommended execution order (Parity batches)
+- **P0** (no dependency): #4 NotificationsSheet, #5 Profile sheets, #3 Manage parity check.
+- **P1** (the locked structural changes): #1 Discovery radar-only, #2 Create-as-modal + 4-tab nav.
+- **Then:** #6/#7 verification passes, finish Batch 8/9/10 visual fills, final consistency pass.
+- Log each parity batch in `CHANGELOG.md` (`Android Parity Batch P#: <name>`). Same rules:
+  no builds (user validates), additive components, stay in `apps/android/`, iOS is LAST.

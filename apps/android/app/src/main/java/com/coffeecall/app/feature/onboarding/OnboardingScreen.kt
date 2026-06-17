@@ -114,7 +114,7 @@ private fun Slide1View(onNext: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = CoffeeSpacing.xl),
         horizontalAlignment = Alignment.Start
     ) {
         // 1. Beta Badge
@@ -157,8 +157,8 @@ private fun Slide1View(onNext: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(horizontal = CoffeeSpacing.xs, vertical = CoffeeSpacing.xl),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)
         ) {
             Text(
                 text = "Meet people",
@@ -188,7 +188,7 @@ private fun Slide1View(onNext: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 40.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
             // Left Card (Sunset Walk)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
@@ -198,11 +198,11 @@ private fun Slide1View(onNext: () -> Unit) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(44.dp)
+                                .size(CoffeeSpacing.minTouchTarget)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(CoffeePrimary),
                             contentAlignment = Alignment.Center
@@ -237,11 +237,11 @@ private fun Slide1View(onNext: () -> Unit) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(44.dp)
+                                .size(CoffeeSpacing.minTouchTarget)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(CoffeePurple),
                             contentAlignment = Alignment.Center
@@ -270,41 +270,13 @@ private fun Slide1View(onNext: () -> Unit) {
         }
 
         // 4. CTA Button
-        Button(
+        CoffeeButton(
+            title = "Let's Go →",
             onClick = onNext,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(bottom = 8.dp)
-                .shadow(
-                    elevation = 12.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    ambientColor = CoffeePrimary.copy(alpha = 0.3f),
-                    spotColor = CoffeePrimary.copy(alpha = 0.36f)
-                ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = CoffeePrimary,
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Let's Go",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "→",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            }
-        }
+            variant = CoffeeButtonVariant.Primary,
+            modifier = Modifier.padding(bottom = CoffeeSpacing.xs),
+            height = 64.dp
+        )
 
         Spacer(modifier = Modifier.height(48.dp))
     }
@@ -318,14 +290,14 @@ private fun Slide2View(onNext: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = CoffeeSpacing.xl)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
         OnboardingProgressBar(
             activeIndex = 0,
             total = 4,
-            modifier = Modifier.padding(top = 24.dp, bottom = 40.dp)
+            modifier = Modifier.padding(top = CoffeeSpacing.xl, bottom = 40.dp)
         )
 
         // Bolt Icon Card
@@ -350,7 +322,7 @@ private fun Slide2View(onNext: () -> Unit) {
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Black,
             color = CoffeeInk,
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp)
+            modifier = Modifier.padding(top = CoffeeSpacing.xl, bottom = CoffeeSpacing.md)
         )
 
         Text(
@@ -364,18 +336,18 @@ private fun Slide2View(onNext: () -> Unit) {
         // Activity Chips grid
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
             ) {
                 ActivityChip(icon = "☕", title = "COFFEE CHAT", activeCount = 4, modifier = Modifier.weight(1f))
                 ActivityChip(icon = "🚶", title = "URBAN WALK", activeCount = 7, modifier = Modifier.weight(1f))
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
             ) {
                 ActivityChip(icon = "🎮", title = "GAME NIGHT", activeCount = 12, modifier = Modifier.weight(1f))
                 ActivityChip(icon = "🎨", title = "ART JAM", activeCount = 3, modifier = Modifier.weight(1f))
@@ -403,14 +375,14 @@ private fun Slide3View(onNext: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = CoffeeSpacing.xl)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OnboardingProgressBar(
             activeIndex = 1,
             total = 4,
-            modifier = Modifier.padding(top = 24.dp, bottom = 40.dp)
+            modifier = Modifier.padding(top = CoffeeSpacing.xl, bottom = 40.dp)
         )
 
         // Shield Icon
@@ -436,7 +408,7 @@ private fun Slide3View(onNext: () -> Unit) {
             fontWeight = FontWeight.Black,
             color = CoffeeInk,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp)
+            modifier = Modifier.padding(top = CoffeeSpacing.xl, bottom = CoffeeSpacing.md)
         )
 
         Text(
@@ -451,7 +423,7 @@ private fun Slide3View(onNext: () -> Unit) {
         // Safety Rows
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
             SafetyFeatureRow(icon = "🔒", text = "Verified Community")
             SafetyFeatureRow(icon = "👥", text = "Shared Mutual Friends")
@@ -485,14 +457,14 @@ private fun Slide4View(onNext: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = CoffeeSpacing.xl)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
         OnboardingProgressBar(
             activeIndex = 2,
             total = 4,
-            modifier = Modifier.padding(top = 24.dp, bottom = 40.dp)
+            modifier = Modifier.padding(top = CoffeeSpacing.xl, bottom = 40.dp)
         )
 
         Text(
@@ -500,7 +472,7 @@ private fun Slide4View(onNext: () -> Unit) {
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Black,
             color = CoffeeInk,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = CoffeeSpacing.md)
         )
 
         Text(
@@ -513,12 +485,12 @@ private fun Slide4View(onNext: () -> Unit) {
         // Grid of Interests
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
             for (chunk in interests.chunked(2)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
                 ) {
                     chunk.forEach { interest ->
                         InterestPill(
@@ -541,32 +513,13 @@ private fun Slide4View(onNext: () -> Unit) {
         Spacer(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.height(40.dp))
 
-        Button(
+        CoffeeButton(
+            title = if (isReady) "Let's Go" else "Select $remaining more",
             onClick = onNext,
+            variant = CoffeeButtonVariant.Primary,
             enabled = isReady,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .shadow(
-                    elevation = if (isReady) 12.dp else 0.dp,
-                    shape = CircleShape,
-                    ambientColor = CoffeePrimary.copy(alpha = 0.22f),
-                    spotColor = CoffeePrimary.copy(alpha = 0.22f)
-                ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = CoffeePrimary,
-                contentColor = Color.White,
-                disabledContainerColor = CoffeeMuted.copy(alpha = 0.24f),
-                disabledContentColor = CoffeeMuted
-            ),
-            shape = CircleShape
-        ) {
-            Text(
-                text = if (isReady) "Let's Go" else "Select $remaining more",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
+            height = CoffeeSpacing.primaryButtonHeight
+        )
 
         Spacer(modifier = Modifier.height(40.dp))
     }
@@ -580,7 +533,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = CoffeeSpacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))
@@ -608,7 +561,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             fontWeight = FontWeight.Black,
             color = Color.White,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 32.dp, bottom = 16.dp)
+            modifier = Modifier.padding(top = 32.dp, bottom = CoffeeSpacing.md)
         )
 
         Text(
@@ -629,7 +582,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
                     model = avatarUrl,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(CoffeeSpacing.minTouchTarget)
                         .clip(CircleShape)
                         .border(2.dp, Color.White, CircleShape),
                     contentScale = ContentScale.Crop
@@ -637,7 +590,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             }
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(CoffeeSpacing.minTouchTarget)
                     .clip(CircleShape)
                     .background(CoffeePurple.copy(alpha = 0.8f))
                     .border(2.dp, Color.White, CircleShape),
@@ -658,7 +611,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             color = Color.White.copy(alpha = 0.8f),
             fontWeight = FontWeight.Black,
             letterSpacing = 1.2.sp,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = CoffeeSpacing.md)
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -667,7 +620,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             title = "Start Exploring",
             onClick = onStartExploring,
             variant = CoffeeButtonVariant.Primary,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = CoffeeSpacing.md)
         )
 
         Text(
@@ -697,7 +650,7 @@ private fun GlassmorphicCard(
                 color = Color.White.copy(alpha = 0.25f),
                 shape = RoundedCornerShape(24.dp)
             )
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.sm)
     ) {
         content()
     }
@@ -707,13 +660,13 @@ private fun GlassmorphicCard(
 private fun OnboardingProgressBar(activeIndex: Int, total: Int, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
     ) {
         for (i in 0 until total) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(4.dp)
+                    .height(CoffeeSpacing.xxs)
                     .clip(CircleShape)
                     .background(
                         if (i <= activeIndex) CoffeePrimary else CoffeeMuted.copy(alpha = 0.2f)
@@ -742,12 +695,12 @@ private fun ActivityChip(
             .clip(RoundedCornerShape(28.dp))
             .background(CoffeeSurface)
             .border(1.dp, CoffeeBorder, RoundedCornerShape(28.dp))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(CoffeeSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
         horizontalAlignment = Alignment.Start
     ) {
         Text(text = icon, fontSize = 24.sp)
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelMedium,
@@ -756,7 +709,7 @@ private fun ActivityChip(
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)
             ) {
                 Box(
                     modifier = Modifier
@@ -793,11 +746,11 @@ private fun SafetyFeatureRow(
             .clip(RoundedCornerShape(16.dp))
             .background(CoffeeSurface)
             .border(1.dp, CoffeeBorder, RoundedCornerShape(16.dp))
-            .padding(16.dp),
+            .padding(CoffeeSpacing.md),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
     ) {
-        Text(text = icon, fontSize = 20.sp, modifier = Modifier.width(24.dp))
+        Text(text = icon, fontSize = 20.sp, modifier = Modifier.width(CoffeeSpacing.xl))
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
@@ -827,7 +780,7 @@ private fun InterestPill(
             .background(if (isSelected) CoffeePrimary else CoffeeSurface)
             .border(1.dp, if (isSelected) Color.Transparent else CoffeeBorder, RoundedCornerShape(30.dp))
             .clickable(onClick = onClick)
-            .padding(vertical = 16.dp),
+            .padding(vertical = CoffeeSpacing.md),
         contentAlignment = Alignment.Center
     ) {
         Text(

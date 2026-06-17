@@ -32,13 +32,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.coffeecall.app.core.design.CoffeeIcons
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,9 +56,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import coil.compose.AsyncImage
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -72,6 +81,10 @@ import com.coffeecall.app.core.design.CoffeeSurface
 import com.coffeecall.app.core.design.CoffeeSurfaceSecondary
 import com.coffeecall.app.core.design.CoffeeTextOnBrand
 import com.coffeecall.app.core.design.CoffeeTopAppBar
+import com.coffeecall.app.core.design.CoffeeAvatar
+import com.coffeecall.app.core.design.CoffeeGlassBadge
+import com.coffeecall.app.core.design.CoffeeButton
+import com.coffeecall.app.core.design.CoffeeButtonVariant
 import com.coffeecall.app.domain.model.DriftCategory
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.JoinMode
@@ -81,7 +94,8 @@ import com.coffeecall.app.domain.model.JoinRequest
 fun DriftDetailScreen(
     postId: String,
     onBack: () -> Unit,
-    onNavigateToDrift: ((String) -> Unit)? = null
+    onNavigateToDrift: ((String) -> Unit)? = null,
+    onNavigateToChat: ((String) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as Application
@@ -89,6 +103,12 @@ fun DriftDetailScreen(
         factory = DriftDetailViewModel.factory(application, postId)
     )
     val uiState by viewModel.uiState.collectAsState()
+    var showEditDialog by remember { mutableStateOf(false) }
+    var showCloseDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var editTitle by remember { mutableStateOf("") }
+    var editDescription by remember { mutableStateOf("") }
+    var editLocation by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -111,8 +131,84 @@ fun DriftDetailScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Top App Bar Spacer & Header
-                Spacer(modifier = Modifier.height(56.dp))
+                // Hero Image Header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                ) {
+                    AsyncImage(
+                        model = categoryHeroUrl(drift.category),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    // Gradient overlay
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Black.copy(alpha = 0.35f),
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.65f)
+                                    )
+                                )
+                            )
+                    )
+
+                    // Host Info Overlay
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(CoffeeSpacing.md),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        CoffeeAvatar(
+                            name = drift.creatorName,
+                            imageUrl = drift.creatorImageUrl.ifBlank { null },
+                            size = CoffeeSpacing.minTouchTarget,
+                            background = Color.White.copy(alpha = 0.2f),
+                            ringColor = Color.White
+                        )
+
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = drift.creatorName,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                if (drift.creatorVerified) {
+                                    Spacer(modifier = Modifier.width(CoffeeSpacing.xxs))
+                                    Text(
+                                        text = "✓",
+                                        color = CoffeePrimary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                            Text(
+                                text = "Host • ${drift.date}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.82f)
+                            )
+                        }
+                    }
+
+                    CoffeeGlassBadge(
+                        title = categoryLabel(drift.category).uppercase(),
+                        icon = CoffeeIcons.category(drift.category.name),
+                        containerColor = categoryColor(drift.category),
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(CoffeeSpacing.md)
+                    )
+                }
 
                 DriftDetailContent(
                     drift = drift,
@@ -134,26 +230,36 @@ fun DriftDetailScreen(
                         val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
                         context.startActivity(mapIntent)
                     },
-                    onNavigateToDrift = onNavigateToDrift
+                    onNavigateToDrift = onNavigateToDrift,
+                    onHostEdit = {
+                        editTitle = drift.title
+                        editDescription = drift.description
+                        editLocation = drift.location
+                        showEditDialog = true
+                    },
+                    onHostClose = { showCloseDialog = true },
+                    onHostDelete = { showDeleteDialog = true },
+                    onHostChat = { onNavigateToChat?.invoke(drift.id) }
                 )
 
-                Spacer(modifier = Modifier.height(140.dp)) // Padding for bottom floating bar
+                Spacer(modifier = Modifier.height(140.dp))
             }
 
-            // Top Bar
-            Surface(
+            // Floating Glassmorphic Back Button
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth(),
-                color = CoffeeBackground.copy(alpha = 0.94f),
-                shadowElevation = 0.dp
+                    .padding(top = CoffeeSpacing.md, start = CoffeeSpacing.screen)
+                    .size(CoffeeSpacing.minTouchTarget)
+                    .clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.48f))
+                    .clickable(onClick = onBack),
+                contentAlignment = Alignment.Center
             ) {
-                CoffeeTopAppBar(
-                    title = "Drift Details",
-                    subtitle = "Hosted by ${drift.creatorName}",
-                    actionLabel = "Back",
-                    onAction = onBack,
-                    modifier = Modifier.padding(top = CoffeeSpacing.xs)
+                Icon(
+                    imageVector = CoffeeIcons.back,
+                    contentDescription = "Back",
+                    tint = Color.White,
+                    modifier = Modifier.size(CoffeeSpacing.lg)
                 )
             }
 
@@ -162,7 +268,8 @@ fun DriftDetailScreen(
                 uiState = uiState,
                 onJoin = { viewModel.requestToJoin() },
                 onCancelRequest = viewModel::cancelJoinRequest,
-                onLeave = { viewModel.leaveDrift() }
+                onLeave = { viewModel.leaveDrift() },
+                onMessage = { onNavigateToChat?.invoke(drift.id) }
             )
         }
 
@@ -178,7 +285,13 @@ fun DriftDetailScreen(
                         viewModel.confirmAddReminder()
                         
                         val categoryFormatted = drift.category.firestoreValue.replaceFirstChar { it.uppercase() }
-                        val formattedDescription = "Drift Category: $categoryFormatted\nMeeting Point: ${drift.meetingPoint.ifBlank { "Approximate location shared until joined" }}\n\n${drift.description}"
+                        val canSeeExactMeetingPoint = uiState.joinStatus == JoinStatus.Joined
+                        val meetingPointText = if (canSeeExactMeetingPoint) {
+                            drift.meetingPoint.ifBlank { "Meeting point will be coordinated in chat" }
+                        } else {
+                            "Exact meeting point unlocks after you join"
+                        }
+                        val formattedDescription = "Drift Category: $categoryFormatted\nMeeting Point: $meetingPointText\n\n${drift.description}"
                         
                         val startTime = parseDriftDateTime(drift.date, drift.time)
                         val endTime = if (drift.endTime.isNotBlank()) {
@@ -226,6 +339,97 @@ fun DriftDetailScreen(
                 shape = CoffeeShapes.medium
             )
         }
+
+        if (showEditDialog) {
+            AlertDialog(
+                onDismissRequest = { showEditDialog = false },
+                title = { Text("Edit Drift", color = CoffeeInk, fontWeight = FontWeight.Bold) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+                        OutlinedTextField(
+                            value = editTitle,
+                            onValueChange = { editTitle = it },
+                            label = { Text("Title") },
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = editDescription,
+                            onValueChange = { editDescription = it },
+                            label = { Text("Description") },
+                            minLines = 3
+                        )
+                        OutlinedTextField(
+                            value = editLocation,
+                            onValueChange = { editLocation = it },
+                            label = { Text("Approximate location") },
+                            singleLine = true
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showEditDialog = false
+                        viewModel.updateHostDrift(editTitle, editDescription, editLocation)
+                    }) {
+                        Text("Save", color = CoffeePrimary)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEditDialog = false }) {
+                        Text("Cancel", color = CoffeeMuted)
+                    }
+                },
+                containerColor = CoffeeSurface,
+                shape = CoffeeShapes.medium
+            )
+        }
+
+        if (showCloseDialog) {
+            AlertDialog(
+                onDismissRequest = { showCloseDialog = false },
+                title = { Text("Close Drift?", color = CoffeeInk, fontWeight = FontWeight.Bold) },
+                text = { Text("This ends the drift for new joins while keeping the record visible.", color = CoffeeMuted) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showCloseDialog = false
+                        viewModel.closeDrift()
+                    }) {
+                        Text("Close", color = CoffeePeach, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showCloseDialog = false }) {
+                        Text("Cancel", color = CoffeeMuted)
+                    }
+                },
+                containerColor = CoffeeSurface,
+                shape = CoffeeShapes.medium
+            )
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Delete Drift?", color = CoffeeInk, fontWeight = FontWeight.Bold) },
+                text = { Text("This removes the drift and its chat thread. This cannot be undone.", color = CoffeeMuted) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDeleteDialog = false
+                        viewModel.deleteDrift()
+                        onBack()
+                    }) {
+                        Text("Delete", color = CoffeeError, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("Cancel", color = CoffeeMuted)
+                    }
+                },
+                containerColor = CoffeeSurface,
+                shape = CoffeeShapes.medium
+            )
+        }
     }
 }
 
@@ -239,7 +443,11 @@ private fun DriftDetailContent(
     onSetReminder: () -> Unit,
     onShare: () -> Unit,
     onOpenMap: () -> Unit,
-    onNavigateToDrift: ((String) -> Unit)? = null
+    onNavigateToDrift: ((String) -> Unit)? = null,
+    onHostEdit: () -> Unit,
+    onHostClose: () -> Unit,
+    onHostDelete: () -> Unit,
+    onHostChat: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -247,48 +455,15 @@ private fun DriftDetailContent(
             .padding(horizontal = CoffeeSpacing.screen, vertical = CoffeeSpacing.md),
         verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
     ) {
-        // Category representation & Status
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
-        ) {
-            val color = categoryColor(drift.category)
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(color.copy(alpha = 0.16f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = categorySymbol(drift.category),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = color
-                )
-            }
-            Text(
-                text = categoryLabel(drift.category).uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = CoffeeMuted,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            CoffeePillBadge(
-                title = drift.status.firestoreValue,
-                containerColor = CoffeePrimary.copy(alpha = 0.12f),
-                contentColor = CoffeePrimaryDark
-            )
-        }
-
         // Title
         Text(
             text = drift.title,
             style = MaterialTheme.typography.headlineLarge.copy(lineHeight = 32.sp),
             color = CoffeeInk,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.padding(top = CoffeeSpacing.sm)
         )
 
-        // Hook (if present)
         if (drift.hook.isNotBlank()) {
             Surface(
                 color = CoffeePeach.copy(alpha = 0.08f),
@@ -306,109 +481,20 @@ private fun DriftDetailContent(
                         text = drift.hook,
                         style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 18.sp),
                         color = CoffeeInk,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
         }
 
-        // Time / Location Details
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(CoffeeShapes.large)
-                .background(CoffeeSurface)
-                .border(1.dp, CoffeeBorder, CoffeeShapes.large)
-                .padding(CoffeeSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-        ) {
-            DetailInfoRow(symbol = "📅", label = "Date", value = drift.date)
-            DetailInfoRow(symbol = "🕒", label = "Time", value = "${drift.time} - ${drift.endTime}")
-            DetailInfoRow(symbol = "📍", label = "Area", value = drift.location)
+        AboutSection(drift = drift)
 
-            // Meeting point details only visible to joined participants/hosts
-            if (uiState.joinStatus == JoinStatus.Joined) {
-                HorizontalDivider(color = CoffeeBorder.copy(alpha = 0.5f), modifier = Modifier.padding(vertical = 4.dp))
-                DetailInfoRow(
-                    symbol = "🔑",
-                    label = "Meeting Point",
-                    value = drift.meetingPoint.ifBlank { "To be decided" }
-                )
-            }
-        }
+        HostContextCard(drift = drift, uiState = uiState, onNavigateToDrift = onNavigateToDrift)
 
-        // Spots Left Indicator
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
-        ) {
-            val progress = if (drift.capacity > 0) drift.participantCount.toFloat() / drift.capacity else 0f
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row {
-                    Text(text = "Spots Left", style = MaterialTheme.typography.labelLarge, color = CoffeeInk)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "${drift.spotsLeft} of ${drift.capacity} slots remaining",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = CoffeeMuted
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(CircleShape)
-                        .background(CoffeeBorder.copy(alpha = 0.5f))
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(progress.coerceIn(0f, 1f))
-                            .height(8.dp)
-                            .clip(CircleShape)
-                            .background(CoffeePrimary)
-                    )
-                }
-            }
-        }
+        ParticipantsSection(drift = drift, uiState = uiState)
 
-        // Description
-        if (drift.description.isNotBlank()) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "About this Drift", style = MaterialTheme.typography.titleMedium, color = CoffeeInk, fontWeight = FontWeight.Bold)
-                Text(
-                    text = drift.description,
-                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 22.sp),
-                    color = CoffeeInk.copy(alpha = 0.86f)
-                )
-            }
-        }
+        DriftDetailsListSection(drift = drift, uiState = uiState)
 
-        // Vibe Tags
-        if (drift.vibeTags.isNotEmpty()) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(text = "Drift Vibes", style = MaterialTheme.typography.titleSmall, color = CoffeeInk, fontWeight = FontWeight.Bold)
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs),
-                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
-                ) {
-                    drift.vibeTags.forEach { vibe ->
-                        Text(
-                            text = "#$vibe",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = CoffeePurple,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(CoffeePurple.copy(alpha = 0.08f))
-                                .border(1.dp, CoffeePurple.copy(alpha = 0.16f), CircleShape)
-                                .padding(horizontal = 10.dp, vertical = 5.dp)
-                        )
-                    }
-                }
-            }
-        }
-
-        // Share & Remind Tools Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
@@ -447,62 +533,21 @@ private fun DriftDetailContent(
             }
         }
 
-        // Participants Initials row
-        if (uiState.participants.isNotEmpty() || drift.participantInitials.isNotEmpty()) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = "Who's Going", style = MaterialTheme.typography.titleMedium, color = CoffeeInk, fontWeight = FontWeight.Bold)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy((-8).dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val initialsToDisplay = if (uiState.participants.isNotEmpty()) {
-                        uiState.participants.map { it.initials }
-                    } else {
-                        drift.participantInitials
-                    }
-
-                    initialsToDisplay.take(5).forEach { initials ->
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(CoffeePeach)
-                                .border(2.dp, CoffeeBackground, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = initials,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = CoffeeTextOnBrand,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                    if (initialsToDisplay.size > 5) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(CoffeeBorder)
-                                .border(2.dp, CoffeeBackground, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "+${initialsToDisplay.size - 5}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = CoffeeInk
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Host Context Card
-        HostContextCard(drift = drift, uiState = uiState, onNavigateToDrift = onNavigateToDrift)
-
-        // Maps Integration Section
         MapSection(drift = drift, uiState = uiState, onOpenMap = onOpenMap)
+
+        SafetyBanner()
+
+        if (drift.creatorId == uiState.currentUserId) {
+            HostManagementPanel(
+                drift = drift,
+                uiState = uiState,
+                onEdit = onHostEdit,
+                onShare = onShare,
+                onClose = onHostClose,
+                onDelete = onHostDelete,
+                onChat = onHostChat
+            )
+        }
 
         // Pending Requests Panel (Host Actions)
         if (drift.creatorId == uiState.currentUserId && drift.pendingRequests.isNotEmpty()) {
@@ -515,13 +560,337 @@ private fun DriftDetailContent(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun DetailInfoRow(symbol: String, label: String, value: String) {
+private fun AboutSection(drift: DriftPost) {
+    Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+        Text(
+            text = "About this Drift",
+            style = MaterialTheme.typography.titleMedium,
+            color = CoffeeInk,
+            fontWeight = FontWeight.Bold
+        )
+        if (drift.description.isNotBlank()) {
+            Text(
+                text = drift.description,
+                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
+                color = CoffeeMuted
+            )
+        }
+        if (drift.vibeTags.isNotEmpty()) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
+            ) {
+                drift.vibeTags.forEach { vibe ->
+                    Text(
+                        text = vibe,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = CoffeePurple,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clip(CoffeeShapes.medium)
+                            .background(CoffeePurple.copy(alpha = 0.08f))
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DriftDetailsListSection(
+    drift: DriftPost,
+    uiState: DriftDetailUiState
+) {
+    val canSeeExactMeetingPoint = uiState.joinStatus == JoinStatus.Joined
+    Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+        Text(
+            text = "Details",
+            style = MaterialTheme.typography.titleMedium,
+            color = CoffeeInk,
+            fontWeight = FontWeight.Bold
+        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = CoffeeShapes.large,
+            color = CoffeeSurface,
+            border = BorderStroke(1.dp, CoffeeBorder)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = CoffeeSpacing.md)) {
+                DetailListRow(
+                    icon = CoffeeIcons.clock,
+                    label = "Time",
+                    value = if (drift.endTime.isNotBlank()) "${drift.time} - ${drift.endTime}" else drift.time
+                )
+                DetailListRow(
+                    icon = if (canSeeExactMeetingPoint) CoffeeIcons.location else CoffeeIcons.lock,
+                    label = "Meeting point",
+                    value = if (canSeeExactMeetingPoint) {
+                        drift.meetingPoint.ifBlank { "Meeting point will be coordinated in chat" }
+                    } else {
+                        "Join to see exact location"
+                    },
+                    locked = !canSeeExactMeetingPoint
+                )
+                DetailListRow(
+                    icon = CoffeeIcons.profile,
+                    label = "Bring",
+                    value = drift.whatToBring.joinToString(", ").ifBlank { "Good mood" }
+                )
+                DetailListRow(
+                    icon = CoffeeIcons.bolt,
+                    label = "Vibe",
+                    value = drift.vibeTags.joinToString(" • ").ifBlank { "Friendly" }
+                )
+                DetailListRow(
+                    icon = CoffeeIcons.info,
+                    label = "Notes",
+                    value = drift.hook.ifBlank { "No extra notes." },
+                    isLast = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailListRow(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    locked: Boolean = false,
+    isLast: Boolean = false
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = CoffeeSpacing.md),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (locked) CoffeeMuted else CoffeePrimary,
+                modifier = Modifier.size(CoffeeSpacing.lg)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = CoffeeMuted,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (locked) CoffeeMuted else CoffeeInk,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        if (!isLast) {
+            HorizontalDivider(color = CoffeeBorder.copy(alpha = 0.72f))
+        }
+    }
+}
+
+@Composable
+private fun SafetyBanner() {
+    Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = CoffeeShapes.medium,
+            color = CoffeePurple.copy(alpha = 0.08f),
+            border = BorderStroke(1.dp, CoffeePurple.copy(alpha = 0.18f))
+        ) {
+            Row(
+                modifier = Modifier.padding(CoffeeSpacing.md),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+            ) {
+                Icon(
+                    imageVector = CoffeeIcons.info,
+                    contentDescription = null,
+                    tint = CoffeePurple,
+                    modifier = Modifier.size(22.dp)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Safety first",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = CoffeeInk,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Exact meeting details stay private until you join.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = CoffeeMuted
+                    )
+                }
+            }
+        }
+        Text(
+            text = "Coordinate final details in the drift chat.",
+            style = MaterialTheme.typography.labelSmall,
+            color = CoffeeMuted,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+@Composable
+private fun ParticipantsSection(
+    drift: DriftPost,
+    uiState: DriftDetailUiState
+) {
+    val canRevealParticipants = uiState.joinStatus == JoinStatus.Joined
+    val initials = if (uiState.participants.isNotEmpty()) {
+        uiState.participants.map { it.initials }
+    } else {
+        drift.participantInitials
+    }
+
+    if (drift.participantCount <= 0 && initials.isEmpty()) return
+
+    Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
+        Text(
+            text = "Who's Going",
+            style = MaterialTheme.typography.titleMedium,
+            color = CoffeeInk,
+            fontWeight = FontWeight.Bold
+        )
+
+        if (!canRevealParticipants) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = CoffeeShapes.large,
+                color = CoffeeSurface,
+                border = BorderStroke(1.dp, CoffeeBorder)
+            ) {
+                Row(
+                    modifier = Modifier.padding(CoffeeSpacing.md),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+                        initials.take(3).forEach { initial ->
+                            CoffeeAvatar(
+                                name = initial,
+                                size = 34.dp,
+                                background = CoffeePeach,
+                                ringColor = CoffeeBackground
+                            )
+                        }
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "${drift.participantCount} people are in",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = CoffeeInk,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = "Full participant details unlock after you join.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = CoffeeMuted
+                        )
+                    }
+                    Icon(
+                        imageVector = CoffeeIcons.check,
+                        contentDescription = null,
+                        tint = CoffeeMuted,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+            return
+        }
+
+        if (uiState.participants.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
+                uiState.participants.forEach { participant ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(CoffeeShapes.medium)
+                            .background(CoffeeSurface)
+                            .border(1.dp, CoffeeBorder, CoffeeShapes.medium)
+                            .padding(CoffeeSpacing.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                    ) {
+                        CoffeeAvatar(
+                            name = participant.initials,
+                            size = 38.dp,
+                            background = CoffeePeach,
+                            ringColor = CoffeeBackground
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = participant.name,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = CoffeeInk,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = participant.interests.take(3).joinToString(", ").ifBlank { participant.joinTimeDescription },
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CoffeeMuted
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy((-8).dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                initials.take(6).forEach { initial ->
+                        CoffeeAvatar(
+                                name = initial,
+                                size = CoffeeSpacing.xxl,
+                                background = CoffeePeach,
+                                ringColor = CoffeeBackground
+                    )
+                }
+                if (initials.size > 6) {
+                    Box(
+                        modifier = Modifier
+                            .size(CoffeeSpacing.xxl)
+                            .clip(CircleShape)
+                            .background(CoffeeBorder)
+                            .border(2.dp, CoffeeBackground, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+${initials.size - 6}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = CoffeeInk
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailInfoRow(icon: ImageVector, label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = symbol, style = MaterialTheme.typography.titleMedium)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(CoffeeSpacing.lg),
+            tint = CoffeeMuted
+        )
         Spacer(modifier = Modifier.width(CoffeeSpacing.sm))
         Text(
             text = "$label: ",
@@ -553,25 +922,18 @@ private fun HostContextCard(
     ) {
         Column(modifier = Modifier.padding(CoffeeSpacing.md), verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(CoffeePrimary.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = drift.creatorName.take(1).uppercase(),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = CoffeePrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                CoffeeAvatar(
+                    name = drift.creatorName,
+                    imageUrl = drift.creatorImageUrl.ifBlank { null },
+                    size = CoffeeSpacing.minTouchTarget,
+                    background = CoffeePrimary.copy(alpha = 0.12f),
+                    ringColor = null
+                )
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = drift.creatorName, style = MaterialTheme.typography.titleMedium, color = CoffeeInk, fontWeight = FontWeight.Bold)
                         if (drift.creatorVerified) {
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(CoffeeSpacing.xxs))
                             Text(text = "✓", color = CoffeePrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         }
                     }
@@ -592,9 +954,9 @@ private fun HostContextCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 HostStatItem(label = "Hosted", value = "4")
-                Box(modifier = Modifier.height(24.dp).width(1.dp).background(CoffeeBorder))
+                Box(modifier = Modifier.height(CoffeeSpacing.xl).width(1.dp).background(CoffeeBorder))
                 HostStatItem(label = "Joined", value = "12")
-                Box(modifier = Modifier.height(24.dp).width(1.dp).background(CoffeeBorder))
+                Box(modifier = Modifier.height(CoffeeSpacing.xl).width(1.dp).background(CoffeeBorder))
                 HostStatItem(label = "Completed", value = "16")
             }
 
@@ -603,8 +965,8 @@ private fun HostContextCard(
             if (interests.isNotEmpty()) {
                 Text(text = "Interests", style = MaterialTheme.typography.labelSmall, color = CoffeeMuted, fontWeight = FontWeight.Bold)
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs),
+                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)
                 ) {
                     interests.forEach { interest ->
                         Text(
@@ -614,7 +976,7 @@ private fun HostContextCard(
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .background(CoffeeBorder.copy(alpha = 0.6f))
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .padding(horizontal = CoffeeSpacing.xs, vertical = CoffeeSpacing.xxs)
                         )
                     }
                 }
@@ -622,7 +984,7 @@ private fun HostContextCard(
 
             // Other Active Drifts
             if (uiState.otherActiveDrifts.isNotEmpty()) {
-                HorizontalDivider(color = CoffeeBorder.copy(alpha = 0.5f), modifier = Modifier.padding(vertical = 4.dp))
+                HorizontalDivider(color = CoffeeBorder.copy(alpha = 0.5f), modifier = Modifier.padding(vertical = CoffeeSpacing.xxs))
                 Text(text = "Other active drifts by host", style = MaterialTheme.typography.labelSmall, color = CoffeeMuted, fontWeight = FontWeight.Bold)
                 
                 uiState.otherActiveDrifts.forEach { activePost ->
@@ -630,7 +992,7 @@ private fun HostContextCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onNavigateToDrift?.invoke(activePost.id) }
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = CoffeeSpacing.xxs),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
@@ -661,7 +1023,7 @@ private fun MapSection(
 ) {
     val joined = uiState.joinStatus == JoinStatus.Joined
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
         Text(
             text = if (joined) "Location Details" else "Approximate Location",
             style = MaterialTheme.typography.titleMedium,
@@ -692,10 +1054,10 @@ private fun MapSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = CoffeeInk.copy(alpha = 0.8f)
             )
-            CoffeePrimaryButton(
+            CoffeeButton(
                 title = "Open in Google Maps",
                 onClick = onOpenMap,
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                modifier = Modifier.fillMaxWidth().padding(top = CoffeeSpacing.xxs)
             )
         } else {
             Text(
@@ -777,6 +1139,151 @@ private fun DetailedMapCanvas(modifier: Modifier = Modifier) {
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun HostManagementPanel(
+    drift: DriftPost,
+    uiState: DriftDetailUiState,
+    onEdit: () -> Unit,
+    onShare: () -> Unit,
+    onClose: () -> Unit,
+    onDelete: () -> Unit,
+    onChat: () -> Unit
+) {
+    Surface(
+        color = CoffeeSurface,
+        shape = CoffeeShapes.large,
+        border = BorderStroke(1.dp, CoffeePrimary.copy(alpha = 0.24f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(CoffeeSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(CoffeePrimary.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = CoffeeIcons.bolt,
+                        contentDescription = null,
+                        tint = CoffeePrimary,
+                        modifier = Modifier.size(21.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Host Management",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = CoffeeInk,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = "${drift.pendingRequests.size} pending requests · ${drift.participantCount} joined",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = CoffeeMuted
+                    )
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm), modifier = Modifier.fillMaxWidth()) {
+                CoffeeButton(
+                    title = "Edit",
+                    onClick = onEdit,
+                    variant = CoffeeButtonVariant.Secondary,
+                    leadingIcon = CoffeeIcons.profile,
+                    modifier = Modifier.weight(1f)
+                )
+                CoffeeButton(
+                    title = "Share",
+                    onClick = onShare,
+                    variant = CoffeeButtonVariant.Secondary,
+                    leadingIcon = CoffeeIcons.send,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm), modifier = Modifier.fillMaxWidth()) {
+                CoffeeButton(
+                    title = "Chat",
+                    onClick = onChat,
+                    variant = CoffeeButtonVariant.Primary,
+                    leadingIcon = CoffeeIcons.chats,
+                    modifier = Modifier.weight(1f)
+                )
+                CoffeeButton(
+                    title = "Close",
+                    onClick = onClose,
+                    variant = CoffeeButtonVariant.Peach,
+                    leadingIcon = CoffeeIcons.close,
+                    modifier = Modifier.weight(1f),
+                    enabled = drift.status != com.coffeecall.app.domain.model.DriftStatus.Ended
+                )
+            }
+
+            CoffeeButton(
+                title = "Delete Drift",
+                onClick = onDelete,
+                variant = CoffeeButtonVariant.Ghost,
+                leadingIcon = CoffeeIcons.close
+            )
+
+            if (uiState.participants.isNotEmpty() || drift.participantInitials.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = "Joined Participants",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = CoffeeInk,
+                        fontWeight = FontWeight.Black
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs),
+                        verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
+                    ) {
+                        val participants = if (uiState.participants.isNotEmpty()) {
+                            uiState.participants.map { it.initials }
+                        } else {
+                            drift.participantInitials
+                        }
+                        participants.forEach { initials ->
+                            Surface(
+                                shape = CircleShape,
+                                color = CoffeeSurfaceSecondary,
+                                border = BorderStroke(1.dp, CoffeeBorder)
+                            ) {
+                                Text(
+                                    text = initials,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = CoffeeInk,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Surface(
+                shape = CoffeeShapes.medium,
+                color = CoffeePeach.copy(alpha = 0.1f),
+                border = BorderStroke(1.dp, CoffeePeach.copy(alpha = 0.28f))
+            ) {
+                Text(
+                    text = "Safety reminder: keep exact meeting details in chat and close or delete plans that are no longer active.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CoffeeInk,
+                    modifier = Modifier.padding(CoffeeSpacing.sm)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun HostRequestsPanel(
     requests: List<JoinRequest>,
     onAccept: (JoinRequest) -> Unit,
@@ -806,40 +1313,33 @@ private fun HostRequestsPanel(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(CoffeePurple.copy(alpha = 0.12f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = request.userInitials,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = CoffeePurple,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    CoffeeAvatar(
+                        name = request.userName,
+                        size = CoffeeSpacing.xxl,
+                        background = CoffeePurple.copy(alpha = 0.12f),
+                        ringColor = null
+                    )
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = request.userName, style = MaterialTheme.typography.labelMedium, color = CoffeeInk, fontWeight = FontWeight.Bold)
                         Text(text = request.message, style = MaterialTheme.typography.labelSmall, color = CoffeeMuted)
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        TextButton(
+                    Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)) {
+                        CoffeeButton(
+                            title = "Reject",
                             onClick = { onReject(request.id) },
-                            colors = ButtonDefaults.textButtonColors(contentColor = CoffeeError)
-                        ) {
-                            Text("Reject", style = MaterialTheme.typography.labelSmall)
-                        }
-                        Button(
+                            variant = CoffeeButtonVariant.Ghost,
+                            fullWidth = false,
+                            height = CoffeeSpacing.xxl
+                        )
+                        CoffeeButton(
+                            title = "Accept",
                             onClick = { onAccept(request) },
-                            colors = ButtonDefaults.buttonColors(containerColor = CoffeePrimary),
-                            shape = CoffeeShapes.small
-                        ) {
-                            Text("Accept", style = MaterialTheme.typography.labelSmall, color = CoffeeTextOnBrand)
-                        }
+                            variant = CoffeeButtonVariant.Primary,
+                            fullWidth = false,
+                            height = CoffeeSpacing.xxl
+                        )
                     }
                 }
             }
@@ -852,7 +1352,8 @@ private fun FloatingBottomCTA(
     uiState: DriftDetailUiState,
     onJoin: () -> Unit,
     onCancelRequest: () -> Unit,
-    onLeave: () -> Unit
+    onLeave: () -> Unit,
+    onMessage: () -> Unit
 ) {
     val isActionLoading = uiState.isActionLoading
 
@@ -889,66 +1390,73 @@ private fun FloatingBottomCTA(
                 ) {
                     if (isActionLoading) {
                         Box(modifier = Modifier.fillMaxWidth().height(48.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = CoffeePrimary, modifier = Modifier.size(24.dp))
+                            CircularProgressIndicator(color = CoffeePrimary, modifier = Modifier.size(CoffeeSpacing.xl))
                         }
                     } else {
                         when (uiState.joinStatus) {
                             JoinStatus.Joined -> {
                                 val isMine = uiState.drift?.creatorId == uiState.currentUserId
-                                if (isMine) {
-                                    Button(
-                                        onClick = {},
-                                        enabled = false,
-                                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(disabledContainerColor = CoffeePrimary.copy(alpha = 0.5f)),
-                                        shape = CoffeeShapes.medium
-                                    ) {
-                                        Text("You are the Host", color = CoffeeTextOnBrand)
-                                    }
-                                } else {
-                                    Button(
-                                        onClick = onLeave,
-                                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = CoffeeError),
-                                        shape = CoffeeShapes.medium
-                                    ) {
-                                        Text("Leave Drift", color = CoffeeTextOnBrand)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CoffeeButton(
+                                        title = "Chat Room",
+                                        onClick = onMessage,
+                                        variant = CoffeeButtonVariant.Primary,
+                                        leadingIcon = CoffeeIcons.chats,
+                                        modifier = Modifier.weight(1f)
+                                    )
+
+                                    if (!isMine) {
+                                        CoffeeButton(
+                                            title = "Leave",
+                                            onClick = onLeave,
+                                            variant = CoffeeButtonVariant.Secondary,
+                                            fullWidth = false
+                                        )
+                                    } else {
+                                        Surface(
+                                            shape = CoffeeShapes.medium,
+                                            color = CoffeeSurfaceSecondary,
+                                            border = BorderStroke(1.dp, CoffeeBorder),
+                                            modifier = Modifier.height(48.dp)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier.padding(horizontal = CoffeeSpacing.md),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text("Host", color = CoffeeInk, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                                            }
+                                        }
                                     }
                                 }
                             }
                             JoinStatus.Requested -> {
-                                Button(
+                                CoffeeButton(
+                                    title = "Cancel Join Request",
                                     onClick = onCancelRequest,
-                                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = CoffeeMuted),
-                                    shape = CoffeeShapes.medium
-                                ) {
-                                    Text("Cancel Join Request", color = CoffeeTextOnBrand)
-                                }
+                                    variant = CoffeeButtonVariant.Secondary
+                                )
                             }
                             JoinStatus.Full -> {
-                                Button(
+                                CoffeeButton(
+                                    title = "Drift Full",
                                     onClick = {},
-                                    enabled = false,
-                                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                                    shape = CoffeeShapes.medium
-                                ) {
-                                    Text("Drift Full", color = CoffeeTextOnBrand)
-                                }
+                                    enabled = false
+                                )
                             }
                             JoinStatus.Ended -> {
-                                Button(
+                                CoffeeButton(
+                                    title = "Drift Ended",
                                     onClick = {},
-                                    enabled = false,
-                                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                                    shape = CoffeeShapes.medium
-                                ) {
-                                    Text("Drift Ended", color = CoffeeTextOnBrand)
-                                }
+                                    enabled = false
+                                )
                             }
                             JoinStatus.NotJoined -> {
                                 val title = if (uiState.drift?.joinMode == JoinMode.Open) "Join Drift" else "Request to Join"
-                                CoffeePrimaryButton(
+                                CoffeeButton(
                                     title = title,
                                     onClick = onJoin,
                                     modifier = Modifier.fillMaxWidth()
@@ -986,41 +1494,7 @@ private fun categoryColor(cat: DriftCategory): Color =
 
 private fun categoryLabel(cat: DriftCategory): String = cat.firestoreValue
 
-@Composable
-fun CoffeePrimaryButton(
-    title: String,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .shadow(
-                elevation = if (enabled) 12.dp else 0.dp,
-                shape = CoffeeShapes.medium,
-                ambientColor = CoffeePrimary.copy(alpha = 0.18f),
-                spotColor = CoffeePrimary.copy(alpha = 0.24f)
-            ),
-        shape = CoffeeShapes.medium,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = CoffeePrimary,
-            contentColor = CoffeeTextOnBrand,
-            disabledContainerColor = CoffeeMuted.copy(alpha = 0.24f),
-            disabledContentColor = CoffeeTextOnBrand.copy(alpha = 0.72f)
-        )
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
+
 
 private fun parseDriftDateTime(dateStr: String, timeStr: String): Long {
     val calendar = java.util.Calendar.getInstance()
@@ -1071,3 +1545,66 @@ private fun parseDriftDateTime(dateStr: String, timeStr: String): Long {
 
     return calendar.timeInMillis
 }
+
+@Composable
+private fun DetailCard(
+    icon: ImageVector,
+    iconColor: Color,
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+            .border(1.dp, CoffeeBorder, RoundedCornerShape(16.dp)),
+        color = Color.White
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(iconColor.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(CoffeeSpacing.md)
+                )
+            }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                color = CoffeeMuted,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = CoffeeInk,
+                fontWeight = FontWeight.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+private fun categoryHeroUrl(cat: DriftCategory): String =
+    when (cat) {
+        DriftCategory.Coffee -> "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Walk -> "https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Movie -> "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Food -> "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Study -> "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Gaming -> "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Music -> "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Yoga -> "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800"
+        DriftCategory.Event -> "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800"
+    }

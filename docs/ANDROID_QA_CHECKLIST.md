@@ -40,22 +40,6 @@ This document details the smoke-test paths required to validate native Android r
 
 ---
 
-## ☕ 3. Drift Creation Flow
-
-- [ ] **Form Validation:**
-  - Tap "+" tab to open the Create Drift screen.
-  - Try to submit with an empty title: verify custom validation warning displays.
-  - Validate vibe selection, spots capacity limits, and manual coordinate fields.
-- [ ] **Drift Place Picker:**
-  - Search a location: verify that debounced Geocoder search resolves matching locality suggestions.
-  - Select a location: verify that coordinates populate and a custom preview map displays.
-- [ ] **Document Creation & Synchronization:**
-  - Submit the form: verify it commits a new post document to the `posts` collection in Firestore.
-  - Verify a matching thread document is created simultaneously in `messageThreads`.
-  - Validate that the post is visible in the creator's "Hosting" tab and to nearby users in their "Around" feed.
-
----
-
 ## 🤝 4. Joins & Host Actions
 
 - [ ] **Join Request:**

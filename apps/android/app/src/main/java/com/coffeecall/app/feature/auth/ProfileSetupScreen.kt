@@ -91,45 +91,19 @@ fun ProfileSetupScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(140.dp)
-                        .clip(RoundedCornerShape(48.dp))
-                        .background(CoffeeSurfaceSecondary)
-                        .border(
-                            width = 2.dp,
-                            color = if (pickedImageUri != null) CoffeePrimary.copy(alpha = 0.4f) else CoffeeBorder,
-                            shape = RoundedCornerShape(48.dp)
-                        )
                         .clickable {
                             photoPickerLauncher.launch(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (pickedImageUri != null) {
-                        AsyncImage(
-                            model = pickedImageUri,
-                            contentDescription = "Profile photo preview",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "📷",
-                                fontSize = 38.sp
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Add Photo",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = CoffeeMuted
-                            )
                         }
-                    }
+                ) {
+                    CoffeeAvatar(
+                        name = uiState.profileName.ifBlank { "User" },
+                        imageUrl = pickedImageUri?.toString(),
+                        size = 140.dp,
+                        background = CoffeeSurfaceSecondary,
+                        ringColor = if (pickedImageUri != null) CoffeePrimary.copy(alpha = 0.4f) else CoffeeBorder
+                    )
                 }
             }
 
@@ -181,36 +155,13 @@ fun ProfileSetupScreen(
 
             // CTA Button
             val isReady = uiState.profileName.isNotBlank()
-            Button(
+            CoffeeButton(
+                title = if (uiState.isLoading) "Saving..." else "Continue",
                 onClick = { onSaveProfile(photoBytes) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .shadow(
-                        elevation = if (isReady) 12.dp else 0.dp,
-                        shape = CoffeeShapes.small,
-                        ambientColor = CoffeePrimary.copy(alpha = 0.22f),
-                        spotColor = CoffeePrimary.copy(alpha = 0.22f)
-                    ),
+                variant = CoffeeButtonVariant.Primary,
                 enabled = isReady && !uiState.isLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CoffeePrimary,
-                    contentColor = CoffeeTextOnBrand,
-                    disabledContainerColor = CoffeeMuted.copy(alpha = 0.24f),
-                    disabledContentColor = CoffeeMuted
-                ),
-                shape = CoffeeShapes.small
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(color = CoffeeTextOnBrand, modifier = Modifier.size(24.dp))
-                } else {
-                    Text(
-                        text = "Continue",
-                        fontWeight = FontWeight.Black,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
+                height = CoffeeSpacing.primaryButtonHeight
+            )
         }
     }
 }

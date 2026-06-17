@@ -12,7 +12,6 @@ data class CoffeeCallDestination(
 
 object CoffeeCallRoutes {
     const val DISCOVERY = "discovery"
-    const val CREATE = "create"
     const val DRIFTS = "drifts"
     const val CHAT = "chat"
     const val PROFILE = "profile"
@@ -24,7 +23,6 @@ object CoffeeCallRoutes {
 val CoffeeCallDestinations = listOf(
     CoffeeCallDestination(CoffeeCallRoutes.DISCOVERY, "Around", CoffeeIcons.around, "People nearby are open to plans"),
     CoffeeCallDestination(CoffeeCallRoutes.DRIFTS, "Drifts", CoffeeIcons.drifts, "Plans happening around you"),
-    CoffeeCallDestination(CoffeeCallRoutes.CREATE, "Create", CoffeeIcons.create, "Share what you are up for"),
     CoffeeCallDestination(CoffeeCallRoutes.CHAT, "Chats", CoffeeIcons.chats, "Drift-tied messages"),
     CoffeeCallDestination(CoffeeCallRoutes.PROFILE, "You", CoffeeIcons.profile, "Your CoffeeCall presence")
 )

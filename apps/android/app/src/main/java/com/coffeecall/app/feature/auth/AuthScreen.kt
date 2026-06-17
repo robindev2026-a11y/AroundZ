@@ -128,7 +128,7 @@ private fun PhoneEntryView(
             .background(CoffeeBackground)
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = CoffeeSpacing.xl)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -137,7 +137,7 @@ private fun PhoneEntryView(
             // Back button
             Box(
                 modifier = Modifier
-                    .padding(top = 24.dp, bottom = 24.dp)
+                    .padding(top = CoffeeSpacing.xl, bottom = CoffeeSpacing.xl)
                     .size(48.dp)
                     .shadow(
                         elevation = 8.dp,
@@ -155,7 +155,7 @@ private fun PhoneEntryView(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
                     tint = CoffeeInk,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(CoffeeSpacing.lg)
                 )
             }
 
@@ -164,7 +164,7 @@ private fun PhoneEntryView(
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Black,
                 color = CoffeeInk,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.sm)
             )
 
             Text(
@@ -172,7 +172,7 @@ private fun PhoneEntryView(
                 style = MaterialTheme.typography.bodyLarge,
                 color = CoffeeMuted,
                 lineHeight = 22.sp,
-                modifier = Modifier.padding(bottom = 36.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.xxl)
             )
 
             // Input fields
@@ -182,18 +182,18 @@ private fun PhoneEntryView(
                 fontWeight = FontWeight.Black,
                 color = CoffeeMuted,
                 letterSpacing = 1.0.sp,
-                modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.xs, start = CoffeeSpacing.xxs)
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Country Code Selector
                 Box(
                     modifier = Modifier
-                        .height(56.dp)
+                        .height(CoffeeSpacing.primaryButtonHeight)
                         .width(110.dp)
                         .shadow(
                             elevation = 8.dp,
@@ -205,7 +205,7 @@ private fun PhoneEntryView(
                         .background(CoffeeSurface)
                         .border(1.dp, CoffeeBorder, RoundedCornerShape(16.dp))
                         .clickable { showCountryPicker = true }
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = CoffeeSpacing.sm),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
@@ -223,7 +223,7 @@ private fun PhoneEntryView(
                             imageVector = Icons.Rounded.ArrowDropDown,
                             contentDescription = null,
                             tint = CoffeeMuted,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(CoffeeSpacing.lg)
                         )
                     }
                 }
@@ -238,7 +238,7 @@ private fun PhoneEntryView(
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp)
+                        .height(CoffeeSpacing.primaryButtonHeight)
                         .shadow(
                             elevation = 8.dp,
                             shape = RoundedCornerShape(16.dp),
@@ -267,123 +267,40 @@ private fun PhoneEntryView(
                     text = error,
                     style = MaterialTheme.typography.bodyMedium,
                     color = CoffeeError,
-                    modifier = Modifier.padding(top = 12.dp, start = 4.dp)
+                    modifier = Modifier.padding(top = CoffeeSpacing.sm, start = CoffeeSpacing.xxs)
                 )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // CTA Button
+            CoffeeButton(
+                title = if (uiState.isLoading) "Sending..." else "Send Code",
+                onClick = { activity?.let { onSendOtp(it) } },
+                variant = CoffeeButtonVariant.Primary,
+                enabled = isPhoneValid && !uiState.isLoading,
+                height = CoffeeSpacing.primaryButtonHeight
+            )
 
             Text(
                 text = "Standard SMS rates may apply. You'll receive a 6-digit code to verify your phone.",
                 style = MaterialTheme.typography.labelMedium,
                 color = CoffeeMuted.copy(alpha = 0.8f),
                 lineHeight = 16.sp,
-                modifier = Modifier.padding(top = 16.dp, start = 4.dp)
+                modifier = Modifier.padding(top = CoffeeSpacing.md, start = CoffeeSpacing.xxs)
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // CTA Button
-            Button(
-                onClick = {
-                    if (activity != null) {
-                        onSendOtp(activity)
-                    }
-                },
-                enabled = isPhoneValid && !uiState.isLoading && activity != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .shadow(
-                        elevation = if (isPhoneValid) 12.dp else 0.dp,
-                        shape = RoundedCornerShape(16.dp),
-                        ambientColor = CoffeePrimary.copy(alpha = 0.22f),
-                        spotColor = CoffeePrimary.copy(alpha = 0.22f)
-                    ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CoffeePrimary,
-                    contentColor = Color.White,
-                    disabledContainerColor = CoffeeMuted.copy(alpha = 0.24f),
-                    disabledContentColor = CoffeeMuted
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = "Send Code",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(40.dp))
         }
 
-        // Country Selection Dialog
+        // Country code picker sheet
         if (showCountryPicker) {
-            AlertDialog(
-                onDismissRequest = { showCountryPicker = false },
-                title = {
-                    Text(
-                        text = "Select Country",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Black,
-                        color = CoffeeInk
-                    )
+            CountryCodePicker(
+                selectedCountry = selectedCountry,
+                onCountrySelected = { country ->
+                    selectedCountry = country
+                    showCountryPicker = false
+                    onPhoneChanged(country.dialCode + localNumber)
                 },
-                text = {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 300.dp)
-                    ) {
-                        items(CountryList) { country ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        selectedCountry = country
-                                        onPhoneChanged(country.dialCode + localNumber)
-                                        showCountryPicker = false
-                                    }
-                                    .padding(vertical = 12.dp, horizontal = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = country.flag,
-                                    fontSize = 22.sp,
-                                    modifier = Modifier.padding(end = 12.dp)
-                                )
-                                Text(
-                                    text = country.name,
-                                    modifier = Modifier.weight(1f),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = CoffeeInk,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = country.dialCode,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = CoffeeMuted,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                },
-                confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = { showCountryPicker = false }) {
-                        Text("Cancel", color = CoffeeMuted, fontWeight = FontWeight.Bold)
-                    }
-                },
-                containerColor = CoffeeSurface,
-                shape = RoundedCornerShape(24.dp)
+                onDismiss = { showCountryPicker = false }
             )
         }
     }
@@ -400,11 +317,17 @@ private fun OtpVerificationView(
 ) {
     val context = LocalContext.current
     val activity = context.findActivity()
-
     val focusRequester = remember { FocusRequester() }
-    var isTextFieldFocused by remember { mutableStateOf(false) }
+    val codeLength = 6
+    var localCode by remember { mutableStateOf("") }
 
-    val isCodeComplete = uiState.otpCode.length == 6
+    val isCodeComplete = localCode.length == codeLength
+
+    LaunchedEffect(uiState.otpCode) {
+        if (uiState.otpCode.isNotEmpty() && localCode.isEmpty()) {
+            localCode = uiState.otpCode
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -412,7 +335,7 @@ private fun OtpVerificationView(
             .background(CoffeeBackground)
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = CoffeeSpacing.xl)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -421,8 +344,8 @@ private fun OtpVerificationView(
             // Back button
             Box(
                 modifier = Modifier
-                    .padding(top = 24.dp, bottom = 24.dp)
-                    .size(48.dp)
+                    .padding(top = CoffeeSpacing.xl, bottom = CoffeeSpacing.xl)
+                    .size(CoffeeSpacing.minTouchTarget)
                     .shadow(
                         elevation = 8.dp,
                         shape = CircleShape,
@@ -439,171 +362,165 @@ private fun OtpVerificationView(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
                     tint = CoffeeInk,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(CoffeeSpacing.lg)
                 )
             }
 
             Text(
-                text = "Verify it's you",
+                text = "Enter the code",
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Black,
                 color = CoffeeInk,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.sm)
             )
 
             Text(
-                text = "Enter the 6-digit code sent to ${uiState.phoneNumber}",
+                text = "We sent a 6-digit code to ${uiState.phoneNumber}",
                 style = MaterialTheme.typography.bodyLarge,
                 color = CoffeeMuted,
-                lineHeight = 22.sp,
-                modifier = Modifier.padding(bottom = 44.dp)
+                modifier = Modifier.padding(bottom = CoffeeSpacing.xxl)
             )
 
-            // Digit entry fields
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
+            // OTP Character boxes
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
             ) {
-                // Invisible overlay TextField to handle keyboard input
-                BasicTextField(
-                    value = uiState.otpCode,
-                    onValueChange = { newValue ->
-                        val digits = newValue.filter { it.isDigit() }
-                        if (digits.length <= 6) {
-                            onCodeChanged(digits)
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier
-                        .size(1.dp)
-                        .alpha(0.01f)
-                        .focusRequester(focusRequester)
-                        .onFocusChanged { isTextFieldFocused = it.isFocused }
-                )
+                for (i in 0 until codeLength) {
+                    val char = localCode.getOrNull(i)?.toString() ?: ""
+                    val isFocused = i == localCode.length
 
-                // 6 Boxes visible to user
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { focusRequester.requestFocus() }
-                ) {
-                    for (i in 0 until 6) {
-                        val char = if (i < uiState.otpCode.length) uiState.otpCode[i].toString() else ""
-                        val isCurrent = i == uiState.otpCode.length
-                        val isFilled = i < uiState.otpCode.length
-
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(62.dp)
-                                .shadow(
-                                    elevation = 8.dp,
-                                    shape = RoundedCornerShape(16.dp),
-                                    ambientColor = Color.Black.copy(alpha = 0.04f),
-                                    spotColor = Color.Black.copy(alpha = 0.04f)
-                                )
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(CoffeeSurface)
-                                .border(
-                                    width = if (isCurrent && isTextFieldFocused) 2.dp else if (isFilled) 2.dp else 1.dp,
-                                    color = if (isCurrent && isTextFieldFocused) CoffeePrimary else if (isFilled) CoffeePrimary else CoffeeBorder,
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = char,
-                                style = MaterialTheme.typography.titleLarge.copy(fontSize = 22.sp),
-                                color = CoffeeInk,
-                                fontWeight = FontWeight.Bold
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(CoffeeSpacing.minTouchTarget)
+                            .shadow(
+                                elevation = if (isFocused) 4.dp else 0.dp,
+                                shape = RoundedCornerShape(CoffeeSpacing.sm)
                             )
-                        }
+                            .clip(RoundedCornerShape(CoffeeSpacing.sm))
+                            .background(if (char.isNotEmpty()) CoffeePrimary.copy(alpha = 0.1f) else CoffeeSurface)
+                            .border(
+                                1.dp,
+                                if (isFocused) CoffeePrimary else CoffeeBorder,
+                                RoundedCornerShape(CoffeeSpacing.sm)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = char,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = CoffeeInk
+                        )
                     }
                 }
             }
 
-            // Resend Code pill
-            Box(
+            // Hidden text field for keyboard input
+            BasicTextField(
+                value = localCode,
+                onValueChange = { newValue ->
+                    val filtered = newValue.filter { it.isDigit() }.take(codeLength)
+                    localCode = filtered
+                    onCodeChanged(filtered)
+                },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp, horizontal = 36.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(CoffeeSurfaceSecondary)
-                        .clickable(enabled = !uiState.isLoading && activity != null) {
-                            if (activity != null) onResendCode(activity)
-                        }
-                        .padding(horizontal = 24.dp, vertical = 10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (uiState.isLoading) "Sending..." else "Resend code",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = CoffeePrimary
-                    )
-                }
-            }
+                    .focusRequester(focusRequester)
+                    .alpha(0f)
+                    .size(0.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
 
-            // Error display
+            // Error message
             uiState.errorMessage?.let { error ->
                 Text(
                     text = error,
                     style = MaterialTheme.typography.bodyMedium,
                     color = CoffeeError,
-                    modifier = Modifier.padding(top = 16.dp, start = 4.dp)
+                    modifier = Modifier.padding(top = CoffeeSpacing.sm)
                 )
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
             // CTA Button
-            Button(
+            CoffeeButton(
+                title = if (uiState.isLoading) "Verifying..." else "Verify",
                 onClick = onVerifyOtp,
+                variant = CoffeeButtonVariant.Primary,
                 enabled = isCodeComplete && !uiState.isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .shadow(
-                        elevation = if (isCodeComplete) 12.dp else 0.dp,
-                        shape = RoundedCornerShape(16.dp),
-                        ambientColor = CoffeePrimary.copy(alpha = 0.22f),
-                        spotColor = CoffeePrimary.copy(alpha = 0.22f)
-                    ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CoffeePrimary,
-                    contentColor = Color.White,
-                    disabledContainerColor = CoffeeMuted.copy(alpha = 0.24f),
-                    disabledContentColor = CoffeeMuted
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = "Verify",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
+                height = CoffeeSpacing.primaryButtonHeight
+            )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(CoffeeSpacing.xl))
         }
 
         // Request keyboard focus immediately on screen load
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
+        }
+    }
+}
+
+// MARK: - Country Code Picker
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CountryCodePicker(
+    selectedCountry: CountryCode,
+    onCountrySelected: (CountryCode) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = CoffeeSurface,
+        shape = CoffeeShapes.xlarge
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = CoffeeSpacing.xl)
+                .padding(bottom = CoffeeSpacing.xxl)
+        ) {
+            Text(
+                text = "Select Country",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = CoffeeInk,
+                modifier = Modifier.padding(bottom = CoffeeSpacing.md)
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(CountryList) { country ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onCountrySelected(country) }
+                            .padding(vertical = CoffeeSpacing.sm)
+                            .then(
+                                if (country.id == selectedCountry.id) Modifier.background(CoffeePrimary.copy(alpha = 0.1f), CoffeeShapes.small)
+                                else Modifier
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = country.flag, fontSize = 24.sp, modifier = Modifier.padding(end = CoffeeSpacing.sm))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = country.name, style = MaterialTheme.typography.bodyLarge, color = CoffeeInk)
+                            Text(text = country.dialCode, style = MaterialTheme.typography.bodyMedium, color = CoffeeMuted)
+                        }
+                        if (country.id == selectedCountry.id) {
+                            Icon(
+                                imageVector = Icons.Rounded.ChevronRight,
+                                contentDescription = null,
+                                tint = CoffeePrimary,
+                                modifier = Modifier.size(CoffeeSpacing.lg)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,10 +31,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
 /**
@@ -192,15 +196,13 @@ fun CoffeeGlassBadge(
     }
 }
 
-// MARK: - Immersive Drift card ------------------------------------------------
+// MARK: - Immersive Drift card (Photo-forward) --------------------------------
 
 /**
- * Photo-forward Drift card matching the Figma Discovery feed. Decoupled from any
- * data model — screens pass primitives. Falls back to a category-tinted gradient
- * with the activity icon when [imageUrl] is null.
+ * Photo-forward Drift card used in immersive feeds.
  */
 @Composable
-fun CoffeeDriftCard(
+fun CoffeeDriftCardImmersive(
     title: String,
     hostName: String,
     category: String,
@@ -348,6 +350,189 @@ fun CoffeeDriftCard(
     }
 }
 
+// MARK: - Light Drift card (Standard) ------------------------------------------
+
+/**
+ * Standard Light Drift card matching the refreshed iOS "Drifts" tab design.
+ */
+@Composable
+fun CoffeeDriftCard(
+    title: String,
+    location: String,
+    timeText: String,
+    distanceText: String,
+    category: String,
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    statusLabel: String? = "OPEN",
+    isBestMatch: Boolean = false,
+    participants: List<String> = emptyList(),
+    participantSummary: String? = null,
+    actionLabel: String = "I'm in",
+    actionColor: Color = CoffeePrimary,
+    onClick: (() -> Unit)? = null
+) {
+    val accent = categoryAccent(category)
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(8.dp, CoffeeShapes.large, ambientColor = Color.Black.copy(alpha = 0.04f), spotColor = Color.Black.copy(alpha = 0.06f))
+            .clip(CoffeeShapes.large)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+        color = Color.White,
+        shape = CoffeeShapes.large
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Category Icon
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(accent.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = CoffeeIcons.category(category),
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        if (isBestMatch) {
+                            Surface(
+                                color = CoffeePurple.copy(alpha = 0.12f),
+                                shape = CircleShape
+                            ) {
+                                Text(
+                                    text = "BEST MATCH",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = CoffeePurple,
+                                    fontWeight = FontWeight.Black,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        } else {
+                            Spacer(Modifier.width(1.dp))
+                        }
+
+                        if (statusLabel != null) {
+                            Text(
+                                text = statusLabel.uppercase(),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CoffeePrimary,
+                                fontWeight = FontWeight.Black,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(CoffeePrimary.copy(alpha = 0.1f))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = CoffeeInk,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = CoffeeMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = "$timeText • $distanceText",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = CoffeeMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (participants.isNotEmpty()) {
+                        CoffeeParticipantOverlap(initials = participants)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    if (participantSummary != null) {
+                        Text(
+                            text = participantSummary,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = CoffeeMuted,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Surface(
+                    onClick = onAction,
+                    color = actionColor,
+                    shape = CircleShape
+                ) {
+                    Text(
+                        text = actionLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CoffeeParticipantOverlap(initials: List<String>) {
+    Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+        initials.take(3).forEach { initial ->
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(categoryAccent("")) // fallback color
+                    .border(1.5.dp, Color.White, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = initial.take(1),
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun CoffeeMetaItem(icon: ImageVector, tint: Color, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -382,16 +567,15 @@ private fun CoffeeDriftCardPreview() {
         ) {
             CoffeeDriftCard(
                 title = "Sunset walk and easy conversation",
-                hostName = "Robin George",
-                category = "walk",
+                location = "Cubbon Park",
                 distanceText = "1.4 km",
                 timeText = "6:30 PM",
+                category = "walk",
                 statusLabel = "Starting Soon",
-                vibe = "Relaxed",
-                peopleGoing = 3,
-                isFeatured = true,
+                participants = listOf("R", "G"),
+                participantSummary = "3g • 1s • Relaxed",
                 actionLabel = "Join Moment",
-                onJoin = {}
+                onAction = {}
             )
             CoffeeButton(title = "Continue", onClick = {}, trailingIcon = CoffeeIcons.arrowUpRight)
             CoffeeButton(title = "Maybe later", onClick = {}, variant = CoffeeButtonVariant.Ghost)

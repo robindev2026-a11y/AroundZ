@@ -11,7 +11,7 @@ Skip is not the active migration path. The current iOS app is a normal Xcode pro
 - Backend config/rules: `apps/backend`
 - Android app home: `apps/android`
 - Backend: Firebase Auth, Firestore, Storage, Functions
-- Product lifecycle: Create Drift -> Nearby Discovery -> Join/Accept -> Confirm -> Message -> Meet
+- Product lifecycle: Nearby Discovery -> Join/Accept -> Confirm -> Message -> Meet
 
 ## Target Architecture
 The repo will contain two first-class clients that share backend contracts:
@@ -169,22 +169,6 @@ Acceptance checks:
 - Permission denied, limited/unavailable, and granted states are handled.
 - Nearby Drifts load from `posts`.
 - Radar does not expose private profile details.
-
-### Batch 5 - Create Drift
-Goal: create Drifts compatible with the iOS app.
-
-Steps:
-1. Implement create form with activity, hook, time, location, spots, and join mode.
-2. Implement Google Places or map picker equivalent.
-3. Validate required fields before submit.
-4. Write Drift document to `posts`.
-5. Create related message thread if iOS expects it at creation time.
-6. Navigate to the created Drift or Drifts screen after success.
-
-Acceptance checks:
-- A Drift created on Android appears correctly on iOS.
-- A Drift created on iOS appears correctly on Android.
-- Invalid form states cannot write partial documents.
 
 ### Batch 6 - Drift Detail And Join Flow
 Goal: implement view, join, accept, leave, share, and maps behavior.

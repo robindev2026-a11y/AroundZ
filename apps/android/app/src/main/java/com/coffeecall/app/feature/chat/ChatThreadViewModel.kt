@@ -8,10 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.coffeecall.app.core.firebase.FirebaseUnavailableException
 import com.coffeecall.app.core.session.SessionPreferencesRepository
-import com.coffeecall.app.data.repository.FirebaseMessageThreadRepository
-import com.coffeecall.app.data.repository.FirebasePostRepository
-import com.coffeecall.app.data.repository.FirebaseReportRepository
-import com.coffeecall.app.data.repository.FirebaseUserRepository
+import com.coffeecall.app.data.repository.RepositoryProvider
 import com.coffeecall.app.domain.model.ChatMessage
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.MessageType
@@ -44,10 +41,10 @@ data class ChatThreadUiState(
 class ChatThreadViewModel(
     application: Application,
     private val threadId: String,
-    private val threadRepository: MessageThreadRepository = FirebaseMessageThreadRepository(),
-    private val postRepository: PostRepository = FirebasePostRepository(),
-    private val userRepository: UserRepository = FirebaseUserRepository(),
-    private val reportRepository: ReportRepository = FirebaseReportRepository(),
+    private val threadRepository: MessageThreadRepository = RepositoryProvider.messageThreadRepository,
+    private val postRepository: PostRepository = RepositoryProvider.postRepository,
+    private val userRepository: UserRepository = RepositoryProvider.userRepository,
+    private val reportRepository: ReportRepository = RepositoryProvider.reportRepository,
     private val sessionRepository: SessionPreferencesRepository = SessionPreferencesRepository(application),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : AndroidViewModel(application) {
