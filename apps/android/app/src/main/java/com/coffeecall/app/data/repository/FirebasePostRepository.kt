@@ -100,7 +100,6 @@ class FirebasePostRepository(
     override suspend fun createPostWithThread(post: DriftPost) {
         requireFirebaseConfigured()
         val firestore = firestoreProvider()
-        val batch = firestore.batch()
         val postRef = firestore.collection(FirebaseCollections.POSTS).document(post.id)
         val threadRef = firestore.collection(FirebaseCollections.MESSAGE_THREADS).document(post.id)
         val postData = post.toDto().toFirestoreMap().toMutableMap()
@@ -108,9 +107,10 @@ class FirebasePostRepository(
         postData["createdAt"] = FieldValue.serverTimestamp()
         postData.remove("updatedAt")
 
-        batch.set(postRef, postData)
-        batch.set(
-            threadRef,
+        // Write sequentially to avoid Code 7 permission errors
+        postRef.set(postData).await()
+        
+        threadRef.set(
             mapOf(
                 "postId" to post.id,
                 "participants" to post.participantIds,
@@ -121,8 +121,7 @@ class FirebasePostRepository(
                     "senderName" to "System"
                 )
             )
-        )
-        batch.commit().await()
+        ).await()
     }
 
     override suspend fun updatePostStatus(postId: String, status: DriftStatus) {

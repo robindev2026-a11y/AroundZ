@@ -308,7 +308,9 @@ private fun PhoneCreateSheet(
                 onTimePresetSelected,
                 uiState.scheduledCalendar().timeInMillis,
                 onCustomDateSelected,
-                onCustomTimeSelected
+                onCustomTimeSelected,
+                uiState.customDateLabel,
+                uiState.customTimeLabel
             )
             LocationSection(uiState.locationName, uiState.latitude, onShowLocationPicker)
             GatheringSection(uiState.capacityText, onCapacityChanged, uiState.openToAll, onOpenToAllChanged, uiState.joinMode, onJoinModeSelected)
@@ -379,7 +381,9 @@ private fun TabletCreatePanel(
                             onTimePresetSelected,
                             uiState.scheduledCalendar().timeInMillis,
                             onCustomDateSelected,
-                            onCustomTimeSelected
+                            onCustomTimeSelected,
+                            uiState.customDateLabel,
+                            uiState.customTimeLabel
                         )
                     }
 
@@ -561,7 +565,9 @@ private fun WhenSection(
     onTimePresetSelected: (TimePreset) -> Unit,
     scheduledTimeMillis: Long,
     onCustomDateSelected: (Int, Int, Int) -> Unit,
-    onCustomTimeSelected: (Int, Int) -> Unit
+    onCustomTimeSelected: (Int, Int) -> Unit,
+    customDateLabel: String,
+    customTimeLabel: String
 ) {
     val context = LocalContext.current
     val selectedCalendar = remember(scheduledTimeMillis) {
@@ -577,7 +583,7 @@ private fun WhenSection(
             SelectablePill("Today", datePreset == DatePreset.Today, { onDatePresetSelected(DatePreset.Today) }, modifier = Modifier.weight(1f))
             SelectablePill("Tomorrow", datePreset == DatePreset.Tomorrow, { onDatePresetSelected(DatePreset.Tomorrow) }, modifier = Modifier.weight(1f))
             SelectablePill(
-                label = "Pick date",
+                label = customDateLabel,
                 selected = datePreset == DatePreset.Custom,
                 onClick = {
                     android.app.DatePickerDialog(
@@ -600,7 +606,7 @@ private fun WhenSection(
             SelectablePill("In 30 mins", timePreset == TimePreset.In30, { onTimePresetSelected(TimePreset.In30) }, modifier = Modifier.weight(1f))
             SelectablePill("In 1 hour", timePreset == TimePreset.In60, { onTimePresetSelected(TimePreset.In60) }, modifier = Modifier.weight(1f))
             SelectablePill(
-                label = "Pick time",
+                label = customTimeLabel,
                 selected = timePreset == TimePreset.Custom,
                 onClick = {
                     android.app.TimePickerDialog(
@@ -1506,6 +1512,12 @@ class CreateDriftViewModel(
         if (state.title.isBlank()) { _uiState.update { it.copy(validationMessage = "Add a title") }; return }
         if (state.vibe == null) { _uiState.update { it.copy(validationMessage = "Pick a vibe") }; return }
         if (state.latitude == null) { _uiState.update { it.copy(validationMessage = "Pick a location") }; return }
+        
+        val uid = auth.currentUser?.uid
+        if (uid.isNullOrBlank()) {
+            _uiState.update { it.copy(validationMessage = "You must be signed in to create a drift. (UID is missing)") }
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isCreating = true) }
@@ -1515,7 +1527,8 @@ class CreateDriftViewModel(
                 _uiState.update { CreateUiState(successMessage = "Created!") }
                 onCreated()
             }.onFailure { e ->
-                _uiState.update { it.copy(isCreating = false, errorMessage = e.localizedMessage) }
+                val errorDetails = e.message ?: e.localizedMessage ?: "Unknown Error"
+                _uiState.update { it.copy(isCreating = false, errorMessage = "Firebase Error: $errorDetails") }
             }
         }
     }
@@ -1547,7 +1560,9 @@ class CreateDriftViewModel(
             latitude = state.latitude ?: 0.0,
             longitude = state.longitude ?: 0.0,
             joinMode = state.joinMode,
-            locationGeoHash = GeoHash.encode(state.latitude ?: 0.0, state.longitude ?: 0.0)
+            locationGeoHash = GeoHash.encode(state.latitude ?: 0.0, state.longitude ?: 0.0),
+            participantIds = listOf(uid),
+            participantInitials = listOf((profile?.name ?: session.profileName).take(1).uppercase())
         )
     }
 
@@ -1592,6 +1607,21 @@ data class CreateUiState(
     val locationSummary = if (latitude != null) "%.4f, %.4f".format(latitude, longitude) else "Current area"
     val descriptionText = "$title • $hook".trim()
     val hasUnsavedChanges = title.isNotBlank() || hook.isNotBlank() || vibe != null
+
+    val customDateLabel: String
+        get() = if (datePreset == DatePreset.Custom && customYear != null && customMonth != null && customDay != null) {
+            val cal = Calendar.getInstance()
+            cal.set(customYear, customMonth, customDay)
+            java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault()).format(cal.time)
+        } else "Pick date"
+
+    val customTimeLabel: String
+        get() = if (timePreset == TimePreset.Custom && customHour != null && customMinute != null) {
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.HOUR_OF_DAY, customHour)
+            cal.set(Calendar.MINUTE, customMinute)
+            java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(cal.time)
+        } else "Pick time"
 
     fun scheduledCalendar(): Calendar = Calendar.getInstance().apply {
         when (datePreset) {
