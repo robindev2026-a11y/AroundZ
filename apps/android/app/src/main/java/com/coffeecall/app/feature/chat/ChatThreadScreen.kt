@@ -723,7 +723,7 @@ private fun MessageBubble(
                         }
                         MessageType.Location -> {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = "📍", fontSize = 16.sp)
+                                Icon(CoffeeIcons.location, contentDescription = null, tint = CoffeePrimary, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(CoffeeSpacing.xxs))
                                 Text(
                                     text = message.text,

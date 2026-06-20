@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -58,14 +59,16 @@ import com.coffeecall.app.core.design.CoffeePurple
 import com.coffeecall.app.core.design.CoffeeShapes
 import com.coffeecall.app.core.design.CoffeeSpacing
 import com.coffeecall.app.core.design.CoffeeSurface
+import com.coffeecall.app.core.design.CoffeeTopAppBar
 import com.coffeecall.app.domain.model.DriftCategory
 import com.coffeecall.app.domain.model.DriftStatus
 import com.coffeecall.app.domain.model.MessageThread
 
 private enum class ChatStatusFilter(val label: String) {
     Active("Active"),
-    Upcoming("Upcoming"),
-    Past("Past")
+    Joined("Joined"),
+    Hosted("Hosted"),
+    Expired("Expired")
 }
 
 @Composable
@@ -80,12 +83,15 @@ fun ChatScreen(
     val uiState by viewModel.uiState.collectAsState()
     var selectedFilter by remember { mutableStateOf(ChatStatusFilter.Active) }
     val visibleThreads = remember(uiState.threads, selectedFilter) {
+        val currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
         uiState.threads.filter { item ->
             val status = item.post?.status ?: DriftStatus.Open
+            val isCreator = item.post?.creatorId == currentUserId
             when (selectedFilter) {
                 ChatStatusFilter.Active -> status == DriftStatus.Open
-                ChatStatusFilter.Upcoming -> status == DriftStatus.StartingSoon || status == DriftStatus.Tonight
-                ChatStatusFilter.Past -> status == DriftStatus.Ended
+                ChatStatusFilter.Joined -> status == DriftStatus.Open && !isCreator
+                ChatStatusFilter.Hosted -> status == DriftStatus.Open && isCreator
+                ChatStatusFilter.Expired -> status == DriftStatus.Ended
             }
         }
     }
@@ -94,11 +100,31 @@ fun ChatScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(CoffeeBackground)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = CoffeeSpacing.screen)
-            .padding(top = 104.dp, bottom = CoffeeSpacing.screenBottomSpacer),
-        verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
     ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.xs),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(32.dp),
+            color = androidx.compose.ui.graphics.Color.White,
+            shadowElevation = 8.dp
+        ) {
+            CoffeeTopAppBar(
+                title = "Chats",
+                subtitle = "Drift rooms",
+                modifier = Modifier
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = CoffeeSpacing.screen)
+                .padding(top = CoffeeSpacing.sm, bottom = CoffeeSpacing.screenBottomSpacer),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
+        ) {
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = CoffeePrimary)
@@ -132,6 +158,7 @@ fun ChatScreen(
             }
         }
     }
+    }
 }
 
 @Composable
@@ -160,8 +187,9 @@ private fun ChatFilterRow(
                     Icon(
                         imageVector = when (filter) {
                             ChatStatusFilter.Active -> CoffeeIcons.chats
-                            ChatStatusFilter.Upcoming -> CoffeeIcons.calendar
-                            ChatStatusFilter.Past -> CoffeeIcons.clock
+                            ChatStatusFilter.Joined -> CoffeeIcons.people
+                            ChatStatusFilter.Hosted -> CoffeeIcons.drifts
+                            ChatStatusFilter.Expired -> CoffeeIcons.clock
                         },
                         contentDescription = null,
                         tint = if (isSelected) Color.White else CoffeeMuted,
@@ -230,10 +258,7 @@ private fun ChatThreadCard(
                         .border(1.5.dp, Color.White, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = categorySymbol(category),
-                        fontSize = 10.sp
-                    )
+                    Icon(categorySymbol(category), contentDescription = null, tint = Color.White, modifier = Modifier.size(10.dp))
                 }
             }
 
@@ -300,18 +325,8 @@ private fun initialsFrom(name: String): String =
         .ifBlank { "U" }
 
 // Helpers
-private fun categorySymbol(cat: DriftCategory): String =
-    when (cat) {
-        DriftCategory.Coffee -> "☕"
-        DriftCategory.Walk -> "🚶"
-        DriftCategory.Movie -> "🎬"
-        DriftCategory.Food -> "🍔"
-        DriftCategory.Study -> "📖"
-        DriftCategory.Gaming -> "🎮"
-        DriftCategory.Music -> "🎵"
-        DriftCategory.Yoga -> "🧘"
-        DriftCategory.Event -> "🎟️"
-    }
+private fun categorySymbol(cat: DriftCategory): androidx.compose.ui.graphics.vector.ImageVector =
+    CoffeeIcons.category(cat.name)
 
 private fun categoryColor(cat: DriftCategory): Color =
     when (cat) {

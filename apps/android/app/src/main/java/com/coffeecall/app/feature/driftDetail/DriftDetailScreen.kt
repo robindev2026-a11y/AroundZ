@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -131,84 +133,114 @@ fun DriftDetailScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Hero Image Header
-                Box(
+                // Compact Header (matching iOS)
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(260.dp)
+                        .statusBarsPadding(),
+                    color = CoffeeBackground
                 ) {
-                    AsyncImage(
-                        model = categoryHeroUrl(drift.category),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    // Gradient overlay
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color.Black.copy(alpha = 0.35f),
-                                        Color.Transparent,
-                                        Color.Black.copy(alpha = 0.65f)
-                                    )
-                                )
-                            )
-                    )
-
-                    // Host Info Overlay
                     Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(CoffeeSpacing.md),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        modifier = Modifier.padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.sm),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CoffeeAvatar(
-                            name = drift.creatorName,
-                            imageUrl = drift.creatorImageUrl.ifBlank { null },
-                            size = CoffeeSpacing.minTouchTarget,
-                            background = Color.White.copy(alpha = 0.2f),
-                            ringColor = Color.White
-                        )
-
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = drift.creatorName,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                if (drift.creatorVerified) {
-                                    Spacer(modifier = Modifier.width(CoffeeSpacing.xxs))
-                                    Text(
-                                        text = "✓",
-                                        color = CoffeePrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-                            Text(
-                                text = "Host • ${drift.date}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.82f)
+                        // Back button
+                        Box(
+                            modifier = Modifier
+                                .size(CoffeeSpacing.minTouchTarget)
+                                .clip(CircleShape)
+                                .background(CoffeeSurface)
+                                .border(1.dp, CoffeeBorder, CircleShape)
+                                .clickable(onClick = onBack),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = CoffeeIcons.back,
+                                contentDescription = "Back",
+                                tint = CoffeeInk,
+                                modifier = Modifier.size(CoffeeSpacing.lg)
                             )
                         }
-                    }
 
-                    CoffeeGlassBadge(
-                        title = categoryLabel(drift.category).uppercase(),
-                        icon = CoffeeIcons.category(drift.category.name),
-                        containerColor = categoryColor(drift.category),
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(CoffeeSpacing.md)
-                    )
+                        Spacer(modifier = Modifier.width(CoffeeSpacing.sm))
+
+                        // Drift icon + title
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(categoryColor(drift.category).copy(alpha = 0.12f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = CoffeeIcons.category(drift.category.name),
+                                contentDescription = null,
+                                tint = categoryColor(drift.category),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(CoffeeSpacing.sm))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = drift.title.take(15) + if (drift.title.length > 15) "..." else "",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = CoffeeInk,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = categoryLabel(drift.category),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CoffeeMuted
+                            )
+                        }
+
+                        // Action icons
+                        Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
+                            HeaderActionIcon(icon = CoffeeIcons.send) {
+                                val inviteText = "Join my CoffeeCall: ${drift.title} on ${drift.date} at ${drift.time}! Meet at ${drift.location}."
+                                val sendIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, inviteText)
+                                    type = "text/plain"
+                                }
+                                context.startActivity(Intent.createChooser(sendIntent, "Share Drift"))
+                            }
+                            HeaderActionIcon(icon = CoffeeIcons.calendar) {
+                                viewModel.setReminder()
+                            }
+                            HeaderActionIcon(icon = CoffeeIcons.bell) {
+                                // Notification action
+                            }
+                        }
+                    }
                 }
+
+                // Status badge
+                if (drift.status == com.coffeecall.app.domain.model.DriftStatus.Open) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = CoffeeSpacing.screen)
+                    ) {
+                        CoffeeGlassBadge(
+                            title = "OPEN",
+                            icon = null,
+                            containerColor = CoffeePrimary
+                        )
+                    }
+                }
+
+                // Title
+                Text(
+                    text = drift.title,
+                    style = MaterialTheme.typography.headlineLarge.copy(lineHeight = 32.sp),
+                    color = CoffeeInk,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(horizontal = CoffeeSpacing.screen, vertical = CoffeeSpacing.sm)
+                )
+
+                // Summary Grid (matching iOS)
+                DriftSummaryGrid(drift = drift, uiState = uiState)
 
                 DriftDetailContent(
                     drift = drift,
@@ -243,24 +275,6 @@ fun DriftDetailScreen(
                 )
 
                 Spacer(modifier = Modifier.height(140.dp))
-            }
-
-            // Floating Glassmorphic Back Button
-            Box(
-                modifier = Modifier
-                    .padding(top = CoffeeSpacing.md, start = CoffeeSpacing.screen)
-                    .size(CoffeeSpacing.minTouchTarget)
-                    .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.48f))
-                    .clickable(onClick = onBack),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = CoffeeIcons.back,
-                    contentDescription = "Back",
-                    tint = Color.White,
-                    modifier = Modifier.size(CoffeeSpacing.lg)
-                )
             }
 
             // Floating Bottom CTA (Glassmorphism design)
@@ -475,7 +489,7 @@ private fun DriftDetailContent(
                     modifier = Modifier.padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.sm),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "🔥", style = MaterialTheme.typography.titleMedium)
+                    Icon(CoffeeIcons.bolt, contentDescription = null, tint = CoffeePeach, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(CoffeeSpacing.sm))
                     Text(
                         text = drift.hook,
@@ -596,6 +610,101 @@ private fun AboutSection(drift: DriftPost) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun HeaderActionIcon(icon: ImageVector, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(CoffeeSpacing.minTouchTarget)
+            .clip(CircleShape)
+            .background(CoffeeSurface)
+            .border(1.dp, CoffeeBorder, CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = CoffeeInk.copy(alpha = 0.7f),
+            modifier = Modifier.size(CoffeeSpacing.lg)
+        )
+    }
+}
+
+@Composable
+private fun DriftSummaryGrid(
+    drift: DriftPost,
+    uiState: DriftDetailUiState
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = CoffeeSpacing.screen),
+        shape = CoffeeShapes.large,
+        color = CoffeeSurface,
+        border = BorderStroke(1.dp, CoffeeBorder)
+    ) {
+        Row(
+            modifier = Modifier.padding(CoffeeSpacing.md),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            SummaryGridItem(
+                icon = CoffeeIcons.calendar,
+                value = drift.date,
+                subtitle = drift.time
+            )
+            SummaryGridItem(
+                icon = CoffeeIcons.location,
+                value = drift.location.take(12) + if (drift.location.length > 12) "..." else "",
+                subtitle = drift.location.split(",").lastOrNull()?.trim() ?: ""
+            )
+            SummaryGridItem(
+                icon = CoffeeIcons.profile,
+                value = String.format("%.1f km", drift.distance),
+                subtitle = "from you"
+            )
+            SummaryGridItem(
+                icon = CoffeeIcons.people,
+                value = "${drift.participantCount} joined",
+                subtitle = "Open to ${drift.spotsLeft + drift.participantCount}"
+            )
+        }
+    }
+}
+
+@Composable
+private fun SummaryGridItem(
+    icon: ImageVector,
+    value: String,
+    subtitle: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = CoffeePrimary,
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelMedium,
+            color = CoffeeInk,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.labelSmall,
+            color = CoffeeMuted,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -934,7 +1043,7 @@ private fun HostContextCard(
                         Text(text = drift.creatorName, style = MaterialTheme.typography.titleMedium, color = CoffeeInk, fontWeight = FontWeight.Bold)
                         if (drift.creatorVerified) {
                             Spacer(modifier = Modifier.width(CoffeeSpacing.xxs))
-                            Text(text = "✓", color = CoffeePrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Icon(CoffeeIcons.check, contentDescription = "Verified", tint = CoffeePrimary, modifier = Modifier.size(12.dp))
                         }
                     }
                     Text(text = "Host", style = MaterialTheme.typography.labelSmall, color = CoffeeMuted)
@@ -999,7 +1108,7 @@ private fun HostContextCard(
                             Text(text = activePost.title, style = MaterialTheme.typography.labelMedium, color = CoffeeInk, fontWeight = FontWeight.Medium)
                             Text(text = "${activePost.date} • ${activePost.time}", style = MaterialTheme.typography.labelSmall, color = CoffeeMuted)
                         }
-                        Text(text = "→", color = CoffeePrimary, style = MaterialTheme.typography.titleMedium)
+                        Icon(CoffeeIcons.chevronRight, contentDescription = null, tint = CoffeePrimary, modifier = Modifier.size(20.dp))
                     }
                 }
             }
@@ -1402,7 +1511,7 @@ private fun FloatingBottomCTA(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     CoffeeButton(
-                                        title = "Chat Room",
+                                        title = "Open Chat",
                                         onClick = onMessage,
                                         variant = CoffeeButtonVariant.Primary,
                                         leadingIcon = CoffeeIcons.chats,

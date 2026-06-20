@@ -23,6 +23,6 @@ object CoffeeCallRoutes {
 val CoffeeCallDestinations = listOf(
     CoffeeCallDestination(CoffeeCallRoutes.DISCOVERY, "Around", CoffeeIcons.around, "People nearby are open to plans"),
     CoffeeCallDestination(CoffeeCallRoutes.DRIFTS, "Drifts", CoffeeIcons.drifts, "Plans happening around you"),
-    CoffeeCallDestination(CoffeeCallRoutes.CHAT, "Chats", CoffeeIcons.chats, "Drift-tied messages"),
-    CoffeeCallDestination(CoffeeCallRoutes.PROFILE, "You", CoffeeIcons.profile, "Your CoffeeCall presence")
+    CoffeeCallDestination(CoffeeCallRoutes.CHAT, "Chats", CoffeeIcons.chats, "Drift rooms"),
+    CoffeeCallDestination(CoffeeCallRoutes.PROFILE, "You", CoffeeIcons.profile, "Your profile")
 )

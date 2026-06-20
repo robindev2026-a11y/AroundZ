@@ -135,10 +135,11 @@ private fun Slide1View(onNext: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text(
-                        text = "✨",
-                        fontSize = 12.sp,
-                        color = Color.White
+                    Icon(
+                        CoffeeIcons.bolt,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(12.dp)
                     )
                     Text(
                         text = "COFFEECALL BETA",
@@ -342,15 +343,15 @@ private fun Slide2View(onNext: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
             ) {
-                ActivityChip(icon = "☕", title = "COFFEE CHAT", activeCount = 4, modifier = Modifier.weight(1f))
-                ActivityChip(icon = "🚶", title = "URBAN WALK", activeCount = 7, modifier = Modifier.weight(1f))
+                ActivityChip(icon = CoffeeIcons.category("coffee"), title = "COFFEE CHAT", activeCount = 4, modifier = Modifier.weight(1f))
+                ActivityChip(icon = CoffeeIcons.category("walk"), title = "URBAN WALK", activeCount = 7, modifier = Modifier.weight(1f))
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
             ) {
-                ActivityChip(icon = "🎮", title = "GAME NIGHT", activeCount = 12, modifier = Modifier.weight(1f))
-                ActivityChip(icon = "🎨", title = "ART JAM", activeCount = 3, modifier = Modifier.weight(1f))
+                ActivityChip(icon = CoffeeIcons.category("gaming"), title = "GAME NIGHT", activeCount = 12, modifier = Modifier.weight(1f))
+                ActivityChip(icon = CoffeeIcons.category("creative"), title = "ART JAM", activeCount = 3, modifier = Modifier.weight(1f))
             }
         }
 
@@ -425,9 +426,9 @@ private fun Slide3View(onNext: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
-            SafetyFeatureRow(icon = "🔒", text = "Verified Community")
-            SafetyFeatureRow(icon = "👥", text = "Shared Mutual Friends")
-            SafetyFeatureRow(icon = "❤️", text = "Vibe-Checked Meetups")
+            SafetyFeatureRow(icon = CoffeeIcons.lock, text = "Verified Community")
+            SafetyFeatureRow(icon = CoffeeIcons.people, text = "Shared Mutual Friends")
+            SafetyFeatureRow(icon = CoffeeIcons.heart, text = "Vibe-Checked Meetups")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -561,7 +562,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             fontWeight = FontWeight.Black,
             color = Color.White,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 32.dp, bottom = CoffeeSpacing.md)
+            modifier = Modifier.padding(top = CoffeeSpacing.xxl, bottom = CoffeeSpacing.md)
         )
 
         Text(
@@ -569,7 +570,7 @@ private fun Slide5View(onStartExploring: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White.copy(alpha = 0.85f),
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(bottom = CoffeeSpacing.xxl)
         )
 
         // Avatar Row Stack
@@ -678,7 +679,7 @@ private fun OnboardingProgressBar(activeIndex: Int, total: Int, modifier: Modifi
 
 @Composable
 private fun ActivityChip(
-    icon: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     activeCount: Int,
     modifier: Modifier = Modifier
@@ -699,7 +700,7 @@ private fun ActivityChip(
         verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(text = icon, fontSize = 24.sp)
+        Icon(icon, contentDescription = null, tint = CoffeeInk, modifier = Modifier.size(24.dp))
         Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)) {
             Text(
                 text = title,
@@ -730,7 +731,7 @@ private fun ActivityChip(
 
 @Composable
 private fun SafetyFeatureRow(
-    icon: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
     modifier: Modifier = Modifier
 ) {
@@ -750,7 +751,7 @@ private fun SafetyFeatureRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
     ) {
-        Text(text = icon, fontSize = 20.sp, modifier = Modifier.width(CoffeeSpacing.xl))
+        Icon(icon, contentDescription = null, tint = CoffeeInk, modifier = Modifier.width(CoffeeSpacing.xl).size(20.dp))
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,

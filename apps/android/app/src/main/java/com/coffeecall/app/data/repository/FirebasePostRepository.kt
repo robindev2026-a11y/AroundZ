@@ -314,6 +314,18 @@ class FirebasePostRepository(
         }
     }
 
+    override suspend fun fetchAllPosts(): List<DriftPost> {
+        requireFirebaseConfigured()
+        val snapshot = firestoreProvider()
+            .collection(FirebaseCollections.POSTS)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .get()
+            .await()
+        return snapshot.documents.mapNotNull { doc ->
+            if (doc.exists()) doc.toPostDto().toDomain() else null
+        }
+    }
+
     private companion object {
         const val GEOHASH_DISCOVERY_PREFIX_LENGTH = 4
     }

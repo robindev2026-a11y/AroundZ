@@ -6,11 +6,12 @@ CoffeeCall is a native SwiftUI iOS app backed by Firebase. The Android strategy 
 - **Drift Lifecycle:** Create -> Nearby Discovery -> Join/Accept -> Confirm -> Message -> Meet.
 
 ## Active Focus
-- **Priority:** Android-first UI redesign matching the Figma "Social Refresh" design (`design-reference/`). Batches 1–4 (tokens, icons, shared components, Discovery screen) are DONE; Batches 5–10 (per-screen rewrites) remain. iOS rollout is LAST.
-- **Handoff:** See `docs/ANDROID_UI_REFRESH_HANDOFF.md` — self-contained plan for completing Batches 5–10. Read it before doing UI work.
+- **Priority:** Android-first UI redesign matching the Figma "Social Refresh" design (`design-reference/`). Batches 1–7, 9 are DONE; Batch 8 (Auth + Onboarding permissions screen) is Partial. iOS rollout is LAST. Android UI now closely matches iOS: glass-style nav, 2x2 stats grid, color-differentiated settings, 4-tab chats, peach "Joined" CTA. **UI Parity Pass (2026-06-19):** Bottom nav text labels, header Sign out removed, filter sheet enhanced with Time/Activity Types, Drift Detail restructured with summary grid, "Hosting" button text, "Open Chat" CTA.
+- **Handoff:** See `docs/ANDROID_UI_REFRESH_HANDOFF.md` — self-contained plan for completing remaining batches. Read it before doing UI work.
 - **Native Migration Plan:** Completed (Batches 0 through 10 are all Done).
 - **QA Checklist:** See `docs/ANDROID_QA_CHECKLIST.md` for release smoke testing.
 - **iOS Mapper:** See `docs/IOS_SCREEN_WIDGET_MAPPER.md` for the point-to-point SwiftUI screen/widget responsibility map from Home/Around through Profile.
+- **Android Drifts parity:** As of 2026-06-18, Drifts Discover/Mine data-source is correct (Discover = non-hosted community drifts, Mine = hosted drifts). Distance mock replaced with real haversine computation + 1–10 km filter sheet matching iOS.
 
 ## Architecture & Tech Stack
 - **iOS Frontend:** SwiftUI in `apps/frontend`.

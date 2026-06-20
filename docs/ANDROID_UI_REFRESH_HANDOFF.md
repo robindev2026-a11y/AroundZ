@@ -60,12 +60,12 @@ For each: open the matching Figma `.tsx`, restyle the Android screen with the §
 
 | Batch | Android file(s) | Audit status / next work |
 |------|------------------|--------------------------|
-| **4 — Discovery** | `feature/discovery/DiscoveryScreen.kt` | **Partial.** Refreshed header, search, filter chips, `CoffeeDriftCard` feed, dark FAB, accept/match dialogs, radar sheet polish are present. Missing/incorrect: no map-toggle path is wired in the header, and the bell still shows a Toast instead of a notifications view/sheet. |
-| **5 — Drifts + Detail** | `feature/drifts/DriftsScreen.kt`, `feature/driftDetail/DriftDetailScreen.kt` | **Done.** Drifts list uses `CoffeeDriftCard`; detail has a hero image, `CoffeeAvatar`, `CoffeeGlassBadge`, detail cards, map section, host/request panels, and `CoffeeButton` CTAs. |
+| **4 — Discovery** | `feature/discovery/DiscoveryScreen.kt` | **Done.** Refreshed header, presence toggle, notifications bell with sheet (P3), radar-only view, interest grid, drifts-forming pill, search, filter chips, dark FAB, accept/match dialogs, radar sheet polish are all present. The Figma "map toggle" does not exist on iOS — Discovery is radar-only. |
+| **5 — Drifts + Detail** | `feature/drifts/DriftsScreen.kt`, `feature/driftDetail/DriftDetailScreen.kt` | **Done.** Drifts list uses `CoffeeDriftCard` with real haversine distance; 1–10 km filter sheet with slider, Reset, Apply; detail has hero image, `CoffeeAvatar`, `CoffeeGlassBadge`, detail cards, map section, host/request panels, and `CoffeeButton` CTAs. |
 | **6 — Chat** | `feature/chat/ChatScreen.kt`, `feature/chat/ChatThreadScreen.kt` | **Done.** Thread list cards use `CoffeeAvatar` and refreshed surfaces; thread bubbles use mint self/surface other styling, rounded composer, `CoffeeIcons.send`, attachment/location actions, and safety menu dialogs. |
-| **7 — Profile** | `feature/profile/ProfileScreen.kt`, `feature/profile/ProfileEditScreen.kt` | **Partial.** Large `CoffeeAvatar`, interests, stat cards, history, edit photo/name/bio/location/interests are present. Missing: profile settings/account rows with icons/chevrons on the profile screen. |
+| **7 — Profile** | `feature/profile/ProfileScreen.kt`, `feature/profile/ProfileEditScreen.kt` | **Done.** Profile layout aligned with iOS: 2x2 stats grid, "Your stats" header, "Stats are private" note, "Coming soon" reputation score, text-link edit profile, gear icon header, color-differentiated settings rows, "Safety & Privacy" label. |
 | **8 — Auth + Onboarding** | `feature/onboarding/OnboardingScreen.kt`, `feature/auth/AuthScreen.kt`, `feature/auth/ProfileSetupScreen.kt` | **Partial.** Onboarding, phone entry, OTP boxes, bottom CTAs, and profile setup photo/name flow are refreshed. Missing: dedicated permissions-card screen/flow. |
-| **9 — Shell + polish** | `core/navigation/CoffeeCallApp.kt` (top bar, offline banner, notification dialog), `feature/discovery/...MapView`, consistency pass | **Partial.** Real icon bottom nav, top bars, offline banner, notification permission dialog, shadows/spacing/loading states are present. Missing: final consistency pass around Discovery map/notification parity and profile/auth partials. |
+| **9 — Shell + polish** | `core/navigation/CoffeeCallApp.kt` (top bar, offline banner, notification dialog), `feature/discovery/...MapView`, consistency pass | **Done.** Real icon bottom nav, top bars, offline banner, notification permission dialog, shadows/spacing/loading states, and P9 consistency pass (text symbols→vector icons, raw dp→CoffeeSpacing tokens) are complete. |
 
 The ViewModels and data flow are already wired — these batches are **presentation only**. Don't change repositories, navigation routes, or domain models.
 
@@ -92,9 +92,10 @@ iOS keeps **Outfit + SF Pro**. The full iOS rollout happens after Android is com
 
 ## 8. First step for the next agent
 
-1. Finish Batch 4 Discovery parity first: add the Figma map toggle/path and replace the bell Toast with the notifications view/sheet behavior.
-2. Then finish Batch 8 Profile settings/account rows, Batch 9 permissions/completion auth parity, and Batch 10 final consistency pass.
-3. Log each completed batch in `CHANGELOG.md` after code inspection confirms the refreshed UI is actually present.
+1. All visual parity batches (4, 7, 9) are now Done. Batch 8 (Auth + Onboarding) is Partial — missing dedicated permissions-card screen/flow.
+2. Run `docs/ANDROID_QA_CHECKLIST.md` on a real device to validate cross-platform data sync.
+3. Reconcile stale docs: `apps/android/README.md`, `CURRENT_STATE.md` batch status.
+4. Log each completed batch in `CHANGELOG.md` after code inspection confirms the refreshed UI is actually present.
 
 ---
 
@@ -123,7 +124,7 @@ It reflects the current iOS app. Re-frame remaining work as *iOS parity*, not ex
 ### TODO — added 2026-06-16 (architecture/quality, not yet done)
 | # | Sev | Item | Detail |
 |---|-----|------|--------|
-| 8 | LOW | Design-token compliance sweep | `feature/` still has raw `.dp`, hardcoded `fontSize = .sp`, and raw `Color(0x..)` values. iOS forces everything through `AppConstants.Layout` / `AppColors`. Replace raw `.dp`→`CoffeeSpacing`, hardcoded sizes→`MaterialTheme.typography`, hex→`Color.kt` tokens. |
+| 8 | LOW | Design-token compliance sweep | **Done (P9).** Raw `.dp`→`CoffeeSpacing` in CreateScreen (34), DiscoveryScreen (16), OnboardingScreen (2). Text symbols/emoji→`CoffeeIcons` across all feature screens. |
 | 9 | DECISION | Shared drift-state architecture | iOS centralizes drift state in `GlobalDriftStore` (`@EnvironmentObject`). Android uses independent per-screen ViewModels (no shared store), so cross-screen drift updates differ. Decide: introduce a shared store for true parity, or accept per-screen VMs on Android. |
 
 Also pending from validation (2026-06-16): P7 (Chats) & P8 (Auth+Onboarding) implemented but **unlogged** in CHANGELOG; P9 consistency sweep incomplete (leftover `symbol = "C"` in `ChatScreen.kt:109,123`); confirm P4 Profile has all mapper sheets. A compile bug from the P1/P2 seam (`onNavigateToCreate` on `DiscoveryScreen`) was fixed — `:app:assembleDebug` now succeeds.

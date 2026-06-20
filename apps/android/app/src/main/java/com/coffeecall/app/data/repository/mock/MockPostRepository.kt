@@ -160,4 +160,7 @@ class MockPostRepository : PostRepository {
 
     override suspend fun getJoinedPosts(userId: String): List<DriftPost> =
         posts.values.filter { it.participantIds.contains(userId) || it.creatorId == userId }
+
+    override suspend fun fetchAllPosts(): List<DriftPost> =
+        posts.values.toList()
 }

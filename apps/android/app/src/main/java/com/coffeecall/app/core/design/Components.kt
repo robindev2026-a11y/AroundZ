@@ -45,6 +45,7 @@ fun CoffeePrimaryButton(
     title: String,
     modifier: Modifier = Modifier,
     trailingSymbol: String? = null,
+    trailingIcon: ImageVector? = null,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -76,7 +77,10 @@ fun CoffeePrimaryButton(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
-        if (trailingSymbol != null) {
+        if (trailingIcon != null) {
+            Spacer(modifier = Modifier.width(CoffeeSpacing.xs))
+            Icon(trailingIcon, contentDescription = null, modifier = Modifier.size(16.dp))
+        } else if (trailingSymbol != null) {
             Spacer(modifier = Modifier.width(CoffeeSpacing.xs))
             Text(
                 text = trailingSymbol,
@@ -91,6 +95,7 @@ fun CoffeePillBadge(
     title: String,
     modifier: Modifier = Modifier,
     symbol: String? = null,
+    icon: ImageVector? = null,
     containerColor: Color = CoffeePrimaryDark.copy(alpha = 0.92f),
     contentColor: Color = CoffeeTextOnBrand
 ) {
@@ -103,7 +108,9 @@ fun CoffeePillBadge(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        if (symbol != null) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(12.dp))
+        } else if (symbol != null) {
             Text(text = symbol, style = MaterialTheme.typography.labelSmall, color = contentColor)
         }
         Text(
@@ -171,7 +178,8 @@ fun CoffeeActivityChip(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
-    symbol: String,
+    symbol: String? = null,
+    icon: ImageVector? = null,
     accent: Color = CoffeePrimary
 ) {
     Surface(
@@ -193,7 +201,11 @@ fun CoffeeActivityChip(
                     .background(accent.copy(alpha = 0.16f)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = symbol, style = MaterialTheme.typography.titleMedium, color = accent)
+                if (icon != null) {
+                    Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(24.dp))
+                } else if (symbol != null) {
+                    Text(text = symbol, style = MaterialTheme.typography.titleMedium, color = accent)
+                }
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
@@ -430,7 +442,8 @@ fun CoffeeTopAppBar(
     subtitle: String,
     modifier: Modifier = Modifier,
     actionLabel: String? = null,
-    onAction: (() -> Unit)? = null
+    onAction: (() -> Unit)? = null,
+    actionIcon: ImageVector? = null
 ) {
     Row(
         modifier = modifier
@@ -455,7 +468,20 @@ fun CoffeeTopAppBar(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        if (actionLabel != null && onAction != null) {
+        if (actionIcon != null && onAction != null) {
+            Spacer(modifier = Modifier.width(CoffeeSpacing.md))
+            Box(
+                modifier = Modifier
+                    .size(CoffeeSpacing.minTouchTarget)
+                    .clip(CircleShape)
+                    .background(CoffeeSurface)
+                    .border(1.dp, CoffeeBorder, CircleShape)
+                    .clickable(onClick = onAction),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(actionIcon, contentDescription = null, tint = CoffeePrimary, modifier = Modifier.size(20.dp))
+            }
+        } else if (actionLabel != null && onAction != null) {
             Spacer(modifier = Modifier.width(CoffeeSpacing.md))
             Text(
                 text = actionLabel,

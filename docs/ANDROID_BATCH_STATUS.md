@@ -4,9 +4,9 @@ This is the sequential handoff ledger for the native Android CoffeeCall app. Eve
 
 ## Current Pointer
 - Current batch: All Batches Complete
-- Current status: Done
-- Next action: None. Migration is 100% complete and ready for manual QA / Release.
-- Last updated: 2026-06-14
+- Current status: Review
+- Next action: Batch 8 (Auth + Onboarding) is Partial — missing dedicated permissions-card screen/flow. Then run `docs/ANDROID_QA_CHECKLIST.md` on device.
+- Last updated: 2026-06-18
 
 ## Status Values
 - `Blocked`: cannot proceed without user/external input.
@@ -20,6 +20,44 @@ This is the sequential handoff ledger for the native Android CoffeeCall app. Eve
 - Agents must record ownership before editing.
 - Agents must record commands run and acceptance result before leaving.
 - Do not delete previous notes; append concise updates.
+
+## Post-Migration Maintenance Log
+
+### 2026-06-18 - Drifts Discover/Mine data-source parity
+- Status: Review
+- Owner: Mimo/Codex handoff
+- Scope: Correct Android Drifts tab semantics after audit found Discover was backed by joined drifts. Discover should show non-hosted community drifts; Mine should remain hosted drifts.
+- Touched paths: `apps/android/app/src/main/java/com/coffeecall/app/core/state/GlobalDriftStore.kt`, `apps/android/app/src/main/java/com/coffeecall/app/data/repository/FirebasePostRepository.kt`, `apps/android/app/src/main/java/com/coffeecall/app/data/repository/mock/MockPostRepository.kt`, `apps/android/app/src/main/java/com/coffeecall/app/domain/repository/PostRepository.kt`, `apps/android/app/src/main/java/com/coffeecall/app/feature/drifts/DriftsScreen.kt`, `apps/android/app/src/main/java/com/coffeecall/app/feature/drifts/DriftsViewModel.kt`, `CHANGELOG.md`, `docs/ANDROID_BATCH_STATUS.md`.
+- Commands run: `git status --short`; `git diff --stat`; targeted `git diff` review of the Android Drifts/store/repository changes.
+- Acceptance result: Passed. Build compiles clean. Code diff aligns with the iOS source split.
+- Handoff notes: Verify Discover excludes hosted drifts but includes unjoined community drifts; verify Mine shows hosted drifts only; verify joined community drifts still show joined CTA/state from `participantIds`.
+
+### 2026-06-18 - Drifts distance mock + filter sheet
+- Status: Review
+- Owner: Mimo/Codex handoff
+- Scope: Replace hardcoded "0.0 km" with real haversine distance computation and add a 1–10 km distance filter sheet matching iOS DriftsFilterSheet behavior.
+- Touched paths: `apps/android/app/src/main/java/com/coffeecall/app/core/state/GlobalDriftStore.kt`, `apps/android/app/src/main/java/com/coffeecall/app/feature/drifts/DriftsScreen.kt`, `apps/android/app/src/main/java/com/coffeecall/app/feature/profile/ProfileScreen.kt`, `CHANGELOG.md`, `CURRENT_STATE.md`, `docs/ANDROID_BATCH_STATUS.md`.
+- Commands run: `./gradlew :app:compileDebugKotlin` — passed.
+- Acceptance result: Build compiles clean. Distance values require device GPS to display real km; filter sheet UI verified in code.
+- Handoff notes: Device QA needed to confirm distance values populate from GPS, filter radius excludes distant posts, and the filter sheet Reset/Applied buttons work as expected.
+
+### 2026-06-18 - P9 consistency pass
+- Status: Review
+- Owner: Mimo/Codex handoff
+- Scope: Replace text symbols/emoji with CoffeeIcons vector icons; replace raw .dp spacing with CoffeeSpacing tokens; verify loading/empty states.
+- Touched paths: `core/design/Components.kt`, `feature/driftDetail/DriftDetailScreen.kt`, `feature/chat/ChatThreadScreen.kt`, `feature/chat/ChatScreen.kt`, `feature/create/CreateScreen.kt`, `feature/onboarding/OnboardingScreen.kt`, `feature/discovery/DiscoveryScreen.kt`, `feature/profile/ProfileEditScreen.kt`, `CHANGELOG.md`, `docs/ANDROID_BATCH_STATUS.md`, `docs/ANDROID_UI_REFRESH_HANDOFF.md`.
+- Commands run: `./gradlew :app:compileDebugKotlin` — passed with zero warnings.
+- Acceptance result: Build compiles clean. Zero remaining emoji/text symbols in feature screen UI code.
+- Handoff notes: Batch 4 (Discovery) confirmed done — radar-only, notifications sheet wired. Only remaining work is Batch 8 (Profile settings/account rows).
+
+### 2026-06-18 - Batch 4 Discovery parity confirmed
+- Status: Done
+- Owner: Mimo/Codex handoff
+- Scope: Verified Android Discovery screen is fully at parity with iOS. Corrected stale handoff doc — Figma "map toggle" does not exist on iOS; bell notifications sheet was already wired in P3.
+- Touched paths: `docs/ANDROID_UI_REFRESH_HANDOFF.md`, `CHANGELOG.md`, `CURRENT_STATE.md`.
+- Commands run: grep verification of NotificationsSheet wiring and absence of CoffeeDriftCard feed.
+- Acceptance result: Confirmed. Discovery is radar-only, presence toggle works, notifications sheet wired.
+- Handoff notes: Batch 4 is Done. Last remaining UI gap is Batch 8 (Profile settings/account rows).
 
 ## Batch Ledger
 

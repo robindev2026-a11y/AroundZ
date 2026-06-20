@@ -370,7 +370,7 @@ fun ProfileEditScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xxs)
                         ) {
-                            Text(text = categorySymbol(cat), fontSize = 12.sp)
+                            Icon(categorySymbol(cat), contentDescription = null, tint = CoffeeInk, modifier = Modifier.size(12.dp))
                             Text(
                                 text = interest.replaceFirstChar { it.uppercase() },
                                 color = textColor,
@@ -455,18 +455,8 @@ fun ProfileEditScreen(
     }
 }
 
-private fun categorySymbol(cat: DriftCategory): String =
-    when (cat) {
-        DriftCategory.Coffee -> "☕"
-        DriftCategory.Walk -> "🚶"
-        DriftCategory.Movie -> "🎬"
-        DriftCategory.Food -> "🍔"
-        DriftCategory.Study -> "📖"
-        DriftCategory.Gaming -> "🎮"
-        DriftCategory.Music -> "🎵"
-        DriftCategory.Yoga -> "🧘"
-        DriftCategory.Event -> "🎟️"
-    }
+private fun categorySymbol(cat: DriftCategory): androidx.compose.ui.graphics.vector.ImageVector =
+    CoffeeIcons.category(cat.name)
 
 private fun categoryColor(cat: DriftCategory): Color =
     when (cat) {

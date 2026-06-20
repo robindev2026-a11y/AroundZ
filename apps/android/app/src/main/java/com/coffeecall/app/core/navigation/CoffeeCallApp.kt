@@ -6,12 +6,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -305,76 +308,29 @@ private fun CoffeeCallAppShell(
             }
         }
 
-        if (selectedDestination.route != CoffeeCallRoutes.DISCOVERY) {
-            Column(
+        if (!isOnline) {
+            Box(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = CoffeeSpacing.screen)
+                    .padding(top = CoffeeSpacing.sm),
+                contentAlignment = Alignment.Center
             ) {
                 Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = CoffeeBackground.copy(alpha = 0.96f),
-                    shadowElevation = 0.dp
+                    shape = CircleShape,
+                    color = CoffeePeach.copy(alpha = 0.9f),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+                    shadowElevation = 8.dp
                 ) {
-                    CoffeeTopAppBar(
-                        title = selectedDestination.label,
-                        subtitle = selectedDestination.subtitle,
-                        actionLabel = "Sign out",
-                        onAction = onSignOut,
-                        modifier = Modifier
-                            .padding(top = CoffeeSpacing.xs)
+                    Text(
+                        text = "⚠️ Device is offline. Using local caches.",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
-                }
-
-                if (!isOnline) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = CoffeeSpacing.screen)
-                            .padding(top = CoffeeSpacing.sm),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Surface(
-                            shape = CircleShape,
-                            color = CoffeePeach.copy(alpha = 0.9f),
-                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
-                            shadowElevation = 8.dp
-                        ) {
-                            Text(
-                                text = "⚠️ Device is offline. Using local caches.",
-                                color = Color.White,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        } else {
-            if (!isOnline) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .fillMaxWidth()
-                        .padding(horizontal = CoffeeSpacing.screen)
-                        .padding(top = CoffeeSpacing.sm),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = CoffeePeach.copy(alpha = 0.9f),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
-                        shadowElevation = 8.dp
-                    ) {
-                        Text(
-                            text = "⚠️ Device is offline. Using local caches.",
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                        )
-                    }
                 }
             }
         }
@@ -559,8 +515,7 @@ private fun CoffeeBottomNavigationItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val background = if (selected) CoffeePrimary else Color.Transparent
-    val content = if (selected) CoffeeTextOnBrand else CoffeeMuted
+    val iconTint = if (selected) CoffeePrimary else CoffeeMuted
 
     Surface(
         onClick = onClick,
@@ -568,39 +523,30 @@ private fun CoffeeBottomNavigationItem(
             .height(CoffeeSpacing.primaryButtonHeight)
             .padding(horizontal = 2.dp),
         shape = CoffeeShapes.large,
-        color = background
+        color = Color.Transparent
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .padding(horizontal = 6.dp)
-                .widthIn(min = CoffeeSpacing.minTouchTarget),
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(horizontal = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(if (selected) 32.dp else 28.dp)
-                    .clip(CircleShape)
-                    .background(if (selected) CoffeeTextOnBrand.copy(alpha = 0.18f) else Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = destination.icon,
-                    contentDescription = destination.label,
-                    tint = if (selected) CoffeeTextOnBrand else CoffeeMuted,
-                    modifier = Modifier.size(if (selected) 20.dp else 22.dp)
-                )
-            }
-            if (selected) {
-                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-                Text(
-                    text = destination.label,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = content,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            Icon(
+                imageVector = destination.icon,
+                contentDescription = destination.label,
+                tint = iconTint,
+                modifier = Modifier.size(22.dp)
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = destination.label,
+                style = MaterialTheme.typography.labelSmall,
+                color = iconTint,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

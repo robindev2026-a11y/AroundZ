@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -66,12 +68,16 @@ import com.coffeecall.app.core.design.CoffeeDriftCard
 import com.coffeecall.app.core.design.CoffeeIcons
 import com.coffeecall.app.core.design.CoffeeInk
 import com.coffeecall.app.core.design.CoffeeMuted
+import com.coffeecall.app.core.design.CoffeePeach
 import com.coffeecall.app.core.design.CoffeePrimary
+import com.coffeecall.app.core.design.CoffeePurple
 import com.coffeecall.app.core.design.CoffeeShapes
 import com.coffeecall.app.core.design.CoffeeSpacing
 import com.coffeecall.app.core.design.CoffeeSurface
+import com.coffeecall.app.core.design.CoffeeError
 import com.coffeecall.app.core.design.CoffeeSurfaceSecondary
 import com.coffeecall.app.core.design.CoffeeTextOnBrand
+import com.coffeecall.app.core.design.CoffeeTopAppBar
 import com.coffeecall.app.core.design.categoryAccent
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.UserProfile
@@ -137,40 +143,93 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = CoffeeSpacing.screen)
-                    .padding(top = 104.dp, bottom = CoffeeSpacing.screenBottomSpacer),
-                verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
             ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(horizontal = CoffeeSpacing.md, vertical = CoffeeSpacing.xs),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(32.dp),
+                    color = androidx.compose.ui.graphics.Color.White,
+                    shadowElevation = 8.dp
+                ) {
+                    CoffeeTopAppBar(
+                        title = "Profile",
+                        subtitle = "Your profile",
+                        modifier = Modifier
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = CoffeeSpacing.screen)
+                        .padding(top = CoffeeSpacing.sm, bottom = CoffeeSpacing.screenBottomSpacer),
+                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
+                ) {
                 IdentityCard(user = user, onEditClick = onEditClick)
 
-                Row(
+                ProfileSectionHeader(title = "Your stats", subtitle = "")
+
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
                 ) {
-                    ProfileStatTile(
-                        value = uiState.driftsHosted.toString(),
-                        label = "Hosted",
-                        onClick = { activeSheet = ProfileSheet.HostedStats },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ProfileStatTile(
-                        value = uiState.driftsJoined.toString(),
-                        label = "Joined",
-                        onClick = { activeSheet = ProfileSheet.JoinedStats },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ProfileStatTile(
-                        value = noShows.toString(),
-                        label = "No-shows",
-                        onClick = { activeSheet = ProfileSheet.NoShowsStats },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ProfileStatTile(
-                        value = score.toString(),
-                        label = "Score",
-                        onClick = { activeSheet = ProfileSheet.ScoreStats },
-                        modifier = Modifier.weight(1f)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                    ) {
+                        ProfileStatTile(
+                            value = uiState.driftsHosted.toString(),
+                            label = "Drifts Hosted",
+                            icon = CoffeeIcons.drifts,
+                            iconTint = CoffeePrimary,
+                            onClick = { activeSheet = ProfileSheet.HostedStats },
+                            modifier = Modifier.weight(1f)
+                        )
+                        ProfileStatTile(
+                            value = uiState.driftsJoined.toString(),
+                            label = "People Joined",
+                            icon = CoffeeIcons.people,
+                            iconTint = CoffeePurple,
+                            onClick = { activeSheet = ProfileSheet.JoinedStats },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                    ) {
+                        ProfileStatTile(
+                            value = noShows.toString(),
+                            label = "No-Shows",
+                            icon = CoffeeIcons.calendar,
+                            iconTint = CoffeePeach,
+                            onClick = { activeSheet = ProfileSheet.NoShowsStats },
+                            modifier = Modifier.weight(1f)
+                        )
+                        ProfileStatTile(
+                            value = "Soon",
+                            label = "Reputation Score",
+                            icon = CoffeeIcons.clock,
+                            iconTint = CoffeeMuted,
+                            onClick = { activeSheet = ProfileSheet.ScoreStats },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.padding(horizontal = CoffeeSpacing.xs),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
+                ) {
+                    Icon(CoffeeIcons.lock, contentDescription = null, tint = CoffeeMuted, modifier = Modifier.size(14.dp))
+                    Text(
+                        text = "Stats are private to you.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = CoffeeMuted
                     )
                 }
 
@@ -194,24 +253,32 @@ fun ProfileScreen(
                         title = "Interests",
                         subtitle = user.interests.ifEmpty { listOf("Not set") }.joinToString(", ") { it.toDisplayLabel() },
                         icon = CoffeeIcons.heart,
+                        iconTint = CoffeePrimary,
+                        iconBackground = CoffeePrimary.copy(alpha = 0.12f),
                         onClick = { activeSheet = ProfileSheet.Interests }
                     )
                     SettingsRow(
                         title = "Availability",
                         subtitle = user.availabilitySummary(),
                         icon = CoffeeIcons.calendar,
+                        iconTint = CoffeePurple,
+                        iconBackground = CoffeePurple.copy(alpha = 0.12f),
                         onClick = { activeSheet = ProfileSheet.Availability }
                     )
                     SettingsRow(
                         title = "Notifications",
                         subtitle = "Meetups, chats, and safety",
                         icon = CoffeeIcons.bell,
+                        iconTint = CoffeePeach,
+                        iconBackground = CoffeePeach.copy(alpha = 0.12f),
                         onClick = { activeSheet = ProfileSheet.Notifications }
                     )
                     SettingsRow(
-                        title = "Privacy & Safety",
+                        title = "Safety & Privacy",
                         subtitle = "Location, approvals, reminders",
-                        icon = CoffeeIcons.check,
+                        icon = CoffeeIcons.shield,
+                        iconTint = CoffeePrimary,
+                        iconBackground = CoffeePrimary.copy(alpha = 0.12f),
                         onClick = { activeSheet = ProfileSheet.Privacy }
                     )
                 }
@@ -222,24 +289,31 @@ fun ProfileScreen(
                         title = "Location",
                         subtitle = user.location.ifBlank { "Set approximate area" },
                         icon = CoffeeIcons.location,
+                        iconTint = CoffeePrimary,
+                        iconBackground = CoffeePrimary.copy(alpha = 0.12f),
                         onClick = { activeSheet = ProfileSheet.Location }
                     )
                     SettingsRow(
                         title = "Help",
                         subtitle = "Safety, hosting, and account help",
-                        icon = CoffeeIcons.bolt,
+                        icon = CoffeeIcons.info,
+                        iconTint = CoffeePurple,
+                        iconBackground = CoffeePurple.copy(alpha = 0.12f),
                         onClick = { activeSheet = ProfileSheet.Help }
                     )
                     SettingsRow(
                         title = "Sign out",
                         subtitle = "Leave this device signed out",
-                        icon = CoffeeIcons.profile,
+                        icon = CoffeeIcons.logout,
+                        iconTint = CoffeeError,
+                        iconBackground = CoffeeError.copy(alpha = 0.12f),
                         onClick = { viewModel.signOut(onSignOut) }
                     )
                 }
             }
+        }
 
-            activeSheet?.let { sheet ->
+        activeSheet?.let { sheet ->
                 ProfileSheetContent(
                     sheet = sheet,
                     user = user,
@@ -381,13 +455,22 @@ private fun IdentityCard(
                     }
                 }
             }
-            CoffeeButton(
-                title = "Edit Profile",
-                onClick = onEditClick,
-                variant = CoffeeButtonVariant.Secondary,
-                fullWidth = false,
-                leadingIcon = CoffeeIcons.profile
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onEditClick)
+                    .padding(vertical = CoffeeSpacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = "Edit Profile",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = CoffeePrimary,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(CoffeeIcons.profile, contentDescription = null, tint = CoffeePrimary, modifier = Modifier.size(16.dp))
+            }
         }
     }
 }
@@ -397,7 +480,9 @@ private fun ProfileStatTile(
     value: String,
     label: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    iconTint: Color = CoffeePrimary
 ) {
     Surface(
         onClick = onClick,
@@ -406,20 +491,33 @@ private fun ProfileStatTile(
         color = CoffeeSurface,
         border = BorderStroke(1.dp, CoffeeBorder)
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = CoffeeSpacing.xs),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Row(
+            modifier = Modifier.padding(horizontal = CoffeeSpacing.sm, vertical = CoffeeSpacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
         ) {
-            Text(text = value, fontSize = 24.sp, fontWeight = FontWeight.Black, color = CoffeeInk)
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = CoffeeMuted,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (icon != null) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(iconTint.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+                }
+            }
+            Column {
+                Text(text = value, fontSize = 24.sp, fontWeight = FontWeight.Black, color = CoffeeInk)
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = CoffeeMuted,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -558,7 +656,9 @@ private fun SettingsRow(
     title: String,
     subtitle: String,
     icon: ImageVector,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    iconTint: Color = CoffeePrimary,
+    iconBackground: Color = CoffeePrimary.copy(alpha = 0.1f)
 ) {
     Row(
         modifier = Modifier
@@ -572,10 +672,10 @@ private fun SettingsRow(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(CoffeePrimary.copy(alpha = 0.1f)),
+                .background(iconBackground),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = CoffeePrimary, modifier = Modifier.size(20.dp))
+            Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, style = MaterialTheme.typography.labelLarge, color = CoffeeInk, fontWeight = FontWeight.Black)
@@ -873,7 +973,7 @@ private fun HistoryDriftCard(
         title = drift.title.ifBlank { drift.hook.ifBlank { "Open Drift" } },
         location = drift.location,
         timeText = drift.date.ifBlank { drift.time },
-        distanceText = "0.0 km",
+        distanceText = String.format("%.1f km", drift.distance),
         category = drift.category.firestoreValue,
         onAction = { onDriftClick(drift.id) },
         participants = drift.participantInitials,

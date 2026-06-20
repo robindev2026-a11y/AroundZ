@@ -36,6 +36,9 @@ import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.ViewAgenda
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -72,6 +75,9 @@ object CoffeeIcons {
     val close: ImageVector = Icons.Rounded.Close
     val refresh: ImageVector = Icons.Rounded.Refresh
     val lock: ImageVector = Icons.Rounded.Lock
+    val shield: ImageVector = Icons.Rounded.Shield
+    val logout: ImageVector = Icons.AutoMirrored.Rounded.Logout
+    val settings: ImageVector = Icons.Rounded.Settings
     val info: ImageVector = Icons.Rounded.Info
 
     /** Maps a Drift category (lowercase string) to its activity icon. */

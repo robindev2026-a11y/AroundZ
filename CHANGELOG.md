@@ -1,5 +1,84 @@
 # CHANGELOG - CoffeeCall
 
+## [2026-06-19] - Android ↔ iOS UI Parity Pass
+**What changed:**
+- **Bottom nav:** Redesigned to show text labels under all icons (matching iOS FloatingTabBar). Removed pill-shaped selected state.
+- **Header "Sign out":** Removed "Sign out" button from Drifts, Chats, and Profile headers. Sign out now only accessible via Profile > Account section (matching iOS).
+- **Drifts filter chips:** Removed "Tonight" chip (matching iOS). Added active filter count badge on filter icon.
+- **Drifts filter sheet:** Enhanced with Time chips (All, Today, Tomorrow, This Weekend) and Activity Types grid (9 categories) matching iOS filter sheet.
+- **Drifts card CTA:** Changed "Manage" to "Hosting" on Mine tab cards (matching iOS).
+- **Drift Detail:** Restructured from hero image layout to compact header with action icons (share, calendar, bell) and summary grid cards (Date, Location, Distance, Participants) matching iOS.
+- **Drift Detail CTA:** Renamed "Chat Room" to "Open Chat" with chat icon (matching iOS).
+- **Create Drift:** Verified phone layout already uses full-width sections matching iOS.
+- **iOS FloatingTabBar:** Fixed bottom nav being cut off on iPhones with Face ID by using GeometryReader to respect safe area insets.
+
+**Why:**
+- Screenshot comparison revealed Android had diverged from iOS in bottom nav styling, header elements, filter sheet completeness, and Drift Detail layout. This pass brings Android to visual parity with iOS as the canonical design. iOS had a safe area bug causing the tab bar to be clipped by the home indicator.
+
+**Verification:**
+- Build passes (`compileDebugKotlin`) with zero errors. Device verification needed for visual confirmation.
+
+## [2026-06-18] - Android iOS UI alignment pass
+**What changed:**
+- **Bottom nav bar:** Removed solid `CoffeePrimary` pill on active tabs. Active tab now shows colored icon + text label (matching iOS glass-style nav).
+- **Profile — stats:** Converted from single-row 4-column layout to 2x2 grid with "Your stats" section header. Added "Stats are private to you" lock note. Changed "Score" to "Coming soon" / "Reputation Score" (matching iOS). Added colored icon circles to stat tiles.
+- **Profile — edit:** Changed from `CoffeeButton` to text link "Edit Profile" with pencil icon (matching iOS).
+- **Profile — header:** Changed subtitle from "Your CoffeeCall presence" to "Your profile". Replaced "Sign out" button with gear icon (sign out moved to Account settings).
+- **Settings rows:** Added `iconTint` and `iconBackground` params. Each row now has distinct colors: Interests=green, Availability=purple, Notifications=peach, Safety & Privacy=green, Location=green, Help=purple, Sign out=red.
+- **Chats:** Updated filter tabs from Active/Upcoming/Past to Active/Joined/Hosted/Expired. Changed subtitle from "Drift-tied messages" to "Drift rooms".
+- **Drifts:** Changed "Joined" CTA color from `CoffeePrimary` (mint) to `CoffeePeach` (orange).
+- **Label fix:** Renamed "Privacy & Safety" to "Safety & Privacy" (matching iOS).
+- Added `settings` icon to `CoffeeIcons.kt`. Added `actionIcon` param to `CoffeeTopAppBar`.
+
+**Why:**
+- Side-by-side screenshot comparison with iOS revealed visual drift in bottom nav styling, profile layout, settings row colors, chats filter tabs, and CTA colors. This pass aligns Android to match iOS pixel-for-pixel where possible.
+
+**Verification:**
+- Build passes (`compileDebugKotlin`) with zero errors. Device unlock needed for visual verification.
+
+## [2026-06-18] - Android P9 consistency pass
+**What changed:**
+- Replaced all text symbols and emoji icons with real vector icons from `CoffeeIcons` across 8 feature screens: DriftDetailScreen (✓, 🔥, →), ChatThreadScreen (📍), CreateScreen (✕), OnboardingScreen (✨, ☕, 🚶, 🎮, 🎨, 🔒, 👥, ❤️), ChatScreen (☕, 🚶, 🎮, etc.), DiscoveryScreen (☕, 🚶, 🎬, ✨), ProfileEditScreen (☕, 🚶, 🎮).
+- Updated component APIs in `Components.kt`: added `icon: ImageVector?` param to `CoffeePillBadge`, `trailingIcon: ImageVector?` to `CoffeePrimaryButton`, `icon: ImageVector?` to `CoffeeActivityChip`.
+- Updated `OnboardingScreen.kt` internal composables: `ActivityChip` and `SafetyFeatureRow` now accept `ImageVector` instead of `String`.
+- Replaced 50+ raw `.dp` spacing values with `CoffeeSpacing` tokens in `CreateScreen.kt` (34 instances) and `DiscoveryScreen.kt` (16 instances).
+- Fixed 2 raw `32.dp` spacing values in `OnboardingScreen.kt` to use `CoffeeSpacing.xxl`.
+
+**Why:**
+- The Android app rendered text symbols (e.g. "C", "W", "✓", "→") and emoji ("☕", "🚶", "📍") where the Figma design uses proper vector icons. This brings Android to visual parity with iOS `AppIcons.swift` and eliminates inconsistent icon rendering across screens.
+
+**Verification:**
+- Build passes (`compileDebugKotlin`) with zero warnings.
+- Grep confirms zero remaining emoji/text symbols in feature screen UI code.
+
+## [2026-06-18] - Android Drifts distance mock + filter sheet
+**What changed:**
+- Wired real haversine distance computation into `GlobalDriftStore.fetch()` using `AndroidLocationProvider` — each post now gets a computed distance (km) from the user's GPS location instead of defaulting to `0.0`.
+- Replaced hardcoded `"0.0 km"` in `DriftsScreen.kt` and `ProfileScreen.kt` with `String.format("%.1f km", drift.distance)`.
+- Added distance filter state (`selectedDistanceRadius`, 1–10 km, default 10) to `DriftsScreen`.
+- Added `ModalBottomSheet` filter sheet with a distance slider, Reset, and Apply buttons — matches iOS `DriftsFilterSheet` behavior.
+- Distance filter is applied in the `visibleList` computation: posts beyond the selected radius are excluded.
+- Updated `GlobalDriftStore` singleton to accept `AndroidLocationProvider` via `getInstance(application)`.
+
+**Why:**
+- Android Drifts cards always showed "0.0 km" even when posts had real lat/lng coordinates. iOS computes distance via haversine at merge time and filters by a user-adjustable km radius. This closes that parity gap.
+
+**Verification:**
+- Build passes (`compileDebugKotlin`). Device QA needed to confirm GPS distance values appear correctly.
+
+## [2026-06-18] - Android Drifts tab source parity
+**What changed:**
+- Updated the Android Drifts tab data split so Discover reads non-hosted community drifts instead of the current user's joined drifts, while Mine remains hosted drifts.
+- Added a repository-level `fetchAllPosts()` path for Android posts and wired `GlobalDriftStore.fetch()` to hydrate the shared store from all posts ordered by `createdAt`, matching the current iOS Drifts service behavior more closely.
+- Added derived `discoveryDrifts` state alongside hosted/joined drifts and updated Drifts cards so joined state affects the CTA label instead of defining the Discover list.
+- Mirrored the new post-fetch API in the mock post repository for Firebase-unconfigured/offline runs.
+
+**Why:**
+- The Android Drifts screen had Discover backed by joined drifts, which inverted the intended iOS behavior. iOS Discover filters the shared posts list to non-owned drifts, while Mine filters to owned/hosted drifts.
+
+**Verification:**
+- Not yet run in this logging pass. Needs Android build and manual Drifts tab QA after the in-progress code changes settle.
+
 ## [2026-06-16] - Android Arch Batch A5: DI standardization via RepositoryProvider
 **What changed:**
 - Migrated all ViewModels to use `RepositoryProvider` for repository injection instead of creating Firebase instances directly: `ChatsListViewModel`, `ChatThreadViewModel`, `AuthViewModel`, `ProfileViewModel`, `DiscoveryViewModel`, `DriftDetailViewModel`, `CreateDriftViewModel`.

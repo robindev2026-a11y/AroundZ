@@ -19,6 +19,7 @@ import java.util.UUID
 data class DriftsUiState(
     val hostedDrifts: List<DriftPost> = emptyList(),
     val joinedDrifts: List<DriftPost> = emptyList(),
+    val discoveryDrifts: List<DriftPost> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null
 )
@@ -46,8 +47,9 @@ class DriftsViewModel(
                 val joined = allDrifts.filter {
                     it.creatorId != currentUserId && (it.participantIds.contains(currentUserId) || it.participantInitials.isNotEmpty())
                 }
+                val discovery = allDrifts.filter { it.creatorId != currentUserId }
                 _uiState.update {
-                    it.copy(hostedDrifts = hosted, joinedDrifts = joined)
+                    it.copy(hostedDrifts = hosted, joinedDrifts = joined, discoveryDrifts = discovery)
                 }
             }
         }
@@ -113,6 +115,7 @@ class DriftsViewModel(
             it.copy(
                 hostedDrifts = mockHosted,
                 joinedDrifts = mockJoined,
+                discoveryDrifts = mockJoined,
                 isLoading = false
             )
         }

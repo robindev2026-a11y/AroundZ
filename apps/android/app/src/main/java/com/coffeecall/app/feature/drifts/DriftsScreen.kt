@@ -30,7 +30,9 @@ import com.coffeecall.app.core.navigation.NavigationManager
 import com.coffeecall.app.domain.model.DriftCategory
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.DriftStatus
+import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DriftsScreen(
     onDriftClick: (String) -> Unit = {},
@@ -51,18 +53,21 @@ fun DriftsScreen(
     var selectedInterestFilter by remember { mutableStateOf(activeInterestFilter) }
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var selectedDistanceRadius by remember { mutableFloatStateOf(10f) }
+    var selectedTimeFilter by remember { mutableStateOf("All") }
+    var selectedActivityFilters by remember { mutableStateOf(setOf<String>()) }
+    var isFilterSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(activeInterestFilter) {
         selectedInterestFilter = activeInterestFilter
     }
 
-    val currentList = if (selectedTab == 1) {
-        uiState.hostedDrifts
-    } else {
-        uiState.joinedDrifts
+    val currentList = when (selectedTab) {
+        1 -> uiState.hostedDrifts
+        else -> uiState.discoveryDrifts
     }
 
-    val visibleList = remember(currentList, selectedInterestFilter, selectedFilter, searchQuery, isSearchActive) {
+    val visibleList = remember(currentList, selectedInterestFilter, selectedFilter, searchQuery, isSearchActive, selectedDistanceRadius) {
         var filtered = currentList
         if (selectedInterestFilter != null) {
             filtered = filtered.filter { it.category.matchesInterest(selectedInterestFilter!!) }
@@ -70,7 +75,9 @@ fun DriftsScreen(
         when (selectedFilter) {
             "Open now" -> filtered = filtered.filter { it.status == DriftStatus.Open }
             "Starting soon" -> filtered = filtered.filter { it.status == DriftStatus.StartingSoon }
-            "Tonight" -> filtered = filtered.filter { it.status == DriftStatus.Tonight }
+        }
+        if (selectedDistanceRadius < 10f) {
+            filtered = filtered.filter { it.distance <= selectedDistanceRadius.toDouble() }
         }
         if (isSearchActive && searchQuery.isNotBlank()) {
             val query = searchQuery.trim().lowercase()
@@ -88,9 +95,6 @@ fun DriftsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(CoffeeBackground)
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = CoffeeSpacing.screenBottomSpacer),
-        verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
     ) {
         // 1. Refreshed Header Card
         Surface(
@@ -130,10 +134,146 @@ fun DriftsScreen(
                         isSearchActive = !isSearchActive
                         if (!isSearchActive) searchQuery = ""
                     }
-                    HeaderIcon(icon = CoffeeIcons.filter)
+                    HeaderIcon(icon = CoffeeIcons.filter) {
+                        isFilterSheetOpen = true
+                    }
                 }
             }
         }
+
+    if (isFilterSheetOpen) {
+        ModalBottomSheet(
+            onDismissRequest = { isFilterSheetOpen = false },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = CoffeeSpacing.xl, vertical = CoffeeSpacing.lg),
+                verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
+            ) {
+                Text(
+                    text = "Filter Drifts",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = CoffeeInk,
+                    fontWeight = FontWeight.Black
+                )
+
+                // 1. Distance
+                Text(
+                    text = "1. Distance",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = CoffeeInk,
+                    fontWeight = FontWeight.Bold
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = CoffeePrimary.copy(alpha = 0.12f)
+                        ) {
+                            Text(
+                                text = "${selectedDistanceRadius.toInt()} km radius",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = CoffeePrimary,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = CoffeeSpacing.sm, vertical = CoffeeSpacing.xs)
+                            )
+                        }
+                    }
+                    Slider(
+                        value = selectedDistanceRadius,
+                        onValueChange = { selectedDistanceRadius = it },
+                        valueRange = 1f..10f,
+                        steps = 17,
+                        colors = SliderDefaults.colors(
+                            thumbColor = CoffeePrimary,
+                            activeTrackColor = CoffeePrimary
+                        )
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("1 km", style = MaterialTheme.typography.labelSmall, color = CoffeeMuted)
+                        Text("10 km", style = MaterialTheme.typography.labelSmall, color = CoffeeMuted)
+                    }
+                }
+
+                // 2. Time
+                Text(
+                    text = "2. Time",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = CoffeeInk,
+                    fontWeight = FontWeight.Bold
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                ) {
+                    listOf("All", "Today", "Tomorrow", "This Weekend").forEach { timeOption ->
+                        FilterTimeChip(
+                            label = timeOption,
+                            isSelected = selectedTimeFilter == timeOption,
+                            onClick = { selectedTimeFilter = timeOption },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                // 3. Activity Types
+                Text(
+                    text = "3. Activity Types",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = CoffeeInk,
+                    fontWeight = FontWeight.Bold
+                )
+                val activityTypes = listOf("Coffee", "Walk", "Movie", "Food", "Study", "Gaming", "Music", "Yoga", "Event")
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
+                ) {
+                    activityTypes.forEach { activity ->
+                        FilterActivityChip(
+                            label = activity,
+                            icon = CoffeeIcons.category(activity),
+                            isSelected = activity in selectedActivityFilters,
+                            onClick = {
+                                selectedActivityFilters = if (activity in selectedActivityFilters) {
+                                    selectedActivityFilters - activity
+                                } else {
+                                    selectedActivityFilters + activity
+                                }
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(CoffeeSpacing.sm))
+
+                // Apply Filters Button
+                CoffeeButton(
+                    title = "Apply Filters",
+                    onClick = { isFilterSheetOpen = false },
+                    variant = CoffeeButtonVariant.Primary,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = CoffeeSpacing.screenBottomSpacer),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
+        ) {
 
         if (isSearchActive) {
             OutlinedTextField(
@@ -217,12 +357,6 @@ fun DriftsScreen(
                 isSelected = selectedFilter == "Starting soon",
                 onClick = { selectedFilter = "Starting soon" }
             )
-            DriftFilterChip(
-                label = "Tonight",
-                icon = CoffeeIcons.clock,
-                isSelected = selectedFilter == "Tonight",
-                onClick = { selectedFilter = "Tonight" }
-            )
         }
 
         // 4. Content Area
@@ -251,24 +385,34 @@ fun DriftsScreen(
                 val currentUserId = auth.currentUser?.uid
                 visibleList.forEach { drift ->
                     val isHost = currentUserId == drift.creatorId
+                    val isJoined = currentUserId != null && drift.participantIds.contains(currentUserId)
                     CoffeeDriftCard(
                         title = drift.title.ifBlank { "Untitled Drift" },
                         location = drift.location,
                         timeText = drift.time,
-                        distanceText = "0.0 km", // Mock distance
+                        distanceText = String.format("%.1f km", drift.distance),
                         category = drift.category.name,
                         onAction = { onDriftClick(drift.id) },
                         statusLabel = drift.status.firestoreValue,
                         isBestMatch = drift.participantCount >= 2,
                         participants = drift.participantInitials,
                         participantSummary = "${drift.participantCount}g • 1s • Focused",
-                    actionLabel = if (isHost || selectedTab == 1) "Manage" else "Joined",
-                    actionColor = if (isHost || selectedTab == 1) CoffeePurple else CoffeePrimary,
+                    actionLabel = when {
+                        isHost || selectedTab == 1 -> "Hosting"
+                        isJoined -> "Joined"
+                        else -> "Join"
+                    },
+                    actionColor = when {
+                        isHost || selectedTab == 1 -> CoffeePurple
+                        isJoined -> CoffeePeach
+                        else -> CoffeePrimary
+                    },
                     onClick = { onDriftClick(drift.id) }
                 )
             }
             }
         }
+    }
     }
 }
 
@@ -388,3 +532,66 @@ private fun String.normalizeInterest(): String =
 
 private fun String.toDisplayInterest(): String =
     trim().ifBlank { "selected" }.replaceFirstChar { it.uppercase() }
+
+@Composable
+private fun FilterTimeChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.height(44.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = if (isSelected) CoffeePrimary.copy(alpha = 0.12f) else Color.White,
+        border = BorderStroke(1.dp, if (isSelected) CoffeePrimary else CoffeeBorder.copy(alpha = 0.5f))
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isSelected) CoffeePrimary else CoffeeInk,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterActivityChip(
+    label: String,
+    icon: ImageVector,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = if (isSelected) CoffeePrimary else Color.White,
+        border = BorderStroke(1.dp, if (isSelected) Color.Transparent else CoffeeBorder.copy(alpha = 0.5f)),
+        modifier = Modifier.height(44.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = CoffeeSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (isSelected) Color.White else CoffeeMuted,
+                modifier = Modifier.size(CoffeeSpacing.md)
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isSelected) Color.White else CoffeeInk,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}

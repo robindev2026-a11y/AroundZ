@@ -294,7 +294,7 @@ private fun PhoneCreateSheet(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = CoffeeSpacing.md),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Spacer(modifier = Modifier.height(2.dp))
@@ -362,8 +362,8 @@ private fun TabletCreatePanel(
                 Row(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 24.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                        .padding(horizontal = CoffeeSpacing.xl, vertical = CoffeeSpacing.xs),
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.lg)
                 ) {
                     Column(
                         modifier = Modifier
@@ -412,7 +412,7 @@ private fun HeaderRow(onClose: () -> Unit, centered: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 14.dp),
+            .padding(horizontal = CoffeeSpacing.lg, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (centered) {
@@ -481,7 +481,7 @@ private fun SectionCard(
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)
         ) {
             Text(
                 text = title,
@@ -548,7 +548,7 @@ private fun VibeSection(
     SectionCard("3. Vibe") {
         Row(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             CreateVibe.entries.forEach { vibe ->
                 SelectablePill(vibe.label, selectedVibe == vibe, { onVibeSelected(vibe) }, CoffeePrimary)
@@ -578,7 +578,7 @@ private fun WhenSection(
         TinyLabel("Date")
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             SelectablePill("Today", datePreset == DatePreset.Today, { onDatePresetSelected(DatePreset.Today) }, modifier = Modifier.weight(1f))
             SelectablePill("Tomorrow", datePreset == DatePreset.Tomorrow, { onDatePresetSelected(DatePreset.Tomorrow) }, modifier = Modifier.weight(1f))
@@ -601,7 +601,7 @@ private fun WhenSection(
         TinyLabel("Time")
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             SelectablePill("In 30 mins", timePreset == TimePreset.In30, { onTimePresetSelected(TimePreset.In30) }, modifier = Modifier.weight(1f))
             SelectablePill("In 1 hour", timePreset == TimePreset.In60, { onTimePresetSelected(TimePreset.In60) }, modifier = Modifier.weight(1f))
@@ -655,7 +655,7 @@ private fun LocationSection(
                 }
 
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(CoffeeSpacing.sm),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -761,7 +761,7 @@ private fun NotesSection(
 
         Row(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             SuggestionChip("What to bring")
             SuggestionChip("Parking info")
@@ -878,8 +878,8 @@ private fun ActivityGrid(
 ) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
         maxItemsInEachRow = 3
     ) {
         CreateActivity.entries.forEach { activity ->
@@ -952,8 +952,8 @@ private fun PlanDetailsCard(
         border = BorderStroke(1.dp, CoffeeBorder.copy(alpha = 0.5f))
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(CoffeeSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
         ) {
             OutlinedTextField(
                 value = title,
@@ -981,7 +981,7 @@ private fun PlanDetailsCard(
 
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
             ) {
                 CreateVibe.entries.forEach { vibe ->
                     SelectablePill(
@@ -1015,12 +1015,12 @@ private fun WhenWhereCard(
         border = BorderStroke(1.dp, CoffeeBorder.copy(alpha = 0.5f))
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            modifier = Modifier.padding(CoffeeSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.lg)
         ) {
             // When
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
                     DatePreset.entries.forEach { preset ->
                         SelectablePill(
                             label = preset.label,
@@ -1029,7 +1029,7 @@ private fun WhenWhereCard(
                         )
                     }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
                     TimePreset.entries.forEach { preset ->
                         SelectablePill(
                             label = preset.label,
@@ -1049,9 +1049,9 @@ private fun WhenWhereCard(
                 border = BorderStroke(1.dp, CoffeeBorder.copy(alpha = 0.3f))
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(CoffeeSpacing.md),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
                 ) {
                     Box(
                         modifier = Modifier
@@ -1108,8 +1108,8 @@ private fun GatheringCard(
         border = BorderStroke(1.dp, CoffeeBorder.copy(alpha = 0.5f))
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            modifier = Modifier.padding(CoffeeSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.lg)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
@@ -1119,7 +1119,7 @@ private fun GatheringCard(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Open to all", style = MaterialTheme.typography.labelMedium, color = CoffeeMuted)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(CoffeeSpacing.xs))
                     Switch(checked = openToAll, onCheckedChange = onOpenToAllChanged)
                 }
             }
@@ -1138,7 +1138,7 @@ private fun GatheringCard(
                 )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm)) {
                 JoinModeButton(
                     title = "Open Join",
                     isSelected = joinMode == JoinMode.Open,
@@ -1175,7 +1175,7 @@ private fun JoinModeButton(
         Row(
             modifier = Modifier.padding(horizontal = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             if (icon != null) {
                 Icon(icon, contentDescription = null, tint = if (isSelected) CoffeePrimaryDark else CoffeeMuted, modifier = Modifier.size(18.dp))
@@ -1207,7 +1207,7 @@ private fun ContextCard(
             placeholder = { Text("Any extra details or items to bring?") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(CoffeeSpacing.lg),
             minLines = 3,
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = Color.Transparent,
@@ -1231,9 +1231,9 @@ private fun StickyFooter(
         Column(
             modifier = Modifier
                 .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = CoffeeSpacing.md, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             CoffeeButton(
                 title = if (isCreating) "Creating Drift" else "Create Drift",
@@ -1298,7 +1298,7 @@ private fun StatusCard(
         color = if (isError) CoffeeError.copy(alpha = 0.10f) else CoffeePrimary.copy(alpha = 0.10f)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(CoffeeSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -1307,11 +1307,11 @@ private fun StatusCard(
                 color = CoffeeInk,
                 modifier = Modifier.weight(1f)
             )
-            Text(
-                text = "✕",
-                style = MaterialTheme.typography.titleMedium,
-                color = if (isError) CoffeeError else CoffeePrimaryDark,
-                modifier = Modifier.clickable(onClick = onDismiss)
+            Icon(
+                CoffeeIcons.close,
+                contentDescription = "Dismiss",
+                tint = if (isError) CoffeeError else CoffeePrimaryDark,
+                modifier = Modifier.clickable(onClick = onDismiss).size(20.dp)
             )
         }
     }
@@ -1374,7 +1374,7 @@ private fun LocationPickerDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
             ) {
                 OutlinedTextField(
                     value = uiState.locationSearchQuery,
@@ -1391,14 +1391,14 @@ private fun LocationPickerDialog(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { onSelectLocationSuggestion(suggestion) }
-                                    .padding(vertical = 8.dp)
+                                    .padding(vertical = CoffeeSpacing.xs)
                             )
                         }
                     }
                 }
 
                 if (uiState.locationSearchQuery.isEmpty()) {
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)) {
                         popularHotspots.forEach { hotspot ->
                             SelectablePill(
                                 label = hotspot.name.substringBefore(","),

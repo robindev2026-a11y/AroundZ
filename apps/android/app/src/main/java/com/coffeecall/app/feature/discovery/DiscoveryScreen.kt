@@ -220,7 +220,7 @@ fun DiscoveryScreen(
             shadowElevation = 12.dp
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+                modifier = Modifier.padding(horizontal = CoffeeSpacing.xl, vertical = CoffeeSpacing.lg),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
@@ -239,7 +239,7 @@ fun DiscoveryScreen(
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.sm),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Presence Toggle Button
@@ -280,7 +280,7 @@ fun DiscoveryScreen(
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(top = 16.dp, end = 16.dp)
+                                    .padding(top = CoffeeSpacing.md, end = CoffeeSpacing.md)
                                     .size(10.dp)
                                     .clip(CircleShape)
                                     .background(CoffeePrimary)
@@ -356,7 +356,7 @@ fun DiscoveryScreen(
                             }
                         )
                     }
-                    .padding(top = 16.dp, bottom = 8.dp),
+                    .padding(top = CoffeeSpacing.md, bottom = CoffeeSpacing.xs),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
@@ -373,14 +373,14 @@ fun DiscoveryScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = CoffeeSpacing.xl)
                     .padding(bottom = 120.dp)
             ) {
                 // Nearby Drifts Pill
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = CoffeeSpacing.xs),
                     shape = RoundedCornerShape(24.dp),
                     color = CoffeeBackground.copy(alpha = 0.4f),
                     border = BorderStroke(1.dp, CoffeeBorder.copy(alpha = 0.5f))
@@ -388,9 +388,9 @@ fun DiscoveryScreen(
                     Row(
                         modifier = Modifier
                             .clickable { onNavigateToDrifts() }
-                            .padding(16.dp),
+                            .padding(CoffeeSpacing.md),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
                     ) {
                         Box(
                             modifier = Modifier
@@ -440,17 +440,17 @@ fun DiscoveryScreen(
                     color = CoffeeInk
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(CoffeeSpacing.lg))
 
                 // 4-column Interests Grid
                 val categories = uiState.interestCategories
                 val columns = 4
                 val rows = (categories.size + columns - 1) / columns
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)) {
                     for (r in 0 until rows) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.md)
                         ) {
                             for (c in 0 until columns) {
                                 val index = r * columns + c
@@ -562,7 +562,7 @@ private fun InterestCard(
         Column(
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
         ) {
             Box(
                 modifier = Modifier
@@ -648,11 +648,11 @@ private data class RadarParticle(
     val color: Color
 )
 
-private fun getInterestEmoji(interest: String): String = when (interest.lowercase().trim()) {
-    "walks", "walk" -> "🚶"
-    "coffee" -> "☕"
-    "movies", "movie" -> "🎬"
-    else -> "✨"
+private fun getInterestEmoji(interest: String): androidx.compose.ui.graphics.vector.ImageVector = when (interest.lowercase().trim()) {
+    "walks", "walk" -> CoffeeIcons.category("walk")
+    "coffee" -> CoffeeIcons.category("coffee")
+    "movies", "movie" -> CoffeeIcons.category("movie")
+    else -> CoffeeIcons.bolt
 }
 
 @Composable
@@ -828,13 +828,13 @@ private fun AroundRadar(
                     .shadow(8.dp, RoundedCornerShape(12.dp))
                     .background(Color.White, RoundedCornerShape(12.dp))
                     .border(1.dp, CoffeeBorder, RoundedCornerShape(12.dp))
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                    .padding(horizontal = 10.dp, vertical = CoffeeSpacing.xs)
                     .widthIn(max = 190.dp)
                     .zIndex(100f)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(CoffeeSpacing.xs)
                 ) {
                     Box(
                         modifier = Modifier
@@ -843,10 +843,7 @@ private fun AroundRadar(
                             .background(person.color.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = getInterestEmoji(person.interests.firstOrNull() ?: ""),
-                            fontSize = 12.sp
-                        )
+                        Icon(getInterestEmoji(person.interests.firstOrNull() ?: ""), contentDescription = null, tint = CoffeeInk, modifier = Modifier.size(12.dp))
                     }
 
                     Column {
@@ -877,7 +874,7 @@ private fun AroundRadar(
                 color = CoffeeMuted,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 12.dp)
+                    .padding(bottom = CoffeeSpacing.sm)
             )
         }
     }

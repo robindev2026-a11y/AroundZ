@@ -2,6 +2,8 @@ package com.coffeecall.app.core.state
 
 import android.app.Application
 import com.coffeecall.app.core.firebase.FirebaseUnavailableException
+import com.coffeecall.app.core.location.AndroidLocationProvider
+import com.coffeecall.app.core.location.haversineDistanceKm
 import com.coffeecall.app.data.repository.FirebasePostRepository
 import com.coffeecall.app.domain.model.DriftPost
 import com.coffeecall.app.domain.model.DriftStatus
@@ -23,7 +25,8 @@ import java.util.Locale
 
 class GlobalDriftStore(
     private val postRepository: PostRepository = FirebasePostRepository(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val locationProvider: AndroidLocationProvider? = null
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -35,13 +38,26 @@ class GlobalDriftStore(
 
     val hostedDrifts: StateFlow<List<DriftPost>> = MutableStateFlow(emptyList())
     val joinedDrifts: StateFlow<List<DriftPost>> = MutableStateFlow(emptyList())
+    val discoveryDrifts: StateFlow<List<DriftPost>> = MutableStateFlow(emptyList())
 
     suspend fun fetch() {
         val userId = auth.currentUser?.uid ?: return
         runCatching {
-            val hosted = postRepository.getHostedPosts(userId)
-            val joined = postRepository.getJoinedPosts(userId).filter { it.creatorId != userId }
-            _drifts.value = hosted + joined
+            val allPosts = postRepository.fetchAllPosts()
+            val userLocation = locationProvider?.currentLocation()
+            val postsWithDistance = if (userLocation != null) {
+                allPosts.map { post ->
+                    val postLat = post.latitude
+                    val postLng = post.longitude
+                    if (postLat != null && postLng != null) {
+                        post.copy(distance = haversineDistanceKm(
+                            userLocation.latitude, userLocation.longitude,
+                            postLat, postLng
+                        ))
+                    } else post
+                }
+            } else allPosts
+            _drifts.value = postsWithDistance
             updateDerivedStates()
         }.onFailure { error ->
             if (error is FirebaseUnavailableException) {
@@ -120,6 +136,7 @@ class GlobalDriftStore(
         (joinedDrifts as MutableStateFlow).value = allDrifts.filter {
             it.creatorId != userId && (it.participantIds.contains(userId) || it.participantInitials.isNotEmpty())
         }
+        (discoveryDrifts as MutableStateFlow).value = allDrifts.filter { it.creatorId != userId }
         _notifications.value = buildNotifications(allDrifts)
     }
 
@@ -169,7 +186,9 @@ class GlobalDriftStore(
 
         fun getInstance(application: Application): GlobalDriftStore =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: GlobalDriftStore().also { INSTANCE = it }
+                INSTANCE ?: GlobalDriftStore(
+                    locationProvider = AndroidLocationProvider(application)
+                ).also { INSTANCE = it }
             }
     }
 }

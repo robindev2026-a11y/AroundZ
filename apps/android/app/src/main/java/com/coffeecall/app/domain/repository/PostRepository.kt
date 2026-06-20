@@ -23,4 +23,5 @@ interface PostRepository {
     suspend fun leavePost(postId: String, userId: String, userInitials: String)
     suspend fun getHostedPosts(userId: String): List<DriftPost>
     suspend fun getJoinedPosts(userId: String): List<DriftPost>
+    suspend fun fetchAllPosts(): List<DriftPost>
 }
